@@ -1,9 +1,11 @@
+import SearchHeader from "../../components/SearchHeader";
+
 
 export const Home = () => {
 
   return (
     <div>
-      Home
+      <SearchHeader />
     </div>
   );
 };
