@@ -1,16 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const SearchHeader = () => {
+const SearchHeader = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [answer, setAnswer] = useState('')
+  const [isSearchActive, setIsSearchActive] = useState(false);
+
+  // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
+  const allowedCharactersRegex = /^[\d\s,+-]*$/;
 
   const handleInputChange = (event) => {
-    setSearchQuery(event.target.value);
+    let value = event.target.value;
+    
+    value = value
+      .replace(/[^\d\s,+-]/g, '')
+      .replace(/(\d{4}-\d{4})[^\s,+]|$/g, '$1')
+      .replace(/([,\s+])\1+/g, '$1')
+      .replace(/([,+])/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/(\d)-(\d)/g, '$1$2')
+      .replace(/(\d{4})-?(\d{4})/g, '$1-$2');
+
+    if (allowedCharactersRegex.test(value)) {
+      setSearchQuery(value);
+    }
   };
 
   const handleSearch = () => {
-    setAnswer(searchQuery)
-    console.log(searchQuery)
+    const normalized = searchQuery
+      .split(/[\s,]+/) 
+      .map(item => {
+        const formatted = item
+          .replace(/-/g, '') 
+          .replace(/(\d{4})(\d{4})/, '$1-$2') 
+          .substring(0, 9); 
+        
+        return /^\d{4}-\d{4}$/.test(formatted) ? formatted : null;
+      })
+      .filter(item => item !== null);
+
+    if (normalized.length > 0) {
+      setIsSearchActive(true);
+      onSearch(normalized);
+    } else {
+      alert('Пожалуйста, введите артикулы в формате ХХХХ-ХХХХ, разделенные пробелом, запятой или +');
+    }
   };
 
   const handleClear = () => {
@@ -23,9 +55,15 @@ const SearchHeader = () => {
     }
   };
 
+  useEffect(() => {
+    if (searchQuery === '') {
+      setIsSearchActive(false);
+      onSearch([]);
+    }
+  }, [searchQuery, onSearch]);
+
   return (
-    <>
-    <div className="search-header">
+    <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <h2>Укажите артикулы товаров</h2>
       <div className="search-wrapper">
         <div className="input-container">
@@ -34,7 +72,8 @@ const SearchHeader = () => {
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Введите поисковый запрос"
+            placeholder="Введите артикулы ..."
+            pattern="[\d\s,+-]+"
           />
           {searchQuery && (
             <button 
@@ -54,11 +93,6 @@ const SearchHeader = () => {
         </button>
       </div>
     </div>
-    <div className='answer'>
-      <p>{answer}</p>
-    </div>
-    
-    </>
   );
 };
 
