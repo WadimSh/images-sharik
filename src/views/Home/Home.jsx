@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import SearchHeader from "../../components/SearchHeader";
 import ItemsGrid from "../../components/ItemsGrid";
@@ -6,9 +6,9 @@ import ItemsGrid from "../../components/ItemsGrid";
 export const Home = () => {
   const [validArticles, setValidArticles] = useState([]);
 
-  const handleSearch = (normalizedArticles) => {
+  const handleSearch = useCallback((normalizedArticles) => {
     setValidArticles(normalizedArticles);
-  };
+  }, []);
 
   return (
     <div>

@@ -17,7 +17,7 @@
 .search-wrapper {
   display: flex;
   justify-content: center;
-  max-width: 600px;
+  max-width: 800px;
   margin: 15px auto;
   transition: transform 0.3s ease;
 }
@@ -28,8 +28,8 @@
 }
 
 input {
-  width: 94%;
-  padding: 10px 15px 10px 15px;
+  width: 95.5%;
+  padding: 15px;
   border: 2px solid #007bff;
   border-radius: 25px 0 0 25px;
   font-size: 16px;

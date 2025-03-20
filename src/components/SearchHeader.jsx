@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const SearchHeader = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,6 +21,10 @@ const SearchHeader = ({ onSearch }) => {
 
     if (allowedCharactersRegex.test(value)) {
       setSearchQuery(value);
+      if (value === '') {
+        setIsSearchActive(false);
+        onSearch([]);
+      }
     }
   };
 
@@ -47,6 +51,8 @@ const SearchHeader = ({ onSearch }) => {
 
   const handleClear = () => {
     setSearchQuery('');
+    setIsSearchActive(false);
+    onSearch([]);
   };
 
   const handleKeyDown = (event) => {
@@ -55,16 +61,21 @@ const SearchHeader = ({ onSearch }) => {
     }
   };
 
-  useEffect(() => {
-    if (searchQuery === '') {
-      setIsSearchActive(false);
-      onSearch([]);
-    }
-  }, [searchQuery, onSearch]);
-
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
-      <h2>Укажите артикулы товаров</h2>
+      <h2 style={{
+        paddingBottom: '12px'
+      }}>
+        Генератор изображений для маркетплейсов
+      </h2>
+      <p style={{
+        fontSize: '20px',
+        color: 'rgba(0,0,0,0.8)',
+        margin: '0px',
+        paddingBottom: '18px'
+      }}>
+        С помощью этого генератора вы легко создадите привлекательные изображения для ваших товаров.
+      </p>
       <div className="search-wrapper">
         <div className="input-container">
           <input
