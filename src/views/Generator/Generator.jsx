@@ -82,7 +82,6 @@ export const Generator = () => {
             color: '#333333',
             fontSize: '24px',
             fontFamily: 'Arial',
-            padding: '5px',
             backgroundColor: 'transparent'
           }}>
             {id}
@@ -93,9 +92,8 @@ export const Generator = () => {
 
         <button 
           onClick={handleDownload}
+          className='search-button'
           style={{
-            backgroundColor: '#2196F3',
-            color: 'white',
             padding: '12px 24px',
             fontSize: '16px',
             border: 'none',
