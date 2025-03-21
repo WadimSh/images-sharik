@@ -1,20 +1,79 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-
-import DraggableElement from '../../components/DraggableElement';
+import { ImageElement } from '../../components/ImageElement';
+import { ShapeElement } from '../../components/ShapeElement';
+import { TextElement } from '../../components/TextElement';
 
 export const Generator = () => {
   const { id } = useParams();
   const captureRef = useRef(null);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const [elements, setElements] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedElementType, setSelectedElementType] = useState('');
 
-  // Логика перемещения элемента
-  const handleDrag = (newPosition) => {
-    setPosition(newPosition);
+  const fileInputRef = useRef(null);
+
+  // Добавляем начальный текстовый элемент с ID
+  useEffect(() => {
+    if (id) {
+      setElements([{
+        id: Date.now(),
+        type: 'text',
+        position: { x: 50, y: 50 },
+        text: id,
+        image: null
+      }]);
+    }
+  }, [id]);
+
+  const handleAddElement = (type) => {
+    if (type === 'image') {
+      fileInputRef.current.click();
+      return;
+    }
+
+    const newElement = {
+      id: Date.now(),
+      type,
+      position: { x: 50, y: 50 },
+      text: type === 'text' ? 'Новый текст' : '',
+      image: null
+    };
+    setElements(prev => [...prev, newElement]);
+    setSelectedElementType('');
   };
 
-  // Логика скачивания изображения
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedFile(event.target.result);
+        // После загрузки файла добавляем элемент
+        const newElement = {
+          id: Date.now(),
+          type: 'image',
+          position: { x: 50, y: 50 },
+          text: '',
+          image: event.target.result
+        };
+        setElements([...elements, newElement]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleDrag = (id, newPosition) => {
+    setElements(elements.map(el => 
+      el.id === id ? { ...el, position: newPosition } : el
+    ));
+  };
+
+  const handleRemoveElement = (id) => {
+    setElements(elements.filter(el => el.id !== id));
+  };
+
   const handleDownload = async () => {
     try {
       const canvas = await html2canvas(captureRef.current, {
@@ -34,76 +93,91 @@ export const Generator = () => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ 
-        marginBottom: '20px',
-        padding: '15px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        textAlign: 'center',
-        marginBottom: '24px'
-      }}>
+    <div className="generator-container">
+      <div className="header-section">
         <h2>Генератор изображений для маркетплейсов</h2>
         <p style={{
           fontSize: '16px',
           color: 'rgba(0,0,0,0.7)',
           marginBottom: '34px'
-        }}>
-          Обратите внимание, что перед тем, как изображение будет готово, у вас есть возможность<br />  
-          самостоятельно внести изменения в финальный вариант.
-        </p>
-      </div>
-
-      <div 
-        ref={captureRef}
-        style={{
-          position: 'relative',
-          width: '450px',
-          height: '600px',
-          borderRadius: '0px',
-          margin: '0 auto',
-          backgroundColor: '#ffffff',
-          backgroundImage: `
-            radial-gradient(
-              circle at 5px 5px, #e0e0e0 1px, transparent 1px
-            )
-          `,
-          backgroundSize: '10px 10px',
-          boxShadow: '0 0 20px rgba(0,0,0,0.1)'
-        }}
-      >
-        <DraggableElement
-          position={position}
-          onDrag={handleDrag}
-          containerWidth={450}
-          containerHeight={600}
-        >
-          <div style={{ 
-            color: '#333333',
-            fontSize: '24px',
-            fontFamily: 'Arial',
-            backgroundColor: 'transparent'
-          }}>
-            {id}
-          </div>
-        </DraggableElement>
+        }}>Обратите внимание, что перед тем, как изображение будет готово, у вас есть возможность<br />  
+        самостоятельно внести изменения в финальный вариант.</p>
         
+        <div className="controls-group">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+            className="hidden-input"
+          />
+
+          <select 
+            value={selectedElementType}
+            onChange={(e) => {
+              const type = e.target.value;
+              setSelectedElementType(type);
+              if (type) handleAddElement(type);
+            }}
+            className="element-selector"
+          >
+            <option value="" disabled hidden>Добавить элемент...</option>
+            <option value="image">Изображение</option>
+            <option value="text">Текст</option>
+            <option value="shape">Квадрат</option>
+          </select>
+        </div>
       </div>
 
-        <button 
-          onClick={handleDownload}
-          className='search-button'
-          style={{
-            padding: '12px 24px',
-            fontSize: '16px',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            width: '264px',
-            margin: '24px auto'
-          }}
-        >
-          Скачать дизайн
+      <div ref={captureRef} className="design-container">
+        {elements.map((element) => {
+          switch (element.type) {
+            case 'image':
+              return (
+                <ImageElement
+                  key={element.id}
+                  src={selectedFile}
+                  position={element.position}
+                  onDrag={(pos) => handleDrag(element.id, pos)}
+                  onRemove={() => handleRemoveElement(element.id)}
+                  containerWidth={450}
+                  containerHeight={600}
+                />
+              );
+            case 'shape':
+              return (
+                <ShapeElement
+                  key={element.id}
+                  position={element.position}
+                  onDrag={(pos) => handleDrag(element.id, pos)}
+                  onRemove={() => handleRemoveElement(element.id)}
+                  containerWidth={450}
+                  containerHeight={600}
+                />
+              );
+            case 'text':
+              return (
+                <TextElement
+                  key={element.id}
+                  text={element.text}
+                  position={element.position}
+                  onDrag={(pos) => handleDrag(element.id, pos)}
+                  onRemove={() => handleRemoveElement(element.id)}
+                  containerWidth={450}
+                  containerHeight={600}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
+      </div>
+
+      <button 
+        onClick={handleDownload} 
+        className="download-button"
+      >
+        Скачать дизайн
       </button>
     </div>
   );

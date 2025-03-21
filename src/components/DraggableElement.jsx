@@ -1,17 +1,31 @@
 import { useState, useRef, useEffect } from 'react';
 
-const DraggableElement = ({ children, position, onDrag, containerWidth, containerHeight }) => {
+const DraggableElement = ({ 
+  children, 
+  position, 
+  onDrag, 
+  onRemove,
+  containerWidth, 
+  containerHeight 
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const elementRef = useRef(null);
 
   const handleMouseDown = (e) => {
+    if (e.button !== 0) return; // Только левая кнопка мыши
+    
     const rect = elementRef.current.getBoundingClientRect();
     setOffset({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     });
     setIsDragging(true);
+  };
+
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    if (onRemove) onRemove();
   };
 
   const handleMouseMove = (e) => {
@@ -57,6 +71,7 @@ const DraggableElement = ({ children, position, onDrag, containerWidth, containe
         userSelect: 'none'
       }}
       onMouseDown={handleMouseDown}
+      onContextMenu={handleContextMenu}
     >
       {children}
     </div>
