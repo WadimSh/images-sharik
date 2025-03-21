@@ -9,9 +9,8 @@ export const Generator = () => {
   const { id } = useParams();
   const captureRef = useRef(null);
   const [elements, setElements] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [selectedElementType, setSelectedElementType] = useState('');
-
+  
   const fileInputRef = useRef(null);
 
   // Добавляем начальный текстовый элемент с ID
@@ -30,9 +29,9 @@ export const Generator = () => {
   const handleAddElement = (type) => {
     if (type === 'image') {
       fileInputRef.current.click();
+      setSelectedElementType('');
       return;
     }
-
     const newElement = {
       id: Date.now(),
       type,
@@ -49,21 +48,20 @@ export const Generator = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setSelectedFile(event.target.result);
-        // После загрузки файла добавляем элемент
+        // Создаем элемент с изображением напрямую
         const newElement = {
           id: Date.now(),
           type: 'image',
           position: { x: 50, y: 50 },
-          text: '',
-          image: event.target.result
+          image: event.target.result // Сохраняем DataURL здесь
         };
-        setElements([...elements, newElement]);
+        setElements(prev => [...prev, newElement]);
+        setSelectedElementType('');
       };
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleDrag = (id, newPosition) => {
     setElements(elements.map(el => 
       el.id === id ? { ...el, position: newPosition } : el
@@ -136,7 +134,7 @@ export const Generator = () => {
               return (
                 <ImageElement
                   key={element.id}
-                  src={selectedFile}
+                  src={element.image} // Берем изображение из данных элемента
                   position={element.position}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}

@@ -98,3 +98,25 @@
 .element-selector option[value=""][disabled] {
   color: #999;
 }
+
+.draggable-element {
+  transition: transform 0.1s;
+}
+
+.resize-handle {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  background-color: #007bff;
+  border-radius: 50%;
+  cursor: nwse-resize;
+  z-index: 1000; 
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.draggable-element:hover .resize-handle {
+  opacity: 1;
+}
