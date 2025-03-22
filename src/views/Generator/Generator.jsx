@@ -161,6 +161,11 @@ export const Generator = () => {
                   position={element.position}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
+                  onTextChange={(newText) => {
+                    setElements(prev => prev.map(el => 
+                      el.id === element.id ? {...el, text: newText} : el
+                    ));
+                  }}
                   containerWidth={450}
                   containerHeight={600}
                 />

@@ -68,6 +68,7 @@
   background-image: radial-gradient(circle at 5px 5px, #e0e0e0 1px, transparent 1px);
   background-size: 10px 10px;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
 .download-button {
@@ -141,4 +142,66 @@
 
 .draggable-element:hover .remove-handle {
   opacity: 1;
+}
+
+.color-change {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.draggable-element:hover .color-change {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.text-input {
+  font-size: 24px;
+  font-family: 'Arial';
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 5px;
+  min-width: 100px;
+  outline: none;
+  transition: all 0.2s;
+  outline: none;
+  word-break: 'break-all'
+}
+
+.text-change {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translate(50%, 50%); /* Смещение на половину размера кнопки */
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.draggable-element:hover .text-change {
+  transform: translate(50%, 50%) scale(1.1);
+  background: #f0f0f0;
 }
