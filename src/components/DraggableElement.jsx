@@ -91,11 +91,6 @@ const DraggableElement = ({
     };
   }, [isDragging, isResizing]);
   
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    if (onRemove) onRemove();
-  };
-
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
@@ -120,9 +115,19 @@ const DraggableElement = ({
         userSelect: 'none'
       }}
       onMouseDown={handleMouseDown}
-      onContextMenu={handleContextMenu}
     >
       {children}
+      {/* Кнопка удаления */}
+      <button 
+        className='remove-handle'
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          ×
+      </button>
+      {/* Кнопка изменения размера */}
       {resizeable && (
         <div
           className='resize-handle'
