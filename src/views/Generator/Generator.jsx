@@ -1,21 +1,37 @@
 import { useRef, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
+
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
 
 export const Generator = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const captureRef = useRef(null);
-  const [elements, setElements] = useState([]);
+
+  // Загрузка из sessionStorage при инициализации
+  const storageKey = `design-${id}`;
+  const savedDesign = sessionStorage.getItem(storageKey);
+  const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
+
+  const [elements, setElements] = useState(initialElements);
   const [selectedElementType, setSelectedElementType] = useState('');
-  
   const fileInputRef = useRef(null);
+
+  // Сохранение в sessionStorage при изменениях
+  useEffect(() => {
+    if (elements.length > 0) {
+      sessionStorage.setItem(storageKey, JSON.stringify(elements));
+    } else {
+      sessionStorage.removeItem(storageKey);
+    }
+  }, [elements, storageKey]);
 
   // Добавляем начальный текстовый элемент с ID
   useEffect(() => {
-    if (id) {
+    if (id && !savedDesign) {
       setElements([{
         id: Date.now(),
         type: 'text',
@@ -24,7 +40,7 @@ export const Generator = () => {
         image: null
       }]);
     }
-  }, [id]);
+  }, [id, savedDesign]);
 
   const handleAddElement = (type) => {
     if (type === 'image') {
@@ -45,6 +61,10 @@ export const Generator = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
+    if (file.size > 2 * 1024 * 1024) { // Ограничение 2MB
+      alert('Изображение должно быть меньше 2MB');
+      return;
+    };
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -90,9 +110,19 @@ export const Generator = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="generator-container">
       <div className="header-section">
+        <button 
+            onClick={handleBack}
+            className='button-back'
+          >
+          {'< Назад'}
+         </button>
         <h2>Генератор изображений для маркетплейсов</h2>
         <p style={{
           fontSize: '16px',

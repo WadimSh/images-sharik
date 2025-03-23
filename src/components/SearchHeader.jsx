@@ -1,12 +1,7 @@
-import { useState } from 'react';
-
-const SearchHeader = ({ onSearch }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchActive, setIsSearchActive] = useState(false);
-
+const SearchHeader = ({ onSearch, searchQuery, setSearchQuery, isSearchActive }) => {
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
-
+  console.log(isSearchActive)
   const handleInputChange = (event) => {
     let value = event.target.value;
     
@@ -22,7 +17,6 @@ const SearchHeader = ({ onSearch }) => {
     if (allowedCharactersRegex.test(value)) {
       setSearchQuery(value);
       if (value === '') {
-        setIsSearchActive(false);
         onSearch([]);
       }
     }
@@ -42,16 +36,15 @@ const SearchHeader = ({ onSearch }) => {
       .filter(item => item !== null);
 
     if (normalized.length > 0) {
-      setIsSearchActive(true);
       onSearch(normalized);
     } else {
+      onSearch([]);
       alert('Пожалуйста, введите артикулы в формате ХХХХ-ХХХХ, разделенные пробелом, запятой или +');
     }
   };
 
   const handleClear = () => {
     setSearchQuery('');
-    setIsSearchActive(false);
     onSearch([]);
   };
 

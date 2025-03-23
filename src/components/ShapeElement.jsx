@@ -75,6 +75,8 @@ export const ShapeElement = ({ position, onDrag, onRemove, containerWidth, conta
           onChange={handleColorChange}
           style={{ 
             position: 'absolute',
+            top: '50%',
+            right: '-300px',
             opacity: 0,
             pointerEvents: 'none',
             width: '0',
