@@ -94,12 +94,14 @@ export const Generator = () => {
 
   const handleDownload = async () => {
     try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const canvas = await html2canvas(captureRef.current, {
         scale: 2,
         useCORS: true,
         logging: false
       });
-
+  
       const link = document.createElement('a');
       link.download = 'design.png';
       link.href = canvas.toDataURL('image/png');

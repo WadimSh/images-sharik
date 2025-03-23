@@ -188,7 +188,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 2px 5px;
-  min-width: 100px;
+  width: 200px;
   outline: none;
   transition: all 0.2s;
   outline: none;
