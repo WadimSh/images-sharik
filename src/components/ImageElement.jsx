@@ -7,29 +7,30 @@ export const ImageElement = ({
   onDrag, 
   onRemove, 
   containerWidth, 
-  containerHeight 
+  containerHeight,
+  width = 200, // Значение по умолчанию
+  height = 200, // Значение по умолчанию
+  onResize
 }) => {
   const [dimensions, setDimensions] = useState({ 
-    width: 200, 
-    height: 200 
+    width: width,
+    height: height 
   });
 
   const handleResize = (newSize) => {
-    setDimensions({
-      width: newSize.width,
-      height: newSize.height
-    });
+    setDimensions(newSize);
+    onResize(newSize);
   };
 
   return (
     <DraggableElement
       position={position}
       onDrag={onDrag}
-      onRemove={onRemove}
       onResize={handleResize}
       resizeable={true}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
+      dimensions={{ width, height }}
     >
       {src && <img // Добавляем проверку на наличие src
         src={src}
@@ -41,7 +42,16 @@ export const ImageElement = ({
           objectFit: 'contain'
         }}
       />}
-      
+      {/* Кнопка удаления */}
+      <button 
+              className='remove-handle'
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+            >
+              ×
+            </button>
     </DraggableElement>
   );
 };

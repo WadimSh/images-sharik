@@ -16,7 +16,28 @@ export const Generator = () => {
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
-  const [elements, setElements] = useState(initialElements);
+  // Добавляем размеры по умолчанию для старых данных
+  const processedElements = initialElements.map(element => {
+    if (element.type === 'image' && !element.width) {
+      return {
+        width: 0,
+        height: 0,
+        ...element,
+        ...(element.type === 'image' && !element.width && { 
+          width: 200,
+          height: 200
+        }),
+        ...(element.type === 'shape' && !element.color && {
+          color: '#ccc',
+          width: 100,
+          height: 100,
+        })
+      };
+    }
+    return element;
+  });
+
+  const [elements, setElements] = useState(processedElements);
   const [selectedElementType, setSelectedElementType] = useState('');
   const fileInputRef = useRef(null);
 
@@ -73,7 +94,9 @@ export const Generator = () => {
           id: Date.now(),
           type: 'image',
           position: { x: 50, y: 50 },
-          image: event.target.result // Сохраняем DataURL здесь
+          image: event.target.result, // Сохраняем DataURL здесь
+          width: 200, // Начальные размеры
+          height: 200
         };
         setElements(prev => [...prev, newElement]);
         setSelectedElementType('');
@@ -168,8 +191,15 @@ export const Generator = () => {
                   key={element.id}
                   src={element.image} // Берем изображение из данных элемента
                   position={element.position}
+                  width={element.width}
+                  height={element.height}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
+                  onResize={(newSize) => {
+                    setElements(prev => prev.map(el => 
+                      el.id === element.id ? {...el, ...newSize} : el
+                    ));
+                  }}
                   containerWidth={450}
                   containerHeight={600}
                 />
@@ -179,8 +209,21 @@ export const Generator = () => {
                 <ShapeElement
                   key={element.id}
                   position={element.position}
+                  width={element.width}
+                  height={element.height}
+                  color={element.color || '#ccc'} // Добавляем цвет
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
+                  onResize={(newSize) => {
+                    setElements(prev => prev.map(el => 
+                      el.id === element.id ? {...el, ...newSize} : el
+                    ));
+                  }}
+                  onColorChange={(newColor) => {
+                    setElements(prev => prev.map(el => 
+                      el.id === element.id ? {...el, color: newColor} : el
+                    ));
+                  }}
                   containerWidth={450}
                   containerHeight={600}
                 />

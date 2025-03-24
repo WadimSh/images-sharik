@@ -43,7 +43,6 @@ export const TextElement = ({
     <DraggableElement
       position={position}
       onDrag={onDrag}
-      onRemove={onRemove}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
     >
@@ -80,6 +79,16 @@ export const TextElement = ({
             }}
           >
             {editedText}
+            {/* Кнопка удаления */}
+            <button 
+              className='remove-handle'
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+            >
+              ×
+            </button>
             {showEditButton && (
               <button
                 onClick={handleEditClick}

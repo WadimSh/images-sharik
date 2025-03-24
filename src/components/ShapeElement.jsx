@@ -1,25 +1,39 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
-export const ShapeElement = ({ position, onDrag, onRemove, containerWidth, containerHeight }) => {
+export const ShapeElement = ({ 
+  position, 
+  onDrag, 
+  onRemove, 
+  containerWidth, 
+  containerHeight,
+  width = 100, // Значение по умолчанию
+  height = 100, // Значение по умолчанию
+  color = '#ccc', // Получаем цвет из пропсов
+  onResize,
+  onColorChange // Новый обработчик изменения цвета
+}) => {
   const [dimensions, setDimensions] = useState({ 
-    width: 100, 
-    height: 100 
+    width: width,
+    height: height 
   });
-  const [color, setColor] = useState('#ccc');
   const [showColorPicker, setShowColorPicker] = useState(false);
   const colorInputRef = useRef(null);
   const containerRef = useRef(null);
 
+  // Синхронизируем внутреннее состояние с пропсами
+  useEffect(() => {
+    setDimensions({ width, height });
+  }, [width, height]);
+
   const handleResize = (newSize) => {
-    setDimensions({
-      width: newSize.width,
-      height: newSize.height
-    });
+    setDimensions(newSize);
+    onResize(newSize);
   };
 
   const handleColorChange = (e) => {
-    setColor(e.target.value);
+    const newColor = e.target.value;
+    onColorChange(newColor); // Пробрасываем изменение вверх
     setShowColorPicker(false);
   };
 
@@ -32,11 +46,11 @@ export const ShapeElement = ({ position, onDrag, onRemove, containerWidth, conta
     <DraggableElement
       position={position}
       onDrag={onDrag}
-      onRemove={onRemove}
       onResize={handleResize}
       resizeable={true}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
+      dimensions={{ width, height }}
     >
       <div 
         ref={containerRef}
@@ -57,7 +71,16 @@ export const ShapeElement = ({ position, onDrag, onRemove, containerWidth, conta
             border: 'none',
           }}
         />
-
+        {/* Кнопка удаления */}
+        <button 
+              className='remove-handle'
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+            >
+              ×
+            </button>
         {/* Кнопка выбора цвета */}
         {showColorPicker && (
           <button 

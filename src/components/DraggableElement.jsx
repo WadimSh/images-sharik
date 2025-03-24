@@ -4,17 +4,17 @@ const DraggableElement = ({
   children, 
   position, 
   onDrag, 
-  onRemove,
   containerWidth, 
   containerHeight,
   onResize,
-  resizeable
+  resizeable,
+  dimensions = null
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const elementRef = useRef(null);
-  const initialSize = useRef({ width: 0, height: 0 });
+  const initialSize = useRef({ width: dimensions ? dimensions.width : 'auto', height: dimensions ? dimensions.height : 'auto' });
 
   const handleResizeStart = (e) => {
     e.stopPropagation();
@@ -112,21 +112,14 @@ const DraggableElement = ({
         left: `${position.x}px`,
         top: `${position.y}px`,
         cursor: isDragging ? 'grabbing' : 'grab',
-        userSelect: 'none'
+        userSelect: 'none',
+        width: dimensions ? `${dimensions.width}px` : 'auto',
+        height: dimensions ? `${dimensions.height}px` : 'auto'
       }}
       onMouseDown={handleMouseDown}
     >
       {children}
-      {/* Кнопка удаления */}
-      <button 
-        className='remove-handle'
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-        >
-          ×
-      </button>
+      
       {/* Кнопка изменения размера */}
       {resizeable && (
         <div
