@@ -56,7 +56,7 @@ export const Generator = () => {
       setElements([{
         id: Date.now(),
         type: 'text',
-        position: { x: 50, y: 50 },
+        position: { x: 162, y: 266 },
         text: id,
         image: null
       }]);
