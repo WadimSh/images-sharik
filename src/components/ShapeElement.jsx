@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const ShapeElement = ({ 
@@ -20,11 +20,6 @@ export const ShapeElement = ({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const colorInputRef = useRef(null);
   const containerRef = useRef(null);
-
-  // Синхронизируем внутреннее состояние с пропсами
-  useEffect(() => {
-    setDimensions({ width, height });
-  }, [width, height]);
 
   const handleResize = (newSize) => {
     setDimensions(newSize);
