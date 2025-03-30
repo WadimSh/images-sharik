@@ -83,27 +83,57 @@ export const Generator = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file.size > 2 * 1024 * 1024) { // Ограничение 2MB
-      alert('Изображение должно быть меньше 2MB');
-      return;
-    };
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        // Создаем элемент с изображением напрямую
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Проверка максимального разрешения
+        if (img.width > 2000 || img.height > 2000) {
+          alert('Максимальный размер изображения 2000x2000 пикселей');
+          return;
+        }
+  
+        // Параметры контейнера
+        const containerWidth = 450;
+        const containerHeight = 600;
+  
+        // Рассчет коэффициента масштабирования
+        const scale = Math.min(
+          containerWidth / img.width,
+          containerHeight / img.height,
+          1 // Запрещаем увеличение изображения
+        );
+  
+        // Новые размеры с сохранением пропорций
+        const newWidth = img.width * scale;
+        const newHeight = img.height * scale;
+  
+        // Позиционирование по центру
+        const position = {
+          x: (containerWidth - newWidth) / 2,
+          y: (containerHeight - newHeight) / 2
+        };
+  
         const newElement = {
           id: Date.now(),
           type: 'image',
-          position: { x: 50, y: 50 },
-          image: event.target.result, // Сохраняем DataURL здесь
-          width: 200, // Начальные размеры
-          height: 200
+          position,
+          image: event.target.result,
+          width: newWidth,
+          height: newHeight,
+          originalWidth: img.width,
+          originalHeight: img.height
         };
+  
         setElements(prev => [...prev, newElement]);
         setSelectedElementType('');
       };
-      reader.readAsDataURL(file);
-    }
+      img.onerror = () => alert('Ошибка загрузки изображения');
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDrag = (id, newPosition) => {
