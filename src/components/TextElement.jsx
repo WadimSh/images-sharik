@@ -25,6 +25,9 @@ export const TextElement = ({
   const handleEditClick = (e) => {
     e.stopPropagation();
     setIsEditing(true);
+    if (e.nativeEvent.button === 0) {
+      e.preventDefault();
+    }
   };
 
   const handleSave = () => {
@@ -45,13 +48,10 @@ export const TextElement = ({
       onDrag={onDrag}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
+      dimensions={{ width: 'auto', height: 'auto' }}
     >
       <div 
-        style={{ 
-          position: 'relative',
-          display: 'inline-block',
-          maxWidth: `${containerWidth - position.x}px`,
-        }}
+        className="text-content-wrapper"
         onMouseEnter={() => setShowEditButton(true)}
         onMouseLeave={() => setShowEditButton(false)}
       >

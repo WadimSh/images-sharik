@@ -16,6 +16,28 @@ const DraggableElement = ({
   const elementRef = useRef(null);
   const initialSize = useRef({ width: dimensions ? dimensions.width : 'auto', height: dimensions ? dimensions.height : 'auto' });
 
+  const overlayRef = useRef(null);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const animationFrameRef = useRef(null);
+
+  const updateOverlayPosition = () => {
+    if (!elementRef.current || !overlayRef.current) return;
+    
+    const element = elementRef.current;
+    const overlay = overlayRef.current;
+    const rect = element.getBoundingClientRect();
+    
+    animationFrameRef.current = requestAnimationFrame(() => {
+      const scrollX = window.scrollX || window.pageXOffset;
+      const scrollY = window.scrollY || window.pageYOffset;
+      
+      overlay.style.left = `${rect.left + scrollX}px`;
+      overlay.style.top = `${rect.top + scrollY}px`;
+      overlay.style.width = `${element.offsetWidth}px`;
+      overlay.style.height = `${element.offsetHeight}px`;
+    });
+  };
+
   const handleResizeStart = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -38,6 +60,8 @@ const DraggableElement = ({
       y: e.clientY - rect.top
     });
     setIsDragging(true);
+    setIsOverlayVisible(true);
+    updateOverlayPosition();
   };
 
   const handleMouseMove = (e) => {
@@ -64,17 +88,18 @@ const DraggableElement = ({
       const newX = e.clientX - parentRect.left - offset.x;
       const newY = e.clientY - parentRect.top - offset.y;
   
-      const maxX = containerWidth - elementRef.current.offsetWidth;
-      const maxY = containerHeight - elementRef.current.offsetHeight;
-  
       onDrag({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
+        x: newX,
+        y: newY
       });
+      updateOverlayPosition();
     }
+    
   };
 
   const handleMouseUp = () => {
+    cancelAnimationFrame(animationFrameRef.current);
+    setIsOverlayVisible(false);
     setIsDragging(false);
     setIsResizing(false);
   };
@@ -103,10 +128,10 @@ const DraggableElement = ({
     };
   }, [isDragging]);
 
-  return (
+  return (<>
     <div
       ref={elementRef}
-      className="draggable-element"
+      className='draggable-element'
       style={{
         position: 'absolute',
         left: `${position.x}px`,
@@ -128,7 +153,11 @@ const DraggableElement = ({
         />
       )}
     </div>
-  );
+    <div 
+        ref={overlayRef}
+        className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
+      />
+  </>);
 };
 
 export default DraggableElement;

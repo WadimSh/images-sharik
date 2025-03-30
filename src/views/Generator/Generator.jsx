@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FaArrowUp, FaArrowDown, FaDownload } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 
 import { ImageElement } from '../../components/ImageElement';
@@ -139,6 +140,20 @@ export const Generator = () => {
     navigate(-1);
   };
 
+  const handleMoveUp = (index) => {
+    if (index === 0) return;
+    const newElements = [...elements];
+    [newElements[index - 1], newElements[index]] = [newElements[index], newElements[index - 1]];
+    setElements(newElements);
+  };
+
+  const handleMoveDown = (index) => {
+    if (index === elements.length - 1) return;
+    const newElements = [...elements];
+    [newElements[index], newElements[index + 1]] = [newElements[index + 1], newElements[index]];
+    setElements(newElements);
+  };
+
   return (
     <div className="generator-container">
       <div className="header-section">
@@ -181,7 +196,7 @@ export const Generator = () => {
           </select>
         </div>
       </div>
-
+    <div className="content-wrapper">
       <div ref={captureRef} className="design-container">
         {elements.map((element) => {
           switch (element.type) {
@@ -251,12 +266,71 @@ export const Generator = () => {
         })}
       </div>
 
-      <button 
-        onClick={handleDownload} 
-        className="download-button"
-      >
-        Скачать дизайн
-      </button>
+      <div className="sidebar">
+        <div className="elements-list">
+          <h3>Элементы дизайна</h3>
+         {[...elements].reverse().map((element, index) => {
+    const originalIndex = elements.length - 1 - index;
+    return (
+            <div key={element.id} className="element-item">
+              <div className="element-info">
+                <span className="element-type">
+                  {element.type === 'text' && '📝 Текст'}
+                  {element.type === 'image' && '🖼 Изображение'}
+                  {element.type === 'shape' && '⬜ Фигура'}
+                </span>
+                {element.type === 'text' && <span> "{element.text}"</span>}
+                {element.type === 'shape' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    <div 
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: element.color,
+                        border: '1px solid #ccc',
+                        borderRadius: '3px'
+                      }}
+                    />
+                    <span>{element.color}</span>
+                  </div>
+                )}
+              </div>
+              <div className="element-controls">
+                <button 
+                  onClick={() => handleMoveUp(originalIndex)} 
+                  disabled={originalIndex === 0}
+                  className="move-button"
+                >
+                  <FaArrowDown />
+                </button>
+                <button 
+                  onClick={() => handleMoveDown(originalIndex)} 
+                  disabled={originalIndex === elements.length - 1}
+                  className="move-button"
+                >
+                  <FaArrowUp />
+                </button>
+                <button 
+                  onClick={() => handleRemoveElement(element.id)}
+                  className="remove-button"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )})}
+        </div>
+
+        <button 
+          onClick={handleDownload} 
+          className="download-button"
+        >
+          <FaDownload /> Скачать дизайн
+        </button>
+      </div>
+    </div>  
+
+      
     </div>
   );
 };
