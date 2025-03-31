@@ -11,6 +11,8 @@ export const ShapeElement = ({
   height = 100, // Значение по умолчанию
   color = '#ccc', // Получаем цвет из пропсов
   onResize,
+  rotation = 0,
+  onRotate,
   onColorChange // Новый обработчик изменения цвета
 }) => {
   const [dimensions, setDimensions] = useState({ 
@@ -42,10 +44,12 @@ export const ShapeElement = ({
       position={position}
       onDrag={onDrag}
       onResize={handleResize}
+      onRotate={onRotate}
       resizeable={true}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={{ width, height }}
+      rotation={rotation}
     >
       <div 
         ref={containerRef}
@@ -53,6 +57,7 @@ export const ShapeElement = ({
           position: 'relative',
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
+          transform: `rotate(${rotation}deg)`
         }}
         onMouseEnter={() => setShowColorPicker(true)}
         onMouseLeave={() => setShowColorPicker(false)}

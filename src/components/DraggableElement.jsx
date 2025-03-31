@@ -7,13 +7,17 @@ const DraggableElement = ({
   containerWidth, 
   containerHeight,
   onResize,
+  onRotate,
   resizeable,
-  dimensions = null
+  dimensions = null,
+  rotation = 0
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [currentRotation, setCurrentRotation] = useState(rotation);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const elementRef = useRef(null);
+  const rotateHandleRef = useRef(null);
   const initialSize = useRef({ width: dimensions ? dimensions.width : 'auto', height: dimensions ? dimensions.height : 'auto' });
 
   const overlayRef = useRef(null);
@@ -28,14 +32,43 @@ const DraggableElement = ({
     const rect = element.getBoundingClientRect();
     
     animationFrameRef.current = requestAnimationFrame(() => {
-      const scrollX = window.scrollX || window.pageXOffset;
-      const scrollY = window.scrollY || window.pageYOffset;
-      
-      overlay.style.left = `${rect.left + scrollX}px`;
-      overlay.style.top = `${rect.top + scrollY}px`;
+      overlay.style.left = `${rect.left}px`;
+      overlay.style.top = `${rect.top}px`;
+
       overlay.style.width = `${element.offsetWidth}px`;
       overlay.style.height = `${element.offsetHeight}px`;
     });
+  };
+
+  const handleRotateStart = (e) => {
+    e.stopPropagation();
+    const rect = elementRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width/2;
+    const centerY = rect.top + rect.height/2;
+    
+    const startAngle = Math.atan2(
+      e.clientY - centerY,
+      e.clientX - centerX
+    );
+    
+    const handleMouseMoveR = (e) => {
+      const angle = Math.atan2(
+        e.clientY - centerY,
+        e.clientX - centerX
+      ) - startAngle;
+      
+      const newRotation = (currentRotation + angle * (180/Math.PI)) % 360;
+      setCurrentRotation(newRotation);
+      if(onRotate) onRotate(newRotation);
+    };
+
+    const handleMouseUpR = () => {
+      document.removeEventListener('mousemove', handleMouseMoveR);
+      document.removeEventListener('mouseup', handleMouseUpR);
+    };
+
+    document.addEventListener('mousemove', handleMouseMoveR);
+    document.addEventListener('mouseup', handleMouseUpR);
   };
 
   const handleResizeStart = (e) => {
@@ -102,7 +135,7 @@ const DraggableElement = ({
     setIsOverlayVisible(false);
     setIsDragging(false);
     setIsResizing(false);
-  };
+  };  
 
   useEffect(() => {
     if (isDragging || isResizing) {
@@ -115,19 +148,8 @@ const DraggableElement = ({
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, isResizing]);
+
   
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
   return (<>
     <div
       ref={elementRef}
@@ -139,11 +161,18 @@ const DraggableElement = ({
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
         width: dimensions ? `${dimensions.width}px` : 'auto',
-        height: dimensions ? `${dimensions.height}px` : 'auto'
-      }}
+        height: dimensions ? `${dimensions.height}px` : 'auto',
+      }} 
       onMouseDown={handleMouseDown}
     >
       {children}
+
+      {/* Ручка поворота */}
+      <div
+        ref={rotateHandleRef}
+        className='rotate-handle'
+        onMouseDown={handleRotateStart}
+      />
       
       {/* Кнопка изменения размера */}
       {resizeable && (
@@ -152,11 +181,16 @@ const DraggableElement = ({
           onMouseDown={handleResizeStart}
         />
       )}
-    </div>
-    <div 
+      <div 
         ref={overlayRef}
         className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
+        style={{
+          transform: `rotate(${currentRotation}deg)`,
+          transformOrigin: 'center center'
+        }}
       />
+    </div>
+    
   </>);
 };
 

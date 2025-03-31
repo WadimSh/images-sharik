@@ -15,6 +15,7 @@ const ItemsGrid = ({ items }) => {
             top: `${(element.position.y / 600) * 100}%`,
             width: `${(element.width / 450) * 100}%`,
             height: `${(element.height / 600) * 100}%`,
+            transform: `rotate(${element.rotation}deg)`,
             position: 'absolute'
           };
   

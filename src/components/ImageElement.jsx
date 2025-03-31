@@ -10,7 +10,9 @@ export const ImageElement = ({
   containerHeight,
   width = 200, // Значение по умолчанию
   height = 200, // Значение по умолчанию
-  onResize
+  onResize,
+  rotation = 0,
+  onRotate
 }) => {
   const [dimensions, setDimensions] = useState({ 
     width: width,
@@ -27,10 +29,12 @@ export const ImageElement = ({
       position={position}
       onDrag={onDrag}
       onResize={handleResize}
+      onRotate={onRotate}
       resizeable={true}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={{ width, height }}
+      rotation={rotation}
     >
       {src && <img // Добавляем проверку на наличие src
         src={src}
@@ -39,7 +43,8 @@ export const ImageElement = ({
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
           pointerEvents: 'none',
-          objectFit: 'contain'
+          objectFit: 'contain',
+          transform: `rotate(${rotation}deg)`
         }}
       />}
       {/* Кнопка удаления */}

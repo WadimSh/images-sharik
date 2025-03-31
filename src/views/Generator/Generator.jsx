@@ -21,6 +21,7 @@ export const Generator = () => {
   const processedElements = initialElements.map(element => {
     if (element.type === 'image' && !element.width) {
       return {
+        rotation: 0,
         width: 0,
         height: 0,
         ...element,
@@ -141,9 +142,9 @@ export const Generator = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleDrag = (id, newPosition) => {
+  const handleDrag = (id, newPosition, newRotation) => {
     setElements(elements.map(el => 
-      el.id === id ? { ...el, position: newPosition } : el
+      el.id === id ? { ...el, position: newPosition, rotation: newRotation !== undefined ? newRotation : el.rotation } : el
     ));
   };
 
@@ -187,6 +188,13 @@ export const Generator = () => {
     const newElements = [...elements];
     [newElements[index], newElements[index + 1]] = [newElements[index + 1], newElements[index]];
     setElements(newElements);
+  };
+
+  // Обработчик поворота
+  const handleRotate = (id, newRotation) => {
+    setElements(elements.map(el => 
+      el.id === id ? { ...el, rotation: newRotation } : el
+    ));
   };
 
   return (
@@ -250,6 +258,8 @@ export const Generator = () => {
                       el.id === element.id ? {...el, ...newSize} : el
                     ));
                   }}
+                  rotation={element.rotation} // Передаем поворот
+                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
                   containerHeight={600}
                 />
@@ -269,6 +279,8 @@ export const Generator = () => {
                       el.id === element.id ? {...el, ...newSize} : el
                     ));
                   }}
+                  rotation={element.rotation} // Передаем поворот
+                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   onColorChange={(newColor) => {
                     setElements(prev => prev.map(el => 
                       el.id === element.id ? {...el, color: newColor} : el
@@ -286,6 +298,8 @@ export const Generator = () => {
                   position={element.position}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
+                  rotation={element.rotation} // Передаем поворот
+                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   onTextChange={(newText) => {
                     setElements(prev => prev.map(el => 
                       el.id === element.id ? {...el, text: newText} : el

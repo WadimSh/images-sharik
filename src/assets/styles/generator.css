@@ -125,7 +125,7 @@
 
 .draggable-element {
   transition: transform 0.1s;
-  
+  transform-origin: center center;  
 }
 
 .dragging-overlay {
@@ -138,6 +138,7 @@
   transition: opacity 0.1s;
   background: rgba(0,123,255,0.1);
   will-change: transform; /* Оптимизация для анимации */
+  transform-origin: center center;
 }
 
 .dragging-overlay.visible {
@@ -149,9 +150,10 @@
   position: absolute;
   right: -8px;
   bottom: -8px;
-  width: 16px;
-  height: 16px;
-  background-color: #007bff;
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border: 1px solid #007bff;
   border-radius: 50%;
   cursor: nwse-resize;
   z-index: 1000; 
@@ -184,6 +186,25 @@
 }
 
 .draggable-element:hover .remove-handle {
+  opacity: 1;
+}
+
+.rotate-handle {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: #007bff;
+  border-radius: 50%;
+  cursor: grab;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+.draggable-element:hover .rotate-handle {
   opacity: 1;
 }
 

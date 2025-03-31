@@ -8,7 +8,9 @@ export const TextElement = ({
   onRemove, 
   containerWidth, 
   containerHeight,
-  onTextChange 
+  onTextChange,
+  rotation = 0,
+  onRotate
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(text);
@@ -49,6 +51,8 @@ export const TextElement = ({
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={{ width: 'auto', height: 'auto' }}
+      onRotate={onRotate}
+      rotation={rotation}
     >
       <div 
         className="text-content-wrapper"
@@ -75,7 +79,8 @@ export const TextElement = ({
               wordBreak: 'break-word',
               maxWidth: '100%',
               position: 'relative',
-              paddingRight: '12px'
+              paddingRight: '12px',
+              transform: `rotate(${rotation}deg)`
             }}
           >
             {editedText}
