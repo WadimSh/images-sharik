@@ -330,3 +330,18 @@
   cursor: pointer;
   font-size: 16px;
 }
+
+.replace-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.replace-button:hover {
+  color: #0056b3;
+}

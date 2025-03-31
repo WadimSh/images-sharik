@@ -149,7 +149,6 @@ const DraggableElement = ({
     };
   }, [isDragging, isResizing]);
 
-  
   return (<>
     <div
       ref={elementRef}
@@ -172,6 +171,9 @@ const DraggableElement = ({
         ref={rotateHandleRef}
         className='rotate-handle'
         onMouseDown={handleRotateStart}
+        style={{
+          
+        }}
       />
       
       {/* Кнопка изменения размера */}
@@ -179,6 +181,9 @@ const DraggableElement = ({
         <div
           className='resize-handle'
           onMouseDown={handleResizeStart}
+          style={{
+            
+          }}
         />
       )}
       <div 

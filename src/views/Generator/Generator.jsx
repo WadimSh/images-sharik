@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowUp, FaArrowDown, FaDownload } from 'react-icons/fa';
+import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 
 import { ImageElement } from '../../components/ImageElement';
@@ -141,6 +142,42 @@ export const Generator = () => {
     };
     reader.readAsDataURL(file);
   };
+
+  // Добавим новую функцию замены изображения
+const handleReplaceImage = (id) => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width > 2000 || img.height > 2000) {
+          alert('Максимальный размер изображения 2000x2000 пикселей');
+          return;
+        }
+
+        setElements(prev => prev.map(el => 
+          el.id === id ? {
+            ...el,
+            image: event.target.result,
+            originalWidth: img.width,
+            originalHeight: img.height
+          } : el
+        ));
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  input.click();
+};
 
   const handleDrag = (id, newPosition, newRotation) => {
     setElements(elements.map(el => 
@@ -345,6 +382,15 @@ export const Generator = () => {
                 )}
               </div>
               <div className="element-controls">
+              {element.type === 'image' && (
+      <button
+        onClick={() => handleReplaceImage(element.id)}
+        className="replace-button"
+        title="Заменить изображение"
+      >
+        <FiRefreshCw />
+      </button>
+    )}
                 <button 
                   onClick={() => handleMoveUp(originalIndex)} 
                   disabled={originalIndex === 0}
