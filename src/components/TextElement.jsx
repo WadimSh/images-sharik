@@ -84,16 +84,6 @@ export const TextElement = ({
             }}
           >
             {editedText}
-            {/* Кнопка удаления */}
-            <button 
-              className='remove-handle'
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-            >
-              ×
-            </button>
             {showEditButton && (
               <button
                 onClick={handleEditClick}

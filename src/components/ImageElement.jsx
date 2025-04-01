@@ -47,16 +47,6 @@ export const ImageElement = ({
           transform: `rotate(${rotation}deg)`
         }}
       />}
-      {/* Кнопка удаления */}
-      <button 
-              className='remove-handle'
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-            >
-              ×
-            </button>
     </DraggableElement>
   );
 };

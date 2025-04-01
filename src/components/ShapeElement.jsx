@@ -62,6 +62,7 @@ export const ShapeElement = ({
         onMouseEnter={() => setShowColorPicker(true)}
         onMouseLeave={() => setShowColorPicker(false)}
       >
+        
         {/* Основной квадрат */}
         <div
           style={{ 
@@ -71,16 +72,6 @@ export const ShapeElement = ({
             border: 'none',
           }}
         />
-        {/* Кнопка удаления */}
-        <button 
-              className='remove-handle'
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-            >
-              ×
-            </button>
         {/* Кнопка выбора цвета */}
         {showColorPicker && (
           <button 

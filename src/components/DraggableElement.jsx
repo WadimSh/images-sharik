@@ -40,6 +40,19 @@ const DraggableElement = ({
     });
   };
 
+  // Клик вне элемента
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (elementRef.current && !elementRef.current.contains(e.target)) {
+        setIsOverlayVisible(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+
   const handleRotateStart = (e) => {
     e.stopPropagation();
     const rect = elementRef.current.getBoundingClientRect();
@@ -127,12 +140,10 @@ const DraggableElement = ({
       });
       updateOverlayPosition();
     }
-    
   };
 
   const handleMouseUp = () => {
     cancelAnimationFrame(animationFrameRef.current);
-    setIsOverlayVisible(false);
     setIsDragging(false);
     setIsResizing(false);
   };  
@@ -161,12 +172,20 @@ const DraggableElement = ({
         userSelect: 'none',
         width: dimensions ? `${dimensions.width}px` : 'auto',
         height: dimensions ? `${dimensions.height}px` : 'auto',
+        
       }} 
       onMouseDown={handleMouseDown}
     >
       {children}
-
-      {/* Ручка поворота */}
+ <div 
+        ref={overlayRef}
+        className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
+        style={{
+          transform: `rotate(${currentRotation}deg)`,
+          transformOrigin: 'center center'
+        }}
+      >
+        {/* Ручка поворота */}
       <div
         ref={rotateHandleRef}
         className='rotate-handle'
@@ -179,21 +198,14 @@ const DraggableElement = ({
       {/* Кнопка изменения размера */}
       {resizeable && (
         <div
-          className='resize-handle'
+          className={`resize-handle ${isOverlayVisible ? 'visible' : ''}`}
           onMouseDown={handleResizeStart}
           style={{
             
           }}
         />
       )}
-      <div 
-        ref={overlayRef}
-        className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
-        style={{
-          transform: `rotate(${currentRotation}deg)`,
-          transformOrigin: 'center center'
-        }}
-      />
+      </div>
     </div>
     
   </>);
