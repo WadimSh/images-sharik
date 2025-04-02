@@ -30,7 +30,7 @@ const DraggableElement = ({
     const element = elementRef.current;
     const overlay = overlayRef.current;
     const rect = element.getBoundingClientRect();
-    
+
     animationFrameRef.current = requestAnimationFrame(() => {
       overlay.style.left = `${rect.left}px`;
       overlay.style.top = `${rect.top}px`;
@@ -50,6 +50,16 @@ const DraggableElement = ({
     
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Обработка скролла
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsOverlayVisible(false);
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
 
