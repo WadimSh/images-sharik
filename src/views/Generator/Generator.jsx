@@ -13,6 +13,12 @@ export const Generator = () => {
   const navigate = useNavigate();
   const captureRef = useRef(null);
 
+  const [selectedColorElementId, setSelectedColorElementId] = useState(null);
+  const colorInputRef = useRef(null);
+
+  // Добавляем состояние для редактирования текста
+  const [editingTextId, setEditingTextId] = useState(null);
+
   // Загрузка из sessionStorage при инициализации
   const storageKey = `design-${id}`;
   const savedDesign = sessionStorage.getItem(storageKey);
@@ -65,6 +71,32 @@ export const Generator = () => {
       }]);
     }
   }, [id, savedDesign]);
+
+  // Обработчик изменения цвета
+  const handleColorChange = (e) => {
+    const newColor = e.target.value;
+    setElements(prev => 
+      prev.map(el => 
+        el.id === selectedColorElementId ? {...el, color: newColor} : el
+      )
+    );
+  };
+
+  // Обработчик клика по кнопке выбора цвета
+  const handleColorButtonClick = (elementId) => {
+    const element = elements.find(el => el.id === elementId);
+    if (element && colorInputRef.current) {
+      // Устанавливаем значение напрямую в DOM-элемент
+      colorInputRef.current.value = element.color || '#ccc';
+      colorInputRef.current.click();
+      setSelectedColorElementId(elementId);
+    }
+  };
+
+  // Обработчик переключения редактирования
+  const handleTextEditToggle = (elementId, isEditing) => {
+    setEditingTextId(isEditing ? elementId : null);
+  };
 
   const handleAddElement = (type) => {
     if (type === 'image') {
@@ -310,7 +342,6 @@ const handleReplaceImage = (id) => {
                   height={element.height}
                   color={element.color || '#ccc'} // Добавляем цвет
                   onDrag={(pos) => handleDrag(element.id, pos)}
-                  onRemove={() => handleRemoveElement(element.id)}
                   onResize={(newSize) => {
                     setElements(prev => prev.map(el => 
                       el.id === element.id ? {...el, ...newSize} : el
@@ -318,11 +349,7 @@ const handleReplaceImage = (id) => {
                   }}
                   rotation={element.rotation} // Передаем поворот
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                  onColorChange={(newColor) => {
-                    setElements(prev => prev.map(el => 
-                      el.id === element.id ? {...el, color: newColor} : el
-                    ));
-                  }}
+                  
                   containerWidth={450}
                   containerHeight={600}
                 />
@@ -342,6 +369,8 @@ const handleReplaceImage = (id) => {
                       el.id === element.id ? {...el, text: newText} : el
                     ));
                   }}
+                  isEditing={editingTextId === element.id}
+                  onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
                   containerWidth={450}
                   containerHeight={600}
                 />
@@ -396,14 +425,38 @@ const handleReplaceImage = (id) => {
               </div>
               <div className="element-controls">
               {element.type === 'image' && (
-      <button
-        onClick={() => handleReplaceImage(element.id)}
-        className="replace-button"
-        title="Заменить изображение"
-      >
-        <FiRefreshCw />
-      </button>
-    )}
+                <button
+                  onClick={() => handleReplaceImage(element.id)}
+                  className="replace-button"
+                  title="Заменить изображение"
+                >
+                  <FiRefreshCw />
+                </button>
+              )}
+              {element.type === 'shape' && (
+                <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleColorButtonClick(element.id);
+                }}
+                  className="replace-button"
+                  title="Изменения цвета"
+                >
+                  🎨
+                </button>
+              )}
+              {element.type === 'text' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTextEditToggle(element.id, true);
+                  }}
+                  className="replace-button"
+                  title="Изменения текста"
+                >
+                  ✎
+                </button>
+              )}
                 <button 
                   onClick={() => handleMoveUp(originalIndex)} 
                   disabled={originalIndex === 0}
@@ -425,6 +478,17 @@ const handleReplaceImage = (id) => {
                   ×
                 </button>
               </div>
+              <input
+  type="color"
+  ref={colorInputRef}
+  onChange={handleColorChange}
+  style={{ 
+    position: 'absolute',
+    opacity: 0,
+    height: 0,
+    width: 0 
+  }}
+/>
             </div>
           )})}
         </div>

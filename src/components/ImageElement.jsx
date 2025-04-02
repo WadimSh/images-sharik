@@ -5,7 +5,6 @@ export const ImageElement = ({
   src, 
   position, 
   onDrag, 
-  onRemove, 
   containerWidth, 
   containerHeight,
   width = 200, // Значение по умолчанию

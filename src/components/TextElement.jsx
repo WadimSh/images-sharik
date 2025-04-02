@@ -5,16 +5,15 @@ export const TextElement = ({
   text, 
   position, 
   onDrag, 
-  onRemove, 
   containerWidth, 
   containerHeight,
   onTextChange,
   rotation = 0,
-  onRotate
+  onRotate,
+  isEditing,      // Принимаем состояние редактирования извне
+  onEditToggle    // Колбэк для переключения состояния
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(text);
-  const [showEditButton, setShowEditButton] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -24,17 +23,9 @@ export const TextElement = ({
     }
   }, [isEditing]);
 
-  const handleEditClick = (e) => {
-    e.stopPropagation();
-    setIsEditing(true);
-    if (e.nativeEvent.button === 0) {
-      e.preventDefault();
-    }
-  };
-
   const handleSave = () => {
-    setIsEditing(false);
     onTextChange(editedText);
+    onEditToggle(false);
   };
 
   const handleKeyDown = (e) => {
@@ -43,6 +34,7 @@ export const TextElement = ({
       handleSave();
     }
   };
+
 
   return (
     <DraggableElement
@@ -54,11 +46,7 @@ export const TextElement = ({
       onRotate={onRotate}
       rotation={rotation}
     >
-      <div 
-        className="text-content-wrapper"
-        onMouseEnter={() => setShowEditButton(true)}
-        onMouseLeave={() => setShowEditButton(false)}
-      >
+      <div className="text-content-wrapper">
         {isEditing ? (
           <input
             ref={inputRef}
@@ -84,14 +72,6 @@ export const TextElement = ({
             }}
           >
             {editedText}
-            {showEditButton && (
-              <button
-                onClick={handleEditClick}
-                className='text-change'
-              >
-                ✎
-              </button>
-            )}
           </div>
         )}
       </div>
