@@ -157,8 +157,7 @@
   border-radius: 50%;
   cursor: nwse-resize;
   z-index: 1000; 
-  transition: opacity 0.2s;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 .rotate-handle {
@@ -169,11 +168,10 @@
   height: 20px;
   background-color: #007bff;
   border-radius: 50%;
-  cursor: grab;
+  cursor: ew-resize;
   transform: translateX(-50%);
-  transition: opacity 0.2s;
   z-index: 1000;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 .color-change {

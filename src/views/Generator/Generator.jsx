@@ -361,25 +361,38 @@ const handleReplaceImage = (id) => {
             <div key={element.id} className="element-item">
               <div className="element-info">
                 <span className="element-type">
-                  {element.type === 'text' && '📝 Текст'}
-                  {element.type === 'image' && '🖼 Изображение'}
-                  {element.type === 'shape' && '⬜ Фигура'}
-                </span>
-                {element.type === 'text' && <span> "{element.text}"</span>}
-                {element.type === 'shape' && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  {element.type === 'text' && '📝 '}
+                  {element.type === 'image' && (
+                    <>
+                      <img 
+                        src={element.image} // URL вашего изображения
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          objectFit: 'cover',
+                          marginRight: '4px',
+                          verticalAlign: 'text-bottom',
+                          borderRadius: '2px'
+                        }}
+                        alt="Превью"
+                      />
+                      Изображение
+                    </>
+                  )}
+                  {element.type === 'shape' && (
                     <div 
                       style={{
                         width: '16px',
                         height: '16px',
                         backgroundColor: element.color,
-                        border: '1px solid #ccc',
-                        borderRadius: '3px'
+                        marginRight: '4px',
+                        borderRadius: '2px'
                       }}
                     />
-                    <span>{element.color}</span>
-                  </div>
-                )}
+                  )}
+                </span>
+                {element.type === 'text' && <span> "{element.text}"</span>}
+                {element.type === 'shape' && 'Фигура'}
               </div>
               <div className="element-controls">
               {element.type === 'image' && (
