@@ -2,6 +2,56 @@ import { useRef, useEffect } from "react";
 
 export const FontControls = ({ element, onClose, onChange }) => {
   const controlsRef = useRef(null);
+  // Полный список шрифтов Windows с группировкой
+  const fontGroups = [
+    {
+      group: "Основные",
+      fonts: [
+        'Arial', 'Arial Black', 'Arial Narrow',
+        'Calibri', 'Calibri Light',
+        'Times New Roman', 
+        'Verdana', 'Tahoma',
+        'Segoe UI', 'Segoe Print', 'Segoe Script',
+        'Georgia', 'Cambria', 'Candara'
+      ]
+    },
+    {
+      group: "Заголовочные",
+      fonts: [
+        'Impact', 'Rockwell', 'Franklin Gothic',
+        'Bahnschrift', 'Britannic Bold', 'Haettenschweiler'
+      ]
+    },
+    {
+      group: "Рукописные",
+      fonts: [
+        'Comic Sans MS', 'MV Boli', 'Ink Free',
+        'Lucida Handwriting', 'Papyrus'
+      ]
+    },
+    {
+      group: "Моноширинные",
+      fonts: [
+        'Consolas', 'Courier New', 'Lucida Console',
+        'MS Gothic', 'OCR A Extended'
+      ]
+    },
+    {
+      group: "Классические",
+      fonts: [
+        'Garamond', 'Book Antiqua', 'Palatino Linotype',
+        'Century Gothic', 'Baskerville Old Face'
+      ]
+    },
+    {
+      group: "Специальные",
+      fonts: [
+        'Wingdings', 'Wingdings 2', 'Wingdings 3',
+        'Webdings', 'Symbol'
+      ]
+    }
+  ];
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -65,6 +115,21 @@ export const FontControls = ({ element, onClose, onChange }) => {
           <option value="Verdana">Verdana</option>
           <option value="Georgia">Georgia</option>
           <option value="Courier New">Courier New</option>
+          <option value="Calibri">Calibri</option>
+          <option value="Tahoma">Tahoma</option>
+          <option value="Impact">Impact</option>
+          <option value="Comic Sans MS">Comic Sans MS</option>
+          <option value="Lucida Sans">Lucida Sans</option>
+          <option value="Segoe UI">Segoe UI</option>
+          <option value="Cambria">Cambria</option>
+          <option value="Garamond">Garamond</option>
+          <option value="Franklin Gothic">Franklin Gothic</option>
+          <option value="Consolas">Consolas</option>
+          <option value="Palatino Linotype">Palatino Linotype</option>
+          <option value="Trebuchet MS">Trebuchet MS</option>
+          <option value="Book Antiqua">Book Antiqua</option>
+          <option value="Century Gothic">Century Gothic</option>
+          <option value="Candara">Candara</option>
         </select>
       </label>
     </div>
