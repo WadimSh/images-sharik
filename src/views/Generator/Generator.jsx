@@ -435,7 +435,9 @@ const handleReplaceImage = (id) => {
                     />
                   )}
                 </span>
-                {element.type === 'text' && <span> "{element.text}"</span>}
+                {element.type === 'text' && <span className="quoted-truncate">
+                  "<span className="truncated-text">{element.text}</span>"
+                </span>}
                 {element.type === 'shape' && 'Фигура'}
               </div>
               <div className="element-controls">
