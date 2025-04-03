@@ -22,7 +22,6 @@ export const TextElement = ({
     wordBreak: 'break-word',
     maxWidth: '100%',
     position: 'relative',
-    paddingRight: '12px',
     transform: `rotate(${element.rotation || 0}deg)`
   };
 
