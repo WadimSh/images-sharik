@@ -398,7 +398,7 @@ const handleReplaceImage = (id) => {
 
       <div className="sidebar">
         <div className="elements-list">
-          <h3>Элементы дизайна</h3>
+          <h3 style={{ marginTop: '0' }}>Элементы дизайна</h3>
          {[...elements].reverse().map((element, index) => {
     const originalIndex = elements.length - 1 - index;
     return (
