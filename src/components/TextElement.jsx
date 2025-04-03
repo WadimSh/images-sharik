@@ -2,19 +2,30 @@ import { useState, useRef, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const TextElement = ({ 
-  text, 
+  element, // Теперь получаем весь объект элемента
   position, 
   onDrag, 
   containerWidth, 
   containerHeight,
   onTextChange,
-  rotation = 0,
   onRotate,
   isEditing,      // Принимаем состояние редактирования извне
   onEditToggle    // Колбэк для переключения состояния
 }) => {
-  const [editedText, setEditedText] = useState(text);
+  const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
+
+  const textStyle = {
+    color: element.color || '#333',
+    fontSize: `${element.fontSize || 24}px`,
+    fontFamily: element.fontFamily || 'Arial',
+    wordBreak: 'break-word',
+    maxWidth: '100%',
+    position: 'relative',
+    paddingRight: '12px',
+    transform: `rotate(${element.rotation || 0}deg)`
+  };
+
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -38,13 +49,13 @@ export const TextElement = ({
 
   return (
     <DraggableElement
-      position={position}
+      position={element.position}
       onDrag={onDrag}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={{ width: 'auto', height: 'auto' }}
       onRotate={onRotate}
-      rotation={rotation}
+      rotation={element.rotation || 0}
     >
       <div className="text-content-wrapper">
         {isEditing ? (
@@ -60,16 +71,7 @@ export const TextElement = ({
           />
         ) : (
           <div
-            style={{ 
-              color: '#333',
-              fontSize: '24px',
-              fontFamily: 'Arial',
-              wordBreak: 'break-word',
-              maxWidth: '100%',
-              position: 'relative',
-              paddingRight: '12px',
-              transform: `rotate(${rotation}deg)`
-            }}
+            style={textStyle}
           >
             {editedText}
           </div>

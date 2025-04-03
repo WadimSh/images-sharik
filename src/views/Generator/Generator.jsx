@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
+import { FontControls } from '../../components/FontControls';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -15,6 +16,9 @@ export const Generator = () => {
 
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const colorInputRef = useRef(null);
+
+  // Добавляем состояние для выбранного текстового элемента
+  const [selectedTextElementId, setSelectedTextElementId] = useState(null);
 
   // Добавляем состояние для редактирования текста
   const [editingTextId, setEditingTextId] = useState(null);
@@ -93,6 +97,15 @@ export const Generator = () => {
     }
   };
 
+  // Обработчик изменений параметров шрифта
+  const handleFontChange = (elementId, property, value) => {
+    setElements(prev => 
+      prev.map(el => 
+        el.id === elementId ? { ...el, [property]: value } : el
+      )
+    );
+  };
+
   // Обработчик переключения редактирования
   const handleTextEditToggle = (elementId, isEditing) => {
     setEditingTextId(isEditing ? elementId : null);
@@ -109,6 +122,9 @@ export const Generator = () => {
       type,
       position: { x: 50, y: 50 },
       text: type === 'text' ? 'Новый текст' : '',
+      fontSize: 24,       // Добавляем по умолчанию
+      color: '#333333',   // Добавляем по умолчанию
+      fontFamily: 'Arial', // Добавляем по умолчанию
       image: null,
       ...(type === 'shape' && { 
         color: '#ccc',
@@ -357,12 +373,11 @@ const handleReplaceImage = (id) => {
             case 'text':
               return (
                 <TextElement
+                  element={element}
                   key={element.id}
-                  text={element.text}
                   position={element.position}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
-                  rotation={element.rotation} // Передаем поворот
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   onTextChange={(newText) => {
                     setElements(prev => prev.map(el => 
@@ -446,6 +461,19 @@ const handleReplaceImage = (id) => {
                 </button>
               )}
               {element.type === 'text' && (
+                
+                    <button
+                      onClick={() => setSelectedTextElementId(
+                        prev => prev === element.id ? null : element.id
+                      )}
+                      className="font-settings-button"
+                      title="Настройки шрифта"
+                    >
+                      Аа
+                    </button>
+                  
+                )}
+              {element.type === 'text' && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -479,20 +507,30 @@ const handleReplaceImage = (id) => {
                 </button>
               </div>
               <input
-  type="color"
-  ref={colorInputRef}
-  onChange={handleColorChange}
-  style={{ 
-    position: 'absolute',
-    opacity: 0,
-    height: 0,
-    width: 0 
-  }}
-/>
+                type="color"
+                ref={colorInputRef}
+                onChange={handleColorChange}
+                style={{ 
+                  position: 'absolute',
+                  opacity: 0,
+                  height: 0,
+                  width: 0 
+                }}
+              />
+              
             </div>
           )})}
         </div>
-
+        {/* Панель настроек шрифта вне цикла элементов */}
+  {selectedTextElementId && (
+    <div className="font-controls-wrapper">
+      <FontControls
+        element={elements.find(el => el.id === selectedTextElementId)}
+        onClose={() => setSelectedTextElementId(null)}
+        onChange={handleFontChange}
+      />
+    </div>
+  )}
         <button 
           onClick={handleDownload} 
           className="download-button"

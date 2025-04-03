@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 
-
 const ItemsGrid = ({ items }) => {
   const navigate = useNavigate();
 
@@ -27,7 +26,9 @@ const ItemsGrid = ({ items }) => {
               return (
                 <div key={element.id} style={{
                   ...style, 
-                  fontSize: `calc(12px + 0.5vw - 0.5vh)`, // Адаптивный размер шрифта
+                  fontSize: `${(element.fontSize || 24) * 0.61}px`,
+                  fontFamily: element.fontFamily,
+                  color: element.color,
                   whiteSpace: 'nowrap'
                 }} className="preview-text">
                   {element.text}
