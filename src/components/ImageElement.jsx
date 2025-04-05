@@ -20,7 +20,12 @@ export const ImageElement = ({
 
   const handleResize = (newSize) => {
     setDimensions(newSize);
-    onResize(newSize);
+    onResize({
+      width: newSize.width,
+      height: newSize.height,
+      x: newSize.x ?? position.x, // Сохраняем новую позицию
+      y: newSize.y ?? position.y
+    });
   };
 
   return (
@@ -42,7 +47,7 @@ export const ImageElement = ({
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
           pointerEvents: 'none',
-          objectFit: 'contain',
+          objectFit: 'cover',
           transform: `rotate(${rotation}deg)`
         }}
       />}

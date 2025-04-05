@@ -227,11 +227,36 @@ const handleReplaceImage = (id) => {
   input.click();
 };
 
-  const handleDrag = (id, newPosition, newRotation) => {
-    setElements(elements.map(el => 
-      el.id === id ? { ...el, position: newPosition, rotation: newRotation !== undefined ? newRotation : el.rotation } : el
-    ));
-  };
+const handleDrag = (id, newPosition, newRotation) => {
+  setElements(prev => prev.map(el => {
+    if (el.id === id) {
+      return {
+        ...el,
+        position: newPosition,
+        rotation: newRotation !== undefined ? newRotation : el.rotation
+      };
+    }
+    return el;
+  }));
+};
+
+// Добавляем новый обработчик для комплексного обновления
+const handleResizeWithPosition = (id, newData) => {
+  setElements(prev => prev.map(el => {
+    if (el.id === id) {
+      return {
+        ...el,
+        width: newData.width,
+        height: newData.height,
+        position: {
+          x: newData.x ?? el.position.x,
+          y: newData.y ?? el.position.y
+        }
+      };
+    }
+    return el;
+  }));
+};
 
   const handleRemoveElement = (id) => {
     setElements(elements.filter(el => el.id !== id));
@@ -338,11 +363,7 @@ const handleReplaceImage = (id) => {
                   height={element.height}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
-                  onResize={(newSize) => {
-                    setElements(prev => prev.map(el => 
-                      el.id === element.id ? {...el, ...newSize} : el
-                    ));
-                  }}
+                  onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                   rotation={element.rotation} // Передаем поворот
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
@@ -358,11 +379,7 @@ const handleReplaceImage = (id) => {
                   height={element.height}
                   color={element.color || '#ccc'} // Добавляем цвет
                   onDrag={(pos) => handleDrag(element.id, pos)}
-                  onResize={(newSize) => {
-                    setElements(prev => prev.map(el => 
-                      el.id === element.id ? {...el, ...newSize} : el
-                    ));
-                  }}
+                  onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                   rotation={element.rotation} // Передаем поворот
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   

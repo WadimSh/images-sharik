@@ -4,8 +4,6 @@ const DraggableElement = ({
   children, 
   position, 
   onDrag, 
-  containerWidth, 
-  containerHeight,
   onResize,
   onRotate,
   resizeable,
@@ -18,8 +16,8 @@ const DraggableElement = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const elementRef = useRef(null);
   const rotateHandleRef = useRef(null);
-  const initialSize = useRef({ width: dimensions ? dimensions.width : 'auto', height: dimensions ? dimensions.height : 'auto' });
-
+  const initialSize = useRef({ width: dimensions?.width, height: dimensions?.height });
+  
   const overlayRef = useRef(null);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const animationFrameRef = useRef(null);
@@ -29,15 +27,15 @@ const DraggableElement = ({
     
     const element = elementRef.current;
     const overlay = overlayRef.current;
+    
+    // Синхронизируем размеры с текущими значениями из DOM
+    overlay.style.width = `${element.offsetWidth}px`;
+    overlay.style.height = `${element.offsetHeight}px`;
+    
+    // Обновляем позицию после изменения размеров
     const rect = element.getBoundingClientRect();
-
-    animationFrameRef.current = requestAnimationFrame(() => {
-      overlay.style.left = `${rect.left}px`;
-      overlay.style.top = `${rect.top}px`;
-
-      overlay.style.width = `${element.offsetWidth}px`;
-      overlay.style.height = `${element.offsetHeight}px`;
-    });
+    overlay.style.left = `${rect.left}px`;
+    overlay.style.top = `${rect.top}px`;
   };
 
   // Клик вне элемента
@@ -82,7 +80,8 @@ const DraggableElement = ({
       
       const newRotation = (currentRotation + angle * (180/Math.PI)) % 360;
       setCurrentRotation(newRotation);
-      if(onRotate) onRotate(newRotation);
+      onRotate?.(newRotation);
+      updateOverlayPosition();
     };
 
     const handleMouseUpR = () => {
@@ -107,6 +106,20 @@ const DraggableElement = ({
     setIsResizing(true);
   };
 
+  const handleDirectionalResize = (e, direction) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rect = elementRef.current.getBoundingClientRect();
+    initialSize.current = {
+      width: rect.width,
+      height: rect.height,
+      x: e.clientX,
+      y: e.clientY,
+      direction
+    };
+    setIsResizing(true);
+  };
+
   const handleMouseDown = (e) => {
     if (e.button !== 0 || isResizing) return;
     
@@ -123,19 +136,47 @@ const DraggableElement = ({
   const handleMouseMove = (e) => {
     if (isResizing) {
       const deltaX = e.clientX - initialSize.current.x;
-      const aspectRatio = initialSize.current.width / initialSize.current.height;
-      
-      const newWidth = Math.max(
-        50,
-        Math.min(
-          initialSize.current.width + deltaX,
-          containerWidth - position.x
-        )
-      );
-      
-      const newHeight = newWidth / aspectRatio;
+      const deltaY = e.clientY - initialSize.current.y;
   
-      onResize({ width: newWidth, height: newHeight });
+      if (!initialSize.current.direction) {
+        // Proportional resize
+        const newWidth = Math.max(50, initialSize.current.width + deltaX);
+        const newHeight = newWidth / (initialSize.current.width / initialSize.current.height);
+        onResize?.({ width: newWidth, height: newHeight });
+      } else {
+        // Directional resize
+        let newWidth = initialSize.current.width;
+        let newHeight = initialSize.current.height;
+        let newX = position.x;
+        let newY = position.y;
+  
+        switch (initialSize.current.direction) {
+          case 'left':
+            newWidth = Math.max(50, initialSize.current.width - deltaX);
+            newX = position.x + deltaX;
+            break;
+          case 'right':
+            newWidth = Math.max(50, initialSize.current.width + deltaX);
+            break;
+          case 'top':
+            newHeight = Math.max(50, initialSize.current.height - deltaY);
+            newY = position.y + deltaY;
+            break;
+          case 'bottom':
+            newHeight = Math.max(50, initialSize.current.height + deltaY);
+            break;
+        }
+  
+        onResize?.({ 
+          width: newWidth, 
+          height: newHeight,
+          x: newX, 
+          y: newY 
+        });
+      }
+  
+      // Принудительное обновление оверлея
+      updateOverlayPosition();
       return;
     }
   
@@ -143,11 +184,7 @@ const DraggableElement = ({
       const parentRect = elementRef.current.parentNode.getBoundingClientRect();
       const newX = e.clientX - parentRect.left - offset.x;
       const newY = e.clientY - parentRect.top - offset.y;
-  
-      onDrag({
-        x: newX,
-        y: newY
-      });
+      onDrag?.({ x: newX, y: newY });
       updateOverlayPosition();
     }
   };
@@ -187,12 +224,14 @@ const DraggableElement = ({
       onMouseDown={handleMouseDown}
     >
       {children}
- <div 
+      <div 
         ref={overlayRef}
         className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
         style={{
           transform: `rotate(${currentRotation}deg)`,
-          transformOrigin: 'center center'
+          transformOrigin: 'center center',
+          width: dimensions ? `${dimensions.width}px` : 'auto',
+          height: dimensions ? `${dimensions.height}px` : 'auto',
         }}
       >
         {/* Ручка поворота */}
@@ -207,14 +246,19 @@ const DraggableElement = ({
       
       {/* Кнопка изменения размера */}
       {resizeable && (
-        <div
-          className={`resize-handle ${isOverlayVisible ? 'visible' : ''}`}
-          onMouseDown={handleResizeStart}
-          style={{
-            
-          }}
-        />
-      )}
+            <>
+              <div className={`resize-handle left ${isOverlayVisible ? 'visible' : ''}`}
+                onMouseDown={(e) => handleDirectionalResize(e, 'left')} />
+              <div className={`resize-handle right ${isOverlayVisible ? 'visible' : ''}`}
+                onMouseDown={(e) => handleDirectionalResize(e, 'right')} />
+              <div className={`resize-handle top ${isOverlayVisible ? 'visible' : ''}`}
+                onMouseDown={(e) => handleDirectionalResize(e, 'top')} />
+              <div className={`resize-handle bottom ${isOverlayVisible ? 'visible' : ''}`}
+                onMouseDown={(e) => handleDirectionalResize(e, 'bottom')} />
+              <div className={`resize-handle diagonal ${isOverlayVisible ? 'visible' : ''}`}
+                onMouseDown={handleResizeStart} />
+            </>
+          )}
       </div>
     </div>
     

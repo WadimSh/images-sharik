@@ -148,16 +148,46 @@
 
 .resize-handle {
   position: absolute;
-  right: -8px;
-  bottom: -8px;
-  width: 14px;
-  height: 14px;
-  background-color: #fff;
+  width: 12px;
+  height: 12px;
+  background: #fff;
   border: 1px solid #007bff;
   border-radius: 50%;
-  cursor: nwse-resize;
-  z-index: 1000; 
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 1000;
   pointer-events: auto;
+}
+
+.resize-handle.diagonal {
+  right: -12px;
+  bottom: -12px;
+  cursor: nwse-resize;
+}
+
+.resize-handle.left {
+  left: 0;
+  top: 50%;
+  cursor: ew-resize;
+}
+
+.resize-handle.right {
+  left: 100%;
+  top: 50%;
+  cursor: ew-resize;
+}
+
+.resize-handle.top {
+  left: 50%;
+  top: 0;
+  cursor: ns-resize;
+}
+
+.resize-handle.bottom {
+  left: 50%;
+  top: 100%;
+  cursor: ns-resize;
 }
 
 .rotate-handle {

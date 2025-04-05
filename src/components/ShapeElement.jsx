@@ -20,10 +20,15 @@ export const ShapeElement = ({
   });
   
   const containerRef = useRef(null);
-
+  
   const handleResize = (newSize) => {
     setDimensions(newSize);
-    onResize(newSize);
+    onResize({
+      width: newSize.width,
+      height: newSize.height,
+      x: newSize.x ?? position.x, // Сохраняем новую позицию
+      y: newSize.y ?? position.y
+    });
   };
   
   return (
@@ -35,7 +40,7 @@ export const ShapeElement = ({
       resizeable={true}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
-      dimensions={{ width, height }}
+      dimensions={dimensions}
       rotation={rotation}
     >
       <div 
@@ -44,18 +49,12 @@ export const ShapeElement = ({
           position: 'relative',
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
-          transform: `rotate(${rotation}deg)`
+          transform: `rotate(${rotation}deg)`,
+          backgroundColor: color,
+          border: 'none',
         }}
       >
-        {/* Основной квадрат */}
-        <div
-          style={{ 
-            width: '100%',
-            height: '100%',
-            backgroundColor: color,
-            border: 'none',
-          }}
-        />
+        
       </div>
     </DraggableElement>
   );
