@@ -21,7 +21,10 @@ const ItemsGrid = ({ items }) => {
           switch (element.type) {
             case 'image':
               return <img key={element.id} src={element.image} alt="preview" 
-                       style={style} className="preview-element" />;
+                       style={{
+                        ...style,
+                        objectFit: 'cover',
+                      }} className="preview-element" />;
             case 'text':
               return (
                 <div key={element.id} style={{
