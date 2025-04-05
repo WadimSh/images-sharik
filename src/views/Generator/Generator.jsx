@@ -345,7 +345,7 @@ const handleResizeWithPosition = (id, newData) => {
             <option value="" disabled hidden>Добавить элемент...</option>
             <option value="image">Изображение</option>
             <option value="text">Текст</option>
-            <option value="shape">Квадрат</option>
+            <option value="shape">Фигура</option>
           </select>
         </div>
       </div>
