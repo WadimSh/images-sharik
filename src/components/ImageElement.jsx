@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
+import item from '../assets/item.jpg'
 
 export const ImageElement = ({ 
   src, 
@@ -13,10 +14,37 @@ export const ImageElement = ({
   rotation = 0,
   onRotate
 }) => {
+  const [imageSrc, setImageSrc] = useState('');
   const [dimensions, setDimensions] = useState({ 
     width: width,
     height: height 
   });
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        if (src.startsWith('https')) {
+          const response = await fetch(src);
+          const blob = await response.blob();
+          const objectURL = URL.createObjectURL(blob);
+          setImageSrc(objectURL);
+        } else {
+          setImageSrc(src);
+        }
+      } catch (error) {
+        console.error('Error loading image:', error);
+        setImageSrc(item); // или установить fallback изображение
+      }
+    };
+
+    loadImage();
+
+    return () => {
+      if (imageSrc.startsWith('blob:')) {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [src]);
 
   const handleResize = (newSize) => {
     setDimensions(newSize);
@@ -40,8 +68,8 @@ export const ImageElement = ({
       dimensions={{ width, height }}
       rotation={rotation}
     >
-      {src && <img // Добавляем проверку на наличие src
-        src={src}
+      {imageSrc && <img // Добавляем проверку на наличие src
+        src={imageSrc}
         alt="uploaded"
         style={{ 
           width: `${dimensions.width}px`,

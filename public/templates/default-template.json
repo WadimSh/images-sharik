@@ -6,7 +6,7 @@
           "x": 3,
           "y": 125
       },
-      "image": "/images/item.jpg",
+      "image": "{{ITEM_IMAGE}}",
       "width": 415,
       "height": 415,
       "originalWidth": 400,
@@ -45,7 +45,7 @@
           "x": 23.66668701171875,
           "y": 75
       },
-      "text": "воздушные шары",
+      "text": "{{CATEGORY}}",
       "fontSize": 32,
       "color": "#1560c1",
       "fontFamily": "Candara",
@@ -58,8 +58,8 @@
           "x": 25.66668701171875,
           "y": 25
       },
-      "text": "Ассорти",
-      "fontSize": 48,
+      "text": "{{TITLE}}",
+      "fontSize": 42,
       "color": "#1560c1",
       "fontFamily": "Candara",
       "image": null
@@ -71,10 +71,10 @@
           "x": 186,
           "y": 550.0000305175781
       },
-      "text": "{{ARTICLE}}",
+      "text": "{{BRAND}}",
       "fontSize": 28,
-      "color": "#333333",
-      "fontFamily": "Arial",
+      "color": "#1560c1",
+      "fontFamily": "Segoe UI",
       "image": null
   },
   {
@@ -84,7 +84,7 @@
           "x": 362,
           "y": 157
       },
-      "text": "25шт",
+      "text": "{{MULTIPLICITY}}",
       "fontSize": 24,
       "color": "#ffffff",
       "fontFamily": "Comic Sans MS",
@@ -97,7 +97,7 @@
           "x": 364,
           "y": 263
       },
-      "text": "20см",
+      "text": "{{SIZE}}",
       "fontSize": 24,
       "color": "#ffffff",
       "fontFamily": "Comic Sans MS",

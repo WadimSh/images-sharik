@@ -1,7 +1,7 @@
 const SearchHeader = ({ onSearch, searchQuery, setSearchQuery, isSearchActive }) => {
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
-  console.log(isSearchActive)
+  
   const handleInputChange = (event) => {
     let value = event.target.value;
     

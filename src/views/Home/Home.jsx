@@ -1,23 +1,22 @@
 import { useState, useCallback, useEffect } from 'react';
-
 import SearchHeader from "../../components/SearchHeader";
 import ItemsGrid from "../../components/ItemsGrid";
+import { data } from "../../assets/data";
 
-const replacePlaceholders = (template, article) => {
-  const replacer = (value) => {
-    if (typeof value === 'string') {
-      return value.replace(/{{ARTICLE}}/g, article);
-    }
-    return value;
-  };
-
-  return template.map(element => {
-    const newElement = {};
-    for (const key in element) {
-      newElement[key] = replacer(element[key]);
-    }
-    return newElement;
-  });
+const replacePlaceholders = (template, item) => {
+  return template.map(element => ({
+    ...element,
+    image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,
+    text: element.text
+      ? element.text
+          .replace("{{CATEGORY}}", item.category)
+          .replace("{{TITLE}}", item.title)
+          .replace("{{MULTIPLICITY}}", item.multiplicity)
+          .replace("{{SIZE}}", item.size)
+          .replace("{{BRAND}}", item.brand)
+          //.replace("{{ARTICLE}}", item.code)
+      : element.text
+  }));
 };
 
 export const Home = () => {
@@ -30,6 +29,36 @@ export const Home = () => {
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [template, setTemplate] = useState([]);
+
+  const result = data.map(item => {
+    // Находим нужные свойства
+    const materialGroup = item.properties.find(prop => prop.name === 'Группа материала');
+    const designGroup = item.properties.find(prop => prop.name === 'Дизайн товара');
+    const sizeGroup = item.properties.find(prop => prop.name === 'Размер');
+    const brandName = item.origin_properties.find(prop => prop.name === 'Торговая марка');
+    
+    return {
+        code: item.code,
+        multiplicity: `${item.multiplicity}шт`,
+        size: sizeGroup
+          ? sizeGroup.value.split("/")[0].trim()
+          : '',
+        title: designGroup
+          ? designGroup.value
+          : '',
+        image: item.images[0] 
+          ? `https://new.sharik.ru${item.images[0].image}` 
+          : '',
+        category: materialGroup 
+          ? materialGroup.value.toLowerCase() 
+          : '',
+        brand: brandName
+          ? brandName.value
+          : '',
+    };
+  });
+
+  console.log(result)
 
   useEffect(() => {
     // Только для синхронизации при обновлениях из других вкладок
@@ -59,7 +88,8 @@ export const Home = () => {
       sessionStorage.removeItem('searchData');
     }
   }, [searchQuery, validArticles]);
-
+  
+  // Загрузка шаблона
   useEffect(() => {
     fetch('/templates/default-template.json')
       .then(response => response.json())
@@ -67,18 +97,21 @@ export const Home = () => {
       .catch(console.error);
   }, []);
 
-  const generateDesignData = useCallback((article) => {
-    return replacePlaceholders(template, article);
+  const generateDesignData = useCallback((item) => {
+    return replacePlaceholders(template, item);
   }, [template]);
 
   const handleSearch = useCallback((normalizedArticles) => {
-    normalizedArticles.forEach(article => {
-      const designData = generateDesignData(article);
-      sessionStorage.setItem(`design-${article}`, JSON.stringify(designData));
+
+    const codes = normalizedArticles.length > 0 && result.map(item => item.code);
+
+    result.forEach(item => {
+      const designData = generateDesignData(item);
+      sessionStorage.setItem(`design-${item.code}`, JSON.stringify(designData));
     });
 
-    setValidArticles(normalizedArticles);
-    setIsSearchActive(normalizedArticles.length > 0);
+    setValidArticles(codes);
+    setIsSearchActive(codes.length > 0);
   }, [generateDesignData]);
 
   return (
