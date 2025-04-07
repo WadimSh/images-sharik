@@ -525,7 +525,12 @@ const handleResizeWithPosition = (id, newData) => {
                   ×
                 </button>
               </div>
-              <input
+              
+              
+            </div>
+          )})}
+        </div>
+        <input
                 type="color"
                 ref={colorInputRef}
                 onChange={handleColorChange}
@@ -536,10 +541,6 @@ const handleResizeWithPosition = (id, newData) => {
                   width: 0 
                 }}
               />
-              
-            </div>
-          )})}
-        </div>
         {/* Панель настроек шрифта вне цикла элементов */}
   {selectedTextElementId && (
     <div className="font-controls-wrapper">
