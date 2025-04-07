@@ -61,7 +61,7 @@ export const Home = () => {
   }, [searchQuery, validArticles]);
 
   useEffect(() => {
-    fetch('/templates/main-template.json')
+    fetch('/templates/default-template.json')
       .then(response => response.json())
       .then(data => setTemplate(data))
       .catch(console.error);
