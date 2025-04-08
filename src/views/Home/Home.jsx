@@ -30,32 +30,33 @@ export const Home = () => {
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [template, setTemplate] = useState([]);
 
-  const result = data.map(item => {
+  const result = data.flatMap(item => {
     // Находим нужные свойства
     const materialGroup = item.properties.find(prop => prop.name === 'Группа материала');
     const designGroup = item.properties.find(prop => prop.name === 'Дизайн товара');
     const sizeGroup = item.properties.find(prop => prop.name === 'Размер');
     const brandName = item.origin_properties.find(prop => prop.name === 'Торговая марка');
     
-    return {
-        code: item.code,
-        multiplicity: `${item.multiplicity}шт`,
-        size: sizeGroup
-          ? sizeGroup.value.split("/")[0].trim()
-          : '',
-        title: designGroup
-          ? designGroup.value
-          : '',
-        image: item.images[0] 
-          ? `https://new.sharik.ru${item.images[0].image}` 
-          : '',
-        category: materialGroup 
-          ? materialGroup.value.toLowerCase() 
-          : '',
-        brand: brandName
-          ? brandName.value
-          : '',
-    };
+    // Создаем отдельную запись для каждого изображения
+    return item.images.map((image, imgIndex) => ({
+      code: `${item.code}_${imgIndex + 1}`, // Уникальный код с индексом
+      originalCode: item.code, // Сохраняем оригинальный код товара
+      multiplicity: `${item.multiplicity}шт`,
+      size: sizeGroup
+        ? sizeGroup.value.split("/")[0].trim()
+        : '',
+      title: designGroup
+        ? designGroup.value
+        : '',
+      image: `https://new.sharik.ru${image.image}`,
+      category: materialGroup 
+        ? materialGroup.value.toLowerCase() 
+        : '',
+      brand: brandName
+        ? brandName.value
+        : '',
+      imageData: image // Сохраняем все данные изображения
+    }));
   });
 
   console.log(result)
@@ -102,17 +103,23 @@ export const Home = () => {
   }, [template]);
 
   const handleSearch = useCallback((normalizedArticles) => {
-
     const codes = normalizedArticles.length > 0 && result.map(item => item.code);
 
     result.forEach(item => {
       const designData = generateDesignData(item);
-      sessionStorage.setItem(`design-${item.code}`, JSON.stringify(designData));
+      sessionStorage.setItem(
+        `design-${item.code}`, 
+        JSON.stringify(designData)
+      );
     });
 
     setValidArticles(codes);
     setIsSearchActive(codes.length > 0);
   }, [generateDesignData]);
+
+  const handleItemsUpdate = (newItems) => {
+    setValidArticles(newItems);
+  };
 
   return (
     <div>
@@ -122,7 +129,10 @@ export const Home = () => {
         setSearchQuery={setSearchQuery}
         isSearchActive={isSearchActive}
       />
-      <ItemsGrid items={validArticles} />
+      <ItemsGrid 
+        items={validArticles} 
+        onItemsUpdate={handleItemsUpdate}
+      />
     </div>
   );
 };
