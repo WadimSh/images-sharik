@@ -1,0 +1,132 @@
+[
+  {
+      "id": 1744221023619,
+      "type": "image",
+      "position": {
+          "x": 0,
+          "y": 0
+      },
+      "image": "/images/fon-01-01.png",
+      "width": 450,
+      "height": 600,
+      "originalWidth": 900,
+      "originalHeight": 1200
+  },
+  {
+      "id": 1744221038696,
+      "type": "image",
+      "position": {
+          "x": 151,
+          "y": 534
+      },
+      "image": "/images/logo-gemar.png",
+      "width": 162,
+      "height": 65,
+      "originalWidth": 626,
+      "originalHeight": 251
+  },
+  {
+      "id": 1744221252268,
+      "type": "image",
+      "position": {
+          "x": 30,
+          "y": 167
+      },
+      "image": "{{ITEM_IMAGE}}",
+      "width": 350,
+      "height": 350,
+      "originalWidth": 400,
+      "originalHeight": 400
+  },
+  {
+      "id": 1744221109540,
+      "type": "image",
+      "position": {
+          "x": 304,
+          "y": 17
+      },
+      "image": "/images/round-01.png",
+      "width": 131,
+      "height": 131,
+      "originalWidth": 250,
+      "originalHeight": 250
+  },
+  {
+      "id": 1744221137175,
+      "type": "image",
+      "position": {
+          "x": 304,
+          "y": 156
+      },
+      "image": "/images/round-08.png",
+      "width": 131,
+      "height": 131,
+      "originalWidth": 250,
+      "originalHeight": 250
+  },
+  {
+      "id": 1744221189410,
+      "type": "image",
+      "position": {
+          "x": 320.5,
+          "y": 415.5
+      },
+      "image": "/images/sertif.png",
+      "width": 104,
+      "height": 104,
+      "originalWidth": 263,
+      "originalHeight": 263
+  },
+  {
+      "id": 1744221565297,
+      "type": "text",
+      "position": {
+          "x": 17,
+          "y": 16
+      },
+      "text": "{{TITLE}}",
+      "fontSize": 34,
+      "color": "#f0f0f0",
+      "fontFamily": "Comic Sans MS",
+      "image": null
+  },
+  {
+      "id": 1744221409662,
+      "type": "text",
+      "position": {
+          "x": 17,
+          "y": 63
+      },
+      "text": "{{CATEGORY}}",
+      "fontSize": 24,
+      "color": "#f0f0f0",
+      "fontFamily": "Comic Sans MS",
+      "image": null
+  },
+  {
+      "id": 1744221504335,
+      "type": "text",
+      "position": {
+          "x": 334,
+          "y": 60
+      },
+      "text": "{{MULTIPLICITY}}",
+      "fontSize": 29,
+      "color": "#f0f0f0",
+      "fontFamily": "Comic Sans MS",
+      "image": null
+  },
+  {
+      "id": 1744221657494,
+      "type": "text",
+      "position": {
+          "x": 334,
+          "y": 196
+      },
+      "text": "{{SIZE}}",
+      "fontSize": 29,
+      "color": "#f0f0f0",
+      "fontFamily": "Comic Sans MS",
+      "image": null
+  }
+]

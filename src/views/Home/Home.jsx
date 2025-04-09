@@ -27,7 +27,10 @@ export const Home = () => {
   const [validArticles, setValidArticles] = useState(initialData.articles);
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
-  const [template, setTemplate] = useState([]);
+  const [templates, setTemplates] = useState({
+    default: [],
+    gemar: []
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -64,10 +67,19 @@ export const Home = () => {
   
   // Загрузка шаблона
   useEffect(() => {
-    fetch('/templates/default-template.json')
-      .then(response => response.json())
-      .then(data => setTemplate(data))
-      .catch(console.error);
+    const loadTemplates = async () => {
+      try {
+        const [defaultTemplate, gemarTemplate] = await Promise.all([
+          fetch('/templates/default-template.json').then(r => r.json()),
+          fetch('/templates/gemar-template.json').then(r => r.json())
+        ]);
+        setTemplates({ default: defaultTemplate, gemar: gemarTemplate });
+      } catch (error) {
+        console.error('Ошибка загрузки шаблонов:', error);
+      }
+    };
+
+    loadTemplates();
   }, []);
 
   // Выносим функцию обработки данных в отдельную утилиту
@@ -107,8 +119,9 @@ export const Home = () => {
   };
 
   const generateDesignData = useCallback((item) => {
+    const template = item.brand === 'Gemar' ? templates.gemar : templates.default;
     return replacePlaceholders(template, item);
-  }, [template]);
+  }, [templates.default, templates.gemar]);
 
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {
