@@ -9,12 +9,11 @@ const replacePlaceholders = (template, item) => {
     image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,
     text: element.text
       ? element.text
-          .replace("{{CATEGORY}}", item.category)
-          .replace("{{TITLE}}", item.title)
-          .replace("{{MULTIPLICITY}}", item.multiplicity)
-          .replace("{{SIZE}}", item.size)
-          .replace("{{BRAND}}", item.brand)
-          //.replace("{{ARTICLE}}", item.code)
+        .replace("{{CATEGORY}}", item.category)
+        .replace("{{TITLE}}", item.title)
+        .replace("{{MULTIPLICITY}}", item.multiplicity)
+        .replace("{{SIZE}}", item.size)
+        .replace("{{BRAND}}", item.brand)
       : element.text
   }));
 };
@@ -30,36 +29,9 @@ export const Home = () => {
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [template, setTemplate] = useState([]);
 
-  const result = data.flatMap(item => {
-    // Находим нужные свойства
-    const materialGroup = item.properties.find(prop => prop.name === 'Группа материала');
-    const designGroup = item.properties.find(prop => prop.name === 'Дизайн товара');
-    const sizeGroup = item.properties.find(prop => prop.name === 'Размер');
-    const brandName = item.origin_properties.find(prop => prop.name === 'Торговая марка');
-    
-    // Создаем отдельную запись для каждого изображения
-    return item.images.map((image, imgIndex) => ({
-      code: `${item.code}_${imgIndex + 1}`, // Уникальный код с индексом
-      originalCode: item.code, // Сохраняем оригинальный код товара
-      multiplicity: `${item.multiplicity}шт`,
-      size: sizeGroup
-        ? sizeGroup.value.split("/")[0].trim()
-        : '',
-      title: designGroup
-        ? designGroup.value
-        : '',
-      image: `https://new.sharik.ru${image.image}`,
-      category: materialGroup 
-        ? materialGroup.value.toLowerCase() 
-        : '',
-      brand: brandName
-        ? brandName.value
-        : '',
-      imageData: image // Сохраняем все данные изображения
-    }));
-  });
-
-  console.log(result)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [infoMessage, setInfoMessage] = useState(null);
 
   useEffect(() => {
     // Только для синхронизации при обновлениях из других вкладок
@@ -98,24 +70,116 @@ export const Home = () => {
       .catch(console.error);
   }, []);
 
+  // Выносим функцию обработки данных в отдельную утилиту
+  const processProductsData = (productsData) => {
+    if (!Array.isArray(productsData)) {
+      console.error('Некорректные данные для обработки:', productsData);
+      return [];
+    }
+  
+    return productsData.flatMap(item => {
+      if (!item || !item.images || !Array.isArray(item.images)) {
+        console.warn('Некорректный элемент товара:', item);
+        return [];
+      }
+  
+      const properties = item.properties || [];
+      const originProperties = item.origin_properties || [];
+  
+      const getPropertyValue = (propName) => 
+        properties.find(p => p.name === propName)?.value || '';
+  
+      const getOriginPropertyValue = (propName) => 
+        originProperties.find(p => p.name === propName)?.value || '';
+  
+      return item.images.map((image, imgIndex) => ({
+        code: `${item.code}_${imgIndex + 1}`,
+        originalCode: item.code,
+        multiplicity: `${item.multiplicity}шт`,
+        size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
+        title: getPropertyValue('Дизайн товара'),
+        image: `https://new.sharik.ru${image.image}`,
+        category: getPropertyValue('Группа материала').toLowerCase(),
+        brand: getOriginPropertyValue('Торговая марка'),
+        imageData: image
+      }));
+    });
+  };
+
   const generateDesignData = useCallback((item) => {
     return replacePlaceholders(template, item);
   }, [template]);
 
-  const handleSearch = useCallback((normalizedArticles) => {
-    const codes = normalizedArticles.length > 0 && result.map(item => item.code);
+  // В компоненте Home обновляем handleSearch
+const handleSearch = useCallback((normalizedArticles) => {
+  setError(null);
+  setInfoMessage(null);
 
-    result.forEach(item => {
-      const designData = generateDesignData(item);
-      sessionStorage.setItem(
-        `design-${item.code}`, 
-        JSON.stringify(designData)
-      );
+  if (!normalizedArticles.length) {
+    setValidArticles([]);
+    setIsSearchActive(false);
+    return
+  };
+
+  setLoading(true);
+
+  const searchQuery = normalizedArticles.join(' ');
+  const encodedSearch = encodeURIComponent(searchQuery);
+
+  fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.results.length === 0) {
+        const message = normalizedArticles.length === 1 
+          ? "Товара с таким артикулом у нас нет." 
+          : "Товаров с такими артикулами у нас нет.";
+        setInfoMessage(message);
+        return Promise.reject(message);
+      }
+
+      const productIds = data.results.map(product => product.id);
+      const idsParam = productIds.join(',');
+      return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+    })
+    .then(response => response?.json())
+    .then(detailedData => {
+      if (!detailedData) return;
+
+      // Обрабатываем полученные данные API
+      const processedResults = processProductsData(detailedData);
+      
+      // Сохраняем в sessionStorage
+      processedResults.forEach(item => {
+        const designData = generateDesignData(item);
+        sessionStorage.setItem(
+          `design-${item.code}`, 
+          JSON.stringify(designData)
+        );
+      });
+
+      // Обновляем состояние
+      const codes = processedResults.map(item => item.code);
+      setValidArticles(codes);
+      setIsSearchActive(codes.length > 0);
+
+      // Сохраняем оригинальные артикулы
+      sessionStorage.setItem('searchData', JSON.stringify({
+        query: searchQuery,
+        articles: codes
+      }));
+
+      return processedResults;
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+      setError(error.message || 'Произошла ошибка при поиске');
+      setValidArticles([]);
+      setIsSearchActive(false);
+    })
+    .finally(() => {
+      setLoading(false);
     });
-
-    setValidArticles(codes);
-    setIsSearchActive(codes.length > 0);
-  }, [generateDesignData]);
+}, [generateDesignData]);
 
   const handleItemsUpdate = (newItems) => {
     setValidArticles(newItems);
@@ -128,6 +192,9 @@ export const Home = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         isSearchActive={isSearchActive}
+        loading={loading}
+        error={error}
+        infoMessage={infoMessage}
       />
       <ItemsGrid 
         items={validArticles} 

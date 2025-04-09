@@ -1,4 +1,12 @@
-const SearchHeader = ({ onSearch, searchQuery, setSearchQuery, isSearchActive }) => {
+const SearchHeader = ({ 
+  onSearch, 
+  searchQuery, 
+  setSearchQuery, 
+  isSearchActive,
+  loading,
+  error,
+  infoMessage
+}) => {
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
   
@@ -95,6 +103,23 @@ const SearchHeader = ({ onSearch, searchQuery, setSearchQuery, isSearchActive })
         >
           Найти
         </button>
+      </div>
+      <div className="status-messages">
+        {loading && (
+          <div className="message loading">
+            ⏳ Подождите немножко, мы ищем интересующие вас товары...
+          </div>
+        )}
+        
+        {infoMessage ? (
+          <div className="message info">
+            ℹ️ {infoMessage}
+          </div>
+        ) : error && (
+          <div className="message error">
+            ❌ {error}
+          </div>
+        )}
       </div>
     </div>
   );
