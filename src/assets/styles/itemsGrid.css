@@ -120,7 +120,7 @@
 
 .delete-button {
   position: absolute;
-  top: 5px;
+  top: 0px;
   right: 0px;
   background: rgba(143, 143, 143, 0.4);
   color: #333;

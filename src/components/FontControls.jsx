@@ -2,57 +2,7 @@ import { useRef, useEffect } from "react";
 
 export const FontControls = ({ element, onClose, onChange }) => {
   const controlsRef = useRef(null);
-  // Полный список шрифтов Windows с группировкой
-  const fontGroups = [
-    {
-      group: "Основные",
-      fonts: [
-        'Arial', 'Arial Black', 'Arial Narrow',
-        'Calibri', 'Calibri Light',
-        'Times New Roman', 
-        'Verdana', 'Tahoma',
-        'Segoe UI', 'Segoe Print', 'Segoe Script',
-        'Georgia', 'Cambria', 'Candara'
-      ]
-    },
-    {
-      group: "Заголовочные",
-      fonts: [
-        'Impact', 'Rockwell', 'Franklin Gothic',
-        'Bahnschrift', 'Britannic Bold', 'Haettenschweiler'
-      ]
-    },
-    {
-      group: "Рукописные",
-      fonts: [
-        'Comic Sans MS', 'MV Boli', 'Ink Free',
-        'Lucida Handwriting', 'Papyrus'
-      ]
-    },
-    {
-      group: "Моноширинные",
-      fonts: [
-        'Consolas', 'Courier New', 'Lucida Console',
-        'MS Gothic', 'OCR A Extended'
-      ]
-    },
-    {
-      group: "Классические",
-      fonts: [
-        'Garamond', 'Book Antiqua', 'Palatino Linotype',
-        'Century Gothic', 'Baskerville Old Face'
-      ]
-    },
-    {
-      group: "Специальные",
-      fonts: [
-        'Wingdings', 'Wingdings 2', 'Wingdings 3',
-        'Webdings', 'Symbol'
-      ]
-    }
-  ];
-
-
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (controlsRef.current && !controlsRef.current.contains(e.target)) {
@@ -110,6 +60,7 @@ export const FontControls = ({ element, onClose, onChange }) => {
           value={element.fontFamily || 'Arial'}
           onChange={(e) => onChange(element.id, 'fontFamily', e.target.value)}
         >
+          <option value="CustomFont9887">CustomFont9887</option>
           <option value="Arial">Arial</option>
           <option value="Times New Roman">Times New Roman</option>
           <option value="Verdana">Verdana</option>
