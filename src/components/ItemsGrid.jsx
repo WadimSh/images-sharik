@@ -51,6 +51,38 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
   if (!items || items.length === 0) return null;
 
   // Функция для создания нового дизайна
+  //const handleCreateNewDesign = (baseCode) => {
+  //  const existingNumbers = items
+  //    .filter(item => item.startsWith(`${baseCode}_`))
+  //    .map(item => parseInt(item.split('_')[1]))
+  //    .filter(num => !isNaN(num));
+  //  
+  //  const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+  //  const newDesignKey = `${baseCode}_${newNumber}`;
+//
+  //  const firstImageItem = items.find(item => item.startsWith(`${baseCode}_1`));
+  //  const firstImageData = firstImageItem 
+  //    ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
+  //    : null;
+//
+  //  const newDesign = {
+  //    id: Date.now(),
+  //    type: "image",
+  //    position: { x: 19, y: 85 },
+  //    image: firstImageData?.find(el => el.type === 'image')?.image || '',
+  //    width: 415,
+  //    height: 415,
+  //    originalWidth: 400,
+  //    originalHeight: 400
+  //  };
+//
+  //  sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
+  //  
+  //  // Обновляем список items
+  //  onItemsUpdate([...items, newDesignKey]);
+  //  navigate(`/template/${newDesignKey}`);
+  //};
+
   const handleCreateNewDesign = (baseCode) => {
     const existingNumbers = items
       .filter(item => item.startsWith(`${baseCode}_`))
@@ -59,26 +91,37 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
     
     const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     const newDesignKey = `${baseCode}_${newNumber}`;
-
-    const firstImageItem = items.find(item => item.startsWith(`${baseCode}_1`));
+  
+    // Явно ищем элемент с суффиксом _1 для этого базового кода
+    const firstImageKey = `${baseCode}_1`;
+    const firstImageItem = items.includes(firstImageKey) 
+      ? firstImageKey 
+      : null;
+  
+    // Получаем данные для элемента _1
     const firstImageData = firstImageItem 
       ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
       : null;
-
+  
+    // Ищем первое изображение с URL в элементах шаблона _1
+    const firstImageUrl = firstImageData?.find(el => 
+      el.type === 'image' && 
+      el.image?.startsWith('http')
+    )?.image || '';
+  
     const newDesign = {
       id: Date.now(),
       type: "image",
       position: { x: 19, y: 85 },
-      image: firstImageData?.find(el => el.type === 'image')?.image || '',
+      image: firstImageUrl,
       width: 415,
       height: 415,
       originalWidth: 400,
       originalHeight: 400
     };
-
+  
     sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
     
-    // Обновляем список items
     onItemsUpdate([...items, newDesignKey]);
     navigate(`/template/${newDesignKey}`);
   };
@@ -141,7 +184,7 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
               >
                 <div className="item-content new-design-content">
                   <div className="plus-sign">+</div>
-                  <div className="create-text">Создать новый дизайн</div>
+                  <div className="create-text">Создать новый слайдер</div>
                 </div>
               </div>
 
@@ -152,4 +195,5 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
     </div>
   );
 };
+
 export default ItemsGrid;

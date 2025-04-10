@@ -37,7 +37,8 @@ export const ShapeElement = ({
       onDrag={onDrag}
       onResize={handleResize}
       onRotate={onRotate}
-      resizeable={true}
+      resizeable
+      splitResizable
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={dimensions}

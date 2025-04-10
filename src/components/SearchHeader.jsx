@@ -107,17 +107,16 @@ const SearchHeader = ({
       <div className="status-messages">
         {loading && (
           <div className="message loading">
-            ⏳ Подождите немножко, мы ищем интересующие вас товары...
+            Подождите немножко, мы ищем интересующие вас товары...
           </div>
         )}
-        
         {infoMessage ? (
           <div className="message info">
-            ℹ️ {infoMessage}
+            {infoMessage}
           </div>
         ) : error && (
           <div className="message error">
-            ❌ {error}
+            {error}
           </div>
         )}
       </div>

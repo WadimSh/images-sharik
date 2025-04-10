@@ -62,7 +62,7 @@ export const ImageElement = ({
       onDrag={onDrag}
       onResize={handleResize}
       onRotate={onRotate}
-      resizeable={true}
+      resizeable
       containerWidth={containerWidth}
       containerHeight={containerHeight}
       dimensions={{ width, height }}

@@ -7,6 +7,7 @@ const DraggableElement = ({
   onResize,
   onRotate,
   resizeable,
+  splitResizable,
   dimensions = null,
   rotation = 0
 }) => {
@@ -244,21 +245,26 @@ const DraggableElement = ({
         }}
       />
       
-      {/* Кнопка изменения размера */}
-      {resizeable && (
-            <>
-              <div className={`resize-handle left ${isOverlayVisible ? 'visible' : ''}`}
-                onMouseDown={(e) => handleDirectionalResize(e, 'left')} />
-              <div className={`resize-handle right ${isOverlayVisible ? 'visible' : ''}`}
-                onMouseDown={(e) => handleDirectionalResize(e, 'right')} />
-              <div className={`resize-handle top ${isOverlayVisible ? 'visible' : ''}`}
-                onMouseDown={(e) => handleDirectionalResize(e, 'top')} />
-              <div className={`resize-handle bottom ${isOverlayVisible ? 'visible' : ''}`}
-                onMouseDown={(e) => handleDirectionalResize(e, 'bottom')} />
-              <div className={`resize-handle diagonal ${isOverlayVisible ? 'visible' : ''}`}
-                onMouseDown={handleResizeStart} />
-            </>
-          )}
+        {/* Кнопка изменения размера */}
+        {splitResizable && (
+          <>
+            <div className={`resize-handle left ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleDirectionalResize(e, 'left')} />
+            <div className={`resize-handle right ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleDirectionalResize(e, 'right')} />
+            <div className={`resize-handle top ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleDirectionalResize(e, 'top')} />
+            <div className={`resize-handle bottom ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleDirectionalResize(e, 'bottom')} />
+          </>
+        )}
+        {resizeable && (
+          <>
+            
+            <div className={`resize-handle diagonal ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={handleResizeStart} />
+          </>
+        )}
       </div>
     </div>
     
