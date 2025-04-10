@@ -80,6 +80,7 @@
   background: white;
   border-radius: 8px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .new-design-card {
@@ -108,6 +109,37 @@
   color: #666;
   text-align: center;
   font-size: 0.9rem;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 0px;
+  background: rgba(143, 143, 143, 0.4);
+  color: #333;
+  border: 1px solid #333;
+  border-radius: 2px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 2;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-card:hover .delete-button {
+  opacity: 1;
+}
+
+.delete-button:hover {
+  color: #fff;
+  border: 1px solid #cc0000;
+  background: #cc0000;
 }
 
 /* Адаптивные стили */

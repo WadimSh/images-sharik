@@ -51,38 +51,6 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
   if (!items || items.length === 0) return null;
 
   // Функция для создания нового дизайна
-  //const handleCreateNewDesign = (baseCode) => {
-  //  const existingNumbers = items
-  //    .filter(item => item.startsWith(`${baseCode}_`))
-  //    .map(item => parseInt(item.split('_')[1]))
-  //    .filter(num => !isNaN(num));
-  //  
-  //  const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-  //  const newDesignKey = `${baseCode}_${newNumber}`;
-//
-  //  const firstImageItem = items.find(item => item.startsWith(`${baseCode}_1`));
-  //  const firstImageData = firstImageItem 
-  //    ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
-  //    : null;
-//
-  //  const newDesign = {
-  //    id: Date.now(),
-  //    type: "image",
-  //    position: { x: 19, y: 85 },
-  //    image: firstImageData?.find(el => el.type === 'image')?.image || '',
-  //    width: 415,
-  //    height: 415,
-  //    originalWidth: 400,
-  //    originalHeight: 400
-  //  };
-//
-  //  sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
-  //  
-  //  // Обновляем список items
-  //  onItemsUpdate([...items, newDesignKey]);
-  //  navigate(`/template/${newDesignKey}`);
-  //};
-
   const handleCreateNewDesign = (baseCode) => {
     const existingNumbers = items
       .filter(item => item.startsWith(`${baseCode}_`))
@@ -137,9 +105,17 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
 
   const uniqueBaseCodes = getUniqueBaseCodes();
 
-  console.log(uniqueBaseCodes)
   const handleItemClick = (itemId) => {
     navigate(`/template/${itemId}`);
+  };
+
+  // Функция удаления элемента
+  const handleDeleteItem = (itemId) => {
+    // Удаляем из sessionStorage
+    sessionStorage.removeItem(`design-${itemId}`);
+    // Обновляем список элементов
+    const updatedItems = items.filter(item => item !== itemId);
+    onItemsUpdate(updatedItems);
   };
 
   return (
@@ -164,6 +140,18 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
                     role="button"
                     tabIndex={0}
                   >
+                    {/* Кнопка удаления */}
+                    <button
+                      className="delete-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteItem(item);
+                      }}
+                      title="Удалить дизайн"
+                    >
+                      ×
+                    </button>
+                    
                     <div className="item-content">
                       {elements ? (
                         <PreviewDesign elements={elements} />
