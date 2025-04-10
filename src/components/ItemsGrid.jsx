@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const PreviewDesign = ({ elements }) => {
   return (
@@ -47,8 +48,26 @@ const PreviewDesign = ({ elements }) => {
 
 const ItemsGrid = ({ items, onItemsUpdate }) => {
   const navigate = useNavigate();
-  
-  if (!items || items.length === 0) return null;
+  const [baseCodesOrder, setBaseCodesOrder] = useState([]);
+
+  // Инициализируем порядок при первом рендере
+  useEffect(() => {
+    const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+    setBaseCodesOrder(initialOrder);
+  }, []);
+
+  // Обновляем порядок при изменениях
+  useEffect(() => {
+    const newCodes = items.map(item => item.split('_').slice(0, -1).join('_'));
+    const uniqueNewCodes = [...new Set(newCodes)];
+    
+    // Сохраняем исходный порядок, добавляя новые группы в конец
+    setBaseCodesOrder(prev => {
+      const preservedOrder = prev.filter(code => uniqueNewCodes.includes(code));
+      const newGroups = uniqueNewCodes.filter(code => !prev.includes(code));
+      return [...preservedOrder, ...newGroups];
+    });
+  }, [items]);
 
   // Функция для создания нового дизайна
   const handleCreateNewDesign = (baseCode) => {
@@ -60,28 +79,15 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
     const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     const newDesignKey = `${baseCode}_${newNumber}`;
   
-    // Явно ищем элемент с суффиксом _1 для этого базового кода
-    const firstImageKey = `${baseCode}_1`;
-    const firstImageItem = items.includes(firstImageKey) 
-      ? firstImageKey 
-      : null;
-  
-    // Получаем данные для элемента _1
-    const firstImageData = firstImageItem 
-      ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
-      : null;
-  
-    // Ищем первое изображение с URL в элементах шаблона _1
-    const firstImageUrl = firstImageData?.find(el => 
-      el.type === 'image' && 
-      el.image?.startsWith('http')
-    )?.image || '';
-  
+    const productMeta = JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || '{}'
+    );
+    
     const newDesign = {
       id: Date.now(),
       type: "image",
       position: { x: 19, y: 85 },
-      image: firstImageUrl,
+      image: productMeta.images[0],
       width: 415,
       height: 415,
       originalWidth: 400,
@@ -96,11 +102,9 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
   
   // Функция для получения уникальных базовых артикулов
   const getUniqueBaseCodes = () => {
-    const baseCodes = items.map(item => {
-      const parts = item.split('_');
-      return parts.slice(0, -1).join('_');
-    });
-    return [...new Set(baseCodes)];
+    return baseCodesOrder.filter(baseCode => 
+      items.some(item => item.startsWith(`${baseCode}_`))
+    );
   };
 
   const uniqueBaseCodes = getUniqueBaseCodes();
