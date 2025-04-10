@@ -116,6 +116,14 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
     // Обновляем список элементов
     const updatedItems = items.filter(item => item !== itemId);
     onItemsUpdate(updatedItems);
+
+    // Проверяем нужно ли удалять метаданные товара
+    const productCode = itemId.split('_').slice(0, -1).join('_');
+    const remaining = items.filter(item => item.startsWith(`${productCode}_`));
+    console.log(remaining)
+    if (remaining.length === 1) {
+      sessionStorage.removeItem(`product-${productCode}`);
+    }
   };
 
   return (
@@ -123,10 +131,15 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
       {uniqueBaseCodes.map((baseCode) => {
         // Находим все элементы относящиеся к этому базовому коду
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
-        
+        const productMeta = JSON.parse(
+          sessionStorage.getItem(`product-${baseCode}`) || '{}'
+        );
         return (
           <div key={baseCode}>
-            <h2 className="item-title">{baseCode}</h2>
+            <h2 className="item-title">
+              {baseCode}
+              {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
+            </h2>
             <div className="items-grid">
               {relatedItems.map((item, index) => {
                 const designData = sessionStorage.getItem(`design-${item}`);

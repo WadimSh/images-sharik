@@ -82,6 +82,45 @@ export const Home = () => {
     loadTemplates();
   }, []);
 
+  const processProductsMeta = (productsData) => {
+    if (!Array.isArray(productsData)) {
+      console.error('Некорректные данные для обработки:', productsData);
+      return [];
+    }
+  
+    return productsData.map(item => {
+      if (!item || !item.images || !Array.isArray(item.images)) {
+        console.warn('Некорректный элемент товара:', item);
+        return null;
+      }
+  
+      const properties = item.properties || [];
+      const originProperties = item.origin_properties || [];
+  
+      const getPropertyValue = (propName) => 
+        properties.find(p => p.name === propName)?.value || '';
+  
+      const getOriginPropertyValue = (propName) => 
+        originProperties.find(p => p.name === propName)?.value || '';
+  
+      // Формируем массив ссылок на изображения
+      const images = item.images.map(image => 
+        `https://new.sharik.ru${image.image}`
+      );
+  
+      return {
+        code: item.code,
+        name: item.name,
+        multiplicity: `${item.multiplicity}шт`,
+        size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
+        title: getPropertyValue('Дизайн товара'),
+        images: images, // Массив ссылок на все изображения товара
+        category: getPropertyValue('Группа материала').toLowerCase(),
+        brand: getOriginPropertyValue('Торговая марка')
+      };
+    }).filter(item => item !== null); // Фильтруем некорректные элементы
+  };
+
   // Выносим функцию обработки данных в отдельную утилиту
   const processProductsData = (productsData) => {
     if (!Array.isArray(productsData)) {
@@ -106,14 +145,12 @@ export const Home = () => {
   
       return item.images.map((image, imgIndex) => ({
         code: `${item.code}_${imgIndex + 1}`,
-        originalCode: item.code,
         multiplicity: `${item.multiplicity}шт`,
         size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
         title: getPropertyValue('Дизайн товара'),
         image: `https://new.sharik.ru${image.image}`,
         category: getPropertyValue('Группа материала').toLowerCase(),
         brand: getOriginPropertyValue('Торговая марка'),
-        imageData: image
       }));
     });
   };
@@ -160,7 +197,9 @@ const handleSearch = useCallback((normalizedArticles) => {
 
       // Обрабатываем полученные данные API
       const processedResults = processProductsData(data);
+      const processedMetaResults = processProductsMeta(data);
       //const processedResults = processProductsData(detailedData);
+      //const processedMetaResults = processProductsMeta(detailedData);
       
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -168,6 +207,13 @@ const handleSearch = useCallback((normalizedArticles) => {
         sessionStorage.setItem(
           `design-${item.code}`, 
           JSON.stringify(designData)
+        );
+      });
+
+      processedMetaResults.forEach(item => {
+        sessionStorage.setItem(
+          `product-${item.code}`, 
+          JSON.stringify(item)
         );
       });
 
