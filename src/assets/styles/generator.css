@@ -283,8 +283,11 @@
 }
 
 .meta-link {
+  min-width: 300px;
+  max-width: 350px;
   text-decoration: none;
   color: #333;
+  white-space: wrap;
 }
 
 .meta-link:hover, .meta-link:hover .meta-subtitle {
@@ -306,17 +309,15 @@
 }
 
 .meta-row {
-  max-width: 300px;
   display: flex;
-  margin: 0 -15px; /* Упрощаем отступы */
+  margin: 0 -10px; /* Упрощаем отступы */
   padding: 5px 0; /* Добавим отступ сверху и снизу */
 }
 
 .meta-col {
-  flex: 0 0 50%;
-  flex-wrap: wrap;
+  flex: 1;
   max-width: 50%;
-  padding: 0 15px; /* Упрощаем отступы */
+  padding: 0 10px; /* Упрощаем отступы */
 }
 
 .meta-col div, .meta-col span {
