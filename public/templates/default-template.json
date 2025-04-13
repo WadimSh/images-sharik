@@ -1,119 +1,15 @@
 [
   {
-      "id": 1744037218977,
+      "id": 1744554572322,
       "type": "image",
       "position": {
-          "x": 3,
-          "y": 125
-      },
-      "image": "{{ITEM_IMAGE}}",
-      "width": 415,
-      "height": 415,
-      "originalWidth": 400,
-      "originalHeight": 400
-  },
-  {
-      "id": 1744036905723,
-      "type": "image",
-      "position": {
-          "x": 342,
-          "y": 124
-      },
-      "image": "/images/round-01.png",
-      "width": 102,
-      "height": 102,
-      "originalWidth": 250,
-      "originalHeight": 250
-  },
-  {
-      "id": 1744036928076,
-      "type": "image",
-      "position": {
-          "x": 342,
-          "y": 233
-      },
-      "image": "/images/round-08.png",
-      "width": 102,
-      "height": 102,
-      "originalWidth": 250,
-      "originalHeight": 250
-  },
-  {
-      "id": 1744037016899,
-      "type": "text",
-      "position": {
-          "x": 23.66668701171875,
+          "x": 0,
           "y": 75
       },
-      "text": "{{CATEGORY}}",
-      "fontSize": 32,
-      "color": "#1560c1",
-      "fontFamily": "Candara",
-      "image": null
-  },
-  {
-      "id": 1744037115578,
-      "type": "text",
-      "position": {
-          "x": 25.66668701171875,
-          "y": 25
-      },
-      "text": "{{TITLE}}",
-      "fontSize": 42,
-      "color": "#1560c1",
-      "fontFamily": "Candara",
-      "image": null
-  },
-  {
-      "id": 1744037294559,
-      "type": "text",
-      "position": {
-          "x": 186,
-          "y": 550.0000305175781
-      },
-      "text": "{{BRAND}}",
-      "fontSize": 28,
-      "color": "#1560c1",
-      "fontFamily": "Segoe UI",
-      "image": null
-  },
-  {
-      "id": 1744037486434,
-      "type": "text",
-      "position": {
-          "x": 362,
-          "y": 157
-      },
-      "text": "{{MULTIPLICITY}}",
-      "fontSize": 24,
-      "color": "#ffffff",
-      "fontFamily": "Comic Sans MS",
-      "image": null
-  },
-  {
-      "id": 1744037625350,
-      "type": "text",
-      "position": {
-          "x": 364,
-          "y": 263
-      },
-      "text": "{{SIZE}}",
-      "fontSize": 24,
-      "color": "#ffffff",
-      "fontFamily": "Comic Sans MS",
-      "image": null
-  },
-  {
-      "id": 1744038020847,
-      "type": "image",
-      "position": {
-          "x": 359,
-          "y": 24.5
-      },
-      "image": "/images/logo.webp",
-      "width": 76,
-      "height": 64,
-      "originalWidth": 150,
-      "originalHeight": 127
+      "image": "{{ITEM_IMAGE}}",
+      "width": 450,
+      "height": 450,
+      "originalWidth": 750,
+      "originalHeight": 750
   }
 ]

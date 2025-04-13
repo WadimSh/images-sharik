@@ -46,9 +46,10 @@ const PreviewDesign = ({ elements }) => {
 };
 
 
-const ItemsGrid = ({ items, onItemsUpdate }) => {
+const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
+  const [selectedTemplates, setSelectedTemplates] = useState({});
 
   // Инициализируем порядок при первом рендере
   useEffect(() => {
@@ -130,9 +131,18 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
     }
   };
 
+  const handleTemplateChange = (baseCode, templateKey) => {
+    // Обновляем состояние выбранного шаблона
+    setSelectedTemplates(prev => ({
+      ...prev,
+      [baseCode]: templateKey
+    }));
+  };
+
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
+        const currentTemplate = selectedTemplates[baseCode] || 'default';
         // Находим все элементы относящиеся к этому базовому коду
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
         const productMeta = JSON.parse(
@@ -144,6 +154,20 @@ const ItemsGrid = ({ items, onItemsUpdate }) => {
               {baseCode}
               {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
             </h2>
+            <div className="template-selector">
+              {Object.keys(templates).map(templateKey => (
+                <label key={templateKey}>
+                  <input
+                    type="radio"
+                    name={`template-${baseCode}`}
+                    value={templateKey}
+                    checked={currentTemplate === templateKey}
+                    onChange={() => handleTemplateChange(baseCode, templateKey)}
+                  />
+                  {templateKey}
+                </label>
+              ))}
+            </div>
             <div className="items-grid">
               {relatedItems.map((item, index) => {
                 const designData = sessionStorage.getItem(`design-${item}`);

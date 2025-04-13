@@ -29,6 +29,7 @@ export const Home = () => {
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [templates, setTemplates] = useState({
     default: [],
+    main: [],
     gemar: []
   });
 
@@ -69,11 +70,12 @@ export const Home = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const [defaultTemplate, gemarTemplate] = await Promise.all([
+        const [mainTemplate, defaultTemplate, gemarTemplate] = await Promise.all([
+          fetch('/templates/main-template.json').then(r => r.json()),
           fetch('/templates/default-template.json').then(r => r.json()),
           fetch('/templates/gemar-template.json').then(r => r.json())
         ]);
-        setTemplates({ default: defaultTemplate, gemar: gemarTemplate });
+        setTemplates({ main: mainTemplate, default: defaultTemplate, gemar: gemarTemplate });
       } catch (error) {
         console.error('Ошибка загрузки шаблонов:', error);
       }
@@ -151,9 +153,9 @@ export const Home = () => {
   };
 
   const generateDesignData = useCallback((item) => {
-    const template = item.brand === 'Gemar' ? templates.gemar : templates.default;
+    const template = item.brand === 'Gemar' ? templates.gemar : templates.main;
     return replacePlaceholders(template, item);
-  }, [templates.default, templates.gemar]);
+  }, [templates.main, templates.gemar]);
 
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {
@@ -254,6 +256,7 @@ const handleSearch = useCallback((normalizedArticles) => {
       <ItemsGrid 
         items={validArticles} 
         onItemsUpdate={handleItemsUpdate}
+        templates={templates}
       />
     </div>
   );
