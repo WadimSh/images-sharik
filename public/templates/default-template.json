@@ -3,12 +3,12 @@
       "id": 1744554572322,
       "type": "image",
       "position": {
-          "x": 0,
-          "y": 75
+          "x": -13,
+          "y": 74
       },
       "image": "{{ITEM_IMAGE}}",
-      "width": 450,
-      "height": 450,
+      "width": 479,
+      "height": 479,
       "originalWidth": 750,
       "originalHeight": 750
   }

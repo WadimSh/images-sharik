@@ -1,22 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import SearchHeader from "../../components/SearchHeader";
 import ItemsGrid from "../../components/ItemsGrid";
-import { data } from "../../assets/data";
 
-const replacePlaceholders = (template, item) => {
-  return template.map(element => ({
-    ...element,
-    image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,
-    text: element.text
-      ? element.text
-        .replace("{{CATEGORY}}", item.category)
-        .replace("{{TITLE}}", item.title)
-        .replace("{{MULTIPLICITY}}", item.multiplicity)
-        .replace("{{SIZE}}", item.size)
-        .replace("{{BRAND}}", item.brand)
-      : element.text
-  }));
-};
+import { replacePlaceholders } from '../../utils/replacePlaceholders';
+import { data } from "../../assets/data";
 
 export const Home = () => {
   const savedData = sessionStorage.getItem('searchData');
@@ -28,9 +15,9 @@ export const Home = () => {
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [templates, setTemplates] = useState({
-    default: [],
+    gemar: [],
     main: [],
-    gemar: []
+    default: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -75,7 +62,7 @@ export const Home = () => {
           fetch('/templates/default-template.json').then(r => r.json()),
           fetch('/templates/gemar-template.json').then(r => r.json())
         ]);
-        setTemplates({ main: mainTemplate, default: defaultTemplate, gemar: gemarTemplate });
+        setTemplates({ gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
       } catch (error) {
         console.error('Ошибка загрузки шаблонов:', error);
       }

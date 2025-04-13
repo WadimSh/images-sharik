@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import { replacePlaceholders } from '../utils/replacePlaceholders';
+
 const PreviewDesign = ({ elements }) => {
   return (
     <div className="preview-container">
@@ -51,6 +53,24 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState({});
 
+  // Функция определения шаблона по существующим данным
+  const determineTemplate = (baseCode) => {
+    return selectedTemplates[baseCode] || 'default';
+  };
+
+  // Инициализация выбранных шаблонов
+  useEffect(() => {
+    const initialTemplates = {};
+    getUniqueBaseCodes().forEach(baseCode => {
+      const firstItem = items.find(item => item.startsWith(`${baseCode}_`));
+      if (firstItem) {
+        const designData = JSON.parse(sessionStorage.getItem(`design-${firstItem}`) || []);
+        initialTemplates[baseCode] = determineTemplate(baseCode);
+      }
+    });
+    setSelectedTemplates(initialTemplates);
+  }, [items]);
+
   // Инициализируем порядок при первом рендере
   useEffect(() => {
     const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
@@ -70,34 +90,53 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     });
   }, [items]);
 
-  // Функция для создания нового дизайна
+  // Обновленная функция создания дизайна
   const handleCreateNewDesign = (baseCode) => {
+    const templateKey = selectedTemplates[baseCode] || 'main';
+    const productMeta = JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || '{}'
+    );
+  
+    // Находим последнее использованное изображение в группе
+    const existingDesigns = items
+      .filter(item => item.startsWith(`${baseCode}_`))
+      .map(item => JSON.parse(sessionStorage.getItem(`design-${item}`) || []));
+  
+    const lastImage = existingDesigns
+      .flatMap(design => design)
+      .reverse()
+      .find(el => el?.type === 'image')?.image 
+      || productMeta.images?.[0];
+  
+    // Генерация нового кода
     const existingNumbers = items
       .filter(item => item.startsWith(`${baseCode}_`))
       .map(item => parseInt(item.split('_')[1]))
       .filter(num => !isNaN(num));
     
-    const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    const newNumber = existingNumbers.length > 0 
+      ? Math.max(...existingNumbers) + 1 
+      : 1;
+    
     const newDesignKey = `${baseCode}_${newNumber}`;
   
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-    
-    const newDesign = {
-      id: Date.now(),
-      type: "image",
-      position: { x: 19, y: 85 },
-      image: productMeta.images[0],
-      width: 415,
-      height: 415,
-      originalWidth: 400,
-      originalHeight: 400
+    // Создание нового дизайна
+    const itemData = {
+      ...productMeta,
+      code: newDesignKey,
+      image: lastImage, // Используем последнее изображение
+      category: getPropertyValue(productMeta, 'Группа материала'),
+      title: getPropertyValue(productMeta, 'Дизайн товара'),
+      multiplicity: `${productMeta.multiplicity}шт`,
+      size: getPropertyValue(productMeta, 'Размер'),
+      brand: getOriginPropertyValue(productMeta, 'Торговая марка')
     };
   
-    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
-    
-    onItemsUpdate([...items, newDesignKey]);
+    const template = templates[templateKey];
+    const newDesign = replacePlaceholders(template, itemData);
+  
+    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
+    onItemsUpdate(prev => [...prev, newDesignKey]);
     navigate(`/template/${newDesignKey}`);
   };
   
@@ -131,18 +170,63 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   };
 
+  // Вспомогательные функции для свойств
+  const getPropertyValue = (productMeta, propName) => 
+    productMeta.properties?.find(p => p.name === propName)?.value || '';
+  
+  const getOriginPropertyValue = (productMeta, propName) => 
+    productMeta.originProperties?.find(p => p.name === propName)?.value || '';
+
+  // Обработчик изменения шаблона
   const handleTemplateChange = (baseCode, templateKey) => {
-    // Обновляем состояние выбранного шаблона
-    setSelectedTemplates(prev => ({
-      ...prev,
-      [baseCode]: templateKey
-    }));
+    // Получаем метаданные товара для группы
+  const productMeta = JSON.parse(
+    sessionStorage.getItem(`product-${baseCode}`) || '{}'
+  );
+
+    const updatedItems = items.map(item => {
+      if (item.startsWith(`${baseCode}_`)) {
+        // Получаем текущий дизайн
+        const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
+        
+        // Находим все изображения с реальными URL
+      const validImages = currentDesign.filter(el => 
+        el.type === 'image' && 
+        el.image?.startsWith('https://')
+      );
+
+      // Берем последнее добавленное изображение или из метаданных
+      const currentImage = validImages.length > 0 
+        ? validImages[validImages.length - 1].image 
+        : productMeta.images?.[0];
+  
+        const itemData = {
+          ...productMeta,
+          code: item,
+          image: currentImage, // Используем сохраненное изображение
+          category: getPropertyValue(productMeta, 'Группа материала'),
+          title: getPropertyValue(productMeta, 'Дизайн товара'),
+          multiplicity: `${productMeta.multiplicity}шт`,
+          size: getPropertyValue(productMeta, 'Размер'),
+          brand: getOriginPropertyValue(productMeta, 'Торговая марка')
+        };
+  
+        const template = templates[templateKey];
+        const newDesign = replacePlaceholders(template, itemData);
+        
+        sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
+      }
+      return item;
+    });
+  
+    setSelectedTemplates(prev => ({ ...prev, [baseCode]: templateKey }));
+    onItemsUpdate([...updatedItems]);
   };
 
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
-        const currentTemplate = selectedTemplates[baseCode] || 'default';
+        const currentTemplate = selectedTemplates[baseCode] || 'main';
         // Находим все элементы относящиеся к этому базовому коду
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
         const productMeta = JSON.parse(
