@@ -52,7 +52,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState({});
-
+  console.log(selectedTemplates)
   // Функция определения шаблона по существующим данным
   const determineTemplate = (baseCode) => {
     return selectedTemplates[baseCode] || 'default';
@@ -64,7 +64,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     getUniqueBaseCodes().forEach(baseCode => {
       const firstItem = items.find(item => item.startsWith(`${baseCode}_`));
       if (firstItem) {
-        const designData = JSON.parse(sessionStorage.getItem(`design-${firstItem}`) || []);
         initialTemplates[baseCode] = determineTemplate(baseCode);
       }
     });
