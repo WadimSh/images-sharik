@@ -3,12 +3,12 @@
         "id": 1744554572322,
         "type": "image",
         "position": {
-            "x": -16,
-            "y": 79
+            "x": -47,
+            "y": 24
         },
         "image": "{{ITEM_IMAGE}}",
-        "width": 488,
-        "height": 488,
+        "width": 543,
+        "height": 543,
         "originalWidth": 750,
         "originalHeight": 750
     },
@@ -17,11 +17,12 @@
         "type": "image",
         "position": {
             "x": 0,
-            "y": -2.125
+            "y": 404
         },
         "image": "/images/shape.png",
         "width": 450,
         "height": 196.25,
+        "rotation": 180,
         "originalWidth": 1800,
         "originalHeight": 785
     },
@@ -29,12 +30,13 @@
         "id": 1744555172564,
         "type": "image",
         "position": {
-            "x": 168,
-            "y": 476.8
+            "x": -37,
+            "y": -22
         },
         "image": "/images/shape2.png",
         "width": 324,
         "height": 145.8,
+        "rotation": 180,
         "originalWidth": 1800,
         "originalHeight": 810
     }
