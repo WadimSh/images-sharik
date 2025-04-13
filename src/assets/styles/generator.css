@@ -272,6 +272,59 @@
   background: #f0f0f0;
 }
 
+.meta-info {
+  width: 300px;
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Добавим тень для глубины */
+}
+
+.meta-link {
+  text-decoration: none;
+  color: #333;
+}
+
+.meta-link:hover, .meta-link:hover .meta-subtitle {
+  color:#2196F3;
+}
+
+.meta-title {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600; /* Сделаем заголовок более жирным */
+  font-size: 0.8rem; /* Увеличим размер шрифта */
+  line-height: 1.5;
+  margin-top: 0;
+  margin-bottom: 10px; /* Добавим отступ снизу */
+}
+
+.meta-subtitle {
+  color: #818a91;
+  font-size: 0.8rem; /* Увеличим размер шрифта для подзаголовка */
+}
+
+.meta-row {
+  max-width: 300px;
+  display: flex;
+  margin: 0 -15px; /* Упрощаем отступы */
+  padding: 5px 0; /* Добавим отступ сверху и снизу */
+}
+
+.meta-col {
+  flex: 0 0 50%;
+  flex-wrap: wrap;
+  max-width: 50%;
+  padding: 0 15px; /* Упрощаем отступы */
+}
+
+.meta-col div, .meta-col span {
+  white-space: wrap; /* Предотвращаем перенос текста */
+  overflow: hidden; /* Скрываем переполнение */
+  text-overflow: ellipsis; /* Добавляем многоточие для длинных текстов */
+}
+
 .sidebar {
   width: 300px;
   background: #f5f5f5;
@@ -280,7 +333,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  
 }
 
 .elements-list {

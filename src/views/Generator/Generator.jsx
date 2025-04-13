@@ -13,21 +13,25 @@ export const Generator = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const captureRef = useRef(null);
+  const baseId = id.split('_')[0];
 
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const colorInputRef = useRef(null);
-
+  
   // Добавляем состояние для выбранного текстового элемента
   const [selectedTextElementId, setSelectedTextElementId] = useState(null);
-
   // Добавляем состояние для редактирования текста
   const [editingTextId, setEditingTextId] = useState(null);
 
+  const storageMetaKey = `product-${baseId}`
+  const savedMetaDate = sessionStorage.getItem(storageMetaKey);
+  const initialMetaDateElement = savedMetaDate ? JSON.parse(savedMetaDate) : [];
+ 
   // Загрузка из sessionStorage при инициализации
   const storageKey = `design-${id}`;
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
-
+ 
   // Добавляем размеры по умолчанию для старых данных
   const processedElements = initialElements.map(element => {
     if (element.type === 'image' && !element.width) {
@@ -306,7 +310,7 @@ const handleResizeWithPosition = (id, newData) => {
       el.id === id ? { ...el, rotation: newRotation } : el
     ));
   };
-
+  console.log(initialMetaDateElement)
   return (
     <div className="generator-container">
       <div className="header-section">
@@ -350,6 +354,35 @@ const handleResizeWithPosition = (id, newData) => {
         </div>
       </div>
     <div className="content-wrapper">
+      <div className='meta-info'>
+        <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
+          <h3 className='meta-title'>
+            {initialMetaDateElement.code}
+            <span className="meta-subtitle"> {initialMetaDateElement.name}</span>
+          </h3>
+        </a>
+          {initialMetaDateElement.originProperties.map((item, index) => (
+              <div className="meta-row" key={index}>
+                  <div className="meta-col">
+                      <div className="meta-subtitle">{item.name}</div>
+                  </div>
+                  <div className="meta-col">
+                      <span className='meta-subtitle'>{item.value}</span>
+                  </div>
+              </div>
+          ))}
+          {initialMetaDateElement.properties.map((item, index) => (
+              <div className="meta-row" key={index}>
+                  <div className="meta-col">
+                      <div className="meta-subtitle">{item.name}</div>
+                  </div>
+                  <div className="meta-col">
+                      <span className='meta-subtitle'>{item.value}</span>
+                  </div>
+              </div>
+          ))}
+      </div>
+
       <div ref={captureRef} className="design-container">
         {elements.map((element) => {
           switch (element.type) {

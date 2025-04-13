@@ -97,28 +97,23 @@ export const Home = () => {
       const properties = item.properties || [];
       const originProperties = item.origin_properties || [];
   
-      const getPropertyValue = (propName) => 
-        properties.find(p => p.name === propName)?.value || '';
-  
-      const getOriginPropertyValue = (propName) => 
-        originProperties.find(p => p.name === propName)?.value || '';
-  
       // Формируем массив ссылок на изображения
       const images = item.images.map(image => 
         `https://new.sharik.ru${image.image}`
       );
+
+      const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
+      const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
   
       return {
         code: item.code,
         name: item.name,
-        multiplicity: `${item.multiplicity}шт`,
-        size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
-        title: getPropertyValue('Дизайн товара'),
+        link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
         images: images, // Массив ссылок на все изображения товара
-        category: getPropertyValue('Группа материала').toLowerCase(),
-        brand: getOriginPropertyValue('Торговая марка')
+        properties: propertiesList,
+        originProperties: originPropertiesList,
       };
-    }).filter(item => item !== null); // Фильтруем некорректные элементы
+    }); // Фильтруем некорректные элементы
   };
 
   // Выносим функцию обработки данных в отдельную утилиту
