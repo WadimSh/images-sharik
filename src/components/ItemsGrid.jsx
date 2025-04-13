@@ -89,54 +89,48 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     });
   }, [items]);
 
-  // Обновленная функция создания дизайна
+  // Функция для создания нового дизайна
   const handleCreateNewDesign = (baseCode) => {
-    const templateKey = selectedTemplates[baseCode] || 'main';
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-  
-    // Находим последнее использованное изображение в группе
-    const existingDesigns = items
-      .filter(item => item.startsWith(`${baseCode}_`))
-      .map(item => JSON.parse(sessionStorage.getItem(`design-${item}`) || []));
-  
-    const lastImage = existingDesigns
-      .flatMap(design => design)
-      .reverse()
-      .find(el => el?.type === 'image')?.image 
-      || productMeta.images?.[0];
-  
-    // Генерация нового кода
     const existingNumbers = items
       .filter(item => item.startsWith(`${baseCode}_`))
       .map(item => parseInt(item.split('_')[1]))
       .filter(num => !isNaN(num));
-    
-    const newNumber = existingNumbers.length > 0 
-      ? Math.max(...existingNumbers) + 1 
-      : 1;
-    
+
+    const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     const newDesignKey = `${baseCode}_${newNumber}`;
-  
-    // Создание нового дизайна
-    const itemData = {
-      ...productMeta,
-      code: newDesignKey,
-      image: lastImage, // Используем последнее изображение
-      category: getPropertyValue(productMeta, 'Группа материала'),
-      title: getPropertyValue(productMeta, 'Дизайн товара'),
-      multiplicity: `${productMeta.multiplicity}шт`,
-      size: getPropertyValue(productMeta, 'Размер'),
-      brand: getOriginPropertyValue(productMeta, 'Торговая марка')
+
+    // Явно ищем элемент с суффиксом _1 для этого базового кода
+    const firstImageKey = `${baseCode}_1`;
+    const firstImageItem = items.includes(firstImageKey) 
+      ? firstImageKey 
+      : null;
+
+    // Получаем данные для элемента _1
+    const firstImageData = firstImageItem 
+      ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
+      : null;
+
+    // Ищем первое изображение с URL в элементах шаблона _1
+    const firstImageUrl = firstImageData?.find(el => 
+      el.type === 'image' && 
+      el.image?.startsWith('http')
+    )?.image || '';
+
+    const newDesign = {
+      id: Date.now(),
+      type: "image",
+      position: { x: 19, y: 85 },
+      image: firstImageUrl,
+      width: 415,
+      height: 415,
+      originalWidth: 400,
+      originalHeight: 400
     };
-  
-    const template = templates[templateKey];
-    const newDesign = replacePlaceholders(template, itemData);
-  
-    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
-    onItemsUpdate(prev => [...prev, newDesignKey]);
-    navigate(`/template/${newDesignKey}`);
+
+    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
+
+    onItemsUpdate([...items, newDesignKey]);
+    
   };
   
   // Функция для получения уникальных базовых артикулов
@@ -206,7 +200,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           category: getPropertyValue(productMeta, 'Группа материала'),
           title: getPropertyValue(productMeta, 'Дизайн товара'),
           multiplicity: `${productMeta.multiplicity}шт`,
-          size: getPropertyValue(productMeta, 'Размер'),
+          size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
           brand: getOriginPropertyValue(productMeta, 'Торговая марка')
         };
   
