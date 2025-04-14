@@ -77,42 +77,35 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       .filter(item => item.startsWith(`${baseCode}_`))
       .map(item => parseInt(item.split('_')[1]))
       .filter(num => !isNaN(num));
-
+  
     const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     const newDesignKey = `${baseCode}_${newNumber}`;
-
-    // Явно ищем элемент с суффиксом _1 для этого базового кода
-    const firstImageKey = `${baseCode}_1`;
-    const firstImageItem = items.includes(firstImageKey) 
-      ? firstImageKey 
-      : null;
-
-    // Получаем данные для элемента _1
-    const firstImageData = firstImageItem 
-      ? JSON.parse(sessionStorage.getItem(`design-${firstImageItem}`))
-      : null;
-
-    // Ищем первое изображение с URL в элементах шаблона _1
-    const firstImageUrl = firstImageData?.find(el => 
-      el.type === 'image' && 
-      el.image?.startsWith('http')
-    )?.image || '';
-
-    const newDesign = {
-      id: Date.now(),
-      type: "image",
-      position: { x: 19, y: 85 },
-      image: firstImageUrl,
-      width: 415,
-      height: 415,
-      originalWidth: 400,
-      originalHeight: 400
+  
+    // Получаем метаданные продукта
+    const productMeta = JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || '{}'
+    );
+  
+    // Базовые данные для шаблона
+    const templateData = {
+      code: newDesignKey,
+      image: productMeta.images?.[0] || '',
+      category: productMeta.properties?.find(p => p.name === 'Группа материала')?.value?.toLowerCase() || '',
+      title: productMeta.properties?.find(p => p.name === 'Дизайн товара')?.value || '',
+      multiplicity: `${productMeta.multiplicity}шт`,
+      size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
+      brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || ''
     };
-
-    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify([newDesign]));
-
+  
+    // Генерируем дизайн из шаблона default
+    const defaultTemplate = templates.default || [];
+    const newDesign = replacePlaceholders(defaultTemplate, templateData);
+  
+    // Сохраняем в sessionStorage
+    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
+  
+    // Обновляем состояние
     onItemsUpdate([...items, newDesignKey]);
-    
   };
   
   // Функция для получения уникальных базовых артикулов
@@ -209,6 +202,13 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     );
   };
 
+  // Объект перевода названий шаблонов
+  const templateLabels = {
+    main: 'Базовый шаблон',
+    default: 'Шаблон картинка',
+    gemar: 'Шаблон Gemar'
+  };
+
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
@@ -233,7 +233,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
                     checked={currentTemplate === templateKey}
                     onChange={() => handleTemplateChange(baseCode, templateKey)}
                   />
-                  {templateKey}
+                  <span>{templateLabels[templateKey] || templateKey}</span>
                 </label>
               ))}
             </div>

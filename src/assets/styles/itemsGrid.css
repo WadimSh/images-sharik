@@ -26,12 +26,20 @@
   background: #f5f5f5;
   border-radius: 8px;
   display: flex;
+  flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+  overflow-x: auto; /* Добавляем скролл при необходимости */
+  gap: 15px; /* Единый отступ между элементами */
 }
 
 .template-selector label {
   margin-right: 15px;
+  white-space: nowrap;
   cursor: pointer;
   display: flex;
+}
+
+.template-selector span {
+  font-size: 0.8rem;
 }
 
 .template-selector input[type="radio"] {

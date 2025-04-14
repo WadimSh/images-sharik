@@ -16,15 +16,15 @@
         "id": 1744555048688,
         "type": "image",
         "position": {
-            "x": 0,
-            "y": 404
+            "x": 327,
+            "y": 324
         },
-        "image": "/images/shape.png",
-        "width": 450,
-        "height": 196.25,
-        "rotation": 180,
-        "originalWidth": 1800,
-        "originalHeight": 785
+        "image": "/images/shape3.png",
+        "width": 141,
+        "height": 313.3,
+        "rotation": 0,
+        "originalWidth": 810,
+        "originalHeight": 1800
     },
     {
         "id": 1744555172564,

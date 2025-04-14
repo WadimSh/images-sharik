@@ -270,6 +270,24 @@ const handleResizeWithPosition = (id, newData) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Формирование имени файла
+      const [baseCode, slideNumber] = id.split('_');
+      const slideType = slideNumber === '1' ? 'main' : `slide${slideNumber}`;
+    
+      const now = new Date();
+      const datePart = [
+        String(now.getDate()).padStart(2, '0'),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        now.getFullYear()
+      ].join('');
+    
+      const timePart = [
+        String(now.getHours()).padStart(2, '0'),
+        String(now.getMinutes()).padStart(2, '0')
+      ].join('');
+
+      const fileName = `${baseCode}_WB_${slideType}_${datePart}_${timePart}.png`;
+
       const canvas = await html2canvas(captureRef.current, {
         scale: 2,
         useCORS: true,
@@ -277,7 +295,7 @@ const handleResizeWithPosition = (id, newData) => {
       });
   
       const link = document.createElement('a');
-      link.download = 'design.png';
+      link.download = fileName;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (error) {
@@ -310,7 +328,7 @@ const handleResizeWithPosition = (id, newData) => {
       el.id === id ? { ...el, rotation: newRotation } : el
     ));
   };
-  console.log(initialMetaDateElement)
+  
   return (
     <div className="generator-container">
       <div className="header-section">
