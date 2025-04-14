@@ -51,25 +51,7 @@ const PreviewDesign = ({ elements }) => {
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
-  const [selectedTemplates, setSelectedTemplates] = useState({});
-  console.log(selectedTemplates)
-  // Функция определения шаблона по существующим данным
-  const determineTemplate = (baseCode) => {
-    return selectedTemplates[baseCode] || 'default';
-  };
-
-  // Инициализация выбранных шаблонов
-  useEffect(() => {
-    const initialTemplates = {};
-    getUniqueBaseCodes().forEach(baseCode => {
-      const firstItem = items.find(item => item.startsWith(`${baseCode}_`));
-      if (firstItem) {
-        initialTemplates[baseCode] = determineTemplate(baseCode);
-      }
-    });
-    setSelectedTemplates(initialTemplates);
-  }, [items]);
-
+    
   // Инициализируем порядок при первом рендере
   useEffect(() => {
     const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
@@ -173,9 +155,14 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   // Обработчик изменения шаблона
   const handleTemplateChange = (baseCode, templateKey) => {
     // Получаем метаданные товара для группы
-  const productMeta = JSON.parse(
-    sessionStorage.getItem(`product-${baseCode}`) || '{}'
-  );
+    const productMeta = JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || '{}'
+    );
+    const updatedMeta = {
+      ...productMeta,
+      templateType: templateKey
+    };
+    sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
 
     const updatedItems = items.map(item => {
       if (item.startsWith(`${baseCode}_`)) {
@@ -197,7 +184,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           ...productMeta,
           code: item,
           image: currentImage, // Используем сохраненное изображение
-          category: getPropertyValue(productMeta, 'Группа материала'),
+          category: getPropertyValue(productMeta, 'Группа материала').toLowerCase(),
           title: getPropertyValue(productMeta, 'Дизайн товара'),
           multiplicity: `${productMeta.multiplicity}шт`,
           size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
@@ -212,19 +199,24 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       return item;
     });
   
-    setSelectedTemplates(prev => ({ ...prev, [baseCode]: templateKey }));
     onItemsUpdate([...updatedItems]);
+  };
+
+  // Вспомогательная функция для получения метаданных
+  const getProductMeta = (baseCode) => {
+    return JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || { templateType: 'default' }
+    );
   };
 
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
-        const currentTemplate = selectedTemplates[baseCode] || 'main';
+        const productMeta = getProductMeta(baseCode);
+        const currentTemplate = productMeta.templateType || 'default';
         // Находим все элементы относящиеся к этому базовому коду
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
-        const productMeta = JSON.parse(
-          sessionStorage.getItem(`product-${baseCode}`) || '{}'
-        );
+        
         return (
           <div key={baseCode}>
             <h2 className="item-title">

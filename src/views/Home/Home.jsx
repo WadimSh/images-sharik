@@ -93,14 +93,21 @@ export const Home = () => {
 
       const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
       const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
+
+      // Добавляем определение типа шаблона
+      const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
+      const brand = brandProperty ? brandProperty.value : '';
+      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : 'main';
   
       return {
         code: item.code,
         name: item.name,
+        multiplicity: item.multiplicity,
         link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
         images: images, // Массив ссылок на все изображения товара
         properties: propertiesList,
         originProperties: originPropertiesList,
+        templateType: templateType, // Добавлено новое поле
       };
     }); // Фильтруем некорректные элементы
   };
@@ -142,7 +149,7 @@ export const Home = () => {
   const generateDesignData = useCallback((item) => {
     const template = item.brand === 'Gemar' ? templates.gemar : templates.main;
     return replacePlaceholders(template, item);
-  }, [templates.main, templates.gemar]);
+  }, [templates.main, templates.gemar, templates.default]);
 
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {
