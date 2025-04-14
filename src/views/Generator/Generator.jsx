@@ -286,7 +286,7 @@ const handleResizeWithPosition = (id, newData) => {
         String(now.getMinutes()).padStart(2, '0')
       ].join('');
 
-      const fileName = `${baseCode}_WB_${slideType}_${datePart}_${timePart}.png`;
+      const fileName = `${baseCode}_WB_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
       const canvas = await html2canvas(captureRef.current, {
         scale: 2,

@@ -36,6 +36,7 @@
   white-space: nowrap;
   cursor: pointer;
   display: flex;
+  align-items: center;
 }
 
 .template-selector span {
