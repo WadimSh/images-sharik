@@ -69,11 +69,11 @@ export const TextElement = ({
             style={{ maxWidth: `${containerWidth - position.x}px` }}
           />
         ) : (
-          <div
+          <span
             style={textStyle}
           >
             {editedText}
-          </div>
+          </span>
         )}
       </div>
     </DraggableElement>

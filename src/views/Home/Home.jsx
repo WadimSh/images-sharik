@@ -136,20 +136,29 @@ export const Home = () => {
   
       return item.images.map((image, imgIndex) => ({
         code: `${item.code}_${imgIndex + 1}`,
-        multiplicity: `${item.multiplicity}шт`,
+        multiplicity: item.multiplicity,
         size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
-        title: getPropertyValue('Дизайн товара'),
+        title: getPropertyValue('Тип латексных шаров'),
         image: `https://new.sharik.ru${image.image}`,
-        category: getPropertyValue('Группа материала').toLowerCase(),
+        category: getPropertyValue('Товарная номенклатура').toLowerCase(),
         brand: getOriginPropertyValue('Торговая марка'),
       }));
     });
   };
 
   const generateDesignData = useCallback((item) => {
-    const template = item.brand === 'Gemar' ? templates.gemar : templates.main;
+    if (item.brand === 'Gemar' && templates.gemar.length > 0) {
+      const parts = item.code.split('_');
+      const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+      // Выбираем индекс шаблона: 
+      // - для первых N картинок (где N = количество шаблонов) берем соответствующий шаблон
+      // - для картинок сверх этого количества берем последний шаблон
+      const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
+      return replacePlaceholders(templates.gemar[templateIndex], item);
+    }
+    const template = item.templateType === 'main' ? templates.main : templates.default;
     return replacePlaceholders(template, item);
-  }, [templates.main, templates.gemar, templates.default]);
+  }, [templates]);
 
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {

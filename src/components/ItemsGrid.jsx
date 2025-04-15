@@ -25,7 +25,7 @@ const PreviewDesign = ({ elements }) => {
                     }} className="preview-element" />;
           case 'text':
             return (
-              <div key={element.id} style={{
+              <span key={element.id} style={{
                 ...style, 
                 fontSize: `${(element.fontSize || 24) * 0.61}px`,
                 fontFamily: element.fontFamily,
@@ -33,7 +33,7 @@ const PreviewDesign = ({ elements }) => {
                 whiteSpace: 'nowrap'
               }} className="preview-text">
                 {element.text}
-              </div>
+              </span>
             );
           case 'shape':
             return <div key={element.id} 
@@ -90,9 +90,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     const templateData = {
       code: newDesignKey,
       image: productMeta.images?.[0] || '',
-      category: productMeta.properties?.find(p => p.name === 'Группа материала')?.value?.toLowerCase() || '',
-      title: productMeta.properties?.find(p => p.name === 'Дизайн товара')?.value || '',
-      multiplicity: `${productMeta.multiplicity}шт`,
+      category: productMeta.properties?.find(p => p.name === 'Товарная номенклатура')?.value?.toLowerCase() || '',
+      title: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+      multiplicity: productMeta.multiplicity,
       size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
       brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || ''
     };
@@ -146,23 +146,24 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     productMeta.originProperties?.find(p => p.name === propName)?.value || '';
 
   // Обработчик изменения шаблона
-  const handleTemplateChange = (baseCode, templateKey) => {
-    // Получаем метаданные товара для группы
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-    const updatedMeta = {
-      ...productMeta,
-      templateType: templateKey
-    };
-    sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
+  // Обработчик изменения шаблона
+const handleTemplateChange = (baseCode, templateKey) => {
+  // Получаем метаданные товара для группы
+  const productMeta = JSON.parse(
+    sessionStorage.getItem(`product-${baseCode}`) || '{}'
+  );
+  const updatedMeta = {
+    ...productMeta,
+    templateType: templateKey
+  };
+  sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
 
-    const updatedItems = items.map(item => {
-      if (item.startsWith(`${baseCode}_`)) {
-        // Получаем текущий дизайн
-        const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
-        
-        // Находим все изображения с реальными URL
+  const updatedItems = items.map(item => {
+    if (item.startsWith(`${baseCode}_`)) {
+      // Получаем текущий дизайн
+      const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
+      
+      // Находим все изображения с реальными URL
       const validImages = currentDesign.filter(el => 
         el.type === 'image' && 
         el.image?.startsWith('https://')
@@ -172,29 +173,43 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       const currentImage = validImages.length > 0 
         ? validImages[validImages.length - 1].image 
         : productMeta.images?.[0];
-  
-        const itemData = {
-          ...productMeta,
-          code: item,
-          image: currentImage, // Используем сохраненное изображение
-          category: getPropertyValue(productMeta, 'Группа материала').toLowerCase(),
-          title: getPropertyValue(productMeta, 'Дизайн товара'),
-          multiplicity: `${productMeta.multiplicity}шт`,
-          size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
-          brand: getOriginPropertyValue(productMeta, 'Торговая марка')
-        };
-  
-        const template = templates[templateKey];
-        const newDesign = replacePlaceholders(template, itemData);
-        
-        sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
-      }
-      return item;
-    });
-  
-    onItemsUpdate([...updatedItems]);
-  };
 
+      // Извлекаем индекс изображения из кода
+      const parts = item.split('_');
+      const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+
+      const itemData = {
+        ...productMeta,
+        code: item,
+        image: currentImage,
+        category: getPropertyValue(productMeta, 'Группа материала').toLowerCase(),
+        title: getPropertyValue(productMeta, 'Дизайн товара'),
+        multiplicity: productMeta.multiplicity,
+        size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
+        brand: getOriginPropertyValue(productMeta, 'Торговая марка'),
+        // Добавляем индекс изображения в данные
+        imageIndex: imageIndex
+      };
+
+      // Выбираем подходящий шаблон
+      let template;
+      if (templateKey === 'gemar' && Array.isArray(templates.gemar)) {
+        // Для Gemar выбираем шаблон по индексу изображения
+        const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
+        template = templates.gemar[templateIndex];
+      } else {
+        // Для остальных шаблонов используем обычный выбор
+        template = templates[templateKey];
+      }
+
+      const newDesign = replacePlaceholders(template, itemData);
+      sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
+    }
+    return item;
+  });
+
+  onItemsUpdate([...updatedItems]);
+};
   // Вспомогательная функция для получения метаданных
   const getProductMeta = (baseCode) => {
     return JSON.parse(
