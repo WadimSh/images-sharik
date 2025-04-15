@@ -15,6 +15,7 @@ export const Home = () => {
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   const [templates, setTemplates] = useState({
+    belbal: [],
     gemar: [],
     main: [],
     default: [],
@@ -57,12 +58,13 @@ export const Home = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const [mainTemplate, defaultTemplate, gemarTemplate] = await Promise.all([
+        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate] = await Promise.all([
           fetch('/templates/main-template.json').then(r => r.json()),
           fetch('/templates/default-template.json').then(r => r.json()),
-          fetch('/templates/gemar-template.json').then(r => r.json())
+          fetch('/templates/gemar-template.json').then(r => r.json()),
+          fetch('/templates/belbal-template.json').then(r => r.json()),
         ]);
-        setTemplates({ gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
+        setTemplates({ belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
       } catch (error) {
         console.error('Ошибка загрузки шаблонов:', error);
       }
@@ -97,7 +99,7 @@ export const Home = () => {
       // Добавляем определение типа шаблона
       const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
       const brand = brandProperty ? brandProperty.value : '';
-      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : 'main';
+      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : 'main';
   
       return {
         code: item.code,
@@ -156,7 +158,10 @@ export const Home = () => {
       const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
       return replacePlaceholders(templates.gemar[templateIndex], item);
     }
-    const template = item.templateType === 'main' ? templates.main : templates.default;
+    if (item.brand === 'Balbal') {
+      return replacePlaceholders(templates.belbal, item);
+    }
+    const template = templates.main;
     return replacePlaceholders(template, item);
   }, [templates]);
 

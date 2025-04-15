@@ -1,9 +1,22 @@
 @font-face {
-  font-family: 'CustomFont9887';
+  font-family: 'GemarFont';
   src: url('./assets/fonts/9887.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
-  
+}
+
+@font-face {
+  font-family: 'BelbalFont';
+  src: url('./assets/fonts/DessertScript.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BelbalFontRegul';
+  src: url('./assets/fonts/AlegreyaSans-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {

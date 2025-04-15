@@ -60,7 +60,9 @@ export const FontControls = ({ element, onClose, onChange }) => {
           value={element.fontFamily || 'Arial'}
           onChange={(e) => onChange(element.id, 'fontFamily', e.target.value)}
         >
-          <option value="CustomFont9887">CustomFont9887</option>
+          <option value="GemarFont">GemarFont</option>
+          <option value="BelbalFont">BelbalFont</option>
+          <option value="BelbalFontRegul">BelbalFontRegul</option>
           <option value="Arial">Arial</option>
           <option value="Times New Roman">Times New Roman</option>
           <option value="Verdana">Verdana</option>

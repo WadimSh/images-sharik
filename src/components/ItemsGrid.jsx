@@ -182,8 +182,8 @@ const handleTemplateChange = (baseCode, templateKey) => {
         ...productMeta,
         code: item,
         image: currentImage,
-        category: getPropertyValue(productMeta, 'Группа материала').toLowerCase(),
-        title: getPropertyValue(productMeta, 'Дизайн товара'),
+        category: getPropertyValue(productMeta, 'Товарная номенклатура').toLowerCase(),
+        title: getPropertyValue(productMeta, 'Тип латексных шаров'),
         multiplicity: productMeta.multiplicity,
         size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
         brand: getOriginPropertyValue(productMeta, 'Торговая марка'),
@@ -217,11 +217,55 @@ const handleTemplateChange = (baseCode, templateKey) => {
     );
   };
 
+  // Разделяем шаблоны на группы
+  const mainTemplates = ['main', 'default'];
+  const thematicTemplates = ['gemar', 'belbal']; // Добавляем нужные теги
+
   // Объект перевода названий шаблонов
   const templateLabels = {
     main: 'Базовый шаблон',
     default: 'Шаблон картинка',
-    gemar: 'Шаблон Gemar'
+    gemar: 'Шаблон Gemar',
+    belbal: 'Шаблон Belbal'
+  };
+
+  // Вспомогательная функция для рендеринга контролов выбора шаблона
+  const renderTemplateControls = (baseCode, currentTemplate) => {
+    const isThematicSelected = thematicTemplates.includes(currentTemplate);
+    const selectedThematic = isThematicSelected ? currentTemplate : '';
+
+    return (
+      <div className="template-selector">
+        {/* Тематические шаблоны - выпадающий список */}
+        <div className="thematic-select">
+          <select
+            value={selectedThematic}
+            onChange={(e) => handleTemplateChange(baseCode, e.target.value)}
+          >
+            <option value="">Тематический шаблон</option>
+            {thematicTemplates.map(templateKey => (
+              <option key={templateKey} value={templateKey}>
+                {templateLabels[templateKey]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Основные шаблоны - радиокнопки */}
+        {mainTemplates.map(templateKey => (
+          <label key={templateKey}>
+            <input
+              type="radio"
+              name={`template-${baseCode}`}
+              value={templateKey}
+              checked={!isThematicSelected && currentTemplate === templateKey}
+              onChange={() => handleTemplateChange(baseCode, templateKey)}
+            />
+            <span>{templateLabels[templateKey]}</span>
+          </label>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -238,20 +282,7 @@ const handleTemplateChange = (baseCode, templateKey) => {
               {baseCode}
               {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
             </h2>
-            <div className="template-selector">
-              {Object.keys(templates).map(templateKey => (
-                <label key={templateKey}>
-                  <input
-                    type="radio"
-                    name={`template-${baseCode}`}
-                    value={templateKey}
-                    checked={currentTemplate === templateKey}
-                    onChange={() => handleTemplateChange(baseCode, templateKey)}
-                  />
-                  <span>{templateLabels[templateKey] || templateKey}</span>
-                </label>
-              ))}
-            </div>
+            {renderTemplateControls(baseCode, currentTemplate)}
             <div className="items-grid">
               {relatedItems.map((item, index) => {
                 const designData = sessionStorage.getItem(`design-${item}`);
