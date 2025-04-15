@@ -88,7 +88,7 @@
     "text": "{{MULTIPLICITY}}",
     "fontSize": 52,
     "color": "#ffffff",
-    "fontFamily": "CustomFont9887",
+    "fontFamily": "GemarFont",
     "image": null
   },
   {
@@ -101,7 +101,7 @@
     "text": "шт",
     "fontSize": 28,
     "color": "#ffffff",
-    "fontFamily": "CustomFont9887",
+    "fontFamily": "GemarFont",
     "image": null
   },
   {
@@ -114,7 +114,7 @@
     "text": "{{SIZE}}",
     "fontSize": 29,
     "color": "#ffffff",
-    "fontFamily": "CustomFont9887",
+    "fontFamily": "GemarFont",
     "image": null
   },
   {
@@ -127,7 +127,7 @@
     "text": "{{CATEGORY}}",
     "fontSize": 32,
     "color": "#ffffff",
-    "fontFamily": "CustomFont9887",
+    "fontFamily": "GemarFont",
     "image": null
   },
   {
@@ -140,7 +140,7 @@
       "text": "{{TITLE}}",
       "fontSize": 42,
       "color": "#ffffff",
-      "fontFamily": "CustomFont9887",
+      "fontFamily": "GemarFont",
       "image": null
   }  
 ],
