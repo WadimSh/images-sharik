@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaDownload } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 
@@ -332,46 +332,18 @@ const handleResizeWithPosition = (id, newData) => {
   return (
     <div className="generator-container">
       <div className="header-section">
-        <button 
-            onClick={handleBack}
-            className='button-back'
-          >
+        <button onClick={handleBack} className='button-back'>
           {'< Назад'}
-         </button>
+        </button>
         <h2>Генератор изображений для маркетплейсов</h2>
-        <p style={{
-          fontSize: '16px',
-          color: 'rgba(0,0,0,0.7)',
-          marginBottom: '18px'
-        }}>Обратите внимание, что перед тем, как изображение будет готово, у вас есть возможность<br />  
-        самостоятельно внести изменения в финальный вариант.</p>
-        
-        <div className="controls-group">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-            className="hidden-input"
-          />
-
-          <select 
-            value={selectedElementType}
-            onChange={(e) => {
-              const type = e.target.value;
-              setSelectedElementType(type);
-              if (type) handleAddElement(type);
-            }}
-            className="element-selector"
-          >
-            <option value="" disabled hidden>Добавить элемент...</option>
-            <option value="image">Изображение</option>
-            <option value="text">Текст</option>
-            <option value="shape">Фигура</option>
-          </select>
-        </div>
+      
+        <button onClick={handleDownload} className="download-button">
+          <FaDownload /> Скачать дизайн
+        </button>
       </div>
+
     <div className="content-wrapper">
+
       <div className='meta-info'>
         <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
           <h3 className='meta-title'>
@@ -400,6 +372,32 @@ const handleResizeWithPosition = (id, newData) => {
               </div>
           ))}
       </div>
+
+      {/* Центральная область с элементами управления и холстом */}
+      <div className="main-content">
+          {/* Панель добавления элементов */}
+          <div className="element-toolbar">
+            <button 
+              onClick={() => handleAddElement('image')}
+              title="Добавить изображение"
+            >
+              <FaImage size={20} />
+            </button>
+            <button 
+              onClick={() => handleAddElement('text')}
+              title="Добавить текст"
+            >
+              <FaFont size={20} />
+            </button>
+            <button 
+              onClick={() => handleAddElement('shape')}
+              title="Добавить фигуру"
+            >
+              <FaSquare size={20} />
+            </button>
+          </div>
+      </div>
+
 
       <div ref={captureRef} className="design-container">
         {elements.map((element) => {
@@ -468,8 +466,8 @@ const handleResizeWithPosition = (id, newData) => {
         <div className="elements-list">
           <h3 style={{ marginTop: '0' }}>Элементы дизайна</h3>
          {[...elements].reverse().map((element, index) => {
-    const originalIndex = elements.length - 1 - index;
-    return (
+            const originalIndex = elements.length - 1 - index;
+            return (
             <div key={element.id} className="element-item">
               <div className="element-info">
                 <span className="element-type">
@@ -576,42 +574,46 @@ const handleResizeWithPosition = (id, newData) => {
                   ×
                 </button>
               </div>
-              
-              
             </div>
+
           )})}
+          
         </div>
-        <input
+         <input
                 type="color"
                 ref={colorInputRef}
                 onChange={handleColorChange}
                 style={{ 
                   position: 'absolute',
+                  left: '-220px',
                   opacity: 0,
                   height: 0,
                   width: 0 
                 }}
               />
-        {/* Панель настроек шрифта вне цикла элементов */}
-  {selectedTextElementId && (
-    <div className="font-controls-wrapper">
-      <FontControls
-        element={elements.find(el => el.id === selectedTextElementId)}
-        onClose={() => setSelectedTextElementId(null)}
-        onChange={handleFontChange}
-      />
-    </div>
-  )}
-        <button 
-          onClick={handleDownload} 
-          className="download-button"
-        >
-          <FaDownload /> Скачать дизайн
-        </button>
+          {/* Панель настроек шрифта вне цикла элементов */}
+          {selectedTextElementId && (
+          <div className="font-controls-wrapper">
+            <FontControls
+              element={elements.find(el => el.id === selectedTextElementId)}
+              onClose={() => setSelectedTextElementId(null)}
+              onChange={handleFontChange}
+            />
+          </div>
+          )}     
+        
       </div>
+
     </div>  
 
-      
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        ref={fileInputRef}
+        className="hidden-input"
+      />
+
     </div>
   );
 };

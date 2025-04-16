@@ -22,7 +22,7 @@ export const TextElement = ({
     wordBreak: 'break-word',
     maxWidth: '100%',
     position: 'relative',
-    transform: `rotate(${element.rotation || 0}deg)`
+    transform: `rotate(${element.rotation}deg)`
   };
 
 
@@ -56,7 +56,7 @@ export const TextElement = ({
       onRotate={onRotate}
       rotation={element.rotation || 0}
     >
-      <div className="text-content-wrapper">
+      <div className="text-content-wrapper" style={{ transform: `rotate(${element.rotation}deg)` }}>
         {isEditing ? (
           <input
             ref={inputRef}
