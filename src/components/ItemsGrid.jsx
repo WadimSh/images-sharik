@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { replacePlaceholders } from '../utils/replacePlaceholders';
 
 const PreviewDesign = ({ elements }) => {
+  
   return (
     <div className="preview-container">
       {elements.map((element) => {
@@ -15,7 +16,6 @@ const PreviewDesign = ({ elements }) => {
           transform: `rotate(${element.rotation}deg)`,
           position: 'absolute'
         };
-
         switch (element.type) {
           case 'image':
             return <img key={element.id} src={element.image} alt="preview" 
@@ -51,7 +51,7 @@ const PreviewDesign = ({ elements }) => {
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
-    
+
   // Инициализируем порядок при первом рендере
   useEffect(() => {
     const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
@@ -145,71 +145,72 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const getOriginPropertyValue = (productMeta, propName) => 
     productMeta.originProperties?.find(p => p.name === propName)?.value || '';
 
+  
   // Обработчик изменения шаблона
-  // Обработчик изменения шаблона
-const handleTemplateChange = (baseCode, templateKey) => {
-  // Получаем метаданные товара для группы
-  const productMeta = JSON.parse(
-    sessionStorage.getItem(`product-${baseCode}`) || '{}'
-  );
-  const updatedMeta = {
-    ...productMeta,
-    templateType: templateKey
-  };
-  sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
+  const handleTemplateChange = async (baseCode, templateKey) => {
+    // Получаем метаданные товара для группы
+    const productMeta = JSON.parse(
+      sessionStorage.getItem(`product-${baseCode}`) || '{}'
+    );
+    const updatedMeta = {
+      ...productMeta,
+      templateType: templateKey
+    };
+    sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
 
-  const updatedItems = items.map(item => {
-    if (item.startsWith(`${baseCode}_`)) {
-      // Получаем текущий дизайн
-      const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
-      
-      // Находим все изображения с реальными URL
-      const validImages = currentDesign.filter(el => 
-        el.type === 'image' && 
-        el.image?.startsWith('https://')
-      );
+    const updatedItems = items.map(item => {
+      if (item.startsWith(`${baseCode}_`)) {
+        // Получаем текущий дизайн
+        const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
 
-      // Берем последнее добавленное изображение или из метаданных
-      const currentImage = validImages.length > 0 
-        ? validImages[validImages.length - 1].image 
-        : productMeta.images?.[0];
+        // Находим все изображения с реальными URL
+        const validImages = currentDesign.filter(el => 
+          el.type === 'image' && 
+          el.image?.startsWith('https://')
+        );
 
-      // Извлекаем индекс изображения из кода
-      const parts = item.split('_');
-      const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+        // Берем последнее добавленное изображение или из метаданных
+        const currentImage = validImages.length > 0 
+          ? validImages[validImages.length - 1].image 
+          : productMeta.images?.[0];
 
-      const itemData = {
-        ...productMeta,
-        code: item,
-        image: currentImage,
-        category: getPropertyValue(productMeta, 'Товарная номенклатура').toLowerCase(),
-        title: getPropertyValue(productMeta, 'Тип латексных шаров'),
-        multiplicity: productMeta.multiplicity,
-        size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
-        brand: getOriginPropertyValue(productMeta, 'Торговая марка'),
-        // Добавляем индекс изображения в данные
-        imageIndex: imageIndex
-      };
+        // Извлекаем индекс изображения из кода
+        const parts = item.split('_');
+        const imageIndex = parseInt(parts[parts.length - 1]) - 1;
 
-      // Выбираем подходящий шаблон
-      let template;
-      if (templateKey === 'gemar' && Array.isArray(templates.gemar)) {
-        // Для Gemar выбираем шаблон по индексу изображения
-        const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
-        template = templates.gemar[templateIndex];
-      } else {
-        // Для остальных шаблонов используем обычный выбор
-        template = templates[templateKey];
+        const itemData = {
+          ...productMeta,
+          code: item,
+          image: currentImage,
+          category: getPropertyValue(productMeta, 'Товарная номенклатура').toLowerCase(),
+          title: getPropertyValue(productMeta, 'Тип латексных шаров'),
+          multiplicity: productMeta.multiplicity,
+          size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
+          brand: getOriginPropertyValue(productMeta, 'Торговая марка'),
+          // Добавляем индекс изображения в данные
+          imageIndex: imageIndex
+        };
+
+        // Выбираем подходящий шаблон
+        let template;
+        if (templateKey === 'gemar' && Array.isArray(templates.gemar)) {
+          // Для Gemar выбираем шаблон по индексу изображения
+          const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
+          template = templates.gemar[templateIndex];
+        } else {
+          // Для остальных шаблонов используем обычный выбор
+          template = templates[templateKey];
+        }
+
+        const newDesign = replacePlaceholders(template, itemData);
+        sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
       }
+      return item;
+    });
 
-      const newDesign = replacePlaceholders(template, itemData);
-      sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
-    }
-    return item;
-  });
-
-  onItemsUpdate([...updatedItems]);
-};
+    onItemsUpdate([...updatedItems]);
+  };
+  
   // Вспомогательная функция для получения метаданных
   const getProductMeta = (baseCode) => {
     return JSON.parse(

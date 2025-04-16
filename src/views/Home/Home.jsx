@@ -158,7 +158,7 @@ export const Home = () => {
       const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
       return replacePlaceholders(templates.gemar[templateIndex], item);
     }
-    if (item.brand === 'Balbal') {
+    if (item.brand === 'Belbal') {
       return replacePlaceholders(templates.belbal, item);
     }
     const template = templates.main;

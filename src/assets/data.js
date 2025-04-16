@@ -2777,5 +2777,636 @@ export const data = [
           }
       }
   ]
+},
+{
+  "measure_units_properties": [
+      [
+          "Размер",
+          [
+              "13.0x6.3x0.2 см",
+              "17.0x2.0x31.0 см",
+              "39.0x29.0x28.0 см"
+          ]
+      ],
+      [
+          "Вес брутто",
+          [
+              "3.63 Г",
+              "200.0 Г(брутто)",
+              "8000.0 Г(брутто)"
+          ]
+      ],
+      [
+          "Объем",
+          [
+              "0.016 дм3",
+              "0.828 дм3",
+              "33.149 дм3"
+          ]
+      ],
+      [
+          "Баз. ед.",
+          [
+              "1 шт",
+              "50 шт",
+              "2000 шт"
+          ]
+      ],
+      [
+          "Штрих код. ед.",
+          [
+              "",
+              "4690390619096",
+              "4690390619102"
+          ]
+      ]
+  ],
+  "rating": 0,
+  "code": "1103-3147",
+  "units_counts": [
+      [
+          "блк",
+          "50 шт"
+      ],
+      [
+          "кор",
+          "2000 шт"
+      ]
+  ],
+  "seo_header": "",
+  "updated_at": "2025-04-16T13:09:50.433467",
+  "rest": 43000,
+  "in_favorite": false,
+  "product_files": [],
+  "category_detail": [
+      {
+          "meta_description": "Оптовая продажа латексных шаров с рисунком в Москве. Покупайте латексные шары с рисунком оптом с доставкой у проверенного поставщика!",
+          "meta_title": "",
+          "code": "SHARIK_RU_1_2//01",
+          "name": "Латексные шары с рисунком",
+          "image": "/media/cache/30/61/30612bc241296fde511d08f9ae3f03b9.jpg",
+          "seo_header": "",
+          "slug": "lateksnye-shary-s-risunkom",
+          "meta_keywords": "",
+          "seo_caption": "",
+          "seo_text": "Латексные шары с рисунком неотъемлемый атрибут любого праздника, придающий ему радостное или романтическое настроение. Шары это, и игрушка, и замечательный материал для оформления: День Рождения, Юбилей, Новый Год, Свадьба, День Св. Валентина, Выпускной вечер, 1 Сентября. Рисунки на шарах бывают с одной или двух сторон (шары с рисунком), а так же с четырех или пяти сторон (шелкография). Могут быть напечатаны одним, двумя, тремя и даже пятью цветами краски. Шары с рисунком продаются как в надутом, так и в не надутом виде в больших упаковках (пакетах) по 25, 50, 100 штук. В маленьких упаковках (наборы шаров с хедером) по 5,  10,  15,  20 штук.",
+          "id": 8627,
+          "extra_info": ""
+      },
+      {
+          "meta_description": "",
+          "meta_title": "",
+          "code": "SHARIK_RU_C1_14_3//01",
+          "name": "8 марта",
+          "image": null,
+          "seo_header": "",
+          "slug": "8-marta",
+          "meta_keywords": "",
+          "seo_caption": "",
+          "seo_text": "",
+          "id": 9563,
+          "extra_info": ""
+      }
+  ],
+  "images": [
+      {
+          "image": "/media/products/109323/0092996b-d0e4-42bf-95b1-3495545ad3ae.jpg",
+          "thumb": {
+              "product_small": "/media/cache/1e/03/1e03e8b0f1d94f8b57a2a28024aa2bf1.jpg",
+              "zoom_medium": "/media/cache/4e/fc/4efc7e539e4e24ce31c178fbf05c31ec.jpg",
+              "zoom_large": "/media/cache/34/bb/34bb4b107d1acd2255ae171c2e81f126.jpg",
+              "medium": "/media/cache/bf/2b/bf2bf9c33b7b0696f85fd7e180e283a1.jpg"
+          },
+          "id": 165004,
+          "is_base": true
+      },
+      {
+          "image": "/media/products/109323/ce2a8852-4649-423d-a010-8ac1f79125f3.jpg",
+          "thumb": {
+              "product_small": "/media/cache/53/99/53999a13c76775a9461634cfe5636da5.jpg",
+              "zoom_medium": "/media/cache/0a/15/0a15cb03537da6045fc1ca66db0ccac5.jpg",
+              "zoom_large": "/media/cache/41/d1/41d195b084b62cc99da9d15dea6603d7.jpg",
+              "medium": "/media/cache/65/9c/659ca0d54f7413e7b4b8ce9107b6c0de.jpg"
+          },
+          "id": 165859,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/24fb1107-6db6-4aff-bdfe-c215fd6a043b.jpg",
+          "thumb": {
+              "product_small": "/media/cache/99/92/999284d78f01d33055b8606830c57b9e.jpg",
+              "zoom_medium": "/media/cache/49/cd/49cd9cb1609e731931b9c495362d777a.jpg",
+              "zoom_large": "/media/cache/d3/cf/d3cfc7455ba5ecdf779bebf5a1258362.jpg",
+              "medium": "/media/cache/ec/55/ec55fce474095723fb0f90c91e356c37.jpg"
+          },
+          "id": 165862,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/ef28184a-e6dd-4fdb-a787-7f878881919e.jpg",
+          "thumb": {
+              "product_small": "/media/cache/17/40/17407537a2dfb3789bedde8bc893c55d.jpg",
+              "zoom_medium": "/media/cache/50/94/509439e5219f29006902fc0b65e832d2.jpg",
+              "zoom_large": "/media/cache/50/40/5040df959c3e313a21d802278ea76649.jpg",
+              "medium": "/media/cache/e5/11/e5116a91b700e16aa75806c707aebf79.jpg"
+          },
+          "id": 165867,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/68452e6c-5dd4-4b0a-b400-ce40811127c3.jpg",
+          "thumb": {
+              "product_small": "/media/cache/14/69/1469c2da5255dcb513ee30359200c4c4.jpg",
+              "zoom_medium": "/media/cache/05/ac/05ac3103f96c6655b9bf4448a7322dbf.jpg",
+              "zoom_large": "/media/cache/27/6c/276cb502841f9bc4bb53e48bccbd3d60.jpg",
+              "medium": "/media/cache/62/25/6225c5df61cbdd8c4ef7b02f1922750a.jpg"
+          },
+          "id": 165861,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/5ff3b072-6395-434a-9a9a-54ba74fb3024.jpg",
+          "thumb": {
+              "product_small": "/media/cache/ef/09/ef09de3c5e220596cd482855c6bdbc55.jpg",
+              "zoom_medium": "/media/cache/52/10/5210fbf213f6d9971898f3e0c588414f.jpg",
+              "zoom_large": "/media/cache/ec/63/ec631d2c9b74987c84291aef46e72e84.jpg",
+              "medium": "/media/cache/ea/a3/eaa31affd8920d8eb5aad4c26a86ef73.jpg"
+          },
+          "id": 165913,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/92540b1c-a456-43d9-b42d-4db129919ac6.jpg",
+          "thumb": {
+              "product_small": "/media/cache/fa/c3/fac35811019c156126588d4ecae5436d.jpg",
+              "zoom_medium": "/media/cache/2d/ab/2dab4ee4b56afdb191977cc9e3dcdf13.jpg",
+              "zoom_large": "/media/cache/34/15/3415868bbef912e6d72e77e720c779cd.jpg",
+              "medium": "/media/cache/c3/20/c320bac9486abd289839c855336c0454.jpg"
+          },
+          "id": 165914,
+          "is_base": false
+      },
+      {
+          "image": "/media/products/109323/a6fb3825-6e57-42a3-a1db-ad20c6c6e1d8.jpg",
+          "thumb": {
+              "product_small": "/media/cache/46/7f/467fb25d6f3f10f16afb6b97cd4fbd82.jpg",
+              "zoom_medium": "/media/cache/50/f9/50f9e924a7e7c5677d6b2afe6099fa27.jpg",
+              "zoom_large": "/media/cache/43/43/43437743f61d21e5a77a156b7a717f0b.jpg",
+              "medium": "/media/cache/7d/06/7d0671f5dd93463fcae366cb00575efb.jpg"
+          },
+          "id": 165915,
+          "is_base": false
+      }
+  ],
+  "document_images": [],
+  "stickers": [
+      13,
+      43
+  ],
+  "id": 131456,
+  "extra_info": "",
+  "category": 8627,
+  "slug": "shar-s-risunkom-14-liubimoi-mamochke-1103-3147",
+  "seo_text": "",
+  "meta_keywords": "",
+  "seo_caption": "",
+  "measure_units_names": [
+      "Штука",
+      "Блок",
+      "Коробка"
+  ],
+  "meta_description": "",
+  "meta_title": "",
+  "description": "Высококачественный шар из натурального латекса. Нежные шары и розовые, одного типа - пастель - матовый оттенок цвета. Шары с двусторонним шелкографическим рисунком и надписями: Мамочка Love you. Мам, ты лучшая. Счастье иметь такую маму. С любовью и нежностью. Единственной на свете. Идеальный ассортимент для розничной продажи воздушных шариков и украшения праздника. Воздушные шары изготавливаются из экологически безопасного 100%-ного натурального латекса. В окружающей среде разлагаются на безопасные компоненты примерно с той-же скоростью, как обычные листья деревьев. После использования лопнуть и утилизировать как бытовой отход. День матери. 8 Марта.",
+  "measure_unit": {
+      "name": "шт",
+      "weight": 3.63,
+      "height": 0.2,
+      "volume": 0.016,
+      "width": 6.3,
+      "length": 13,
+      "common": {
+          "name": "шт",
+          "full_name": "Штука"
+      },
+      "full_name": "Штука",
+      "id": 329146
+  },
+  "properties": [
+      {
+          "name": "Индивидуальная упаковка",
+          "image": "/media/property_value/%D1%83%D0%BF%D0%B0%D0%BA%D0%BE%D0%B2%D0%BA%D0%B050%D1%8550.png",
+          "value": "Есть",
+          "unimportant": false,
+          "value_id": 50186,
+          "id": 23672388
+      },
+      {
+          "name": "Вид материала",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Круглые с рисунком",
+          "unimportant": true,
+          "value_id": 28352,
+          "id": 23670013
+      },
+      {
+          "name": "Группа материала",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Шар с рисунком",
+          "unimportant": true,
+          "value_id": 27961,
+          "id": 23670014
+      },
+      {
+          "name": "Код ТНВЭД",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "9503 00 9909",
+          "unimportant": true,
+          "value_id": 29485,
+          "id": 23670011
+      },
+      {
+          "name": "Количество сторон печати",
+          "image": "/media/property_value/%D1%81%D1%82%D0%BE%D1%80%D0%BE%D0%BD02.png",
+          "value": "Печать с двух сторон",
+          "unimportant": false,
+          "value_id": 27786,
+          "id": 23672382
+      },
+      {
+          "name": "Количество цветов печати",
+          "image": "/media/property_value/%D1%86%D0%B2%D0%B5%D1%82%D0%B001.png",
+          "value": "Печать в один цвет",
+          "unimportant": false,
+          "value_id": 27791,
+          "id": 23672381
+      },
+      {
+          "name": "Коллекция",
+          "image": "/media/property_value/%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D0%BE%D0%B2%D1%8B%D0%B5_%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D1%8B.png",
+          "value": "Текстовые дизайны",
+          "unimportant": false,
+          "value_id": 59815,
+          "id": 23672377
+      },
+      {
+          "name": "Наличие рисунка",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Шар с рисунком",
+          "unimportant": false,
+          "value_id": 27796,
+          "id": 23672380
+      },
+      {
+          "name": "Наш дизайн",
+          "image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
+          "value": "Наш дизайн",
+          "unimportant": false,
+          "value_id": 27750,
+          "id": 23672384
+      },
+      {
+          "name": "Отрасль",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "1Шары латексные",
+          "unimportant": true,
+          "value_id": 28413,
+          "id": 23670015
+      },
+      {
+          "name": "Размер",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "35см/14\"",
+          "unimportant": false,
+          "value_id": 27762,
+          "id": 23672383
+      },
+      {
+          "name": "Размер латекс",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "14\"",
+          "unimportant": false,
+          "value_id": 28274,
+          "id": 23672369
+      },
+      {
+          "name": "Размеры\\Габариты",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "14\"/36СМ",
+          "unimportant": false,
+          "value_id": 29519,
+          "id": 23670012
+      },
+      {
+          "name": "Событие",
+          "image": "/media/property_value/%D0%9D%D0%9821__%D0%9B%D1%8E%D0%B1%D0%B8%D0%BC%D0%BE%D0%B9_%D0%BC%D0%B0%D0%BC%D0%B5.png",
+          "value": "Любимой маме",
+          "unimportant": false,
+          "value_id": 52838,
+          "id": 23672373
+      },
+      {
+          "name": "Способ выкладки",
+          "image": "/media/property_value/%D0%BA%D1%80%D1%8E%D1%87%D0%BE%D0%BA.png",
+          "value": "Крючок",
+          "unimportant": false,
+          "value_id": 64566,
+          "id": 23672389
+      },
+      {
+          "name": "Статус мелкий опт",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Базовый ассортимент",
+          "unimportant": false,
+          "value_id": 27733,
+          "id": 23672385
+      },
+      {
+          "name": "Статус товара",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Базовый ассортимент",
+          "unimportant": false,
+          "value_id": 28422,
+          "id": 23672374
+      },
+      {
+          "name": "Статус Франшиза",
+          "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+          "value": "Базовый ассортимент",
+          "unimportant": true,
+          "value_id": 27724,
+          "id": 23672386
+      },
+      {
+          "name": "Тип латексных шаров",
+          "image": "/media/property_value/%D0%9F%D0%B0%D1%81%D1%82.png",
+          "value": "Пастель",
+          "unimportant": false,
+          "value_id": 29100,
+          "id": 23672372
+      },
+      {
+          "name": "Товарная номенклатура",
+          "image": "/media/property_value/%D0%A8._%D0%B8%D0%B7_%D0%BB%D0%B0%D1%82%D0%B5%D0%BA%D1%81%D0%B0.png",
+          "value": "Шарики из латекса",
+          "unimportant": false,
+          "value_id": 50246,
+          "id": 23672379
+      },
+      {
+          "name": "Форма латекс",
+          "image": "/media/property_value/%D0%A4%D0%9B_%D0%BA%D1%80%D1%83%D0%B3%D0%BB%D1%8B%D0%B9.png",
+          "value": "Круглый",
+          "unimportant": false,
+          "value_id": 29157,
+          "id": 23672371
+      },
+      {
+          "name": "Цвет латекс",
+          "image": "/media/property_value/%D0%B0%D1%81%D1%81%D0%BE%D1%80%D1%82%D0%B8.png",
+          "value": "Ассорти",
+          "unimportant": false,
+          "value_id": 29265,
+          "id": 23672370
+      }
+  ],
+  "promotions": [],
+  "name": "Шар с рисунком 14\" Любимой Мамочке",
+  "rests": [
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "Сокол, склад-магазин",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "",
+              "address": "ул.Дубосековская, д 4 (МАИ ГУП)",
+              "id": 22
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": 300,
+          "id": 259272,
+          "rest": 550
+      },
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "Комсомольская, склад-магазин",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "55.77647194769816,37.65784693652341",
+              "address": "Комсомольская площадь, д. 1 А, строение 2, 17 склад",
+              "id": 23
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": null,
+          "id": 259328,
+          "rest": 200
+      },
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "РЦ, Зеленоград",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "",
+              "address": "Зеленоград, ул.Заводская, д.18, стр.9",
+              "id": 25
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": null,
+          "id": 259240,
+          "rest": 41100
+      },
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "Фуд Сити, склад-магазин",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "",
+              "address": "Москва, п. Сосненское, 22-й км Калужского шоссе, здание №10",
+              "id": 27
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": null,
+          "id": 259345,
+          "rest": 200
+      },
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "Садовод-Салют, склад-магазин",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "",
+              "address": "ул. Верхние Поля, 56, стр. 11, Садовод, ТЦ “Салют” Вход №1, 3 этаж, павильон № 20",
+              "id": 24
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": null,
+          "id": 259334,
+          "rest": 500
+      },
+      {
+          "warehouse": {
+              "city": 1,
+              "name": "Нагорный, склад-магазин",
+              "is_visible": true,
+              "country": 1,
+              "coordinates": "",
+              "address": "Нагорный проезд, дом 7, Институт вакуумной техники имени С. А. Векшинского, м.Нагатинская",
+              "id": 21
+          },
+          "date_of_new_arrival": null,
+          "new_arrival": null,
+          "id": 259329,
+          "rest": 450
+      }
+  ],
+  "multiplicity": 50,
+  "default_price": {
+      "is_rrc": false,
+      "is_visible": false,
+      "price_type": "PR00//ALL//1000",
+      "currency_price": 10.94,
+      "is_default": false,
+      "currency": "RUB",
+      "original_currency_price": 10.94,
+      "position": 1
+  },
+  "popularity": 153,
+  "multiplicity_measure_unit": "шт",
+  "icons_property_value": [
+      {
+          "value__image": "/media/property_value/belgium_glossy_wave_icon_50.png",
+          "value__property__name": "Страна",
+          "value__name": "Бельгия",
+          "value__property__value_icon_position": 1
+      },
+      {
+          "value__image": "/media/property_value/%D1%86%D0%B2%D0%B5%D1%82%D0%B001.png",
+          "value__property__name": "Количество цветов печати",
+          "value__name": "Печать в один цвет",
+          "value__property__value_icon_position": 2
+      },
+      {
+          "value__image": "/media/property_value/%D1%81%D1%82%D0%BE%D1%80%D0%BE%D0%BD02.png",
+          "value__property__name": "Количество сторон печати",
+          "value__name": "Печать с двух сторон",
+          "value__property__value_icon_position": 3
+      },
+      {
+          "value__image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
+          "value__property__name": "Наш дизайн",
+          "value__name": "Наш дизайн",
+          "value__property__value_icon_position": 0
+      },
+      {
+          "value__image": "/media/property_value/%D1%83%D0%BF%D0%B0%D0%BA%D0%BE%D0%B2%D0%BA%D0%B050%D1%8550.png",
+          "value__property__name": "Индивидуальная упаковка",
+          "value__name": "Есть",
+          "value__property__value_icon_position": 3
+      }
+  ],
+  "dist_markets": "",
+  "origin_properties": [
+      {
+          "name": "Торговая марка",
+          "image": "/media/property_value/BELBAL.png",
+          "value": "Belbal",
+          "unimportant": false,
+          "value_id": 27913,
+          "id": 23670016
+      },
+      {
+          "name": "Страна",
+          "image": "/media/property_value/belgium_glossy_wave_icon_50.png",
+          "value": "Бельгия",
+          "unimportant": false,
+          "value_id": 27838,
+          "id": 23672378
+      }
+  ],
+  "measure_prices": [
+      {
+          "measure_unit": {
+              "name": "шт",
+              "weight": 3.63,
+              "height": 0.2,
+              "volume": 0.016,
+              "width": 6.3,
+              "length": 13,
+              "common": {
+                  "name": "шт",
+                  "full_name": "Штука"
+              },
+              "full_name": "Штука",
+              "id": 329146
+          },
+          "price": {
+              "is_rrc": false,
+              "is_visible": false,
+              "price_type": "PR00//ALL//1000",
+              "currency_price": 10.94,
+              "is_default": false,
+              "currency": "RUB",
+              "original_currency_price": 10.94,
+              "position": 1
+          }
+      },
+      {
+          "measure_unit": {
+              "name": "блк",
+              "weight": 200,
+              "height": 31,
+              "volume": 0.828,
+              "width": 2,
+              "length": 17,
+              "common": {
+                  "name": "блк",
+                  "full_name": "Блок"
+              },
+              "full_name": "Блок",
+              "id": 329147
+          },
+          "price": {
+              "is_rrc": false,
+              "is_visible": false,
+              "price_type": "PR00//ALL//1000",
+              "currency_price": 547,
+              "is_default": false,
+              "currency": "RUB",
+              "original_currency_price": 547,
+              "position": 1
+          }
+      },
+      {
+          "measure_unit": {
+              "name": "кор",
+              "weight": 8000,
+              "height": 28,
+              "volume": 33.149,
+              "width": 29,
+              "length": 39,
+              "common": {
+                  "name": "кор",
+                  "full_name": "Коробка"
+              },
+              "full_name": "Коробка",
+              "id": 329148
+          },
+          "price": {
+              "is_rrc": false,
+              "is_visible": false,
+              "price_type": "PR00//ALL//1000",
+              "currency_price": 21880,
+              "is_default": false,
+              "currency": "RUB",
+              "original_currency_price": 21880,
+              "position": 1
+          }
+      }
+  ]
 }
 ]
