@@ -41,7 +41,7 @@
       "originalHeight": 400
   },
   {
-    "id": 1744738456611,
+    "id": 1744738456621,
     "type": "image",
     "position": {
         "x": 0,
@@ -52,7 +52,7 @@
     "height": 242.231,
     "originalWidth": 1358,
     "originalHeight": 731
-},
+  },
   {
       "id": 1744738456611,
       "type": "image",
@@ -77,8 +77,7 @@
       "width": 96,
       "height": 96,
       "originalWidth": 263,
-      "originalHeight": 263,
-      "rotation": -1.2841598460088097
+      "originalHeight": 263
   },
   {
       "id": 1744738831275,
