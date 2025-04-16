@@ -56,12 +56,12 @@
       "id": 1744221109540,
       "type": "image",
       "position": {
-          "x": 304,
-          "y": 17
+          "x": 316,
+          "y": 132
       },
       "image": "/images/round-01.png",
-      "width": 131,
-      "height": 131,
+      "width": 114,
+      "height": 114,
       "originalWidth": 250,
       "originalHeight": 250
   },
@@ -69,12 +69,12 @@
       "id": 1744221137175,
       "type": "image",
       "position": {
-          "x": 304,
-          "y": 156
+          "x": 316,
+          "y": 267
       },
       "image": "/images/round-08.png",
-      "width": 131,
-      "height": 131,
+      "width": 114,
+      "height": 114,
       "originalWidth": 250,
       "originalHeight": 250
   },
@@ -82,11 +82,11 @@
     "id": 1744221504335,
     "type": "text",
     "position": {
-        "x": 336,
-        "y": 49
+        "x": 343,
+        "y": 159
     },
     "text": "{{MULTIPLICITY}}",
-    "fontSize": 52,
+    "fontSize": 48,
     "color": "#ffffff",
     "fontFamily": "GemarFont",
     "image": null
@@ -95,11 +95,11 @@
     "id": 1744734115161,
     "type": "text",
     "position": {
-        "x": 353,
-        "y": 92
+        "x": 357,
+        "y": 198
     },
     "text": "шт",
-    "fontSize": 28,
+    "fontSize": 24,
     "color": "#ffffff",
     "fontFamily": "GemarFont",
     "image": null
@@ -108,8 +108,8 @@
     "id": 1744221657494,
     "type": "text",
     "position": {
-        "x": 335,
-        "y": 205
+        "x": 337,
+        "y": 307
     },
     "text": "{{SIZE}}",
     "fontSize": 29,

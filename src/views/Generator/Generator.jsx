@@ -328,6 +328,28 @@ const handleResizeWithPosition = (id, newData) => {
       el.id === id ? { ...el, rotation: newRotation } : el
     ));
   };
+
+  const handleImageSelect = (imgUrl) => {
+    
+    // Находим первый image элемент
+    const imageElement = elements.find(el => 
+      el.type === 'image' && 
+      el.image?.startsWith('https://')
+    );
+    console.log(imageElement)
+
+
+    if (imageElement) {
+      // Обновляем изображение с сохранением позиции и размеров
+      setElements(prev => prev.map(el => 
+        el.id === imageElement.id ? {
+          ...el,
+          image: imgUrl,
+          
+        } : el
+      ));
+    } 
+  };
   
   return (
     <div className="generator-container">
@@ -398,6 +420,32 @@ const handleResizeWithPosition = (id, newData) => {
           </div>
       </div>
 
+    <div className='design-area'>
+      {/* Секция отображения фоток товара */}
+      
+        <div className="images-grid">
+          {initialMetaDateElement?.images?.map((img, index) => {
+            const isActive = elements.some(el => 
+              el.type === 'image' && el.image === img
+            );
+
+            return (
+              <div 
+                key={index}
+                className={`image-item ${isActive ? 'active' : ''}`}
+                onClick={() => handleImageSelect(img)}
+              >
+                <img 
+                  src={img} 
+                  alt={`Вариант ${index + 1}`}
+                  className="product-image"
+                />
+              </div>
+            )
+          })}
+        </div>
+      
+
 
       <div ref={captureRef} className="design-container">
         {elements.map((element) => {
@@ -461,6 +509,7 @@ const handleResizeWithPosition = (id, newData) => {
           }
         })}
       </div>
+    </div> 
 
       <div className="sidebar">
         <div className="elements-list">
@@ -579,18 +628,18 @@ const handleResizeWithPosition = (id, newData) => {
           )})}
           
         </div>
-         <input
-                type="color"
-                ref={colorInputRef}
-                onChange={handleColorChange}
-                style={{ 
-                  position: 'absolute',
-                  left: '-220px',
-                  opacity: 0,
-                  height: 0,
-                  width: 0 
-                }}
-              />
+          <input
+            type="color"
+            ref={colorInputRef}
+            onChange={handleColorChange}
+            style={{ 
+              position: 'absolute',
+              left: '-220px',
+              opacity: 0,
+              height: 0,
+              width: 0 
+            }}
+          />
           {/* Панель настроек шрифта вне цикла элементов */}
           {selectedTextElementId && (
           <div className="font-controls-wrapper">

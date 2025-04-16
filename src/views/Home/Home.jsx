@@ -140,9 +140,9 @@ export const Home = () => {
         code: `${item.code}_${imgIndex + 1}`,
         multiplicity: item.multiplicity,
         size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
-        title: getPropertyValue('Тип латексных шаров'),
+        title: getPropertyValue('Событие'),
         image: `https://new.sharik.ru${image.image}`,
-        category: getPropertyValue('Товарная номенклатура').toLowerCase(),
+        category: getPropertyValue('Тип латексных шаров'),
         brand: getOriginPropertyValue('Торговая марка'),
       }));
     });

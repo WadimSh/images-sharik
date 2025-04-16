@@ -90,8 +90,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     const templateData = {
       code: newDesignKey,
       image: productMeta.images?.[0] || '',
-      category: productMeta.properties?.find(p => p.name === 'Товарная номенклатура')?.value?.toLowerCase() || '',
-      title: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+      category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+      title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
       multiplicity: productMeta.multiplicity,
       size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
       brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || ''
@@ -182,8 +182,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           ...productMeta,
           code: item,
           image: currentImage,
-          category: getPropertyValue(productMeta, 'Товарная номенклатура').toLowerCase(),
-          title: getPropertyValue(productMeta, 'Тип латексных шаров'),
+          category: getPropertyValue(productMeta, 'Тип латексных шаров'),
+          title: getPropertyValue(productMeta, 'Событие'),
           multiplicity: productMeta.multiplicity,
           size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
           brand: getOriginPropertyValue(productMeta, 'Торговая марка'),

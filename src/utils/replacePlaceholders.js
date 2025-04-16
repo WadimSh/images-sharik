@@ -4,7 +4,7 @@ export const replacePlaceholders = (template, item) => {
     image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,
     text: element.text
       ? element.text
-        .replace("{{CATEGORY}}", item.category)
+        .replace("{{CATEGORY}}", `воздушные шары ${item.category}`)
         .replace("{{TITLE}}", item.title)
         .replace("{{MULTIPLICITY}}", item.multiplicity)
         .replace("{{SIZE}}", item.size)

@@ -2351,18 +2351,7 @@ export const data = [
           },
           "id": 82982,
           "is_base": false
-      },
-      {
-        "image": "/media/products/56013/d2e77aa1-1482-46a0-b34a-57e18c5e6d95.jpg",
-        "thumb": {
-            "product_small": "/media/cache/99/8b/998b9ab6b9263a5a690aeee01357d1cc.jpg",
-            "zoom_medium": "/media/cache/fe/11/fe1188889c7d23f3b1d9a90814c0a675.jpg",
-            "zoom_large": "/media/cache/dd/5c/dd5ca71d5a72bce94727d44f6e90717b.jpg",
-            "medium": "/media/cache/95/eb/95eb0ea0e6bea3fbb649f0ce7ae1b299.jpg"
-        },
-        "id": 82982,
-        "is_base": false
-    }
+      }
   ],
   "document_images": [],
   "stickers": [],
