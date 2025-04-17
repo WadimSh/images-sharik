@@ -29,6 +29,8 @@ const PreviewDesign = ({ elements }) => {
                 ...style, 
                 fontSize: `${(element.fontSize || 24) * 0.61}px`,
                 fontFamily: element.fontFamily,
+                fontWeight: element.fontWeight || 'normal',
+                fontStyle: element.fontStyle || 'normal',
                 color: element.color,
                 whiteSpace: 'nowrap'
               }} className="preview-text">
