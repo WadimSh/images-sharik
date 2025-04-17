@@ -6,6 +6,7 @@
         "x": -74,
         "y": 0
       },
+      "isFlipped": "false",
       "image": "{{ITEM_IMAGE}}",
       "width": 600,
       "height": 600,
