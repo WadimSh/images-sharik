@@ -3,7 +3,7 @@
   font-family: Arial;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   max-height: 100vh;
   overflow: hidden;
 }
@@ -62,7 +62,7 @@
 /* --- */
 .content-wrapper {
   padding: 20px;
-  height: 95vh;
+  height: 90vh;
   width: 100%;
   display: flex;
   justify-content: space-between;
