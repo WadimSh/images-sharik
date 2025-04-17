@@ -13,7 +13,8 @@ const PreviewDesign = ({ elements }) => {
           top: `${(element.position.y / 600) * 100}%`,
           width: `${(element.width / 450) * 100}%`,
           height: `${(element.height / 600) * 100}%`,
-          transform: `rotate(${element.rotation}deg)`,
+          transform: `rotate(${element.rotation || 0}deg) scaleX(${element.isFlipped ? -1 : 1})`,
+          transformOrigin: 'center',
           position: 'absolute'
         };
         switch (element.type) {

@@ -12,7 +12,8 @@ export const ImageElement = ({
   height = 200, // Значение по умолчанию
   onResize,
   rotation = 0,
-  onRotate
+  onRotate,
+  isFlipped = false
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [dimensions, setDimensions] = useState({ 
@@ -58,6 +59,7 @@ export const ImageElement = ({
 
   return (
     <DraggableElement
+      isFlipped={isFlipped}
       position={position}
       onDrag={onDrag}
       onResize={handleResize}
@@ -76,7 +78,8 @@ export const ImageElement = ({
           height: `${dimensions.height}px`,
           pointerEvents: 'none',
           objectFit: 'cover',
-          transform: `rotate(${rotation}deg)`
+          transform: `rotate(${rotation}deg) scaleX(${isFlipped ? -1 : 1})`,
+          transformOrigin: 'center',
         }}
       />}
     </DraggableElement>

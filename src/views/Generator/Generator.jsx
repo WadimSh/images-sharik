@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 
@@ -36,6 +36,7 @@ export const Generator = () => {
   const processedElements = initialElements.map(element => {
     if (element.type === 'image' && !element.width) {
       return {
+        isFlipped: false,
         rotation: 0,
         width: 0,
         height: 0,
@@ -185,7 +186,8 @@ export const Generator = () => {
           width: newWidth,
           height: newHeight,
           originalWidth: img.width,
-          originalHeight: img.height
+          originalHeight: img.height,
+          isFlipped: false
         };
   
         setElements(prev => [...prev, newElement]);
@@ -221,7 +223,8 @@ const handleReplaceImage = (id) => {
             ...el,
             image: event.target.result,
             originalWidth: img.width,
-            originalHeight: img.height
+            originalHeight: img.height,
+            isFlipped: el.isFlipped
           } : el
         ));
       };
@@ -332,25 +335,28 @@ const handleResizeWithPosition = (id, newData) => {
   };
 
   const handleImageSelect = (imgUrl) => {
-    
     // Находим первый image элемент
     const imageElement = elements.find(el => 
       el.type === 'image' && 
       el.image?.startsWith('https://')
     );
-    console.log(imageElement)
-
-
+    
     if (imageElement) {
       // Обновляем изображение с сохранением позиции и размеров
       setElements(prev => prev.map(el => 
         el.id === imageElement.id ? {
           ...el,
           image: imgUrl,
-          
+          isFlipped: el.isFlipped || false
         } : el
       ));
     } 
+  };
+
+  const handleFlipImage = (id) => {
+    setElements(prev => prev.map(el => 
+      el.id === id ? {...el, isFlipped: !el.isFlipped} : el
+    ));
   };
   
   return (
@@ -460,6 +466,7 @@ const handleResizeWithPosition = (id, newData) => {
                   position={element.position}
                   width={element.width}
                   height={element.height}
+                  isFlipped={element.isFlipped}
                   onDrag={(pos) => handleDrag(element.id, pos)}
                   onRemove={() => handleRemoveElement(element.id)}
                   onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
@@ -481,7 +488,6 @@ const handleResizeWithPosition = (id, newData) => {
                   onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                   rotation={element.rotation} // Передаем поворот
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                  
                   containerWidth={450}
                   containerHeight={600}
                 />
@@ -558,6 +564,15 @@ const handleResizeWithPosition = (id, newData) => {
                 {element.type === 'shape' && 'Фигура'}
               </div>
               <div className="element-controls">
+              {element.type === 'image' && (
+                <button
+                onClick={() => handleFlipImage(element.id)}
+                className="flip-button"
+                title="Зеркальное отражение"
+                >
+                  <FaExchangeAlt />
+                </button>
+              )}  
               {element.type === 'image' && (
                 <button
                   onClick={() => handleReplaceImage(element.id)}

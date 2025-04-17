@@ -406,6 +406,19 @@
   gap: 5px;
 }
 
+.flip-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.flip-button:hover {
+  color: #007bff;
+}
+
 .move-button {
   padding: 5px;
   border: none;
