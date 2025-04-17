@@ -123,9 +123,27 @@
   pointer-events: auto;
 }
 
-.resize-handle.diagonal {
-  right: -12px;
-  bottom: -12px;
+.resize-handle.top-left {
+  left: 0;
+  top: 0;
+  cursor: nwse-resize;
+}
+
+.resize-handle.top-right {
+  left: 100%;
+  top: 0;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-left {
+  left: 0;
+  top: 100%;
+  cursor: nesw-resize;
+}
+
+.resize-handle.bottom-right {
+  left: 100%;
+  top: 100%;
   cursor: nwse-resize;
 }
 

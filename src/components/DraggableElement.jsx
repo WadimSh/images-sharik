@@ -94,7 +94,7 @@ const DraggableElement = ({
     document.addEventListener('mouseup', handleMouseUpR);
   };
 
-  const handleResizeStart = (e) => {
+  const handleProportionalResize = (e, direction) => {
     e.stopPropagation();
     e.preventDefault();
     const rect = elementRef.current.getBoundingClientRect();
@@ -102,10 +102,15 @@ const DraggableElement = ({
       width: rect.width,
       height: rect.height,
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
+      direction,
+      aspectRatio: rect.width / rect.height,
+      startX: rect.left,
+      startY: rect.top
     };
     setIsResizing(true);
   };
+  
 
   const handleDirectionalResize = (e, direction) => {
     e.stopPropagation();
@@ -139,48 +144,69 @@ const DraggableElement = ({
       const deltaX = e.clientX - initialSize.current.x;
       const deltaY = e.clientY - initialSize.current.y;
   
-      if (!initialSize.current.direction) {
-        // Proportional resize
-        const newWidth = Math.max(50, initialSize.current.width + deltaX);
-        const newHeight = newWidth / (initialSize.current.width / initialSize.current.height);
-        onResize?.({ width: newWidth, height: newHeight });
-      } else {
-        // Directional resize
+      // Новая логика для угловых пропорциональных ручек
+      if (initialSize.current.direction) {
+        const direction = initialSize.current.direction;
         let newWidth = initialSize.current.width;
         let newHeight = initialSize.current.height;
         let newX = position.x;
         let newY = position.y;
-  
-        switch (initialSize.current.direction) {
-          case 'left':
-            newWidth = Math.max(50, initialSize.current.width - deltaX);
-            newX = position.x + deltaX;
-            break;
-          case 'right':
-            newWidth = Math.max(50, initialSize.current.width + deltaX);
-            break;
-          case 'top':
-            newHeight = Math.max(50, initialSize.current.height - deltaY);
-            newY = position.y + deltaY;
-            break;
-          case 'bottom':
-            newHeight = Math.max(50, initialSize.current.height + deltaY);
-            break;
+        
+        if (direction.includes('-')) {
+          switch(direction) {
+            case 'top-left':
+              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newHeight = newWidth / initialSize.current.aspectRatio;
+              newX = position.x + (initialSize.current.width - newWidth);
+              newY = position.y + (initialSize.current.height - newHeight);
+              break;
+            case 'top-right':
+              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              newHeight = newWidth / initialSize.current.aspectRatio;
+              newY = position.y + (initialSize.current.height - newHeight);
+              break;
+            case 'bottom-left':
+              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newHeight = newWidth / initialSize.current.aspectRatio;
+              newX = position.x + (initialSize.current.width - newWidth);
+              break;
+            case 'bottom-right':
+              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              newHeight = newWidth / initialSize.current.aspectRatio;
+              break;
+          }
+        } else {
+          switch(direction) {
+            case 'left':
+              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newX = position.x + deltaX;
+              break;
+            case 'right':
+              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              break;
+            case 'top':
+              newHeight = Math.max(50, initialSize.current.height - deltaY);
+              newY = position.y + deltaY;
+              break;
+            case 'bottom':
+              newHeight = Math.max(50, initialSize.current.height + deltaY);
+              break;
+          }
         }
   
-        onResize?.({ 
-          width: newWidth, 
+        onResize?.({
+          width: newWidth,
           height: newHeight,
-          x: newX, 
-          y: newY 
+          x: newX,
+          y: newY
         });
       }
   
-      // Принудительное обновление оверлея
       updateOverlayPosition();
       return;
     }
   
+    // Остальная часть функции без изменений
     if (isDragging && elementRef.current) {
       const parentRect = elementRef.current.parentNode.getBoundingClientRect();
       const newX = e.clientX - parentRect.left - offset.x;
@@ -258,11 +284,17 @@ const DraggableElement = ({
               onMouseDown={(e) => handleDirectionalResize(e, 'bottom')} />
           </>
         )}
+        {/* Кнопка пропорционального изменения размера */}
         {resizeable && (
           <>
-            
-            <div className={`resize-handle diagonal ${isOverlayVisible ? 'visible' : ''}`}
-              onMouseDown={handleResizeStart} />
+            <div className={`resize-handle top-left ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleProportionalResize(e, 'top-left')} />
+            <div className={`resize-handle top-right ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleProportionalResize(e, 'top-right')} />
+            <div className={`resize-handle bottom-left ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleProportionalResize(e, 'bottom-left')} />
+            <div className={`resize-handle bottom-right ${isOverlayVisible ? 'visible' : ''}`}
+              onMouseDown={(e) => handleProportionalResize(e, 'bottom-right')} />
           </>
         )}
       </div>
