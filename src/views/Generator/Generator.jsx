@@ -17,6 +17,14 @@ export const Generator = () => {
 
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const colorInputRef = useRef(null);
+
+  const [selectedElementId, setSelectedElementId] = useState(null);
+  const [copiedElement, setCopiedElement] = useState(null);
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+  });
   
   // Добавляем состояние для выбранного текстового элемента
   const [selectedTextElementId, setSelectedTextElementId] = useState(null);
@@ -358,6 +366,64 @@ const handleResizeWithPosition = (id, newData) => {
       el.id === id ? {...el, isFlipped: !el.isFlipped} : el
     ));
   };
+
+  // Обработчик двойного клика
+const handleDoubleClick = (e, elementId) => {
+  e.stopPropagation();
+  setSelectedElementId(elementId);
+  setContextMenu({
+    visible: true,
+    x: e.clientX,
+    y: e.clientY
+  });
+};
+
+// Закрытие меню
+const closeContextMenu = () => {
+  setContextMenu({ ...contextMenu, visible: false });
+};
+
+// Копирование
+const handleCopy = () => {
+  const element = elements.find(el => el.id === selectedElementId);
+  if (element) {
+    setCopiedElement({ ...element, id: Date.now() });
+    closeContextMenu();
+  }
+};
+
+// Вставка
+const handlePaste = () => {
+  if (!copiedElement) return;
+  
+  const newElement = {
+    ...copiedElement,
+    position: {
+      x: copiedElement.position.x + 20,
+      y: copiedElement.position.y + 20
+    }
+  };
+  
+  setElements(prev => [...prev, newElement]);
+  closeContextMenu();
+};
+
+  // Обработчик горячих клавиш
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'c' && selectedElementId) {
+          handleCopy();
+        }
+        if (e.key === 'v' && copiedElement) {
+          handlePaste();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedElementId, copiedElement]);
   
   return (
     <div className="generator-container">
@@ -455,7 +521,15 @@ const handleResizeWithPosition = (id, newData) => {
       
 
 
-      <div ref={captureRef} className="design-container">
+      <div 
+        ref={captureRef} 
+        className="design-container"
+        onClick={closeContextMenu}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          closeContextMenu();
+        }}
+      >
         {elements.map((element) => {
           switch (element.type) {
             case 'image':
@@ -474,6 +548,7 @@ const handleResizeWithPosition = (id, newData) => {
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
                   containerHeight={600}
+                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
                 />
               );
             case 'shape':
@@ -490,6 +565,7 @@ const handleResizeWithPosition = (id, newData) => {
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
                   containerHeight={600}
+                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
                 />
               );
             case 'text':
@@ -510,12 +586,34 @@ const handleResizeWithPosition = (id, newData) => {
                   onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
                   containerWidth={450}
                   containerHeight={600}
+                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
                 />
               );
             default:
               return null;
           }
         })}
+
+        {/* Контекстное меню */}
+        {contextMenu.visible && (
+          <div 
+            className="context-menu"
+            style={{
+              position: 'fixed',
+              left: contextMenu.x,
+              top: contextMenu.y,
+              zIndex: 1000
+            }}
+          >
+            <button onClick={handleCopy}>Копировать (Ctrl+C)</button>
+            <button 
+              onClick={handlePaste}
+              disabled={!copiedElement}
+            >
+              Вставить (Ctrl+V)
+            </button>
+          </div>
+        )}
       </div>
     </div> 
 

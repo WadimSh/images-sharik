@@ -10,7 +10,8 @@ export const TextElement = ({
   onTextChange,
   onRotate,
   isEditing,      // Принимаем состояние редактирования извне
-  onEditToggle    // Колбэк для переключения состояния
+  onEditToggle,    // Колбэк для переключения состояния
+  onDoubleClick
 }) => {
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
@@ -57,8 +58,10 @@ export const TextElement = ({
       dimensions={{ width: 'auto', height: 'auto' }}
       onRotate={onRotate}
       rotation={element.rotation || 0}
+      onDoubleClick={onDoubleClick}
+      
     >
-      <div className="text-content-wrapper" style={{ transform: `rotate(${element.rotation}deg)` }}>
+      <div className="text-content-wrapper" style={{ transform: `rotate(${element.rotation}deg)` }} onDoubleClick={onDoubleClick}>
         {isEditing ? (
           <input
             ref={inputRef}

@@ -10,7 +10,8 @@ const DraggableElement = ({
   resizeable,
   splitResizable,
   dimensions = null,
-  rotation = 0
+  rotation = 0,
+  onDoubleClick
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -250,6 +251,7 @@ const DraggableElement = ({
         
       }} 
       onMouseDown={handleMouseDown}
+      onDoubleClick={onDoubleClick}
     >
       {children}
       <div 
