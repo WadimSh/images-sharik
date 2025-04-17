@@ -11,7 +11,8 @@ const DraggableElement = ({
   splitResizable,
   dimensions = null,
   rotation = 0,
-  onDoubleClick
+  onContextMenu,
+  onClick
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -49,8 +50,8 @@ const DraggableElement = ({
       }
     };
     
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutside, true);
+    return () => document.removeEventListener('click', handleClickOutside, true);
   }, []);
 
   // Обработка скролла
@@ -251,7 +252,8 @@ const DraggableElement = ({
         
       }} 
       onMouseDown={handleMouseDown}
-      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
+      onClick={onClick}
     >
       {children}
       <div 

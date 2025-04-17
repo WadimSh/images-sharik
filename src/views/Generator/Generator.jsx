@@ -39,6 +39,9 @@ export const Generator = () => {
   const storageKey = `design-${id}`;
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
+
+  // Добавим функцию для генерации уникальных ID
+  const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
  
   // Добавляем размеры по умолчанию для старых данных
   const processedElements = initialElements.map(element => {
@@ -131,7 +134,7 @@ export const Generator = () => {
       return;
     }
     const newElement = {
-      id: Date.now(),
+      id: generateUniqueId(),
       type,
       position: { x: 50, y: 50 },
       text: type === 'text' ? 'Новый текст' : '',
@@ -367,16 +370,16 @@ const handleResizeWithPosition = (id, newData) => {
     ));
   };
 
-  // Обработчик двойного клика
-const handleDoubleClick = (e, elementId) => {
-  e.stopPropagation();
-  setSelectedElementId(elementId);
-  setContextMenu({
-    visible: true,
-    x: e.clientX,
-    y: e.clientY
-  });
-};
+  // Обработчик клика правой кнопик мыши
+  const handleContextMenu = (e, elementId) => {
+    e.preventDefault();
+    setSelectedElementId(elementId);
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
 
 // Закрытие меню
 const closeContextMenu = () => {
@@ -386,18 +389,31 @@ const closeContextMenu = () => {
 // Копирование
 const handleCopy = () => {
   const element = elements.find(el => el.id === selectedElementId);
-  if (element) {
-    setCopiedElement({ ...element, id: Date.now() });
-    closeContextMenu();
+
+  // Проверяем, является ли изображение внешней ссылкой
+  if (element?.type === 'image' && element.image?.startsWith('https://')) {
+    return;
   }
+
+  const copied = JSON.parse(JSON.stringify(element));
+  copied.id = generateUniqueId();
+  
+  setCopiedElement(copied);
+  closeContextMenu();
 };
 
 // Вставка
 const handlePaste = () => {
   if (!copiedElement) return;
+
+  // Дополнительная проверка для вставки
+  if (copiedElement?.image?.startsWith('https://')) {
+    return;
+  }
   
   const newElement = {
     ...copiedElement,
+    id: generateUniqueId(),
     position: {
       x: copiedElement.position.x + 20,
       y: copiedElement.position.y + 20
@@ -411,19 +427,26 @@ const handlePaste = () => {
   // Обработчик горячих клавиш
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'c' && selectedElementId) {
+      // Проверяем комбинации для обеих раскладок
+      const isCopy = e.code === 'KeyC' || e.key.toLowerCase() === 'с'; // c - русская
+      const isPaste = e.code === 'KeyV' || e.key.toLowerCase() === 'м'; // v - русская
+  
+      if ((e.ctrlKey || e.metaKey) && !editingTextId) {
+        if (isCopy && selectedElementId) {
+          e.preventDefault();
           handleCopy();
         }
-        if (e.key === 'v' && copiedElement) {
+        
+        if (isPaste && copiedElement) {
+          e.preventDefault();
           handlePaste();
         }
       }
     };
-
+  
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElementId, copiedElement]);
+  }, [handleCopy, handlePaste, selectedElementId, copiedElement, editingTextId]);
   
   return (
     <div className="generator-container">
@@ -519,15 +542,12 @@ const handlePaste = () => {
           })}
         </div>
       
-
-
       <div 
         ref={captureRef} 
         className="design-container"
         onClick={closeContextMenu}
         onContextMenu={(e) => {
           e.preventDefault();
-          closeContextMenu();
         }}
       >
         {elements.map((element) => {
@@ -548,7 +568,17 @@ const handlePaste = () => {
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
                   containerHeight={600}
-                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
+                  onContextMenu={(e) => handleContextMenu(e, element.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Скрываем все оверлеи перед показом нового
+                    elements.forEach(el => {
+                      if (el.id !== element.id) {
+                        // Здесь должен быть механизм скрытия других оверлеев
+                      }
+                    });
+                    setSelectedElementId(element.id);
+                  }}
                 />
               );
             case 'shape':
@@ -565,7 +595,17 @@ const handlePaste = () => {
                   onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                   containerWidth={450}
                   containerHeight={600}
-                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
+                  onContextMenu={(e) => handleContextMenu(e, element.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Скрываем все оверлеи перед показом нового
+                    elements.forEach(el => {
+                      if (el.id !== element.id) {
+                        // Здесь должен быть механизм скрытия других оверлеев
+                      }
+                    });
+                    setSelectedElementId(element.id);
+                  }}
                 />
               );
             case 'text':
@@ -586,7 +626,17 @@ const handlePaste = () => {
                   onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
                   containerWidth={450}
                   containerHeight={600}
-                  onDoubleClick={(e) => handleDoubleClick(e, element.id)}
+                  onContextMenu={(e) => handleContextMenu(e, element.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Скрываем все оверлеи перед показом нового
+                    elements.forEach(el => {
+                      if (el.id !== element.id) {
+                        // Здесь должен быть механизм скрытия других оверлеев
+                      }
+                    });
+                    setSelectedElementId(element.id);
+                  }}
                 />
               );
             default:
@@ -605,7 +655,14 @@ const handlePaste = () => {
               zIndex: 1000
             }}
           >
-            <button onClick={handleCopy}>Копировать (Ctrl+C)</button>
+            <button 
+              onClick={handleCopy}
+              disabled={elements.some(el => 
+                el.id === selectedElementId && 
+                el.type === 'image' && 
+                el.image?.startsWith('https://')
+              )}
+            >Копировать (Ctrl+C)</button>
             <button 
               onClick={handlePaste}
               disabled={!copiedElement}

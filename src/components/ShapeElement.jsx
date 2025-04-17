@@ -12,7 +12,8 @@ export const ShapeElement = ({
   onResize,
   rotation = 0,
   onRotate,
-  onDoubleClick
+  onContextMenu,
+  onClick
 }) => {
   const [dimensions, setDimensions] = useState({ 
     width: width,
@@ -43,7 +44,8 @@ export const ShapeElement = ({
       containerHeight={containerHeight}
       dimensions={dimensions}
       rotation={rotation}
-      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
+      onClick={onClick}
     >
       <div 
         ref={containerRef}
@@ -55,7 +57,7 @@ export const ShapeElement = ({
           backgroundColor: color,
           border: 'none',
         }}
-        onDoubleClick={onDoubleClick}
+        onContextMenu={onContextMenu}
       >
         
       </div>

@@ -14,7 +14,8 @@ export const ImageElement = ({
   rotation = 0,
   onRotate,
   isFlipped = false,
-  onDoubleClick
+  onContextMenu,
+  onClick
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [dimensions, setDimensions] = useState({ 
@@ -70,7 +71,8 @@ export const ImageElement = ({
       containerHeight={containerHeight}
       dimensions={{ width, height }}
       rotation={rotation}
-      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
+      onClick={onClick}
     >
       {imageSrc && <img // Добавляем проверку на наличие src
         src={imageSrc}
@@ -83,7 +85,6 @@ export const ImageElement = ({
           transform: `rotate(${rotation}deg) scaleX(${isFlipped ? -1 : 1})`,
           transformOrigin: 'center',
         }}
-        onDoubleClick={onDoubleClick}
       />}
     </DraggableElement>
   );
