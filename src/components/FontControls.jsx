@@ -27,6 +27,30 @@ export const FontControls = ({ element, onClose, onChange }) => {
 
   return (
     <div className="font-controls" ref={controlsRef}>
+      <div className="style-controls">
+        <button
+          className={`style-button bold ${element.fontWeight === 'bold' ? 'active' : ''}`}
+          onClick={() => 
+            onChange(element.id, 'fontWeight', 
+              element.fontWeight === 'bold' ? 'normal' : 'bold'
+            )
+          }
+        >
+          B
+        </button>
+        
+        <button
+          className={`style-button italic ${element.fontStyle === 'italic' ? 'active' : ''}`}
+          onClick={() => 
+            onChange(element.id, 'fontStyle', 
+              element.fontStyle === 'italic' ? 'normal' : 'italic'
+            )
+          }
+        >
+          I
+        </button>
+      </div>
+
       <label>
         Размер:
         <input

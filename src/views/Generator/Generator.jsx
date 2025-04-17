@@ -129,6 +129,8 @@ export const Generator = () => {
       fontSize: 24,       // Добавляем по умолчанию
       color: '#333333',   // Добавляем по умолчанию
       fontFamily: 'Arial', // Добавляем по умолчанию
+      fontWeight: 'normal', // Добавляем по умолчанию
+      fontStyle: 'normal',  // Добавляем по умолчанию
       image: null,
       ...(type === 'shape' && { 
         color: '#ccc',

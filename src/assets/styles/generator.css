@@ -434,7 +434,6 @@
 .font-controls-wrapper {
   margin-top: auto;
   padding: 15px 0;
-  border-top: 1px solid #eee;
   position: absolute;
   left: -220px;
 }
@@ -448,6 +447,41 @@
   position: relative;
   margin-bottom: 15px;
   transition: all 0.2s ease;
+}
+
+.font-controls .style-controls {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.font-controls .style-button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.style-button.bold {
+  font-weight: bold;
+  font-style: normal;
+}
+
+.style-button.italic {
+  font-weight: normal;
+  font-style: italic;
+}
+
+.font-controls .style-button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.font-controls .style-button:hover {
+  background: #f0f0f0;
 }
 
 .font-controls label {

@@ -19,6 +19,8 @@ export const TextElement = ({
     color: element.color || '#333',
     fontSize: `${element.fontSize || 24}px`,
     fontFamily: element.fontFamily || 'Arial',
+    fontWeight: element.fontWeight || 'normal',
+    fontStyle: element.fontStyle || 'normal',
     wordBreak: 'break-word',
     maxWidth: '100%',
     position: 'relative',
