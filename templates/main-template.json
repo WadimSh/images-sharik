@@ -6,7 +6,7 @@
             "x": -52,
             "y": 24
         },
-        "isFlipped": "false",
+        "isFlipped": false,
         "image": "{{ITEM_IMAGE}}",
         "width": 552,
         "height": 552,
@@ -20,7 +20,7 @@
             "x": 327,
             "y": 324
         },
-        "isFlipped": "false",
+        "isFlipped": false,
         "image": "/images/shape3.png",
         "width": 141,
         "height": 313.3,
@@ -35,7 +35,7 @@
             "x": -37,
             "y": -22
         },
-        "isFlipped": "false",
+        "isFlipped": false,
         "image": "/images/shape2.png",
         "width": 324,
         "height": 145.8,
