@@ -306,7 +306,7 @@ const handleResizeWithPosition = (id, newData) => {
         method: 'POST',
         headers: {
           'Accept': 'image/png',
-          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e' // Замените на ваш ключ
+          'x-api-key': 'xxx' // Замените на ваш ключ
         },
         body: form
       };
