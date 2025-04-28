@@ -26,6 +26,9 @@ export const Generator = () => {
     x: 0,
     y: 0,
   });
+
+  // Состояние для отслеживания обработки при запросе на удаление фона 
+  const [processingIds, setProcessingIds] = useState(new Set());
   
   // Добавляем состояние для выбранного текстового элемента
   const [selectedTextElementId, setSelectedTextElementId] = useState(null);
@@ -278,6 +281,65 @@ const handleResizeWithPosition = (id, newData) => {
     return el;
   }));
 };
+
+  // Функция удаления фона через PhotoRoom API
+  const handleRemoveBackground = async (elementId) => {
+    try {
+      const element = elements.find(el => el.id === elementId);
+      if (!element || !element.image?.startsWith('http')) return;
+
+      setProcessingIds(prev => new Set(prev).add(elementId));
+
+      // Скачиваем изображение
+      const response = await fetch(element.image);
+      const blob = await response.blob();
+
+      // Формируем запрос
+      const form = new FormData();
+      form.append('image_file', blob, 'image.png');
+      form.append('format', 'png');
+      form.append('size', 'auto');
+      form.append('bg_color', '#FFFFFF'); // Цвет фона
+      form.append('despill', 'medium'); // Уровень коррекции цветов
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Accept': 'image/png',
+          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e' // Замените на ваш ключ
+        },
+        body: form
+      };
+
+      // Отправляем запрос
+      const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
+      
+      if (!apiResponse.ok) throw new Error('Ошибка API');
+      
+      // Конвертируем ответ в Data URL
+      const processedBlob = await apiResponse.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(processedBlob);
+      
+      reader.onloadend = () => {
+        setElements(prev => 
+          prev.map(el => 
+            el.id === elementId ? { ...el, image: reader.result } : el
+          )
+        );
+      };
+
+    } catch (error) {
+      console.error('Ошибка удаления фона:', error);
+      alert('Не удалось удалить фон. Проверьте API ключ и попробуйте позже.');
+    } finally {
+      setProcessingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(elementId);
+        return newSet;
+      });
+    }
+  };
 
   const handleRemoveElement = (id) => {
     setElements(elements.filter(el => el.id !== id));
@@ -707,7 +769,7 @@ const handlePaste = () => {
             return (
             <div key={element.id} className="element-item">
               <div className="element-info">
-                <span className="element-type">
+                <span>
                   {element.type === 'text' && '📝 '}
                   {element.type === 'image' && (
                     <>
@@ -723,7 +785,7 @@ const handlePaste = () => {
                         }}
                         alt="Превью"
                       />
-                      Изображение
+                      
                     </>
                   )}
                   {element.type === 'shape' && (
@@ -741,6 +803,7 @@ const handlePaste = () => {
                 {element.type === 'text' && <span className="quoted-truncate">
                   "<span className="truncated-text">{element.text}</span>"
                 </span>}
+                {element.type === 'image' && 'Изображение'}
                 {element.type === 'shape' && 'Фигура'}
               </div>
               <div className="element-controls">
@@ -762,6 +825,23 @@ const handlePaste = () => {
                   <FiRefreshCw />
                 </button>
               )}
+
+              {/* Кнопка удаления фона */}
+              {element.image?.startsWith('http') && (
+                <button
+                  onClick={() => handleRemoveBackground(element.id)}
+                  className="remove-bg-button"
+                  title="Удалить фон"
+                  disabled={processingIds.has(element.id)}
+                >
+                  {processingIds.has(element.id) ? (
+                    <div className="spinner"></div>
+                  ) : (
+                    '🎭'
+                  )}
+                </button>
+              )}
+
               {element.type === 'shape' && (
                 <button
                 onClick={(e) => {
