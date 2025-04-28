@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
+import UPNG from 'upng-js';
 
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
@@ -304,16 +305,40 @@ const handleResizeWithPosition = (id, newData) => {
 
       const fileName = `${baseCode}_WB_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
+      // Генерация изображения
       const canvas = await html2canvas(captureRef.current, {
         scale: 2,
         useCORS: true,
-        logging: false
+        logging: false,
+        backgroundColor: '#FFFFFF' // Убираем прозрачность для уменьшения размера
       });
+
+      // Получаем сырые данные изображения
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+      // Оптимизация с UPNG
+      const pngBuffer = UPNG.encode(
+        [imageData.data.buffer], // Пиксельные данные
+        canvas.width,
+        canvas.height,
+        256, // Количество цветов (256 = 8-битная палитра)
+        0    // Задержка для анимации
+      );
+
+      // Создаем Blob и URL
+      const blob = new Blob([pngBuffer], { type: 'image/png' });
+      const url = URL.createObjectURL(blob);
   
       const link = document.createElement('a');
       link.download = fileName;
-      link.href = canvas.toDataURL('image/png');
+      link.href = url;
+      document.body.appendChild(link);
       link.click();
+
+      // Очистка
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Ошибка генерации:', error);
       alert('Ошибка при генерации изображения!');
