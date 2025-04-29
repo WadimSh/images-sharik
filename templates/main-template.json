@@ -8,6 +8,7 @@
         },
         "isFlipped": false,
         "image": "{{ITEM_IMAGE}}",
+        "isProduct": true,
         "width": 552,
         "height": 552,
         "originalWidth": 750,
