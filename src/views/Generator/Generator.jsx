@@ -14,7 +14,11 @@ export const Generator = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const captureRef = useRef(null);
-  const baseId = id.split('_')[0];
+  // Добавляем получение номера слайда
+  const [baseId, slideNumber] = id.split('_');
+
+  // Добавляем реф для контекстного меню
+  const contextMenuRef = useRef(null);
 
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const colorInputRef = useRef(null);
@@ -44,6 +48,14 @@ export const Generator = () => {
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
+  // Функция для формирования заголовка
+  const getHeaderTitle = () => {
+    const slide = slideNumber || '1'; // По умолчанию первый слайд
+    return slide === '1' 
+      ? 'Основной слайд' 
+      : `Слайд ${slide}`;
+  };
+
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
  
@@ -71,7 +83,7 @@ export const Generator = () => {
   });
 
   const [elements, setElements] = useState(processedElements);
-  const [selectedElementType, setSelectedElementType] = useState('');
+  const [indexImg, setIndexImg] = useState(-1);
   const fileInputRef = useRef(null);
 
   // Сохранение в sessionStorage при изменениях
@@ -134,7 +146,6 @@ export const Generator = () => {
   const handleAddElement = (type) => {
     if (type === 'image') {
       fileInputRef.current.click();
-      setSelectedElementType('');
       return;
     }
     const newElement = {
@@ -155,7 +166,6 @@ export const Generator = () => {
       })
     };
     setElements(prev => [...prev, newElement]);
-    setSelectedElementType('');
   };
 
   const handleFileUpload = (e) => {
@@ -206,7 +216,6 @@ export const Generator = () => {
         };
   
         setElements(prev => [...prev, newElement]);
-        setSelectedElementType('');
       };
       img.onerror = () => alert('Ошибка загрузки изображения');
       img.src = event.target.result;
@@ -299,14 +308,13 @@ const handleResizeWithPosition = (id, newData) => {
       form.append('image_file', blob, 'image.png');
       form.append('format', 'png');
       form.append('size', 'auto');
-      form.append('bg_color', '#FFFFFF'); // Цвет фона
       form.append('despill', 'medium'); // Уровень коррекции цветов
 
       const options = {
         method: 'POST',
         headers: {
           'Accept': 'image/png',
-          'x-api-key': 'xxx' // Замените на ваш ключ
+          'x-api-key': 'xxx'
         },
         body: form
       };
@@ -322,11 +330,25 @@ const handleResizeWithPosition = (id, newData) => {
       reader.readAsDataURL(processedBlob);
       
       reader.onloadend = () => {
-        setElements(prev => 
-          prev.map(el => 
-            el.id === elementId ? { ...el, image: reader.result } : el
-          )
+        // Обновляем элементы и метаданные
+        const updatedElements = elements.map(el => 
+          el.id === elementId ? { ...el, image: reader.result } : el
         );
+
+        // Обновляем sessionStorage
+        const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || {});
+        const updatedImages = [...currentMeta.images];
+
+        if (indexImg >= 0 && indexImg < updatedImages.length) {
+          updatedImages[indexImg] = reader.result;
+
+          sessionStorage.setItem(storageMetaKey, JSON.stringify({
+            ...currentMeta,
+            images: updatedImages
+          }));
+        }
+
+        setElements(updatedElements);
       };
 
     } catch (error) {
@@ -436,7 +458,7 @@ const handleResizeWithPosition = (id, newData) => {
     // Находим первый image элемент
     const imageElement = elements.find(el => 
       el.type === 'image' && 
-      el.image?.startsWith('https://')
+      el.isProduct
     );
     
     if (imageElement) {
@@ -448,6 +470,7 @@ const handleResizeWithPosition = (id, newData) => {
           isFlipped: el.isFlipped || false
         } : el
       ));
+      
     } 
   };
 
@@ -476,15 +499,16 @@ const closeContextMenu = () => {
 // Копирование
 const handleCopy = () => {
   const element = elements.find(el => el.id === selectedElementId);
-
-  // Проверяем, является ли изображение внешней ссылкой
-  if (element?.type === 'image' && element.image?.startsWith('https://')) {
-    return;
-  }
+  if (!element) return;
 
   const copied = JSON.parse(JSON.stringify(element));
+
+  // Удаляем флаг isProduct, если он существует
+  if (copied.hasOwnProperty('isProduct')) {
+    delete copied.isProduct;
+  }
+
   copied.id = generateUniqueId();
-  
   setCopiedElement(copied);
   closeContextMenu();
 };
@@ -493,11 +517,6 @@ const handleCopy = () => {
 const handlePaste = () => {
   if (!copiedElement) return;
 
-  // Дополнительная проверка для вставки
-  if (copiedElement?.image?.startsWith('https://')) {
-    return;
-  }
-  
   const newElement = {
     ...copiedElement,
     id: generateUniqueId(),
@@ -510,6 +529,35 @@ const handlePaste = () => {
   setElements(prev => [...prev, newElement]);
   closeContextMenu();
 };
+
+useEffect(() => {
+  // Найти индекс активного изображения
+  const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
+    elements.some(el => el.type === 'image' && el.image === img)
+  ) ?? -1;
+
+  setIndexImg(activeIndex);
+}, [elements, initialMetaDateElement?.images]);
+
+  // Эффект для закрытия меню при клике вне его области
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      contextMenu.visible && 
+      contextMenuRef.current && 
+      !contextMenuRef.current.contains(event.target)
+    ) {
+      closeContextMenu();
+    }
+  };
+
+  // Добавляем обработчик для события mousedown (срабатывает при нажатии ЛЮБОЙ кнопки мыши)
+  document.addEventListener('mousedown', handleClickOutside);
+  
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [contextMenu.visible]);
 
   // Обработчик горячих клавиш
   useEffect(() => {
@@ -541,7 +589,7 @@ const handlePaste = () => {
         <button onClick={handleBack} className='button-back'>
           {'< Назад'}
         </button>
-        <h2>Генератор изображений для маркетплейсов</h2>
+        <h2>{getHeaderTitle()}</h2>
       
         <button onClick={handleDownload} className="download-button">
           <FaDownload /> Скачать дизайн
@@ -612,7 +660,7 @@ const handlePaste = () => {
             const isActive = elements.some(el => 
               el.type === 'image' && el.image === img
             );
-
+            
             return (
               <div 
                 key={index}
@@ -734,6 +782,7 @@ const handlePaste = () => {
         {/* Контекстное меню */}
         {contextMenu.visible && (
           <div 
+            ref={contextMenuRef}
             className="context-menu"
             style={{
               position: 'fixed',
@@ -744,11 +793,6 @@ const handlePaste = () => {
           >
             <button 
               onClick={handleCopy}
-              disabled={elements.some(el => 
-                el.id === selectedElementId && 
-                el.type === 'image' && 
-                el.image?.startsWith('https://')
-              )}
             >Копировать (Ctrl+C)</button>
             <button 
               onClick={handlePaste}
@@ -774,7 +818,7 @@ const handlePaste = () => {
                   {element.type === 'image' && (
                     <>
                       <img 
-                        src={element.image} // URL вашего изображения
+                        src={element.image}
                         style={{
                           width: '18px',
                           height: '18px',

@@ -37,6 +37,7 @@
       },
       "isFlipped": false,
       "image": "{{ITEM_IMAGE}}",
+      "isProduct": true,
       "width": 408,
       "height": 408,
       "originalWidth": 400,
