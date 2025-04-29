@@ -296,64 +296,87 @@ const handleResizeWithPosition = (id, newData) => {
     try {
       const element = elements.find(el => el.id === elementId);
       if (!element || !element.image?.startsWith('http')) return;
-
+  
       setProcessingIds(prev => new Set(prev).add(elementId));
-
+  
       // Скачиваем изображение
       const response = await fetch(element.image);
       const blob = await response.blob();
-
+  
       // Формируем запрос
       const form = new FormData();
       form.append('image_file', blob, 'image.png');
       form.append('format', 'png');
       form.append('size', 'auto');
-      form.append('despill', 'medium'); // Уровень коррекции цветов
-
+      form.append('despill', 'medium');
+  
       const options = {
         method: 'POST',
         headers: {
           'Accept': 'image/png',
-          'x-api-key': 'xxx'
+          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e'
         },
         body: form
       };
-
+  
       // Отправляем запрос
       const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
       
       if (!apiResponse.ok) throw new Error('Ошибка API');
       
-      // Конвертируем ответ в Data URL
+      // Конвертируем ответ в ArrayBuffer
       const processedBlob = await apiResponse.blob();
+      const arrayBuffer = await processedBlob.arrayBuffer();
+      
+      // Декодируем изображение
+      const image = UPNG.decode(arrayBuffer);
+      
+      // Параметры сжатия
+      const compression = 90; // Уровень сжатия (0-100)
+            
+      // Перекодируем с оптимизацией
+      const compressedArray = UPNG.encode(
+        [image.data.buffer],
+        image.width,
+        image.height,
+        image.frames[0].cnum,
+        compression
+      );
+      
+      // Создаем Blob из сжатых данных
+      const compressedBlob = new Blob([compressedArray], {type: 'image/png'});
+      
+      // Конвертируем в Data URL
       const reader = new FileReader();
-      reader.readAsDataURL(processedBlob);
+      reader.readAsDataURL(compressedBlob);
       
       reader.onloadend = () => {
+        const compressedDataURL = reader.result;
+        
         // Обновляем элементы и метаданные
         const updatedElements = elements.map(el => 
-          el.id === elementId ? { ...el, image: reader.result } : el
+          el.id === elementId ? { ...el, image: compressedDataURL } : el
         );
-
+  
         // Обновляем sessionStorage
         const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || {});
         const updatedImages = [...currentMeta.images];
-
+  
         if (indexImg >= 0 && indexImg < updatedImages.length) {
-          updatedImages[indexImg] = reader.result;
-
+          updatedImages[indexImg] = compressedDataURL;
+  
           sessionStorage.setItem(storageMetaKey, JSON.stringify({
             ...currentMeta,
             images: updatedImages
           }));
         }
-
+  
         setElements(updatedElements);
       };
-
+  
     } catch (error) {
-      console.error('Ошибка удаления фона:', error);
-      alert('Не удалось удалить фон. Проверьте API ключ и попробуйте позже.');
+      console.error('Ошибка:', error);
+      alert(`Ошибка обработки изображения: ${error.message}`);
     } finally {
       setProcessingIds(prev => {
         const newSet = new Set(prev);
