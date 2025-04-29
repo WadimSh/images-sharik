@@ -314,7 +314,7 @@ const handleResizeWithPosition = (id, newData) => {
         method: 'POST',
         headers: {
           'Accept': 'image/png',
-          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e'
+          'x-api-key': 'xxx'
         },
         body: form
       };
@@ -339,7 +339,6 @@ const handleResizeWithPosition = (id, newData) => {
         [image.data.buffer],
         image.width,
         image.height,
-        image.frames[0].cnum,
         compression
       );
       
@@ -361,7 +360,7 @@ const handleResizeWithPosition = (id, newData) => {
         // Обновляем sessionStorage
         const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || {});
         const updatedImages = [...currentMeta.images];
-  
+        
         if (indexImg >= 0 && indexImg < updatedImages.length) {
           updatedImages[indexImg] = compressedDataURL;
   
@@ -385,7 +384,7 @@ const handleResizeWithPosition = (id, newData) => {
       });
     }
   };
-
+  console.log(indexImg)
   const handleRemoveElement = (id) => {
     setElements(elements.filter(el => el.id !== id));
   };
@@ -477,7 +476,7 @@ const handleResizeWithPosition = (id, newData) => {
     ));
   };
 
-  const handleImageSelect = (imgUrl) => {
+  const handleImageSelect = (imgUrl, index) => {
     // Находим первый image элемент
     const imageElement = elements.find(el => 
       el.type === 'image' && 
@@ -493,7 +492,7 @@ const handleResizeWithPosition = (id, newData) => {
           isFlipped: el.isFlipped || false
         } : el
       ));
-      
+      setIndexImg(index);
     } 
   };
 
@@ -556,7 +555,7 @@ const handlePaste = () => {
 useEffect(() => {
   // Найти индекс активного изображения
   const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
-    elements.some(el => el.type === 'image' && el.image === img)
+    elements.some(el => el.type === 'image' && el.image === img && el.isProduct)
   ) ?? -1;
 
   setIndexImg(activeIndex);
@@ -681,14 +680,14 @@ useEffect(() => {
         <div className="images-grid">
           {initialMetaDateElement?.images?.map((img, index) => {
             const isActive = elements.some(el => 
-              el.type === 'image' && el.image === img
+              el.type === 'image' && el.image === img && el.isProduct
             );
             
             return (
               <div 
                 key={index}
                 className={`image-item ${isActive ? 'active' : ''}`}
-                onClick={() => handleImageSelect(img)}
+                onClick={() => handleImageSelect(img, index)}
               >
                 <img 
                   src={img} 
@@ -894,7 +893,7 @@ useEffect(() => {
               )}
 
               {/* Кнопка удаления фона */}
-              {element.image?.startsWith('http') && (
+              {element.isProduct && (
                 <button
                   onClick={() => handleRemoveBackground(element.id)}
                   className="remove-bg-button"
