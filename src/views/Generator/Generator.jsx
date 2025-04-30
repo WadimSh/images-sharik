@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt, FaClipboardCheck } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
@@ -86,6 +86,16 @@ export const Generator = () => {
   const [indexImg, setIndexImg] = useState(-1);
   const fileInputRef = useRef(null);
 
+  // Состояния для модалки создания локальных шаблонов
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
+  const [modalMessage, setModalMessage] = useState('');
+  // Для работы с локальными шаблонами
+  const [templates, setTemplates] = useState({});
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
+
   // Сохранение в sessionStorage при изменениях
   useEffect(() => {
     if (elements.length > 0) {
@@ -107,6 +117,49 @@ export const Generator = () => {
       }]);
     }
   }, [id, savedDesign]);
+
+  // Эффект для загрузки шаблонов при монтировании и изменении
+  useEffect(() => {
+    const loadTemplates = () => {
+      const savedTemplates = localStorage.getItem('templatesLocal');
+      if (savedTemplates) {
+        setTemplates(JSON.parse(savedTemplates));
+      }
+    };
+
+    loadTemplates();
+    // Слушаем изменения в localStorage
+    window.addEventListener('storage', loadTemplates);
+    return () => window.removeEventListener('storage', loadTemplates);
+  }, []);
+
+  // Функция для загрузки шаблона
+  const loadTemplate = (templateName) => {
+    const template = templates[templateName];
+    if (!template) return;
+
+    // Заменяем плейсхолдер на текущее изображение товара
+    const productImage = initialMetaDateElement?.images?.[indexImg] || '';
+
+    const modifiedElements = template.map(element => ({
+      ...element,
+      image: element.type === 'image' && element.image === "{{ITEM_IMAGE}}" 
+        ? productImage 
+        : element.image
+    }));
+
+    setElements(modifiedElements);
+    sessionStorage.setItem(storageKey, JSON.stringify(modifiedElements));
+  };
+
+  // Функция для удаления шаблона
+  const handleDeleteTemplate = (templateName) => {
+    const updatedTemplates = { ...templates };
+    delete updatedTemplates[templateName];
+    localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
+    setTemplates(updatedTemplates);
+    if (selectedTemplate === templateName) setSelectedTemplate('');
+  };
 
   // Обработчик изменения цвета
   const handleColorChange = (e) => {
@@ -314,7 +367,7 @@ const handleResizeWithPosition = (id, newData) => {
         method: 'POST',
         headers: {
           'Accept': 'image/png',
-          'x-api-key': 'xxx'
+          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e'
         },
         body: form
       };
@@ -388,6 +441,66 @@ const handleResizeWithPosition = (id, newData) => {
   const handleRemoveElement = (id) => {
     setElements(elements.filter(el => el.id !== id));
   };
+
+  // Функция для обработки создания шаблона
+  const handleCreateTemplate = () => {
+    setIsTemplateModalOpen(true);
+  };
+
+  const handleSaveTemplate = async (overwrite = false) => {
+    try {
+      const name = templateName.trim().toLowerCase();
+      if (!name) return;
+  
+      // Получаем существующие шаблоны
+      const existingTemplates = JSON.parse(localStorage.getItem('templatesLocal')) || {};
+      
+      // Проверка на существующий шаблон
+      const existingNames = Object.keys(existingTemplates).map(n => n.toLowerCase());
+      if (existingNames.includes(name)) {
+        setModalStep('overwrite');
+        setModalMessage('Шаблон с таким именем уже существует!');
+        return;
+      }
+  
+      // Логика сохранения
+      const storageKey = `design-${id}`;
+      const savedDesign = sessionStorage.getItem(storageKey);
+      const currentDesign = savedDesign ? JSON.parse(savedDesign) : [];
+  
+      const modifiedDesign = currentDesign.map(element => ({
+        ...element,
+        image: element.type === 'image' && element.isProduct ? "{{ITEM_IMAGE}}" : element.image
+      }));
+  
+      const updatedTemplates = {
+        ...existingTemplates,
+        [name]: modifiedDesign
+      };
+  
+      localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
+      
+      // Успешное сохранение
+      setModalStep('success');
+      setModalMessage('Шаблон успешно сохранён!');
+
+      setTemplates(updatedTemplates); // Обновляем состояние шаблонов
+      setSelectedTemplate(name); // Выбираем новый шаблон
+      
+      // Автоматическое закрытие через 2 сек
+      setTimeout(() => {
+        setIsTemplateModalOpen(false);
+        setModalStep('input');
+        setTemplateName('');
+      }, 2000);
+  
+    } catch (error) {
+      setModalStep('error');
+      setModalMessage('Ошибка при сохранении: ' + error.message);
+    }
+  };
+  
+
 
   const handleDownload = async () => {
     try {
@@ -612,7 +725,53 @@ useEffect(() => {
           {'< Назад'}
         </button>
         <h2>{getHeaderTitle()}</h2>
+
+        <div className="template-select-wrapper">
+          {Object.keys(templates).length > 0 && (
+            <div className="template-select-container">
+              <div 
+                className="template-select-header"
+                onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
+              >
+                {selectedTemplate || 'Выберите шаблон'}
+                <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
+              </div>
+
+              {isTemplateListOpen && (
+                <div className="template-list">
+                  {Object.keys(templates).map(name => (
+                    <div key={name} className="template-item">
+                      <span 
+                        className="template-name"
+                        onClick={() => {
+                          setSelectedTemplate(name);
+                          loadTemplate(name);
+                          setIsTemplateListOpen(false);
+                        }}
+                      >
+                        {name}
+                      </span>
+                      <button 
+                        className="delete-template-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTemplate(name);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       
+        <button onClick={handleCreateTemplate} className="template-button">
+          <FaClipboardCheck /> Создать шаблон
+        </button>
+
         <button onClick={handleDownload} className="download-button">
           <FaDownload /> Скачать дизайн
         </button>
@@ -994,9 +1153,9 @@ useEffect(() => {
           </div>
           )}     
         
-      </div>
+        </div>
 
-    </div>  
+      </div>  
 
       <input
         type="file"
@@ -1006,6 +1165,88 @@ useEffect(() => {
         className="hidden-input"
       />
 
+      {isTemplateModalOpen && (
+        <div className="modal-overlay" onClick={() => {
+          setIsTemplateModalOpen(false);
+          setModalStep('input');
+          setTemplateName('');
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          {modalStep === 'input' ? (
+          <>
+            <h2>Создай свой шаблон</h2>
+            <input
+              type="text"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              placeholder="Введите название шаблона"
+              className="template-input"
+              maxLength={50} // Ограничение длины
+              onKeyDown={(e) => { 
+                if (e.key === 'Enter' && templateName.trim()) {
+                  handleSaveTemplate();
+                }
+              }}
+            />
+            <div className="modal-actions">
+              <button 
+                className="cancel-button"
+                onClick={() => {
+                  setIsTemplateModalOpen(false);
+                  setTemplateName('');
+                }}
+              >
+                Отменить
+              </button>
+              <button
+                className="create-button"
+                onClick={handleSaveTemplate}
+                disabled={!templateName.trim()}
+              >
+                Создать
+              </button>
+            </div>
+            </>
+      ) : modalStep === 'overwrite' ? (
+        <>
+          <h2>Внимание!</h2>
+          <p>{modalMessage}</p>
+          <div className="modal-actions">
+            <button
+              className="cancel-button"
+              onClick={() => setModalStep('input')}
+            >
+              Отменить
+            </button>
+            <button
+              className="create-button"
+              onClick={() => handleSaveTemplate(true)}
+            >
+              Перезаписать
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2>{modalStep === 'success' ? 'Успешно!' : 'Ошибка!'}</h2>
+          <p>{modalMessage}</p>
+          <div className="modal-actions">
+            <button
+              className="close-button"
+              onClick={() => {
+                setIsTemplateModalOpen(false);
+                setModalStep('input');
+                setTemplateName('');
+              }}
+            >
+              Закрыть
+            </button>
+          </div>
+        </>
+      )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
