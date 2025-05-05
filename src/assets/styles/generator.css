@@ -194,15 +194,28 @@
 .template-select-header {
   padding: 8px 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px; /* Добавляем отступ между текстом и стрелкой */
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.selected-template-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; 
 }
 
 .arrow {
+  flex-shrink: 0; 
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
+  transition: transform 0.2s;
 }
 
 .arrow.down {
@@ -241,20 +254,42 @@
 .template-name {
   flex-grow: 1;
   margin-right: 10px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.template-buttons {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.export-template-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 2px 5px;
+  font-size: 16px;
+}
+
+.export-template-button:hover {
+  color: #2196F3;
 }
 
 .delete-template-button {
   background: none;
   border: none;
-  color: #ff4444;
   cursor: pointer;
+  color: #666;
   padding: 2px 5px;
-  font-size: 16px;
-  line-height: 1;
+}
 
-  &:hover {
-    color: #cc0000;
-  }
+.delete-template-button:hover {
+  color: #ff4444;
 }
 
 /* --- */

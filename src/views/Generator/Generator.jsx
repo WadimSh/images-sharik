@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt, FaClipboardCheck } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchangeAlt, FaClipboardCheck, FaSave } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
@@ -86,12 +86,12 @@ export const Generator = () => {
   const [indexImg, setIndexImg] = useState(-1);
   const fileInputRef = useRef(null);
 
-  // Состояния для модалки создания локальных шаблонов
+  // Состояния для модалки создания макетов
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
   const [modalMessage, setModalMessage] = useState('');
-  // Для работы с локальными шаблонами
+  // Для работы с макетами
   const [templates, setTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
@@ -118,7 +118,7 @@ export const Generator = () => {
     }
   }, [id, savedDesign]);
 
-  // Эффект для загрузки шаблонов при монтировании и изменении
+  // Эффект для загрузки макетов при монтировании и изменении
   useEffect(() => {
     const loadTemplates = () => {
       const savedTemplates = localStorage.getItem('templatesLocal');
@@ -133,7 +133,7 @@ export const Generator = () => {
     return () => window.removeEventListener('storage', loadTemplates);
   }, []);
 
-  // Функция для загрузки шаблона
+  // Функция для загрузки макетов
   const loadTemplate = (templateName) => {
     const template = templates[templateName];
     if (!template) return;
@@ -152,13 +152,42 @@ export const Generator = () => {
     sessionStorage.setItem(storageKey, JSON.stringify(modifiedElements));
   };
 
-  // Функция для удаления шаблона
+  // Функция для удаления макета
   const handleDeleteTemplate = (templateName) => {
     const updatedTemplates = { ...templates };
     delete updatedTemplates[templateName];
     localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
     setTemplates(updatedTemplates);
     if (selectedTemplate === templateName) setSelectedTemplate('');
+  };
+
+  // Функция выгрузки макета в одельный файл
+  const handleExportTemplate = (templateName) => {
+    const template = templates[templateName];
+    if (!template) return;
+  
+    // Формируем имя файла
+    const fileName = templateName
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zа-яё0-9_-]/gi, '') + '.json';
+  
+    // Создаем JSON строку
+    const json = JSON.stringify(template, null, 2);
+    
+    // Создаем Blob и ссылку для скачивания
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Очистка
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Обработчик изменения цвета
@@ -500,8 +529,6 @@ const handleResizeWithPosition = (id, newData) => {
     }
   };
   
-
-
   const handleDownload = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -733,7 +760,9 @@ useEffect(() => {
                 className="template-select-header"
                 onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
               >
-                {selectedTemplate || 'Выберите макет'}
+                <span className="selected-template-text">
+                  {selectedTemplate || 'Выберите макет'}
+                </span>
                 <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
               </div>
 
@@ -751,15 +780,28 @@ useEffect(() => {
                       >
                         {name}
                       </span>
-                      <button 
-                        className="delete-template-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteTemplate(name);
-                        }}
-                      >
-                        ×
-                      </button>
+                      <div className="template-buttons">
+                        <button 
+                          className="export-template-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleExportTemplate(name);
+                          }}
+                          title="Сохранить в файл"
+                        >
+                          <FaSave />
+                        </button>
+                        <button 
+                          className="delete-template-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTemplate(name);
+                          }}
+                          title="Удалить макет"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
