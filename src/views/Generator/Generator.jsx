@@ -4,6 +4,7 @@ import { FaArrowUp, FaArrowDown, FaDownload, FaImage, FaFont, FaSquare, FaExchan
 import { FiRefreshCw } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
+import imageCompression from 'browser-image-compression';
 
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
@@ -253,58 +254,66 @@ export const Generator = () => {
     setElements(prev => [...prev, newElement]);
   };
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = async (file) => {
     if (!file) return;
   
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        // Проверка максимального разрешения
-        if (img.width > 2000 || img.height > 2000) {
-          alert('Максимальный размер изображения 2000x2000 пикселей');
-          return;
-        }
-  
-        // Параметры контейнера
-        const containerWidth = 450;
-        const containerHeight = 600;
-  
-        // Рассчет коэффициента масштабирования
-        const scale = Math.min(
-          containerWidth / img.width,
-          containerHeight / img.height,
-          1 // Запрещаем увеличение изображения
-        );
-  
-        // Новые размеры с сохранением пропорций
-        const newWidth = img.width * scale;
-        const newHeight = img.height * scale;
-  
-        // Позиционирование по центру
-        const position = {
-          x: (containerWidth - newWidth) / 2,
-          y: (containerHeight - newHeight) / 2
-        };
-  
-        const newElement = {
-          id: Date.now(),
-          type: 'image',
-          position,
-          image: event.target.result,
-          width: newWidth,
-          height: newHeight,
-          originalWidth: img.width,
-          originalHeight: img.height,
-          isFlipped: false
-        };
-  
-        setElements(prev => [...prev, newElement]);
+    try {
+      // Настройки компрессии
+      const options = {
+        maxSizeMB: 1, // Максимальный размер файла
+        maxWidthOrHeight: 2000, // Максимальное измерение
+        useWebWorker: true, // Использовать многопоточность
+        fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
+        initialQuality: 0.8 // Качество сжатия (0-1)
       };
-      img.onerror = () => alert('Ошибка загрузки изображения');
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+  
+      // Сжимаем изображение
+      const compressedFile = await imageCompression(file, options);
+      
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const containerWidth = 450;
+          const containerHeight = 600;
+  
+          const scale = Math.min(
+            containerWidth / img.width,
+            containerHeight / img.height,
+            1
+          );
+  
+          const newWidth = img.width * scale;
+          const newHeight = img.height * scale;
+  
+          const position = {
+            x: (containerWidth - newWidth) / 2,
+            y: (containerHeight - newHeight) / 2
+          };
+  
+          const newElement = {
+            id: Date.now(),
+            type: 'image',
+            position,
+            image: event.target.result,
+            width: newWidth,
+            height: newHeight,
+            originalWidth: img.width,
+            originalHeight: img.height,
+            isFlipped: false
+          };
+  
+          setElements(prev => [...prev, newElement]);
+        };
+        img.onerror = () => alert('Ошибка загрузки изображения');
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(compressedFile);
+  
+    } catch (error) {
+      console.error('Ошибка сжатия:', error);
+      alert('Не удалось обработать изображение');
+    }
   };
 
   // Добавим новую функцию замены изображения
