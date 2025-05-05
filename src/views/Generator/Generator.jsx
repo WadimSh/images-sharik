@@ -96,6 +96,9 @@ export const Generator = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
 
+  // Добавили состояние для отслеживания перетаскивания
+  const [isDragging, setIsDragging] = useState(false);
+
   // Сохранение в sessionStorage при изменениях
   useEffect(() => {
     if (elements.length > 0) {
@@ -250,8 +253,7 @@ export const Generator = () => {
     setElements(prev => [...prev, newElement]);
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = (file) => {
     if (!file) return;
   
     const reader = new FileReader();
@@ -907,7 +909,35 @@ useEffect(() => {
         onContextMenu={(e) => {
           e.preventDefault();
         }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          
+          const files = Array.from(e.dataTransfer.files);
+          const imageFile = files.find(file => file.type.startsWith('image/'));
+          
+          if (imageFile) {
+            handleFileUpload(imageFile);
+          }
+        }}
       >
+        {/* Стилизованная область для визуальной обратной связи */}
+        <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
+          {isDragging && (
+            <div className="drop-message">
+              Перетащите изображение сюда
+            </div>
+          )}
+        </div>
+
         {elements.map((element) => {
           switch (element.type) {
             case 'image':
@@ -1202,7 +1232,7 @@ useEffect(() => {
       <input
         type="file"
         accept="image/*"
-        onChange={handleFileUpload}
+        onChange={(e) => handleFileUpload(e.target.files[0])}
         ref={fileInputRef}
         className="hidden-input"
       />

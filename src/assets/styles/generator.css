@@ -319,6 +319,34 @@
   overflow: hidden;
 }
 
+.drop-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 99%;
+  height: 99%;
+  border: 2px dashed transparent;
+  transition: all 0.3s ease;
+  z-index: 999;
+  pointer-events: none; 
+}
+
+.drop-zone.active {
+  border-color: #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+  pointer-events: none;
+}
+
+.drop-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  color: #2196F3;
+  pointer-events: none;
+}
+
 .context-menu {
   background: white;
   border: 1px solid #ddd;
