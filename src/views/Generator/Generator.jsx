@@ -447,7 +447,7 @@ const handleResizeWithPosition = (id, newData) => {
     setIsTemplateModalOpen(true);
   };
 
-  const handleSaveTemplate = async (overwrite = false) => {
+  const handleSaveTemplate = async () => {
     try {
       const name = templateName.trim().toLowerCase();
       if (!name) return;
@@ -459,7 +459,7 @@ const handleResizeWithPosition = (id, newData) => {
       const existingNames = Object.keys(existingTemplates).map(n => n.toLowerCase());
       if (existingNames.includes(name)) {
         setModalStep('overwrite');
-        setModalMessage('Шаблон с таким именем уже существует!');
+        setModalMessage('Макет с таким именем уже существует!');
         return;
       }
   
@@ -482,7 +482,7 @@ const handleResizeWithPosition = (id, newData) => {
       
       // Успешное сохранение
       setModalStep('success');
-      setModalMessage('Шаблон успешно сохранён!');
+      setModalMessage('Макет успешно сохранён!');
 
       setTemplates(updatedTemplates); // Обновляем состояние шаблонов
       setSelectedTemplate(name); // Выбираем новый шаблон
@@ -733,7 +733,7 @@ useEffect(() => {
                 className="template-select-header"
                 onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
               >
-                {selectedTemplate || 'Выберите шаблон'}
+                {selectedTemplate || 'Выберите макет'}
                 <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
               </div>
 
@@ -769,7 +769,7 @@ useEffect(() => {
         </div>
       
         <button onClick={handleCreateTemplate} className="template-button">
-          <FaClipboardCheck /> Создать шаблон
+          <FaClipboardCheck /> Создать макет
         </button>
 
         <button onClick={handleDownload} className="download-button">
@@ -1174,12 +1174,12 @@ useEffect(() => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           {modalStep === 'input' ? (
           <>
-            <h2>Создай свой шаблон</h2>
+            <h2>Создай свой макет</h2>
             <input
               type="text"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Введите название шаблона"
+              placeholder="Введите название макета"
               className="template-input"
               maxLength={50} // Ограничение длины
               onKeyDown={(e) => { 

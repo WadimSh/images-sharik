@@ -31,6 +31,8 @@ const SearchHeader = ({
   };
 
   const handleSearch = () => {
+    // Полная очистка sessionStorage
+    sessionStorage.clear();
     const normalized = searchQuery
       .split(/[\s,]+/) 
       .map(item => {
@@ -54,6 +56,8 @@ const SearchHeader = ({
   const handleClear = () => {
     setSearchQuery('');
     onSearch([]);
+    // Полная очистка sessionStorage
+    sessionStorage.clear();
   };
 
   const handleKeyDown = (event) => {
