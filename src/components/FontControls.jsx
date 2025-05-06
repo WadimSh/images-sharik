@@ -84,6 +84,7 @@ export const FontControls = ({ element, onClose, onChange }) => {
           value={element.fontFamily || 'Arial'}
           onChange={(e) => onChange(element.id, 'fontFamily', e.target.value)}
         >
+          <option value="HeliosCond">HeliosCond</option>
           <option value="GemarFont">GemarFont</option>
           <option value="BelbalFont">BelbalFont</option>
           <option value="BelbalFontRegul">BelbalFontRegul</option>

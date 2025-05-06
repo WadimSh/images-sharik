@@ -1,44 +1,21 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaArrowUp, FaArrowDown, FaImage, FaFont, FaSquare, FaExchangeAlt } from 'react-icons/fa';
-import { FiRefreshCw } from 'react-icons/fi';
+import { FaImage, FaFont, FaSquare } from 'react-icons/fa';
 import UPNG from 'upng-js';
 import imageCompression from 'browser-image-compression';
 
 import { HeaderSection } from '../../components/HeaderSection';
-
+import { TemplateModal } from '../../components/TemplateModal';
+import { ProductMetaInfo } from '../../components/ProductMetaInfo';
+import { ProductImagesGrid } from '../../components/ProductImagesGrid';
+import { ElementsList } from '../../components/ElementsList';
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
-import { FontControls } from '../../components/FontControls';
 
 export const Generator = () => {
   const { id } = useParams();
-  const captureRef = useRef(null);
-  // Добавляем получение номера слайда
   const [baseId, slideNumber] = id.split('_');
-
-  // Добавляем реф для контекстного меню
-  const contextMenuRef = useRef(null);
-
-  const [selectedColorElementId, setSelectedColorElementId] = useState(null);
-  const colorInputRef = useRef(null);
-
-  const [selectedElementId, setSelectedElementId] = useState(null);
-  const [copiedElement, setCopiedElement] = useState(null);
-  const [contextMenu, setContextMenu] = useState({
-    visible: false,
-    x: 0,
-    y: 0,
-  });
-
-  // Состояние для отслеживания обработки при запросе на удаление фона 
-  const [processingIds, setProcessingIds] = useState(new Set());
-  
-  // Добавляем состояние для выбранного текстового элемента
-  const [selectedTextElementId, setSelectedTextElementId] = useState(null);
-  // Добавляем состояние для редактирования текста
-  const [editingTextId, setEditingTextId] = useState(null);
 
   const storageMetaKey = `product-${baseId}`
   const savedMetaDate = sessionStorage.getItem(storageMetaKey);
@@ -49,9 +26,6 @@ export const Generator = () => {
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
-  // Добавим функцию для генерации уникальных ID
-  const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
- 
   // Добавляем размеры по умолчанию для старых данных
   const processedElements = initialElements.map(element => {
     if (element.type === 'image' && !element.width) {
@@ -75,22 +49,38 @@ export const Generator = () => {
     return element;
   });
 
-  const [elements, setElements] = useState(processedElements);
-  const [indexImg, setIndexImg] = useState(-1);
+  const captureRef = useRef(null);
+  const contextMenuRef = useRef(null);
+  const colorInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  const [selectedColorElementId, setSelectedColorElementId] = useState(null);
+  const [selectedElementId, setSelectedElementId] = useState(null);
+  const [copiedElement, setCopiedElement] = useState(null);
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+  });
+  // Состояние для отслеживания обработки при запросе на удаление фона 
+  const [processingIds, setProcessingIds] = useState(new Set());
+  // Добавляем состояние для выбранного текстового элемента
+  const [selectedTextElementId, setSelectedTextElementId] = useState(null);
+  // Добавляем состояние для редактирования текста
+  const [editingTextId, setEditingTextId] = useState(null);
+  const [elements, setElements] = useState(processedElements);
+  const [indexImg, setIndexImg] = useState(-1);
   // Состояния для модалки создания макетов
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
-  const [modalMessage, setModalMessage] = useState('');
   // Для работы с макетами
   const [templates, setTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState('');
-  
   // Добавили состояние для отслеживания перетаскивания
   const [isDragging, setIsDragging] = useState(false);
 
+  // Добавим функцию для генерации уникальных ID
+  const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
+ 
   // Сохранение в sessionStorage при изменениях
   useEffect(() => {
     if (elements.length > 0) {
@@ -255,72 +245,72 @@ export const Generator = () => {
   };
 
   // Добавим новую функцию замены изображения
-const handleReplaceImage = (id) => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleReplaceImage = (id) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width > 2000 || img.height > 2000) {
-          alert('Максимальный размер изображения 2000x2000 пикселей');
-          return;
-        }
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-        setElements(prev => prev.map(el => 
-          el.id === id ? {
-            ...el,
-            image: event.target.result,
-            originalWidth: img.width,
-            originalHeight: img.height,
-            isFlipped: el.isFlipped
-          } : el
-        ));
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width > 2000 || img.height > 2000) {
+            alert('Максимальный размер изображения 2000x2000 пикселей');
+            return;
+          }
+
+          setElements(prev => prev.map(el => 
+            el.id === id ? {
+              ...el,
+              image: event.target.result,
+              originalWidth: img.width,
+              originalHeight: img.height,
+              isFlipped: el.isFlipped
+            } : el
+          ));
+        };
+        img.src = event.target.result;
       };
-      img.src = event.target.result;
+      reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
+
+    input.click();
   };
-  
-  input.click();
-};
 
-const handleDrag = (id, newPosition, newRotation) => {
-  setElements(prev => prev.map(el => {
-    if (el.id === id) {
-      return {
-        ...el,
-        position: newPosition,
-        rotation: newRotation !== undefined ? newRotation : el.rotation
-      };
-    }
-    return el;
-  }));
-};
+  const handleDrag = (id, newPosition, newRotation) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === id) {
+        return {
+          ...el,
+          position: newPosition,
+          rotation: newRotation !== undefined ? newRotation : el.rotation
+        };
+      }
+      return el;
+    }));
+  };
 
-// Добавляем новый обработчик для комплексного обновления
-const handleResizeWithPosition = (id, newData) => {
-  setElements(prev => prev.map(el => {
-    if (el.id === id) {
-      return {
-        ...el,
-        width: newData.width,
-        height: newData.height,
-        position: {
-          x: newData.x ?? el.position.x,
-          y: newData.y ?? el.position.y
-        }
-      };
-    }
-    return el;
-  }));
-};
+  // Добавляем новый обработчик для комплексного обновления
+  const handleResizeWithPosition = (id, newData) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === id) {
+        return {
+          ...el,
+          width: newData.width,
+          height: newData.height,
+          position: {
+            x: newData.x ?? el.position.x,
+            y: newData.y ?? el.position.y
+          }
+        };
+      }
+      return el;
+    }));
+  };
 
   // Функция удаления фона через PhotoRoom API
   const handleRemoveBackground = async (elementId) => {
@@ -425,59 +415,6 @@ const handleResizeWithPosition = (id, newData) => {
     setIsTemplateModalOpen(true);
   };
 
-  const handleSaveTemplate = async () => {
-    try {
-      const name = templateName.trim().toLowerCase();
-      if (!name) return;
-  
-      // Получаем существующие шаблоны
-      const existingTemplates = JSON.parse(localStorage.getItem('templatesLocal')) || {};
-      
-      // Проверка на существующий шаблон
-      const existingNames = Object.keys(existingTemplates).map(n => n.toLowerCase());
-      if (existingNames.includes(name)) {
-        setModalStep('overwrite');
-        setModalMessage('Макет с таким именем уже существует!');
-        return;
-      }
-  
-      // Логика сохранения
-      const storageKey = `design-${id}`;
-      const savedDesign = sessionStorage.getItem(storageKey);
-      const currentDesign = savedDesign ? JSON.parse(savedDesign) : [];
-  
-      const modifiedDesign = currentDesign.map(element => ({
-        ...element,
-        image: element.type === 'image' && element.isProduct ? "{{ITEM_IMAGE}}" : element.image
-      }));
-  
-      const updatedTemplates = {
-        ...existingTemplates,
-        [name]: modifiedDesign
-      };
-  
-      localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
-      
-      // Успешное сохранение
-      setModalStep('success');
-      setModalMessage('Макет успешно сохранён!');
-
-      setTemplates(updatedTemplates); // Обновляем состояние шаблонов
-      setSelectedTemplate(name); // Выбираем новый шаблон
-      
-      // Автоматическое закрытие через 2 сек
-      setTimeout(() => {
-        setIsTemplateModalOpen(false);
-        setModalStep('input');
-        setTemplateName('');
-      }, 2000);
-  
-    } catch (error) {
-      setModalStep('error');
-      setModalMessage('Ошибка при сохранении: ' + error.message);
-    }
-  };
-  
   const handleMoveUp = (index) => {
     if (index === 0) return;
     const newElements = [...elements];
@@ -536,73 +473,73 @@ const handleResizeWithPosition = (id, newData) => {
     });
   };
 
-// Закрытие меню
-const closeContextMenu = () => {
-  setContextMenu({ ...contextMenu, visible: false });
-};
-
-// Копирование
-const handleCopy = () => {
-  const element = elements.find(el => el.id === selectedElementId);
-  if (!element) return;
-
-  const copied = JSON.parse(JSON.stringify(element));
-
-  // Удаляем флаг isProduct, если он существует
-  if (copied.hasOwnProperty('isProduct')) {
-    delete copied.isProduct;
-  }
-
-  copied.id = generateUniqueId();
-  setCopiedElement(copied);
-  closeContextMenu();
-};
-
-// Вставка
-const handlePaste = () => {
-  if (!copiedElement) return;
-
-  const newElement = {
-    ...copiedElement,
-    id: generateUniqueId(),
-    position: {
-      x: copiedElement.position.x + 20,
-      y: copiedElement.position.y + 20
-    }
+  // Закрытие меню
+  const closeContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false });
   };
-  
-  setElements(prev => [...prev, newElement]);
-  closeContextMenu();
-};
 
-useEffect(() => {
-  // Найти индекс активного изображения
-  const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
-    elements.some(el => el.type === 'image' && el.image === img && el.isProduct)
-  ) ?? -1;
+  // Копирование
+  const handleCopy = () => {
+    const element = elements.find(el => el.id === selectedElementId);
+    if (!element) return;
 
-  setIndexImg(activeIndex);
-}, [elements, initialMetaDateElement?.images]);
+    const copied = JSON.parse(JSON.stringify(element));
+
+    // Удаляем флаг isProduct, если он существует
+    if (copied.hasOwnProperty('isProduct')) {
+      delete copied.isProduct;
+    }
+
+    copied.id = generateUniqueId();
+    setCopiedElement(copied);
+    closeContextMenu();
+  };
+
+  // Вставка
+  const handlePaste = () => {
+    if (!copiedElement) return;
+
+    const newElement = {
+      ...copiedElement,
+      id: generateUniqueId(),
+      position: {
+        x: copiedElement.position.x + 20,
+        y: copiedElement.position.y + 20
+      }
+    };
+
+    setElements(prev => [...prev, newElement]);
+    closeContextMenu();
+  };
+
+  useEffect(() => {
+    // Найти индекс активного изображения
+    const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
+      elements.some(el => el.type === 'image' && el.image === img && el.isProduct)
+    ) ?? -1;
+
+    setIndexImg(activeIndex);
+  }, [elements, initialMetaDateElement?.images]);
 
   // Эффект для закрытия меню при клике вне его области
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (
-      contextMenu.visible && 
-      contextMenuRef.current && 
-      !contextMenuRef.current.contains(event.target)
-    ) {
-      closeContextMenu();
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        contextMenu.visible && 
+        contextMenuRef.current && 
+        !contextMenuRef.current.contains(event.target)
+      ) {
+        closeContextMenu();
+      }
+    };
 
-  // Добавляем обработчик для события mousedown (срабатывает при нажатии ЛЮБОЙ кнопки мыши)
-  document.addEventListener('mousedown', handleClickOutside);
-  
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, [contextMenu.visible]);
+    // Добавляем обработчик для события mousedown (срабатывает при нажатии ЛЮБОЙ кнопки мыши)
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [contextMenu.visible]);
 
   // Обработчик горячих клавиш
   useEffect(() => {
@@ -640,40 +577,11 @@ useEffect(() => {
         loadTemplate={loadTemplate}
         handleCreateTemplate={handleCreateTemplate}
       />
-
-    <div className="content-wrapper">
-
-      <div className='meta-info'>
-        <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
-          <h3 className='meta-title'>
-            {initialMetaDateElement.code}
-            <span className="meta-subtitle"> {initialMetaDateElement.name}</span>
-          </h3>
-        </a>
-          {initialMetaDateElement.originProperties.map((item, index) => (
-              <div className="meta-row" key={index}>
-                  <div className="meta-col">
-                      <div className="meta-subtitle">{item.name}</div>
-                  </div>
-                  <div className="meta-col">
-                      <span className='meta-subtitle'>{item.value}</span>
-                  </div>
-              </div>
-          ))}
-          {initialMetaDateElement.properties.map((item, index) => (
-              <div className="meta-row" key={index}>
-                  <div className="meta-col">
-                      <div className="meta-subtitle">{item.name}</div>
-                  </div>
-                  <div className="meta-col">
-                      <span className='meta-subtitle'>{item.value}</span>
-                  </div>
-              </div>
-          ))}
-      </div>
-
-      {/* Центральная область с элементами управления и холстом */}
-      <div className="main-content">
+      <div className="content-wrapper">
+        <ProductMetaInfo 
+          initialMetaDateElement={initialMetaDateElement}
+        />
+        <div className="main-content">
           {/* Панель добавления элементов */}
           <div className="element-toolbar">
             <button 
@@ -695,360 +603,184 @@ useEffect(() => {
               <FaSquare size={20} />
             </button>
           </div>
-      </div>
-
-    <div className='design-area'>
-      {/* Секция отображения фоток товара */}
-      
-        <div className="images-grid">
-          {initialMetaDateElement?.images?.map((img, index) => {
-            const isActive = elements.some(el => 
-              el.type === 'image' && el.image === img && el.isProduct
-            );
-            
-            return (
-              <div 
-                key={index}
-                className={`image-item ${isActive ? 'active' : ''}`}
-                onClick={() => handleImageSelect(img, index)}
-              >
-                <img 
-                  src={img} 
-                  alt={`Вариант ${index + 1}`}
-                  className="product-image"
-                />
-              </div>
-            )
-          })}
         </div>
-      
-      <div 
-        ref={captureRef} 
-        className="design-container"
-        onClick={closeContextMenu}
-        onContextMenu={(e) => {
-          e.preventDefault();
-        }}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={(e) => {
-          e.preventDefault();
-          setIsDragging(false);
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsDragging(false);
-          
-          const files = Array.from(e.dataTransfer.files);
-          const imageFile = files.find(file => file.type.startsWith('image/'));
-          
-          if (imageFile) {
-            handleFileUpload(imageFile);
-          }
-        }}
-      >
-        {/* Стилизованная область для визуальной обратной связи */}
-        <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
-          {isDragging && (
-            <div className="drop-message">
-              Перетащите изображение сюда
-            </div>
-          )}
-        </div>
-
-        {elements.map((element) => {
-          switch (element.type) {
-            case 'image':
-              return (
-                <ImageElement
-                  key={element.id}
-                  src={element.image} // Берем изображение из данных элемента
-                  position={element.position}
-                  width={element.width}
-                  height={element.height}
-                  isFlipped={element.isFlipped}
-                  onDrag={(pos) => handleDrag(element.id, pos)}
-                  onRemove={() => handleRemoveElement(element.id)}
-                  onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                  rotation={element.rotation} // Передаем поворот
-                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                  containerWidth={450}
-                  containerHeight={600}
-                  onContextMenu={(e) => handleContextMenu(e, element.id)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Скрываем все оверлеи перед показом нового
-                    elements.forEach(el => {
-                      if (el.id !== element.id) {
-                        // Здесь должен быть механизм скрытия других оверлеев
-                      }
-                    });
-                    setSelectedElementId(element.id);
-                  }}
-                />
-              );
-            case 'shape':
-              return (
-                <ShapeElement
-                  key={element.id}
-                  position={element.position}
-                  width={element.width}
-                  height={element.height}
-                  color={element.color || '#ccc'} // Добавляем цвет
-                  onDrag={(pos) => handleDrag(element.id, pos)}
-                  onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                  rotation={element.rotation} // Передаем поворот
-                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                  containerWidth={450}
-                  containerHeight={600}
-                  onContextMenu={(e) => handleContextMenu(e, element.id)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Скрываем все оверлеи перед показом нового
-                    elements.forEach(el => {
-                      if (el.id !== element.id) {
-                        // Здесь должен быть механизм скрытия других оверлеев
-                      }
-                    });
-                    setSelectedElementId(element.id);
-                  }}
-                />
-              );
-            case 'text':
-              return (
-                <TextElement
-                  element={element}
-                  key={element.id}
-                  position={element.position}
-                  onDrag={(pos) => handleDrag(element.id, pos)}
-                  onRemove={() => handleRemoveElement(element.id)}
-                  onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                  onTextChange={(newText) => {
-                    setElements(prev => prev.map(el => 
-                      el.id === element.id ? {...el, text: newText} : el
-                    ));
-                  }}
-                  isEditing={editingTextId === element.id}
-                  onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
-                  containerWidth={450}
-                  containerHeight={600}
-                  onContextMenu={(e) => handleContextMenu(e, element.id)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Скрываем все оверлеи перед показом нового
-                    elements.forEach(el => {
-                      if (el.id !== element.id) {
-                        // Здесь должен быть механизм скрытия других оверлеев
-                      }
-                    });
-                    setSelectedElementId(element.id);
-                  }}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
-
-        {/* Контекстное меню */}
-        {contextMenu.visible && (
+        <div className='design-area'>
+          <ProductImagesGrid 
+            images={initialMetaDateElement?.images}
+            elements={elements}
+            handleImageSelect={handleImageSelect}
+          />
           <div 
-            ref={contextMenuRef}
-            className="context-menu"
-            style={{
-              position: 'fixed',
-              left: contextMenu.x,
-              top: contextMenu.y,
-              zIndex: 1000
+            ref={captureRef} 
+            className="design-container"
+            onClick={closeContextMenu}
+            onContextMenu={(e) => {
+              e.preventDefault();
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+
+              const files = Array.from(e.dataTransfer.files);
+              const imageFile = files.find(file => file.type.startsWith('image/'));
+
+              if (imageFile) {
+                handleFileUpload(imageFile);
+              }
             }}
           >
-            <button 
-              onClick={handleCopy}
-            >Копировать (Ctrl+C)</button>
-            <button 
-              onClick={handlePaste}
-              disabled={!copiedElement}
-            >
-              Вставить (Ctrl+V)
-            </button>
-          </div>
-        )}
-      </div>
-    </div> 
-
-      <div className="sidebar">
-        <div className="elements-list">
-          <h3 style={{ marginTop: '0' }}>Элементы дизайна</h3>
-         {[...elements].reverse().map((element, index) => {
-            const originalIndex = elements.length - 1 - index;
-            return (
-            <div key={element.id} className="element-item">
-              <div className="element-info">
-                <span>
-                  {element.type === 'text' && '📝 '}
-                  {element.type === 'image' && (
-                    <>
-                      <img 
-                        src={element.image}
-                        style={{
-                          width: '18px',
-                          height: '18px',
-                          objectFit: 'cover',
-                          marginRight: '4px',
-                          verticalAlign: 'text-bottom',
-                          borderRadius: '2px'
-                        }}
-                        alt="Превью"
-                      />
-                      
-                    </>
-                  )}
-                  {element.type === 'shape' && (
-                    <div 
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        backgroundColor: element.color,
-                        marginRight: '4px',
-                        borderRadius: '2px'
+            {/* Стилизованная область для визуальной обратной связи */}
+            <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
+              {isDragging && (
+                <div className="drop-message">
+                  Перетащите изображение сюда
+                </div>
+              )}
+            </div>            
+            {elements.map((element) => {
+              switch (element.type) {
+                case 'image':
+                  return (
+                    <ImageElement
+                      key={element.id}
+                      src={element.image} // Берем изображение из данных элемента
+                      position={element.position}
+                      width={element.width}
+                      height={element.height}
+                      isFlipped={element.isFlipped}
+                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onRemove={() => handleRemoveElement(element.id)}
+                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                      rotation={element.rotation} // Передаем поворот
+                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      containerWidth={450}
+                      containerHeight={600}
+                      onContextMenu={(e) => handleContextMenu(e, element.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Скрываем все оверлеи перед показом нового
+                        elements.forEach(el => {
+                          if (el.id !== element.id) {
+                            // Здесь должен быть механизм скрытия других оверлеев
+                          }
+                        });
+                        setSelectedElementId(element.id);
                       }}
                     />
-                  )}
-                </span>
-                {element.type === 'text' && <span className="quoted-truncate">
-                  "<span className="truncated-text">{element.text}</span>"
-                </span>}
-                {element.type === 'image' && 'Изображение'}
-                {element.type === 'shape' && 'Фигура'}
-              </div>
-              <div className="element-controls">
-              {element.type === 'image' && (
-                <button
-                onClick={() => handleFlipImage(element.id)}
-                className="flip-button"
-                title="Зеркальное отражение"
-                >
-                  <FaExchangeAlt />
-                </button>
-              )}  
-              {element.type === 'image' && (
-                <button
-                  onClick={() => handleReplaceImage(element.id)}
-                  className="replace-button"
-                  title="Заменить изображение"
-                >
-                  <FiRefreshCw />
-                </button>
-              )}
-
-              {/* Кнопка удаления фона */}
-              {element.isProduct && (
-                <button
-                  onClick={() => handleRemoveBackground(element.id)}
-                  className="remove-bg-button"
-                  title="Удалить фон"
-                  disabled={processingIds.has(element.id)}
-                >
-                  {processingIds.has(element.id) ? (
-                    <div className="spinner"></div>
-                  ) : (
-                    '🎭'
-                  )}
-                </button>
-              )}
-
-              {element.type === 'shape' && (
-                <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleColorButtonClick(element.id);
+                  );
+                case 'shape':
+                  return (
+                    <ShapeElement
+                      key={element.id}
+                      position={element.position}
+                      width={element.width}
+                      height={element.height}
+                      color={element.color || '#ccc'} // Добавляем цвет
+                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                      rotation={element.rotation} // Передаем поворот
+                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      containerWidth={450}
+                      containerHeight={600}
+                      onContextMenu={(e) => handleContextMenu(e, element.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Скрываем все оверлеи перед показом нового
+                        elements.forEach(el => {
+                          if (el.id !== element.id) {
+                            // Здесь должен быть механизм скрытия других оверлеев
+                          }
+                        });
+                        setSelectedElementId(element.id);
+                      }}
+                    />
+                  );
+                case 'text':
+                  return (
+                    <TextElement
+                      element={element}
+                      key={element.id}
+                      position={element.position}
+                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onRemove={() => handleRemoveElement(element.id)}
+                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      onTextChange={(newText) => {
+                        setElements(prev => prev.map(el => 
+                          el.id === element.id ? {...el, text: newText} : el
+                        ));
+                      }}
+                      isEditing={editingTextId === element.id}
+                      onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
+                      containerWidth={450}
+                      containerHeight={600}
+                      onContextMenu={(e) => handleContextMenu(e, element.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Скрываем все оверлеи перед показом нового
+                        elements.forEach(el => {
+                          if (el.id !== element.id) {
+                            // Здесь должен быть механизм скрытия других оверлеев
+                          }
+                        });
+                        setSelectedElementId(element.id);
+                      }}
+                    />
+                  );
+                default:
+                  return null;
+              }
+            })}
+            {/* Контекстное меню */}
+            {contextMenu.visible && (
+              <div 
+                ref={contextMenuRef}
+                className="context-menu"
+                style={{
+                  position: 'fixed',
+                  left: contextMenu.x,
+                  top: contextMenu.y,
+                  zIndex: 1000
                 }}
-                  className="replace-button"
-                  title="Изменения цвета"
-                >
-                  🎨
-                </button>
-              )}
-              {element.type === 'text' && (
-                
-                    <button
-                      onClick={() => setSelectedTextElementId(
-                        prev => prev === element.id ? null : element.id
-                      )}
-                      className="font-settings-button"
-                      title="Настройки шрифта"
-                    >
-                      Аа
-                    </button>
-                  
-                )}
-              {element.type === 'text' && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleTextEditToggle(element.id, true);
-                  }}
-                  className="replace-button"
-                  title="Изменения текста"
-                >
-                  ✎
-                </button>
-              )}
+              >
                 <button 
-                  onClick={() => handleMoveUp(originalIndex)} 
-                  disabled={originalIndex === 0}
-                  className="move-button"
-                >
-                  <FaArrowDown />
-                </button>
+                  onClick={handleCopy}
+                >Копировать (Ctrl+C)</button>
                 <button 
-                  onClick={() => handleMoveDown(originalIndex)} 
-                  disabled={originalIndex === elements.length - 1}
-                  className="move-button"
+                  onClick={handlePaste}
+                  disabled={!copiedElement}
                 >
-                  <FaArrowUp />
-                </button>
-                <button 
-                  onClick={() => handleRemoveElement(element.id)}
-                  className="remove-button"
-                >
-                  ×
+                  Вставить (Ctrl+V)
                 </button>
               </div>
-            </div>
-
-          )})}
-          
-        </div>
-          <input
-            type="color"
-            ref={colorInputRef}
-            onChange={handleColorChange}
-            style={{ 
-              position: 'absolute',
-              left: '-220px',
-              opacity: 0,
-              height: 0,
-              width: 0 
-            }}
-          />
-          {/* Панель настроек шрифта вне цикла элементов */}
-          {selectedTextElementId && (
-          <div className="font-controls-wrapper">
-            <FontControls
-              element={elements.find(el => el.id === selectedTextElementId)}
-              onClose={() => setSelectedTextElementId(null)}
-              onChange={handleFontChange}
-            />
+            )}
           </div>
-          )}     
-        
-        </div>
-
+        </div> 
+        <ElementsList 
+          elements={elements}
+          colorInputRef={colorInputRef}
+          handleMoveUp={handleMoveUp}
+          handleMoveDown={handleMoveDown}
+          handleRemoveElement={handleRemoveElement}
+          handleFlipImage={handleFlipImage}
+          handleReplaceImage={handleReplaceImage}
+          handleColorButtonClick={handleColorButtonClick}
+          handleRemoveBackground={handleRemoveBackground}
+          processingIds={processingIds}
+          selectedTextElementId={selectedTextElementId}
+          setSelectedTextElementId={setSelectedTextElementId}
+          handleTextEditToggle={handleTextEditToggle}
+          handleColorChange={handleColorChange}
+          handleFontChange={handleFontChange}
+        />      
       </div>  
-
       <input
         type="file"
         accept="image/*"
@@ -1056,89 +788,11 @@ useEffect(() => {
         ref={fileInputRef}
         className="hidden-input"
       />
-
-      {isTemplateModalOpen && (
-        <div className="modal-overlay" onClick={() => {
-          setIsTemplateModalOpen(false);
-          setModalStep('input');
-          setTemplateName('');
-        }}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          {modalStep === 'input' ? (
-          <>
-            <h2>Создай свой макет</h2>
-            <input
-              type="text"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Введите название макета"
-              className="template-input"
-              maxLength={50} // Ограничение длины
-              onKeyDown={(e) => { 
-                if (e.key === 'Enter' && templateName.trim()) {
-                  handleSaveTemplate();
-                }
-              }}
-            />
-            <div className="modal-actions">
-              <button 
-                className="cancel-button"
-                onClick={() => {
-                  setIsTemplateModalOpen(false);
-                  setTemplateName('');
-                }}
-              >
-                Отменить
-              </button>
-              <button
-                className="create-button"
-                onClick={handleSaveTemplate}
-                disabled={!templateName.trim()}
-              >
-                Создать
-              </button>
-            </div>
-            </>
-      ) : modalStep === 'overwrite' ? (
-        <>
-          <h2>Внимание!</h2>
-          <p>{modalMessage}</p>
-          <div className="modal-actions">
-            <button
-              className="cancel-button"
-              onClick={() => setModalStep('input')}
-            >
-              Отменить
-            </button>
-            <button
-              className="create-button"
-              onClick={() => handleSaveTemplate(true)}
-            >
-              Перезаписать
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <h2>{modalStep === 'success' ? 'Успешно!' : 'Ошибка!'}</h2>
-          <p>{modalMessage}</p>
-          <div className="modal-actions">
-            <button
-              className="close-button"
-              onClick={() => {
-                setIsTemplateModalOpen(false);
-                setModalStep('input');
-                setTemplateName('');
-              }}
-            >
-              Закрыть
-            </button>
-          </div>
-        </>
-      )}
-          </div>
-        </div>
-      )}
-    </div>
+      {isTemplateModalOpen && <TemplateModal 
+        setIsTemplateModalOpen={setIsTemplateModalOpen}
+        setTemplates={setTemplates}
+        setSelectedTemplate={setSelectedTemplate}
+      />}
+  </div>
   );
 };
