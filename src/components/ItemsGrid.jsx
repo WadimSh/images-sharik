@@ -50,16 +50,15 @@ const PreviewDesign = ({ elements }) => {
   );
 };
 
-
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
-
+  
   // Инициализируем порядок при первом рендере
   useEffect(() => {
     const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
     setBaseCodesOrder(initialOrder);
-  }, []);
+  }, [items]);
 
   // Обновляем порядок при изменениях
   useEffect(() => {
@@ -119,7 +118,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   };
 
   const uniqueBaseCodes = getUniqueBaseCodes();
-
+  
   const handleItemClick = (itemId) => {
     navigate(`/template/${itemId}`);
   };
@@ -216,9 +215,13 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   
   // Вспомогательная функция для получения метаданных
   const getProductMeta = (baseCode) => {
-    return JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || { templateType: 'default' }
-    );
+    try {
+      const storedData = sessionStorage.getItem(`product-${baseCode}`);
+      return storedData ? JSON.parse(storedData) : { templateType: 'default' };
+    } catch (error) {
+      console.error('Error parsing product meta:', error);
+      return { templateType: 'default' };
+    }
   };
 
   // Разделяем шаблоны на группы
@@ -316,7 +319,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
                       {elements ? (
                         <PreviewDesign elements={elements} />
                       ) : (
-                        <span className="item-article">{item}</span>
+                        <div className="loader-container">
+                          <div className="loader"></div>
+                        </div>
                       )}
                     </div>
                   </div>
