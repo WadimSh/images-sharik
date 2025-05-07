@@ -16,6 +16,7 @@ import { TextElement } from '../../components/TextElement';
 export const Generator = () => {
   const { id } = useParams();
   const [baseId, slideNumber] = id.split('_');
+  const apiKey = process.env.REACT_APP_API_KEY;
 
   const storageMetaKey = `product-${baseId}`
   const savedMetaDate = sessionStorage.getItem(storageMetaKey);
@@ -334,8 +335,7 @@ export const Generator = () => {
       const options = {
         method: 'POST',
         headers: {
-          'Accept': 'image/png',
-          'x-api-key': 'sandbox_1ba99b1a395c77e5095879519331e24781531d6e'
+          'x-api-key': apiKey
         },
         body: form
       };
