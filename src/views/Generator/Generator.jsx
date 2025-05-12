@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaImage, FaFont, FaSquare, FaElementor } from 'react-icons/fa';
+import { FaImage, FaFont, FaSquare, FaElementor, FaPuzzlePiece } from 'react-icons/fa';
 import UPNG from 'upng-js';
 import imageCompression from 'browser-image-compression';
 
@@ -80,8 +80,10 @@ export const Generator = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   // Добавили состояние для отслеживания перетаскивания сторонней картинки
   const [isDragging, setIsDragging] = useState(false);
-  // В состоянии компонента добавить:
+  // Добавили состояние для модалки выбора изображений для элементов
   const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
+  // Добавили состояние для модалки добавления дополнительного товара
+
 
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
@@ -327,7 +329,7 @@ export const Generator = () => {
   const handleRemoveBackground = async (elementId) => {
     try {
       const element = elements.find(el => el.id === elementId);
-      if (!element || !element.image?.startsWith('http')) return;
+      //if (!element || !element.image?.startsWith('http')) return;
   
       setProcessingIds(prev => new Set(prev).add(elementId));
   
@@ -670,6 +672,12 @@ export const Generator = () => {
               title="Добавить элемент"
             >
               <FaElementor size={20} />
+            </button>
+            <button 
+              onClick={() => console.log('product')}
+              title="Добавить товар"
+            >
+              <FaPuzzlePiece size={20} />
             </button>
           </div>
         </div>
