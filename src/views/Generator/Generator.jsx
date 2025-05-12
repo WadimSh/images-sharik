@@ -14,6 +14,7 @@ import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
 import { ElementsElement } from '../../components/ElementsElement';
 import { ImageLibraryModal } from '../../components/ImageLibraryModal';
+import { ProductModal } from '../../components/ProductModal';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -83,7 +84,7 @@ export const Generator = () => {
   // Добавили состояние для модалки выбора изображений для элементов
   const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
   // Добавили состояние для модалки добавления дополнительного товара
-
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
@@ -171,6 +172,10 @@ export const Generator = () => {
     };
     if (type === 'element') {
       setIsImageLibraryOpen(true);
+      return;
+    };
+    if (type === 'product') {
+      setIsProductModalOpen(true);
       return;
     };
     const newElement = {
@@ -390,17 +395,22 @@ export const Generator = () => {
           el.id === elementId ? { ...el, image: compressedDataURL } : el
         );
   
-        // Обновляем sessionStorage
-        const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || {});
-        const updatedImages = [...currentMeta.images];
-        
-        if (indexImg >= 0 && indexImg < updatedImages.length) {
-          updatedImages[indexImg] = compressedDataURL;
-  
-          sessionStorage.setItem(storageMetaKey, JSON.stringify({
-            ...currentMeta,
-            images: updatedImages
-          }));
+        // Обновляем sessionStorage только для продуктовых изображений
+        if (element?.isProduct) {
+          try {
+            const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
+            const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
+            
+            if (indexImg >= 0 && indexImg < updatedImages.length) {
+              updatedImages[indexImg] = compressedDataURL;
+              sessionStorage.setItem(storageMetaKey, JSON.stringify({
+                ...currentMeta,
+                images: updatedImages
+              }));
+            }
+          } catch (e) {
+            console.error('Ошибка обновления sessionStorage:', e);
+          }
         }
   
         setElements(updatedElements);
@@ -525,6 +535,59 @@ export const Generator = () => {
       console.error('Error loading image:', error);
       alert('Не удалось загрузить изображение');
     }
+  };
+
+  const handleSelectImageProduct = async (imgUrl) => {
+    try {
+      const img = new Image();
+      img.src = imgUrl;
+      
+      // Ждем загрузки изображения
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+  
+      const containerWidth = 450;
+      const containerHeight = 600;
+      
+      // Рассчитываем масштаб с учетом оригинальных размеров
+      const scale = Math.min(
+        containerWidth / img.naturalWidth,
+        containerHeight / img.naturalHeight,
+        1
+      );
+      
+      const newWidth = img.naturalWidth * scale;
+      const newHeight = img.naturalHeight * scale;
+      
+      // Центрируем изображение
+      const position = {
+        x: (containerWidth - newWidth) / 2,
+        y: (containerHeight - newHeight) / 2
+      };
+  
+      const newElement = {
+        id: generateUniqueId(),
+        type: 'image',
+        position,
+        image: imgUrl,
+        width: newWidth,
+        height: newHeight,
+        originalWidth: img.naturalWidth,
+        originalHeight: img.naturalHeight,
+        isFlipped: false,
+        rotation: 0
+      };
+  
+      setElements(prev => [...prev, newElement]);
+      setIsProductModalOpen(false);
+      
+    } catch (error) {
+      console.error('Error loading image:', error);
+      alert('Не удалось загрузить изображение');
+    }
+    
   };
 
   // Обработчик клика правой кнопик мыши
@@ -674,7 +737,7 @@ export const Generator = () => {
               <FaElementor size={20} />
             </button>
             <button 
-              onClick={() => console.log('product')}
+              onClick={() => handleAddElement('product')}
               title="Добавить товар"
             >
               <FaPuzzlePiece size={20} />
@@ -904,6 +967,13 @@ export const Generator = () => {
           isOpen={isImageLibraryOpen}
           onClose={() => setIsImageLibraryOpen(false)}
           onSelectImage={handleSelectFromLibrary}
+        />
+      )}
+      {isProductModalOpen && (
+        <ProductModal 
+          isOpen={isProductModalOpen}
+          onClose={() => setIsProductModalOpen(false)}
+          onSelectImage={handleSelectImageProduct}
         />
       )}
   </div>

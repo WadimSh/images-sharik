@@ -27,7 +27,7 @@
   flex-grow: 1;
 }
 
-input {
+.input-container input {
   width: 95.5%;
   padding: 15px;
   border: 2px solid #007bff;
@@ -37,12 +37,12 @@ input {
   transition: all 0.3s ease;
 }
 
-input:invalid {
+.input-container input:invalid {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
 }
 
-input:focus:invalid {
+.input-container input:focus:invalid {
   box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
 }
 
