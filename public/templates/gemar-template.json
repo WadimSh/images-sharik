@@ -2,7 +2,7 @@
 [
   {
       "id": 1744221023619,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 0,
           "y": 0
@@ -16,7 +16,7 @@
   },
   {
       "id": 1744221038696,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 151,
           "y": 534
@@ -45,7 +45,7 @@
   },
   {
     "id": 1744221189410,
-    "type": "image",
+    "type": "element",
     "position": {
         "x": 320.5,
         "y": 415.5
@@ -59,7 +59,7 @@
   },
   {
       "id": 1744221109540,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 316,
           "y": 132
@@ -73,7 +73,7 @@
   },
   {
       "id": 1744221137175,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 316,
           "y": 267
@@ -169,7 +169,7 @@
     },
     {
         "id": 1744221038696,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 151,
             "y": 534
@@ -183,7 +183,7 @@
     },
     {
         "id": 1744221189410,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 320.5,
             "y": 415.5
@@ -197,7 +197,7 @@
     },
     {
         "id": 1744731970068,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 25,
             "y": 28.125
@@ -228,7 +228,7 @@
     },
     {
         "id": 1744221038696,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 151,
             "y": 534
@@ -242,7 +242,7 @@
     },
     {
         "id": 1744221189410,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 320.5,
             "y": 415.5
@@ -256,7 +256,7 @@
     },
     {
         "id": 1744732957739,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 35,
             "y": 36

@@ -22,7 +22,7 @@ export const ElementsList = ({
 }) => (
   <div className="sidebar">
     <div className="elements-list">
-      <h3 style={{ marginTop: '0' }}>Элементы дизайна</h3>
+      <h3 style={{ marginTop: '0' }}>Компоненты дизайна</h3>
       {[...elements].reverse().map((element, index) => {
         const originalIndex = elements.length - 1 - index;
         return (
@@ -30,13 +30,13 @@ export const ElementsList = ({
             <div className="element-info">
               <span>
                 {element.type === 'text' && '📝 '}
-                {element.type === 'image' && (
+                {(element.type === 'image' || element.type === 'element') && (
                   <img 
                     src={element.image}
                     style={{
-                      width: '18px',
-                      height: '18px',
-                      objectFit: 'cover',
+                      width: '24px',
+                      height: '24px',
+                      objectFit: 'contain',
                       marginRight: '4px',
                       verticalAlign: 'text-bottom',
                       borderRadius: '2px'
@@ -59,11 +59,13 @@ export const ElementsList = ({
               {element.type === 'text' && <span className="quoted-truncate">
                 "<span className="truncated-text">{element.text}</span>"
               </span>}
-              {element.type === 'image' && 'Изображение'}
+              {(element.type === 'image' && !element.isProduct) && 'Изображение'}
+              {element.isProduct && 'Основной товар'}
+              {element.type === 'element' && 'Элемент'}
               {element.type === 'shape' && 'Фигура'}
             </div>
             <div className="element-controls">
-              {element.type === 'image' && (
+              {(element.type === 'image' || element.type === 'element') && (
                 <button
                 onClick={() => handleFlipImage(element.id)}
                 className="flip-button"
@@ -72,7 +74,7 @@ export const ElementsList = ({
                   <FaExchangeAlt />
                 </button>
               )}  
-              {element.type === 'image' && (
+              {(element.type === 'image' && !element.isProduct) && (
                 <button
                   onClick={() => handleReplaceImage(element.id)}
                   className="replace-button"
@@ -81,7 +83,7 @@ export const ElementsList = ({
                   <FiRefreshCw />
                 </button>
               )}
-              {element.isProduct && (
+              {element.type === 'image' && (
                 <button
                   onClick={() => handleRemoveBackground(element.id)}
                   className="remove-bg-button"

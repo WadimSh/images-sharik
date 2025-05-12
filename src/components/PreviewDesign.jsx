@@ -17,6 +17,12 @@ export const PreviewDesign = ({ elements }) => (
                     ...style,
                     objectFit: 'cover',
                   }} className="preview-element" />;
+        case 'element':
+          return <img key={element.id} src={element.image} alt="preview" 
+                   style={{
+                    ...style,
+                    objectFit: 'cover',
+                  }} className="preview-element" />;
         case 'text':
           return (
             <span key={element.id} style={{

@@ -1,7 +1,7 @@
 [
   {
       "id": 1744738384460,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 0,
           "y": 0
@@ -45,7 +45,7 @@
   },
   {
     "id": 1744738456721,
-    "type": "image",
+    "type": "element",
     "position": {
         "x": 0,
         "y": 320.875
@@ -59,7 +59,7 @@
   },
   {
       "id": 1744738456611,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 153.5,
           "y": 544
@@ -73,7 +73,7 @@
   },
   {
       "id": 1744221189410,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 333.5,
           "y": 421.5
@@ -87,7 +87,7 @@
   },
   {
       "id": 1744738831275,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 333.5,
           "y": 318.5
@@ -101,7 +101,7 @@
   },
   {
       "id": 1744738678078,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 333.5,
           "y": 214.5
@@ -115,7 +115,7 @@
   },
   {
       "id": 1744738946843,
-      "type": "image",
+      "type": "element",
       "position": {
           "x": 333.5,
           "y": 106.5

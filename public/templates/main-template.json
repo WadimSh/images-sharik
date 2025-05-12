@@ -16,7 +16,7 @@
     },
     {
         "id": 1744555048688,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": 327,
             "y": 324
@@ -31,7 +31,7 @@
     },
     {
         "id": 1744555172564,
-        "type": "image",
+        "type": "element",
         "position": {
             "x": -37,
             "y": -22

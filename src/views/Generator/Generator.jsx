@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaImage, FaFont, FaSquare } from 'react-icons/fa';
+import { FaImage, FaFont, FaSquare, FaElementor } from 'react-icons/fa';
 import UPNG from 'upng-js';
 import imageCompression from 'browser-image-compression';
 
@@ -12,6 +12,8 @@ import { ElementsList } from '../../components/ElementsList';
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
+import { ElementsElement } from '../../components/ElementsElement';
+import { ImageLibraryModal } from '../../components/ImageLibraryModal';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -76,8 +78,10 @@ export const Generator = () => {
   // Для работы с макетами
   const [templates, setTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState('');
-  // Добавили состояние для отслеживания перетаскивания
+  // Добавили состояние для отслеживания перетаскивания сторонней картинки
   const [isDragging, setIsDragging] = useState(false);
+  // В состоянии компонента добавить:
+  const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
 
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
@@ -162,17 +166,23 @@ export const Generator = () => {
     if (type === 'image') {
       fileInputRef.current.click();
       return;
-    }
+    };
+    if (type === 'element') {
+      setIsImageLibraryOpen(true);
+      return;
+    };
     const newElement = {
       id: generateUniqueId(),
       type,
       position: { x: 50, y: 50 },
-      text: type === 'text' ? 'Новый текст' : '',
-      fontSize: 24,       // Добавляем по умолчанию
-      color: '#333333',   // Добавляем по умолчанию
-      fontFamily: 'Arial', // Добавляем по умолчанию
-      fontWeight: 'normal', // Добавляем по умолчанию
-      fontStyle: 'normal',  // Добавляем по умолчанию
+      ...(type === 'text' && {
+        text: 'Новый текст',
+        fontSize: 24,       
+        color: '#333333',   
+        fontFamily: 'Arial', 
+        fontWeight: 'normal', 
+        fontStyle: 'normal',  
+      }),
       image: null,
       ...(type === 'shape' && { 
         color: '#ccc',
@@ -462,6 +472,59 @@ export const Generator = () => {
     ));
   };
 
+  // Добавить обработчик выбора изображения из библиотеки для компонента элемент
+  const handleSelectFromLibrary = async (imageName) => {
+    try {
+      const img = new Image();
+      img.src = `/images/${imageName}`;
+      
+      // Ждем загрузки изображения
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+  
+      const containerWidth = 450;
+      const containerHeight = 600;
+      
+      // Рассчитываем масштаб с учетом оригинальных размеров
+      const scale = Math.min(
+        containerWidth / img.naturalWidth,
+        containerHeight / img.naturalHeight,
+        1
+      );
+      
+      const newWidth = img.naturalWidth * scale;
+      const newHeight = img.naturalHeight * scale;
+      
+      // Центрируем изображение
+      const position = {
+        x: (containerWidth - newWidth) / 2,
+        y: (containerHeight - newHeight) / 2
+      };
+  
+      const newElement = {
+        id: generateUniqueId(),
+        type: 'element',
+        position,
+        image: `/images/${imageName}`,
+        width: newWidth,
+        height: newHeight,
+        originalWidth: img.naturalWidth,
+        originalHeight: img.naturalHeight,
+        isFlipped: false,
+        rotation: 0
+      };
+  
+      setElements(prev => [...prev, newElement]);
+      setIsImageLibraryOpen(false);
+      
+    } catch (error) {
+      console.error('Error loading image:', error);
+      alert('Не удалось загрузить изображение');
+    }
+  };
+
   // Обработчик клика правой кнопик мыши
   const handleContextMenu = (e, elementId) => {
     e.preventDefault();
@@ -602,6 +665,12 @@ export const Generator = () => {
             >
               <FaSquare size={20} />
             </button>
+            <button 
+              onClick={() => handleAddElement('element')}
+              title="Добавить элемент"
+            >
+              <FaElementor size={20} />
+            </button>
           </div>
         </div>
         <div className='design-area'>
@@ -650,6 +719,35 @@ export const Generator = () => {
                 case 'image':
                   return (
                     <ImageElement
+                      key={element.id}
+                      src={element.image} // Берем изображение из данных элемента
+                      position={element.position}
+                      width={element.width}
+                      height={element.height}
+                      isFlipped={element.isFlipped}
+                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onRemove={() => handleRemoveElement(element.id)}
+                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                      rotation={element.rotation} // Передаем поворот
+                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      containerWidth={450}
+                      containerHeight={600}
+                      onContextMenu={(e) => handleContextMenu(e, element.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Скрываем все оверлеи перед показом нового
+                        elements.forEach(el => {
+                          if (el.id !== element.id) {
+                            // Здесь должен быть механизм скрытия других оверлеев
+                          }
+                        });
+                        setSelectedElementId(element.id);
+                      }}
+                    />
+                  );
+                case 'element':
+                  return (
+                    <ElementsElement
                       key={element.id}
                       src={element.image} // Берем изображение из данных элемента
                       position={element.position}
@@ -793,6 +891,13 @@ export const Generator = () => {
         setTemplates={setTemplates}
         setSelectedTemplate={setSelectedTemplate}
       />}
+      {isImageLibraryOpen && (
+        <ImageLibraryModal 
+          isOpen={isImageLibraryOpen}
+          onClose={() => setIsImageLibraryOpen(false)}
+          onSelectImage={handleSelectFromLibrary}
+        />
+      )}
   </div>
   );
 };
