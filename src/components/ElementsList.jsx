@@ -10,7 +10,6 @@ export const ElementsList = ({
   colorInputRef,
   handleRemoveElement,
   handleFlipImage,
-  handleReplaceImage,
   handleColorButtonClick,
   handleRemoveBackground,
   processingIds,
@@ -87,15 +86,6 @@ export const ElementsList = ({
                   <FaExchangeAlt />
                 </button>
               )}  
-              {(element.type === 'image' && !element.isProduct) && (
-                <button
-                  onClick={() => handleReplaceImage(element.id)}
-                  className="replace-button"
-                  title="Заменить изображение"
-                >
-                  <FiRefreshCw />
-                </button>
-              )}
               {element.type === 'image' && (
                 <button
                   onClick={() => handleRemoveBackground(element.id)}

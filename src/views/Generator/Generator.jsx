@@ -262,43 +262,6 @@ export const Generator = () => {
     }
   };
 
-  // Добавим новую функцию замены изображения
-  const handleReplaceImage = (id) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          if (img.width > 2000 || img.height > 2000) {
-            alert('Максимальный размер изображения 2000x2000 пикселей');
-            return;
-          }
-
-          setElements(prev => prev.map(el => 
-            el.id === id ? {
-              ...el,
-              image: event.target.result,
-              originalWidth: img.width,
-              originalHeight: img.height,
-              isFlipped: el.isFlipped
-            } : el
-          ));
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    };
-
-    input.click();
-  };
-
   const handleDrag = (id, newPosition, newRotation) => {
     setElements(prev => prev.map(el => {
       if (el.id === id) {
@@ -600,7 +563,7 @@ const moveElement = (fromIndex, toIndex) => {
   const closeContextMenu = () => {
     setContextMenu({ ...contextMenu, visible: false });
   };
-
+  
   // Копирование
   const handleCopy = () => {
     const element = elements.find(el => el.id === selectedElementId);
@@ -789,6 +752,7 @@ const moveElement = (fromIndex, toIndex) => {
                 case 'image':
                   return (
                     <ImageElement
+                      contextMenuRef={contextMenuRef}
                       element={element}
                       key={element.id}
                       src={element.image} // Берем изображение из данных элемента
@@ -815,6 +779,7 @@ const moveElement = (fromIndex, toIndex) => {
                 case 'element':
                   return (
                     <ElementsElement
+                      contextMenuRef={contextMenuRef}
                       element={element}
                       key={element.id}
                       src={element.image} // Берем изображение из данных элемента
@@ -841,6 +806,7 @@ const moveElement = (fromIndex, toIndex) => {
                 case 'shape':
                   return (
                     <ShapeElement
+                      contextMenuRef={contextMenuRef}
                       element={element}
                       key={element.id}
                       position={element.position}
@@ -865,6 +831,7 @@ const moveElement = (fromIndex, toIndex) => {
                 case 'text':
                   return (
                     <TextElement
+                      contextMenuRef={contextMenuRef}
                       element={element}
                       key={element.id}
                       position={element.position}
@@ -907,7 +874,9 @@ const moveElement = (fromIndex, toIndex) => {
               >
                 <button 
                   onClick={handleCopy}
-                >Копировать (Ctrl+C)</button>
+                >
+                  Копировать (Ctrl+C)
+                </button>
                 <button 
                   onClick={handlePaste}
                   disabled={!copiedElement}
@@ -924,7 +893,6 @@ const moveElement = (fromIndex, toIndex) => {
           colorInputRef={colorInputRef}
           handleRemoveElement={handleRemoveElement}
           handleFlipImage={handleFlipImage}
-          handleReplaceImage={handleReplaceImage}
           handleColorButtonClick={handleColorButtonClick}
           handleRemoveBackground={handleRemoveBackground}
           processingIds={processingIds}

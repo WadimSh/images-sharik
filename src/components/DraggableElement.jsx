@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 const DraggableElement = ({ 
+  contextMenuRef,
   children, 
   id,
   selectedElementId,
@@ -65,7 +66,9 @@ const DraggableElement = ({
   // Клик вне элемента
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (elementRef.current && !elementRef.current.contains(e.target)) {
+      if (elementRef.current && 
+          !elementRef.current.contains(e.target) && 
+          !contextMenuRef.current?.contains(e.target)) { // Игнорируем клики по меню
         setIsOverlayVisible(false);
         onDeselect?.();
       }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const ElementsElement = ({ 
+  contextMenuRef,
   element,
   src, 
   position, 
@@ -55,6 +56,7 @@ export const ElementsElement = ({
 
   return (
     <DraggableElement
+      contextMenuRef={contextMenuRef}
       id={element.id}
       isFlipped={isFlipped}
       position={position}

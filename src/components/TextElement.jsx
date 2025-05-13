@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const TextElement = ({ 
+  contextMenuRef,
   element, // Теперь получаем весь объект элемента
   position, 
   onDrag, 
@@ -53,6 +54,7 @@ export const TextElement = ({
 
   return (
     <DraggableElement
+      contextMenuRef={contextMenuRef}
       id={element.id}
       position={element.position}
       onDrag={onDrag}

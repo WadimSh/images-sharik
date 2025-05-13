@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const ShapeElement = ({ 
+  contextMenuRef,
   position, 
   onDrag, 
   containerWidth, 
@@ -37,6 +38,7 @@ export const ShapeElement = ({
   
   return (
     <DraggableElement
+      contextMenuRef={contextMenuRef}
       id={element.id}
       position={position}
       onDrag={onDrag}

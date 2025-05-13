@@ -3,6 +3,7 @@ import DraggableElement from './DraggableElement';
 import item from '../assets/item.jpg'
 
 export const ImageElement = ({ 
+  contextMenuRef,
   element,
   src, 
   position, 
@@ -64,6 +65,7 @@ export const ImageElement = ({
 
   return (
     <DraggableElement
+      contextMenuRef={contextMenuRef}
       id={element.id}
       isFlipped={isFlipped}
       position={position}
