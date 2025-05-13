@@ -8,7 +8,7 @@ import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
 import { ProductMetaInfo } from '../../components/ProductMetaInfo';
 import { ProductImagesGrid } from '../../components/ProductImagesGrid';
-import { ElementsList } from '../../components/ElementsList';
+import { DraggableElementsList } from '../../components/DraggableElementsList';
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
@@ -400,7 +400,7 @@ export const Generator = () => {
           try {
             const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
             const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
-            
+
             if (indexImg >= 0 && indexImg < updatedImages.length) {
               updatedImages[indexImg] = compressedDataURL;
               sessionStorage.setItem(storageMetaKey, JSON.stringify({
@@ -437,19 +437,14 @@ export const Generator = () => {
     setIsTemplateModalOpen(true);
   };
 
-  const handleMoveUp = (index) => {
-    if (index === 0) return;
-    const newElements = [...elements];
-    [newElements[index - 1], newElements[index]] = [newElements[index], newElements[index - 1]];
-    setElements(newElements);
-  };
-
-  const handleMoveDown = (index) => {
-    if (index === elements.length - 1) return;
-    const newElements = [...elements];
-    [newElements[index], newElements[index + 1]] = [newElements[index + 1], newElements[index]];
-    setElements(newElements);
-  };
+  // Замените старые функции перемещения на новую
+const moveElement = (fromIndex, toIndex) => {
+  if (fromIndex === toIndex) return;
+  const newElements = [...elements];
+  const [movedElement] = newElements.splice(fromIndex, 1);
+  newElements.splice(toIndex, 0, movedElement);
+  setElements(newElements);
+};
 
   // Обработчик поворота
   const handleRotate = (id, newRotation) => {
@@ -932,11 +927,10 @@ export const Generator = () => {
             )}
           </div>
         </div> 
-        <ElementsList 
+        <DraggableElementsList 
           elements={elements}
+          moveElement={moveElement}
           colorInputRef={colorInputRef}
-          handleMoveUp={handleMoveUp}
-          handleMoveDown={handleMoveDown}
           handleRemoveElement={handleRemoveElement}
           handleFlipImage={handleFlipImage}
           handleReplaceImage={handleReplaceImage}

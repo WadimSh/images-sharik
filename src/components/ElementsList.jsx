@@ -1,13 +1,13 @@
-import { FaArrowUp, FaArrowDown, FaExchangeAlt } from 'react-icons/fa';
+import { FaExchangeAlt } from 'react-icons/fa';
 import { FiRefreshCw } from 'react-icons/fi';
+import { RxDragHandleDots2 } from "react-icons/rx";
 
+import { DraggableElementItem } from './DraggableElemetItem';
 import { FontControls } from "./FontControls";
 
 export const ElementsList = ({
   elements,
   colorInputRef,
-  handleMoveUp,
-  handleMoveDown,
   handleRemoveElement,
   handleFlipImage,
   handleReplaceImage,
@@ -18,7 +18,8 @@ export const ElementsList = ({
   setSelectedTextElementId,
   handleTextEditToggle,
   handleColorChange,
-  handleFontChange
+  handleFontChange,
+  moveElement
 }) => (
   <div className="sidebar">
     <div className="elements-list">
@@ -26,8 +27,16 @@ export const ElementsList = ({
       {[...elements].reverse().map((element, index) => {
         const originalIndex = elements.length - 1 - index;
         return (
-          <div key={element.id} className="element-item">
+          <DraggableElementItem
+            key={element.id}
+            element={element}
+            originalIndex={originalIndex}
+            moveElement={moveElement}
+            elements={elements}
+          >
+          <div className="element-item">
             <div className="element-info">
+              <RxDragHandleDots2 className="drag-handle" />
               <span>
                 {element.type === 'text' && '📝 '}
                 {(element.type === 'image' || element.type === 'element') && (
@@ -133,20 +142,6 @@ export const ElementsList = ({
                 </button>
               )}
               <button 
-                onClick={() => handleMoveUp(originalIndex)} 
-                disabled={originalIndex === 0}
-                className="move-button"
-              >
-                <FaArrowDown />
-              </button>
-              <button 
-                onClick={() => handleMoveDown(originalIndex)} 
-                disabled={originalIndex === elements.length - 1}
-                className="move-button"
-              >
-                <FaArrowUp />
-              </button>
-              <button 
                 onClick={() => handleRemoveElement(element.id)}
                 className="remove-button"
               >
@@ -154,7 +149,8 @@ export const ElementsList = ({
               </button>
             </div>
           </div>
-        )
+          </DraggableElementItem>
+        );
       })}
     </div>
     <input

@@ -176,29 +176,29 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-  setLoading(true);
-  
-  const searchQuery = normalizedArticles.join(' ');
-  const encodedSearch = encodeURIComponent(searchQuery);
-  
-  fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.results.length === 0) {
-        const message = normalizedArticles.length === 1 
-          ? "Товар с таким артикулом не активен." 
-          : "Товары с такими артикулами не активны.";
-        setInfoMessage(message);
-        return Promise.reject(message);
-      }
-  
-      const productIds = data.results.map(product => product.id);
-      const idsParam = productIds.join(',');
-      return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    })
-    .then(response => response?.json())
-    .then(detailedData => {
-      if (!detailedData) return;
+    setLoading(true);
+    
+    const searchQuery = normalizedArticles.join(' ');
+    const encodedSearch = encodeURIComponent(searchQuery);
+    
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          const message = normalizedArticles.length === 1 
+            ? "Товар с таким артикулом не активен." 
+            : "Товары с такими артикулами не активны.";
+          setInfoMessage(message);
+          return Promise.reject(message);
+        }
+    
+        const productIds = data.results.map(product => product.id);
+        const idsParam = productIds.join(',');
+        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+      })
+      .then(response => response?.json())
+      .then(detailedData => {
+        if (!detailedData) return;
 
       // Обрабатываем полученные данные API
       //const processedResults = processProductsData(data);
