@@ -79,6 +79,7 @@ const DraggableElement = ({
   useEffect(() => {
     const handleScroll = () => {
       setIsOverlayVisible(false);
+      onDeselect?.();
     };
   
     window.addEventListener('scroll', handleScroll);
