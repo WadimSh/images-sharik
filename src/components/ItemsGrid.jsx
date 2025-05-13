@@ -178,53 +178,29 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   };
 
-  // Разделяем шаблоны на группы
-  const mainTemplates = ['main', 'default'];
-  const thematicTemplates = ['gemar', 'belbal']; // Добавляем нужные теги
-
   // Объект перевода названий шаблонов
-  const templateLabels = {
-    main: 'Базовый шаблон',
+  const templateOptions = {
     default: 'Шаблон картинка',
+    main: 'Базовый шаблон',
     gemar: 'Шаблон Gemar',
     belbal: 'Шаблон Belbal'
   };
 
   // Вспомогательная функция для рендеринга контролов выбора шаблона
   const renderTemplateControls = (baseCode, currentTemplate) => {
-    const isThematicSelected = thematicTemplates.includes(currentTemplate);
-    const selectedThematic = isThematicSelected ? currentTemplate : '';
-
     return (
       <div className="template-selector">
-        {/* Тематические шаблоны - выпадающий список */}
-        <div className="thematic-select">
-          <select
-            value={selectedThematic}
-            onChange={(e) => handleTemplateChange(baseCode, e.target.value)}
-          >
-            <option value="">Тематический шаблон</option>
-            {thematicTemplates.map(templateKey => (
-              <option key={templateKey} value={templateKey}>
-                {templateLabels[templateKey]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Основные шаблоны - радиокнопки */}
-        {mainTemplates.map(templateKey => (
-          <label key={templateKey}>
-            <input
-              type="radio"
-              name={`template-${baseCode}`}
-              value={templateKey}
-              checked={!isThematicSelected && currentTemplate === templateKey}
-              onChange={() => handleTemplateChange(baseCode, templateKey)}
-            />
-            <span>{templateLabels[templateKey]}</span>
-          </label>
-        ))}
+        <select
+          value={currentTemplate}
+          onChange={(e) => handleTemplateChange(baseCode, e.target.value)}
+          className="template-select"
+        >
+          {Object.entries(templateOptions).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
     );
   };
