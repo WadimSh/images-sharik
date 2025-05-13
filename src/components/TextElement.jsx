@@ -12,7 +12,9 @@ export const TextElement = ({
   isEditing,      // Принимаем состояние редактирования извне
   onEditToggle,    // Колбэк для переключения состояния
   onContextMenu,
-  onClick
+  onClick,
+  selectedElementId,
+  onDeselect
 }) => {
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
@@ -51,6 +53,7 @@ export const TextElement = ({
 
   return (
     <DraggableElement
+      id={element.id}
       position={element.position}
       onDrag={onDrag}
       containerWidth={containerWidth}
@@ -60,6 +63,8 @@ export const TextElement = ({
       rotation={element.rotation || 0}
       onContextMenu={onContextMenu}  
       onClick={onClick}
+      selectedElementId={selectedElementId}
+      onDeselect={onDeselect}
     >
       <div className="text-content-wrapper" style={{ transform: `rotate(${element.rotation}deg)` }}>
         {isEditing ? (

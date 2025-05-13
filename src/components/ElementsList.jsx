@@ -19,7 +19,9 @@ export const ElementsList = ({
   handleTextEditToggle,
   handleColorChange,
   handleFontChange,
-  moveElement
+  moveElement,
+  selectedElementId, // Добавляем новый пропс
+  setSelectedElementId // Добавляем обработчик выбора
 }) => (
   <div className="sidebar">
     <div className="elements-list">
@@ -33,18 +35,20 @@ export const ElementsList = ({
             originalIndex={originalIndex}
             moveElement={moveElement}
             elements={elements}
+            isSelected={element.id === selectedElementId} // Передаем флаг выделения
+             // Обработчик клика
           >
-          <div className="element-item">
+          <div className={`element-item ${element.id === selectedElementId ? 'selected' : ''}`} onClick={() => setSelectedElementId(element.id)}>
             <div className="element-info">
               <RxDragHandleDots2 className="drag-handle" />
-              <span>
+              <span style={{alignSelf: 'center'}}>
                 {element.type === 'text' && '📝 '}
                 {(element.type === 'image' || element.type === 'element') && (
                   <img 
                     src={element.image}
                     style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '30px',
+                      height: '30px',
                       objectFit: 'contain',
                       marginRight: '4px',
                       verticalAlign: 'text-bottom',
@@ -56,8 +60,8 @@ export const ElementsList = ({
                 {element.type === 'shape' && (
                   <div 
                     style={{
-                      width: '16px',
-                      height: '16px',
+                      width: '30px',
+                      height: '30px',
                       backgroundColor: element.color,
                       marginRight: '4px',
                       borderRadius: '2px'

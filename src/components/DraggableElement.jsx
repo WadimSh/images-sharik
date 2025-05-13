@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 
 const DraggableElement = ({ 
   children, 
+  id,
+  selectedElementId,
   isFlipped,
   position, 
   onDrag, 
@@ -12,7 +14,8 @@ const DraggableElement = ({
   dimensions = null,
   rotation = 0,
   onContextMenu,
-  onClick
+  onClick,
+  onDeselect
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -42,11 +45,29 @@ const DraggableElement = ({
     overlay.style.top = `${rect.top}px`;
   };
 
+  useEffect(() => {
+  if (selectedElementId === null) {
+    setIsOverlayVisible(false);
+    return;
+  }
+
+  if (id === selectedElementId) {
+    // Добавляем задержку для корректного позиционирования
+    requestAnimationFrame(() => {
+      updateOverlayPosition();
+      setIsOverlayVisible(true);
+    });
+  } else {
+    setIsOverlayVisible(false);
+  }
+}, [selectedElementId, id, position, dimensions]);
+
   // Клик вне элемента
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (elementRef.current && !elementRef.current.contains(e.target)) {
         setIsOverlayVisible(false);
+        onDeselect?.();
       }
     };
     
@@ -63,7 +84,6 @@ const DraggableElement = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
 
   const handleRotateStart = (e) => {
     e.stopPropagation();
@@ -114,7 +134,6 @@ const DraggableElement = ({
     setIsResizing(true);
   };
   
-
   const handleDirectionalResize = (e, direction) => {
     e.stopPropagation();
     e.preventDefault();

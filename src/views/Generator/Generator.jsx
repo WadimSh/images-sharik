@@ -635,6 +635,10 @@ const moveElement = (fromIndex, toIndex) => {
     closeContextMenu();
   };
 
+  const handleElementClick = (elementId) => {
+    setSelectedElementId(elementId);
+  };
+
   useEffect(() => {
     // Найти индекс активного изображения
     const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
@@ -785,6 +789,7 @@ const moveElement = (fromIndex, toIndex) => {
                 case 'image':
                   return (
                     <ImageElement
+                      element={element}
                       key={element.id}
                       src={element.image} // Берем изображение из данных элемента
                       position={element.position}
@@ -801,19 +806,16 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Скрываем все оверлеи перед показом нового
-                        elements.forEach(el => {
-                          if (el.id !== element.id) {
-                            // Здесь должен быть механизм скрытия других оверлеев
-                          }
-                        });
                         setSelectedElementId(element.id);
                       }}
+                      selectedElementId={selectedElementId}
+                      onDeselect={() => setSelectedElementId(null)}
                     />
                   );
                 case 'element':
                   return (
                     <ElementsElement
+                      element={element}
                       key={element.id}
                       src={element.image} // Берем изображение из данных элемента
                       position={element.position}
@@ -830,19 +832,16 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Скрываем все оверлеи перед показом нового
-                        elements.forEach(el => {
-                          if (el.id !== element.id) {
-                            // Здесь должен быть механизм скрытия других оверлеев
-                          }
-                        });
                         setSelectedElementId(element.id);
                       }}
+                      selectedElementId={selectedElementId}
+                      onDeselect={() => setSelectedElementId(null)}
                     />
                   );
                 case 'shape':
                   return (
                     <ShapeElement
+                      element={element}
                       key={element.id}
                       position={element.position}
                       width={element.width}
@@ -857,14 +856,10 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Скрываем все оверлеи перед показом нового
-                        elements.forEach(el => {
-                          if (el.id !== element.id) {
-                            // Здесь должен быть механизм скрытия других оверлеев
-                          }
-                        });
                         setSelectedElementId(element.id);
                       }}
+                      selectedElementId={selectedElementId}
+                      onDeselect={() => setSelectedElementId(null)}
                     />
                   );
                 case 'text':
@@ -888,14 +883,10 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Скрываем все оверлеи перед показом нового
-                        elements.forEach(el => {
-                          if (el.id !== element.id) {
-                            // Здесь должен быть механизм скрытия других оверлеев
-                          }
-                        });
                         setSelectedElementId(element.id);
                       }}
+                      selectedElementId={selectedElementId}
+                      onDeselect={() => setSelectedElementId(null)}
                     />
                   );
                 default:
@@ -942,6 +933,8 @@ const moveElement = (fromIndex, toIndex) => {
           handleTextEditToggle={handleTextEditToggle}
           handleColorChange={handleColorChange}
           handleFontChange={handleFontChange}
+          selectedElementId={selectedElementId}
+          setSelectedElementId={handleElementClick}
         />      
       </div>  
       <input

@@ -13,7 +13,10 @@ export const ShapeElement = ({
   rotation = 0,
   onRotate,
   onContextMenu,
-  onClick
+  onClick,
+  element,
+  selectedElementId,
+  onDeselect
 }) => {
   const [dimensions, setDimensions] = useState({ 
     width: width,
@@ -34,6 +37,7 @@ export const ShapeElement = ({
   
   return (
     <DraggableElement
+      id={element.id}
       position={position}
       onDrag={onDrag}
       onResize={handleResize}
@@ -46,6 +50,8 @@ export const ShapeElement = ({
       rotation={rotation}
       onContextMenu={onContextMenu}
       onClick={onClick}
+      selectedElementId={selectedElementId}
+      onDeselect={onDeselect}
     >
       <div 
         ref={containerRef}

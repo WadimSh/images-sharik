@@ -675,7 +675,7 @@
 
 .drag-handle {
   cursor: grab;
-  height: 24px;
+  height: 31.333px;
   margin-right: 8px;
   vertical-align: middle;
 }
@@ -715,6 +715,12 @@
 .element-item.dragging {
   opacity: 0.5;
   transform: scale(0.95);
+}
+
+.element-item.selected {
+  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid #007bff;
+  border-radius: 4px;
 }
  
 .element-info {

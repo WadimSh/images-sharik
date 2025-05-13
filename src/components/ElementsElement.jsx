@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
 export const ElementsElement = ({ 
+  element,
   src, 
   position, 
   onDrag, 
@@ -14,7 +15,9 @@ export const ElementsElement = ({
   onRotate,
   isFlipped = false,
   onContextMenu,
-  onClick
+  onClick,
+  selectedElementId,
+  onDeselect
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [dimensions, setDimensions] = useState({ 
@@ -52,6 +55,7 @@ export const ElementsElement = ({
 
   return (
     <DraggableElement
+      id={element.id}
       isFlipped={isFlipped}
       position={position}
       onDrag={onDrag}
@@ -64,6 +68,8 @@ export const ElementsElement = ({
       rotation={rotation}
       onContextMenu={onContextMenu}
       onClick={onClick}
+      selectedElementId={selectedElementId}
+      onDeselect={onDeselect}
     >
       {imageSrc && <img // Добавляем проверку на наличие src
         src={imageSrc}

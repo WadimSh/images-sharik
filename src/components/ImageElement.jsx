@@ -3,6 +3,7 @@ import DraggableElement from './DraggableElement';
 import item from '../assets/item.jpg'
 
 export const ImageElement = ({ 
+  element,
   src, 
   position, 
   onDrag, 
@@ -15,7 +16,9 @@ export const ImageElement = ({
   onRotate,
   isFlipped = false,
   onContextMenu,
-  onClick
+  onClick,
+  selectedElementId,
+  onDeselect
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   const [dimensions, setDimensions] = useState({ 
@@ -61,6 +64,7 @@ export const ImageElement = ({
 
   return (
     <DraggableElement
+      id={element.id}
       isFlipped={isFlipped}
       position={position}
       onDrag={onDrag}
@@ -73,6 +77,8 @@ export const ImageElement = ({
       rotation={rotation}
       onContextMenu={onContextMenu}
       onClick={onClick}
+      selectedElementId={selectedElementId}
+      onDeselect={onDeselect}
     >
       {imageSrc && <img // Добавляем проверку на наличие src
         src={imageSrc}
