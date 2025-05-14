@@ -85,6 +85,8 @@ export const Generator = () => {
   const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
   // Добавили состояние для модалки добавления дополнительного товара
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  // Добавили состояние для раскрытия меню со свойствами компонета
+  const [expandedElementId, setExpandedElementId] = useState(null);
 
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
@@ -903,6 +905,8 @@ const moveElement = (fromIndex, toIndex) => {
           handleFontChange={handleFontChange}
           selectedElementId={selectedElementId}
           setSelectedElementId={handleElementClick}
+          expandedElementId={expandedElementId}
+          setExpandedElementId={setExpandedElementId}
         />      
       </div>  
       <input
