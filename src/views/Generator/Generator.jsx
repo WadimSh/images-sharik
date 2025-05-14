@@ -845,7 +845,7 @@ const moveElement = (fromIndex, toIndex) => {
                       }}
                       isEditing={editingTextId === element.id}
                       onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
-                      containerWidth={450}
+                      containerWidth={400}
                       containerHeight={600}
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {

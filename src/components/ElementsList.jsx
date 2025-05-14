@@ -79,7 +79,10 @@ export const ElementsList = ({
             <div className="element-controls">
               {(element.type === 'image' || element.type === 'element') && (
                 <button
-                onClick={() => handleFlipImage(element.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFlipImage(element.id);
+                }}
                 className="flip-button"
                 title="Зеркальное отражение"
                 >
@@ -88,7 +91,10 @@ export const ElementsList = ({
               )}  
               {element.type === 'image' && (
                 <button
-                  onClick={() => handleRemoveBackground(element.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveBackground(element.id);
+                  }}
                   className="remove-bg-button"
                   title="Удалить фон"
                   disabled={processingIds.has(element.id)}
@@ -114,9 +120,12 @@ export const ElementsList = ({
               )}
               {element.type === 'text' && (
                 <button
-                  onClick={() => setSelectedTextElementId(
-                    prev => prev === element.id ? null : element.id
-                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTextElementId(
+                      prev => prev === element.id ? null : element.id
+                    );
+                  }}
                   className="font-settings-button"
                   title="Настройки шрифта"
                 >

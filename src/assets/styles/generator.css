@@ -718,7 +718,6 @@
 }
 
 .element-item.selected {
-  background: rgba(0, 123, 255, 0.1);
   border: 1px solid #007bff;
   border-radius: 4px;
 }
