@@ -30,6 +30,10 @@ const DraggableElement = ({
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const animationFrameRef = useRef(null);
 
+  useEffect(() => {
+    setCurrentRotation(rotation);
+  }, [rotation]);
+
   const updateOverlayPosition = () => {
     if (!elementRef.current || !overlayRef.current) return;
     

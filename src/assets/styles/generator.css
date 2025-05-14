@@ -375,6 +375,15 @@
   cursor: not-allowed;
 }
 
+.context-delete {
+  color: red;
+}
+
+.context-menu .separator {
+  border-top: 1px solid #ddd;
+  margin: 5px 0;
+}
+
 .draggable-element {
   transition: transform 0.1s;
   transform-origin: center center;  

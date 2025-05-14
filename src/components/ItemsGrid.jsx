@@ -180,10 +180,10 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   // Объект перевода названий шаблонов
   const templateOptions = {
-    default: 'Шаблон картинка',
-    main: 'Базовый шаблон',
+    belbal: 'Шаблон Belbal',
     gemar: 'Шаблон Gemar',
-    belbal: 'Шаблон Belbal'
+    main: 'Базовый шаблон',
+    default: 'Шаблон картинка',
   };
 
   // Вспомогательная функция для рендеринга контролов выбора шаблона

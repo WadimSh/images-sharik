@@ -68,8 +68,6 @@ export const Generator = () => {
   });
   // Состояние для отслеживания обработки при запросе на удаление фона 
   const [processingIds, setProcessingIds] = useState(new Set());
-  // Добавляем состояние для выбранного текстового элемента
-  const [selectedTextElementId, setSelectedTextElementId] = useState(null);
   // Добавляем состояние для редактирования текста
   const [editingTextId, setEditingTextId] = useState(null);
   const [elements, setElements] = useState(processedElements);
@@ -160,6 +158,63 @@ export const Generator = () => {
         el.id === elementId ? { ...el, [property]: value } : el
       )
     );
+  };
+
+  const handlePositionChange = (elementId, axis, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          position: {
+            ...el.position,
+            [axis]: parseInt(value) || 0
+          }
+        };
+      }
+      return el;
+    }));
+  };
+
+  const handleSizeChange = (elementId, dimension, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          [dimension]: parseInt(value) || 0
+        };
+      }
+      return el;
+    }));
+  };
+
+  const handleRotationChange = (elementId, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          rotation: parseInt(value) || 0
+        };
+      }
+      return el;
+    }));
+  };
+
+  const handleProportionalResize = (elementId, dimension, newValue) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        const numericValue = Number(newValue);
+        if (isNaN(numericValue)) return el; // Защита от невалидных значений
+
+        const delta = numericValue - el[dimension];
+
+        return {
+          ...el,
+          width: dimension === 'width' ? numericValue : el.width + delta,
+          height: dimension === 'height' ? numericValue : el.height + delta,
+        };
+      }
+      return el;
+    }));
   };
 
   // Обработчик переключения редактирования
@@ -600,6 +655,13 @@ const moveElement = (fromIndex, toIndex) => {
     closeContextMenu();
   };
 
+  const handleDelete = () => {
+    const element = elements.find(el => el.id === selectedElementId);
+    if (!element) return;
+    handleRemoveElement(element.id);
+    closeContextMenu();
+  };
+
   const handleElementClick = (elementId) => {
     setSelectedElementId(elementId);
   };
@@ -636,10 +698,18 @@ const moveElement = (fromIndex, toIndex) => {
   // Обработчик горячих клавиш
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const isDelete = e.code === 'Delete';
+    
+      if (isDelete && selectedElementId && !editingTextId) {
+        e.preventDefault();
+        handleRemoveElement(selectedElementId);
+        return;
+      }
+
       // Проверяем комбинации для обеих раскладок
       const isCopy = e.code === 'KeyC' || e.key.toLowerCase() === 'с'; // c - русская
       const isPaste = e.code === 'KeyV' || e.key.toLowerCase() === 'м'; // v - русская
-  
+        
       if ((e.ctrlKey || e.metaKey) && !editingTextId) {
         if (isCopy && selectedElementId) {
           e.preventDefault();
@@ -655,7 +725,7 @@ const moveElement = (fromIndex, toIndex) => {
   
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleCopy, handlePaste, selectedElementId, copiedElement, editingTextId]);
+  }, [handleCopy, handlePaste, handleRemoveElement, selectedElementId, copiedElement, editingTextId]);
   
   return (
     <div className="generator-container">
@@ -885,6 +955,13 @@ const moveElement = (fromIndex, toIndex) => {
                 >
                   Вставить (Ctrl+V)
                 </button>
+                <div className='separator'></div>
+                <button
+                  className='context-delete'
+                  onClick={handleDelete}
+                >
+                  Удалить (Del)
+                </button>
               </div>
             )}
           </div>
@@ -898,8 +975,6 @@ const moveElement = (fromIndex, toIndex) => {
           handleColorButtonClick={handleColorButtonClick}
           handleRemoveBackground={handleRemoveBackground}
           processingIds={processingIds}
-          selectedTextElementId={selectedTextElementId}
-          setSelectedTextElementId={setSelectedTextElementId}
           handleTextEditToggle={handleTextEditToggle}
           handleColorChange={handleColorChange}
           handleFontChange={handleFontChange}
@@ -907,6 +982,10 @@ const moveElement = (fromIndex, toIndex) => {
           setSelectedElementId={handleElementClick}
           expandedElementId={expandedElementId}
           setExpandedElementId={setExpandedElementId}
+          onPositionChange={handlePositionChange}
+          onSizeChange={handleSizeChange}
+          onRotationChange={handleRotationChange}
+          onProportionalResize={handleProportionalResize}
         />      
       </div>  
       <input

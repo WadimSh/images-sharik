@@ -22,11 +22,7 @@ export const ImageElement = ({
   onDeselect
 }) => {
   const [imageSrc, setImageSrc] = useState('');
-  const [dimensions, setDimensions] = useState({ 
-    width: width,
-    height: height 
-  });
-
+  
   useEffect(() => {
     const loadImage = async () => {
       try {
@@ -54,7 +50,6 @@ export const ImageElement = ({
   }, [src]);
 
   const handleResize = (newSize) => {
-    setDimensions(newSize);
     onResize({
       width: newSize.width,
       height: newSize.height,
@@ -86,8 +81,8 @@ export const ImageElement = ({
         src={imageSrc}
         alt="uploaded"
         style={{ 
-          width: `${dimensions.width}px`,
-          height: `${dimensions.height}px`,
+          width: `${width}px`,
+          height: `${height}px`,
           pointerEvents: 'none',
           objectFit: 'cover',
           transform: `rotate(${rotation}deg) scaleX(${isFlipped ? -1 : 1})`,

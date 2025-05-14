@@ -1,11 +1,9 @@
-import { FaExchangeAlt } from 'react-icons/fa';
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 
 import { DraggableElementItem } from './DraggableElemetItem';
-import { FontControls } from "./FontControls";
 
 export const ElementsList = ({
   elements,
@@ -15,8 +13,6 @@ export const ElementsList = ({
   handleColorButtonClick,
   handleRemoveBackground,
   processingIds,
-  selectedTextElementId,
-  setSelectedTextElementId,
   handleTextEditToggle,
   handleColorChange,
   handleFontChange,
@@ -24,7 +20,11 @@ export const ElementsList = ({
   selectedElementId, // Добавляем новый пропс
   setSelectedElementId, // Добавляем обработчик выбора
   expandedElementId, // Новый пропс для отслеживания раскрытого элемента
-  setExpandedElementId // Обработчик раскрытия/закрытия
+  setExpandedElementId, // Обработчик раскрытия/закрытия
+  onPositionChange,
+  onSizeChange,
+  onRotationChange,
+  onProportionalResize,
 }) => (
   <div className="sidebar">
     <div className="elements-list">
@@ -98,9 +98,94 @@ export const ElementsList = ({
 
             {isExpanded && (
               <div className="element-controls-dropdown" onClick={e => e.stopPropagation()}>
+                
+                <div className="element-controls">
+                  <span>Позиционирование</span>
+                  <div className="font-controls">
+                    <label>
+                      По горезотали, px:
+                      <input
+                        type="number"
+                        value={(element.position.x).toFixed(0)}
+                        onChange={(e) => onPositionChange(element.id, 'x', e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      По вертикали, px:
+                      <input
+                        type="number"
+                        value={(element.position.y).toFixed(0)}
+                        onChange={(e) => onPositionChange(element.id, 'y', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {element.type === 'shape' && ( 
+                  <div className="element-controls line">
+                    <span>Размеры</span>
+                    <div className="font-controls">
+                    <label>
+                      Ширина, px:
+                      <input
+                        type="number"
+                        value={(element.width).toFixed(0)}
+                        onChange={(e) => onSizeChange(element.id, 'width', e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Высота, px:
+                      <input
+                        type="number"
+                        value={(element.height).toFixed(0)}
+                        onChange={(e) => onSizeChange(element.id, 'height', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  </div>
+                )}
+
+                {(element.type === 'image' || element.type === 'element') && ( 
+                  <div className="element-controls line">
+                    <span>Размеры</span>
+                    <div className="font-controls">
+                    <label>
+                      Ширина, px:
+                      <input
+                        type="number"
+                        value={(element.width).toFixed(0)}
+                        onChange={(e) => onProportionalResize(element.id, 'width', e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Высота, px:
+                      <input
+                        type="number"
+                        value={(element.height).toFixed(0)}
+                        onChange={(e) => onProportionalResize(element.id, 'height', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  </div>
+                )}
+
+
+                <div className="element-controls line">
+                  <span>Поворот</span>
+                  <div className="font-controls">
+                    <label>
+                      Поворот, deg:
+                      <input
+                        type="number"
+                        value={(element.rotation || 0).toFixed(0)}
+                        onChange={(e) => onRotationChange(element.id, e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </div>
 
                 {(element.type === 'image' || element.type === 'element') && (
-                  <div className="element-controls">
+                  <div className="element-controls line">
                     <label className="flip-checkbox-label">
                       <input
                         type="checkbox"
@@ -137,7 +222,7 @@ export const ElementsList = ({
                 )}
 
                 {element.type === 'shape' && (
-                  <div className="element-controls">
+                  <div className="element-controls line">
                     <span>Цвет</span>
                     <div className="color-control">
                       <div 
@@ -169,7 +254,7 @@ export const ElementsList = ({
                 )}
 
                 {element.type === 'text' && (
-                  <div className="element-controls">
+                  <div className="element-controls line">
                     <span>Типографика</span>
                     <div className="font-controls">
                       <div className="style-controls">

@@ -19,15 +19,9 @@ export const ShapeElement = ({
   selectedElementId,
   onDeselect
 }) => {
-  const [dimensions, setDimensions] = useState({ 
-    width: width,
-    height: height 
-  });
-  
   const containerRef = useRef(null);
   
   const handleResize = (newSize) => {
-    setDimensions(newSize);
     onResize({
       width: newSize.width,
       height: newSize.height,
@@ -48,7 +42,7 @@ export const ShapeElement = ({
       splitResizable
       containerWidth={containerWidth}
       containerHeight={containerHeight}
-      dimensions={dimensions}
+      dimensions={{ width, height }}
       rotation={rotation}
       onContextMenu={onContextMenu}
       onClick={onClick}
@@ -59,8 +53,8 @@ export const ShapeElement = ({
         ref={containerRef}
         style={{ 
           position: 'relative',
-          width: `${dimensions.width}px`,
-          height: `${dimensions.height}px`,
+          width: `${width}px`,
+          height: `${height}px`,
           transform: `rotate(${rotation}deg)`,
           backgroundColor: color,
           border: 'none',
