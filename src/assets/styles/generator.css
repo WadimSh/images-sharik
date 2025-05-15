@@ -43,9 +43,9 @@
 .download-button {
   font-size: 16px;
   padding: 8px 20px;
+  border: 2px solid #007bff;
   background: #007bff;
   color: white;
-  border: none;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -184,7 +184,7 @@
 }
 
 .template-select-container {
-  width: 200px;
+  width: 260px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -925,7 +925,6 @@
 .change-color-button:hover {
   color: #007bff;
 }
-
 
 .replace-button {
   background: none;

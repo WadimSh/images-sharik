@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
@@ -32,7 +33,7 @@ export const ElementsList = ({
       {[...elements].reverse().map((element, index) => {
         const originalIndex = elements.length - 1 - index;
         const isExpanded = expandedElementId === element.id;
-
+               
         return (
           <DraggableElementItem
             key={element.id}
