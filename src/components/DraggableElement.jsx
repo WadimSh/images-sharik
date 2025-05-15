@@ -288,7 +288,6 @@ const DraggableElement = ({
         className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
         style={{
           transform: `rotate(${currentRotation}deg)`,
-          transform: `rotate(${currentRotation}deg) scaleX(${isFlipped ? -1 : 1})`,
           transformOrigin: 'center',
           transformOrigin: 'center center',
           width: dimensions ? `${dimensions.width}px` : 'auto',
