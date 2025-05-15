@@ -933,37 +933,65 @@ const moveElement = (fromIndex, toIndex) => {
               }
             })}
             {/* Контекстное меню */}
-            {contextMenu.visible && (
-              <div 
-                ref={contextMenuRef}
-                className="context-menu"
-                style={{
-                  position: 'fixed',
-                  left: contextMenu.x,
-                  top: contextMenu.y,
-                  zIndex: 1000
-                }}
-              >
-                <button 
-                  onClick={handleCopy}
+            {contextMenu.visible && (() => {
+              const element = elements.find(el => el.id === selectedElementId);
+              return (
+                <div 
+                  ref={contextMenuRef}
+                  className="context-menu"
+                  style={{
+                    position: 'fixed',
+                    left: contextMenu.x,
+                    top: contextMenu.y,
+                    zIndex: 1000
+                  }}
                 >
-                  Копировать (Ctrl+C)
-                </button>
-                <button 
-                  onClick={handlePaste}
-                  disabled={!copiedElement}
-                >
-                  Вставить (Ctrl+V)
-                </button>
-                <div className='separator'></div>
-                <button
-                  className='context-delete'
-                  onClick={handleDelete}
-                >
-                  Удалить (Del)
-                </button>
-              </div>
-            )}
+                  <button onClick={handleCopy}>
+                    Копировать (Ctrl+C)
+                  </button>
+                  <button 
+                    onClick={handlePaste}
+                    disabled={!copiedElement}
+                  >
+                    Вставить (Ctrl+V)
+                  </button>
+                  <div className='separator'></div>
+                  <button 
+                    onClick={() => handleTextEditToggle(element.id, true)}
+                    disabled={element?.type !== 'text'}
+                  >
+                    Редактировать текст
+                  </button>
+                  <button 
+                    onClick={() => handleFlipImage(element.id)}
+                    disabled={element?.type !== 'image' && element?.type !== 'element' }
+                  >
+                    Отобразить зеркально
+                  </button>
+                  <button 
+                    onClick={() => handleRemoveBackground(element.id)}
+                    disabled={element?.type !== 'image'}
+                  >
+                    Удалить фон
+                  </button>
+                  <button 
+                    onClick={() => handleColorButtonClick(element.id)}
+                    disabled={element?.type !== 'shape'}
+                  >
+                    Изменить цвет
+                  </button>
+                  
+                  <div className='separator'></div>
+
+                  <button
+                    className='context-delete'
+                    onClick={handleDelete}
+                  >
+                    Удалить (Del)
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         </div> 
         <DraggableElementsList 

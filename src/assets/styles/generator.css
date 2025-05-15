@@ -1058,7 +1058,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-size: 14px;
-  width: 140px;
+  width: 200px;
   background: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") 
     no-repeat right 8px center/12px;
   -webkit-appearance: none;

@@ -47,7 +47,13 @@ export const ElementsList = ({
               onClick={() => setSelectedElementId(element.id)}
             >
 
-              <div className="element-info">
+              <div 
+                className="element-info" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedElementId(isExpanded ? null : element.id);
+                }}
+              >
                 <RxDragHandleDots2 className="drag-handle" />
                 <span style={{alignSelf: 'center'}}>
                   {element.type === 'text' && '📝 '}
@@ -276,7 +282,7 @@ export const ElementsList = ({
                   <span>Позиционирование</span>
                   <div className="font-controls">
                     <label>
-                      По горезотали, px:
+                      По горизотали, px:
                       <input
                         type="number"
                         value={(element.position.x).toFixed(0)}
