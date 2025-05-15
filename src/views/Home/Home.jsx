@@ -158,8 +158,14 @@ export const Home = () => {
       const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
       return replacePlaceholders(templates.gemar[templateIndex], item);
     }
-    if (item.brand === 'Belbal') {
-      return replacePlaceholders(templates.belbal, item);
+    if (item.brand === 'Belbal' && templates.belbal.length > 0) {
+      const parts = item.code.split('_');
+      const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+      // Выбираем индекс шаблона: 
+      // - для первых N картинок (где N = количество шаблонов) берем соответствующий шаблон
+      // - для картинок сверх этого количества берем последний шаблон
+      const templateIndex = Math.min(imageIndex, templates.belbal.length - 1);
+      return replacePlaceholders(templates.belbal[templateIndex], item);
     }
     const template = templates.main;
     return replacePlaceholders(template, item);

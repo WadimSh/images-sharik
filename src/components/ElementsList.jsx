@@ -216,33 +216,6 @@ export const ElementsList = ({
                       </div>
 
                       <label>
-                        Размер:
-                        <input
-                          type="number"
-                          value={element.fontSize || 24}
-                          onChange={(e) => handleFontChange(element.id, 'fontSize', parseInt(e.target.value))}
-                          min="8"
-                          max="72"
-                        />
-                      </label>
-
-                      <label>
-                        Цвет:
-                        <div className="color-picker-wrapper">
-                          <input
-                            type="color"
-                            className="color-picker-input"
-                            value={element.color || '#333333'}
-                            onChange={(e) => handleFontChange(element.id, 'color', e.target.value)}
-                          />
-                          <div 
-                            className="color-preview"
-                            style={{ color: element.color || '#333333' }}
-                          />
-                        </div>
-                      </label>
-
-                      <label>
                         Шрифт:
                         <select
                           value={element.fontFamily || 'Arial'}
@@ -273,6 +246,33 @@ export const ElementsList = ({
                           <option value="Century Gothic">Century Gothic</option>
                           <option value="Candara">Candara</option>
                         </select>
+                      </label>
+
+                      <label>
+                        Размер:
+                        <input
+                          type="number"
+                          value={element.fontSize || 24}
+                          onChange={(e) => handleFontChange(element.id, 'fontSize', parseInt(e.target.value))}
+                          min="8"
+                          max="72"
+                        />
+                      </label>
+
+                      <label>
+                        Цвет:
+                        <div className="color-picker-wrapper">
+                          <input
+                            type="color"
+                            className="color-picker-input"
+                            value={element.color || '#333333'}
+                            onChange={(e) => handleFontChange(element.id, 'color', e.target.value)}
+                          />
+                          <div 
+                            className="color-preview"
+                            style={{ color: element.color || '#333333' }}
+                          />
+                        </div>
                       </label>
                     </div>
                   </div>

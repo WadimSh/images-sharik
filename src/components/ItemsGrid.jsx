@@ -149,10 +149,14 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
         // Выбираем подходящий шаблон
         let template;
-        if (templateKey === 'gemar' && Array.isArray(templates.gemar)) {
-          // Для Gemar выбираем шаблон по индексу изображения
-          const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
-          template = templates.gemar[templateIndex];
+        if (
+          (templateKey === 'gemar' || templateKey === 'belbal') && 
+          Array.isArray(templates[templateKey])
+        ) {
+          // Для Gemar и Belbal выбираем шаблон по индексу изображения
+          const templateArray = templates[templateKey];
+          const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+          template = templateArray[templateIndex];
         } else {
           // Для остальных шаблонов используем обычный выбор
           template = templates[templateKey];
