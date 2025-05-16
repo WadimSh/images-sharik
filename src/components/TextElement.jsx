@@ -29,7 +29,6 @@ export const TextElement = ({
     wordBreak: 'break-word',
     maxWidth: '100%',
     position: 'relative',
-    transform: `rotate(${element.rotation}deg)`
   };
 
   useEffect(() => {

@@ -5,7 +5,6 @@ const DraggableElement = ({
   children, 
   id,
   selectedElementId,
-  isFlipped,
   position, 
   onDrag, 
   onResize,
@@ -236,7 +235,6 @@ const DraggableElement = ({
       return;
     }
   
-    // Остальная часть функции без изменений
     if (isDragging && elementRef.current) {
       const parentRect = elementRef.current.parentNode.getBoundingClientRect();
       const newX = e.clientX - parentRect.left - offset.x;
@@ -288,8 +286,6 @@ const DraggableElement = ({
         className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
         style={{
           transform: `rotate(${currentRotation}deg)`,
-          transformOrigin: 'center',
-          transformOrigin: 'center center',
           width: dimensions ? `${dimensions.width}px` : 'auto',
           height: dimensions ? `${dimensions.height}px` : 'auto',
         }}
