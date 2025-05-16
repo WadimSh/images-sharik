@@ -18,10 +18,10 @@ export const ElementsList = ({
   handleColorChange,
   handleFontChange,
   moveElement,
-  selectedElementId, // Добавляем новый пропс
-  setSelectedElementId, // Добавляем обработчик выбора
-  expandedElementId, // Новый пропс для отслеживания раскрытого элемента
-  setExpandedElementId, // Обработчик раскрытия/закрытия
+  selectedElementId,
+  setSelectedElementId,
+  expandedElementId,
+  setExpandedElementId,
   onPositionChange,
   onSizeChange,
   onRotationChange,
