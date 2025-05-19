@@ -2,22 +2,37 @@ import { useEffect, useState } from 'react';
 
 export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     // Загрузка списка изображений из public/images
     const loadImages = async () => {
       try {
-        const response = await fetch('/images/image-list.json');
+        setIsLoading(true);
+        // Искусственная задержка для демонстрации скелетона
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const response = await fetch('/images/image-list.json', {
+          signal: controller.signal
+        });
         const data = await response.json();
         setImages(data);
       } catch (error) {
-        console.error('Error loading images:', error);
+        if (error.name !== 'AbortError') { // Игнорируем ошибку отмены запроса
+          console.error('Error loading images:', error);
+        }
+      } finally {
+        setIsLoading(false); // Гарантированный сброс состояния загрузки
       }
     };
-    
-    if (isOpen) loadImages();
-  }, [isOpen]);
 
+    if (isOpen) loadImages();
+
+    return () => controller.abort(); // Очистка при размонтировании
+  }, [isOpen]);
+  console.log(isLoading)
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>
       <div className="modal-contents">
@@ -25,7 +40,13 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
           <h2>Библиотека изображений</h2>
           <button onClick={onClose} className="close-btn">&times;</button>
         </div>
-        <div className="image-grid">
+        {isLoading ? (
+          <div className="skeleton-container">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="skeleton-item" />
+            ))}
+          </div>
+        ) : (<div className="image-grid">
           {images.map((img, index) => (
             <div 
               key={index}
@@ -39,7 +60,7 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
               />
             </div>
           ))}
-        </div>
+        </div>)}
       </div>
     </div>
   );

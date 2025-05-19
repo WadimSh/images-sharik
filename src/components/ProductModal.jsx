@@ -113,7 +113,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
       handleSaveTemplate();
     }
   };
-  console.log(productImages)
+  
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`} onClick={onClose}>
       <div className="modal-contents" onClick={(e) => e.stopPropagation()}>
