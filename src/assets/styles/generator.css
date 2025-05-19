@@ -779,6 +779,101 @@
   font-weight: bold;
 }
 
+/* Стили для функционала скругления */
+.radius-controls {
+  background: #fff;
+  padding: 0 15px;
+  position: relative;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radius-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.radius-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radius-icon {
+  width: 24px;
+  height: 24px;
+  color: #666;
+}
+
+.radius-controls input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.radius-controls input[type="number"]:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+/* Стили для определения градиента */
+.gradient-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.direction-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.direction-buttons button {
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background: white;
+}
+
+.direction-buttons button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.color-pickers {
+  display: flex;
+  gap: 8px;
+}
+
+.color-pickers input[type="color"] {
+  width: 30px;
+  height: 30px;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.opacity-control input[type="range"],
+.color-control input[type="range"] {
+  flex-grow: 1;
+}
+
 .flip-button {
   background: none;
   border: none;

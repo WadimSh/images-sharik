@@ -1,9 +1,11 @@
-import { useState } from "react";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
+import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
+import { MdOpacity } from "react-icons/md";
 
+import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
 
 export const ElementsList = ({
@@ -13,6 +15,9 @@ export const ElementsList = ({
   handleFlipImage,
   handleColorButtonClick,
   handleRemoveBackground,
+  handleBorderRadiusChange,
+  handleGradientChange,
+  handleoOpacityChange,
   processingIds,
   handleTextEditToggle,
   handleColorChange,
@@ -77,7 +82,11 @@ export const ElementsList = ({
                       style={{
                         width: '30px',
                         height: '30px',
-                        backgroundColor: element.color,
+                        background: element.gradient 
+                                      ? `linear-gradient(${element.gradient.direction}, 
+                                        ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
+                                        ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+                                      : element.color,
                         marginRight: '4px',
                         borderRadius: '2px'
                       }}
@@ -164,7 +173,11 @@ export const ElementsList = ({
                         style={{
                           width: '20px',
                           height: '20px',
-                          backgroundColor: element.color,
+                          background: element.gradient 
+                                      ? `linear-gradient(${element.gradient.direction}, 
+                                        ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
+                                        ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+                                      : element.color,
                           marginRight: '4px',
                           borderRadius: '2px'
                         }}
@@ -184,6 +197,154 @@ export const ElementsList = ({
                         }}
                         />
                       </button>
+                    </div>
+                    <div className="color-control">
+                      <MdOpacity
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                        }}
+                      />
+                      <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={element.opacity || 1}
+                          onChange={(e) => handleoOpacityChange(element.id, e.target.value)}
+                        />
+                        <span>{(element.opacity || 1).toFixed(1)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {element.type === 'shape' && (
+                  <div className="element-controls line">
+                    <span>Скругление углов</span>
+                    <div className="radius-controls">
+                      <div className="radius-row">
+                        <div className="radius-block">
+                          <TbRadiusTopLeft className="radius-icon"/>
+                          <input
+                            type="number"
+                            className="radius-input"
+                            value={element.borderRadius?.topLeft || 0}
+                            onChange={(e) => handleBorderRadiusChange(element.id, 'topLeft', e.target.value)}
+                            min="0"
+                            max="100"
+                          />
+                        </div>
+                        <div className="radius-block">
+                          <TbRadiusTopRight className="radius-icon"/>
+                          <input
+                            type="number"
+                            className="radius-input"
+                            value={element.borderRadius?.topRight || 0}
+                            onChange={(e) => handleBorderRadiusChange(element.id, 'topRight', e.target.value)}
+                            min="0"
+                            max="100"
+                          />
+                        </div>
+                      </div>
+                      <div className="radius-row">
+                        <div className="radius-block">
+                          <TbRadiusBottomLeft className="radius-icon"/>
+                          <input
+                            type="number"
+                            className="radius-input"
+                            value={element.borderRadius?.bottomLeft || 0}
+                            onChange={(e) => handleBorderRadiusChange(element.id, 'bottomLeft', e.target.value)}
+                            min="0"
+                            max="100"
+                          />
+                        </div>
+                        <div className="radius-block">
+                          <TbRadiusBottomRight className="radius-icon"/>
+                          <input
+                            type="number"
+                            className="radius-input"
+                            value={element.borderRadius?.bottomRight || 0}
+                            onChange={(e) => handleBorderRadiusChange(element.id, 'bottomRight', e.target.value)}
+                            min="0"
+                            max="100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {element.type === 'shape' && (
+                  <div className="element-controls line">
+                    <span>Линейный градиент</span>
+                    <div className="gradient-controls">
+                      {/* Выбор направления */}
+                      <div className="direction-buttons">
+                        <button
+                          onClick={() => handleGradientChange(element.id, 'direction', 'to right')}
+                          className={element.gradient?.direction === 'to right' ? 'active' : ''}
+                          title="Слева направо"
+                        >
+                          →
+                        </button>
+                        <button
+                          onClick={() => handleGradientChange(element.id, 'direction', 'to left')}
+                          className={element.gradient?.direction === 'to left' ? 'active' : ''}
+                          title="Справа налево"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => handleGradientChange(element.id, 'direction', 'to bottom')}
+                          className={element.gradient?.direction === 'to bottom' ? 'active' : ''}
+                          title="Сверху вниз"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          onClick={() => handleGradientChange(element.id, 'direction', 'to top')}
+                          className={element.gradient?.direction === 'to top' ? 'active' : ''}
+                          title="Снизу вверх"
+                        >
+                          ↑
+                        </button>
+                      </div>
+
+                      {/* Выбор цветов */}
+                      <div className="opacity-control">
+                        <label>Цвет 1:</label>
+                        <input
+                          type="color"
+                          value={element.gradient?.colors?.[0] || '#000000'}
+                          onChange={(e) => handleGradientChange(element.id, 'color1', e.target.value)}
+                        />
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={element.gradient?.opacity?.[0] || 1}
+                          onChange={(e) => handleGradientChange(element.id, 'opacity1', e.target.value)}
+                        />
+                        <span>{(element.gradient?.opacity?.[0] || 1).toFixed(1)}</span>
+                      </div>
+                      <div className="opacity-control">
+                        <label>Цвет 2:</label>
+                        <input
+                          type="color"
+                          value={element.gradient?.colors?.[1] || '#ffffff'}
+                          onChange={(e) => handleGradientChange(element.id, 'color2', e.target.value)}
+                        />
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={element.gradient?.opacity?.[1] || 1}
+                          onChange={(e) => handleGradientChange(element.id, 'opacity2', e.target.value)}
+                        />
+                        <span>{(element.gradient?.opacity?.[1] || 1).toFixed(1)}</span>
+                      </div>
                     </div>
                   </div>
                 )}

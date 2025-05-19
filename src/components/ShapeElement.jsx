@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
+
 import DraggableElement from './DraggableElement';
+import { hexToRgba } from '../utils/hexToRgba';
 
 export const ShapeElement = ({ 
   contextMenuRef,
@@ -56,8 +58,15 @@ export const ShapeElement = ({
           width: `${width}px`,
           height: `${height}px`,
           transform: `rotate(${rotation}deg)`,
-          backgroundColor: color,
+          background: element.gradient 
+            ? `linear-gradient(${element.gradient.direction}, 
+              ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
+              ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+            : color,
           border: 'none',
+          opacity: element.opacity,
+          borderRadius: `${element.borderRadius?.topLeft || 0}px ${element.borderRadius?.topRight || 0}px 
+                 ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`
         }}
         onContextMenu={onContextMenu}
       >

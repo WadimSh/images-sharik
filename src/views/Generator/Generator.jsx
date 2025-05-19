@@ -204,6 +204,62 @@ export const Generator = () => {
     }));
   };
 
+  const handleBorderRadiusChange = (elementId, corner, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          borderRadius: {
+            ...el.borderRadius,
+            [corner]: parseInt(value) || 0
+          }
+        };
+      }
+      return el;
+    }));
+  };
+
+  const handleGradientChange = (elementId, type, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        const gradient = el.gradient || {
+          direction: 'to right',
+          colors: ['#000000', '#ffffff'],
+          opacity: [1, 0]
+        };
+
+        return {
+          ...el,
+          gradient: {
+            ...gradient,
+            ...(type === 'direction' && { direction: value }),
+            ...(type === 'color1' && { colors: [value, gradient.colors[1]] }),
+            ...(type === 'color2' && { colors: [gradient.colors[0], value] }),
+            ...(type === 'opacity1' && { 
+              opacity: [parseFloat(value), gradient.opacity[1]] 
+            }),
+            ...(type === 'opacity2' && { 
+              opacity: [gradient.opacity[0], parseFloat(value)] 
+            }),
+          }
+        };
+      }
+      return el;
+    }));
+  };
+  
+  const handleoOpacityChange = (elementId, value) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          opacity: parseFloat(value) || 1
+        };
+      }
+      return el;
+    }));
+  };
+
   const handleProportionalResize = (elementId, dimension, newValue) => {
     setElements(prev => prev.map(el => {
       if (el.id === elementId) {
@@ -256,7 +312,14 @@ export const Generator = () => {
       ...(type === 'shape' && { 
         color: '#ccc',
         width: 100,
-        height: 100 
+        height: 100,
+         borderRadius: {
+          topLeft: 0,
+          topRight: 0,
+          bottomLeft: 0,
+          bottomRight: 0
+        },
+        gradient: null
       })
     };
     setElements(prev => [...prev, newElement]);
@@ -1017,6 +1080,9 @@ const moveElement = (fromIndex, toIndex) => {
           handleFlipImage={handleFlipImage}
           handleColorButtonClick={handleColorButtonClick}
           handleRemoveBackground={handleRemoveBackground}
+          handleBorderRadiusChange={handleBorderRadiusChange}
+          handleGradientChange={handleGradientChange}
+          handleoOpacityChange={handleoOpacityChange}
           processingIds={processingIds}
           handleTextEditToggle={handleTextEditToggle}
           handleColorChange={handleColorChange}
