@@ -79,7 +79,7 @@ export const FontControls = ({ element, onClose, onChange }) => {
       </label>
 
       <label>
-        Шрифт:
+        Шрифт:&emsp;
         <select
           value={element.fontFamily || 'Arial'}
           onChange={(e) => onChange(element.id, 'fontFamily', e.target.value)}

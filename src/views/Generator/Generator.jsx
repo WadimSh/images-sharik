@@ -15,6 +15,7 @@ import { TextElement } from '../../components/TextElement';
 import { ElementsElement } from '../../components/ElementsElement';
 import { ImageLibraryModal } from '../../components/ImageLibraryModal';
 import { ProductModal } from '../../components/ProductModal';
+import { FontControls } from '../../components/FontControls';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -83,6 +84,8 @@ export const Generator = () => {
   const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
   // Добавили состояние для модалки добавления дополнительного товара
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  // Добавили состояние для окрытия меню редактирования шрифта для контекстного меню
+  const [selectedTextEdit, setSelectedTextEdit] = useState(null);
   // Добавили состояние для раскрытия меню со свойствами компонета
   const [expandedElementId, setExpandedElementId] = useState(null);
 
@@ -153,6 +156,8 @@ export const Generator = () => {
 
   // Обработчик изменений параметров шрифта
   const handleFontChange = (elementId, property, value) => {
+    console.log(elementId)
+    console.log(property)
     setElements(prev => 
       prev.map(el => 
         el.id === elementId ? { ...el, [property]: value } : el
@@ -963,11 +968,21 @@ const moveElement = (fromIndex, toIndex) => {
                     Редактировать текст
                   </button>
                   <button 
+                    onClick={() => {
+                      setSelectedTextEdit(element.id);
+                      closeContextMenu();
+                    }}
+                    disabled={element?.type !== 'text'}
+                  >
+                    Шрифт...
+                  </button>
+                  <button 
                     onClick={() => handleFlipImage(element.id)}
                     disabled={element?.type !== 'image' && element?.type !== 'element' }
                   >
                     Отобразить зеркально
                   </button>
+                  
                   <button 
                     onClick={() => handleRemoveBackground(element.id)}
                     disabled={element?.type !== 'image'}
@@ -1023,6 +1038,22 @@ const moveElement = (fromIndex, toIndex) => {
         ref={fileInputRef}
         className="hidden-input"
       />
+      {/* Панель настроек шрифта вне цикла элементов */}
+      {selectedTextEdit && (
+        <div className="font-controls-wrapper"
+          style={{
+            position: 'fixed',
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+        >
+          <FontControls
+            element={elements.find(el => el.id === selectedTextEdit)}
+            onClose={() => setSelectedTextEdit(null)}
+            onChange={handleFontChange}
+          />
+        </div>
+      )}     
       {isTemplateModalOpen && <TemplateModal 
         setIsTemplateModalOpen={setIsTemplateModalOpen}
         setTemplates={setTemplates}
