@@ -22,8 +22,8 @@ export const TextElement = ({
 
   const textStyle = {
     color: element.color || '#333',
-    fontSize: `${element.fontSize || 24}px`,
-    fontFamily: element.fontFamily || 'Arial',
+    fontSize: `${element.fontSize || 32}px`,
+    fontFamily: element.fontFamily || 'HeliosCond',
     fontWeight: element.fontWeight || 'normal',
     fontStyle: element.fontStyle || 'normal',
     wordBreak: 'break-word',

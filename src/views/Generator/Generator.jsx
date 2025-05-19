@@ -241,9 +241,9 @@ export const Generator = () => {
       position: { x: 50, y: 50 },
       ...(type === 'text' && {
         text: 'Новый текст',
-        fontSize: 24,       
+        fontSize: 32,       
         color: '#333333',   
-        fontFamily: 'Arial', 
+        fontFamily: 'HeliosCond', 
         fontWeight: 'normal', 
         fontStyle: 'normal',  
       }),

@@ -184,41 +184,41 @@ const DraggableElement = ({
         if (direction.includes('-')) {
           switch(direction) {
             case 'top-left':
-              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newWidth = Math.max(1, initialSize.current.width - deltaX);
               newHeight = newWidth / initialSize.current.aspectRatio;
               newX = position.x + (initialSize.current.width - newWidth);
               newY = position.y + (initialSize.current.height - newHeight);
               break;
             case 'top-right':
-              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              newWidth = Math.max(1, initialSize.current.width + deltaX);
               newHeight = newWidth / initialSize.current.aspectRatio;
               newY = position.y + (initialSize.current.height - newHeight);
               break;
             case 'bottom-left':
-              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newWidth = Math.max(1, initialSize.current.width - deltaX);
               newHeight = newWidth / initialSize.current.aspectRatio;
               newX = position.x + (initialSize.current.width - newWidth);
               break;
             case 'bottom-right':
-              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              newWidth = Math.max(1, initialSize.current.width + deltaX);
               newHeight = newWidth / initialSize.current.aspectRatio;
               break;
           }
         } else {
           switch(direction) {
             case 'left':
-              newWidth = Math.max(50, initialSize.current.width - deltaX);
+              newWidth = Math.max(1, initialSize.current.width - deltaX);
               newX = position.x + deltaX;
               break;
             case 'right':
-              newWidth = Math.max(50, initialSize.current.width + deltaX);
+              newWidth = Math.max(1, initialSize.current.width + deltaX);
               break;
             case 'top':
-              newHeight = Math.max(50, initialSize.current.height - deltaY);
+              newHeight = Math.max(1, initialSize.current.height - deltaY);
               newY = position.y + deltaY;
               break;
             case 'bottom':
-              newHeight = Math.max(50, initialSize.current.height + deltaY);
+              newHeight = Math.max(1, initialSize.current.height + deltaY);
               break;
           }
         }
