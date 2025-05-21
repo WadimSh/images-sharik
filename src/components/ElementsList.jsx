@@ -47,9 +47,11 @@ export const ElementsList = ({
             moveElement={moveElement}
             elements={elements}
             isSelected={element.id === selectedElementId} // Передаем флаг выделения
+            disabled={isExpanded}
+            setExpandedElementId={setExpandedElementId}
           >
             <div 
-              className={`element-item ${element.id === selectedElementId ? 'selected' : ''}`} 
+              className={`element-item ${element.id === selectedElementId ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
               onClick={() => setSelectedElementId(element.id)}
             >
 
@@ -60,7 +62,13 @@ export const ElementsList = ({
                   setExpandedElementId(isExpanded ? null : element.id);
                 }}
               >
-                <RxDragHandleDots2 className="drag-handle" />
+                <RxDragHandleDots2 
+                  className="drag-handle" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedElementId(null); // Закрываем все меню
+                  }}
+                />
                 <span style={{alignSelf: 'center'}}>
                   {element.type === 'text' && '📝 '}
                   {(element.type === 'image' || element.type === 'element') && (
@@ -182,7 +190,7 @@ export const ElementsList = ({
                           borderRadius: '2px'
                         }}
                       />
-                      <span className="color-hex">{element.color}</span>
+                      <span className="color-hex">{element.gradient?.colors?.[0] || element.color}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -233,6 +241,7 @@ export const ElementsList = ({
                             min="0"
                             max="100"
                           />
+                          px
                         </div>
                         <div className="radius-block">
                           <TbRadiusTopRight className="radius-icon"/>
@@ -244,6 +253,7 @@ export const ElementsList = ({
                             min="0"
                             max="100"
                           />
+                          px
                         </div>
                       </div>
                       <div className="radius-row">
@@ -257,6 +267,7 @@ export const ElementsList = ({
                             min="0"
                             max="100"
                           />
+                          px
                         </div>
                         <div className="radius-block">
                           <TbRadiusBottomRight className="radius-icon"/>
@@ -268,6 +279,7 @@ export const ElementsList = ({
                             min="0"
                             max="100"
                           />
+                          px
                         </div>
                       </div>
                     </div>
@@ -311,6 +323,18 @@ export const ElementsList = ({
                       </div>
 
                       {/* Выбор цветов */}
+                      <div className="opacity-control">
+                        <label>Стартовая точка:</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={element.gradient?.start || 0}
+                          onChange={(e) => handleGradientChange(element.id, 'start', e.target.value)}
+                        />
+                        <span>{(element.gradient?.start || 0)} %</span>
+                      </div>
                       <div className="opacity-control">
                         <label>Цвет 1:</label>
                         <input

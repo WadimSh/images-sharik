@@ -1,3 +1,5 @@
+import { ToggleSwitch } from "./ui/ToggleSwitch/ToggleSwitch";
+
 const SearchHeader = ({ 
   onSearch, 
   searchQuery, 
@@ -5,11 +7,13 @@ const SearchHeader = ({
   isSearchActive,
   loading,
   error,
-  infoMessage
+  infoMessage,
+  isToggled, 
+  setIsToggled
 }) => {
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
-  
+    
   const handleInputChange = (event) => {
     let value = event.target.value;
     
@@ -32,6 +36,7 @@ const SearchHeader = ({
 
   const handleSearch = () => {
     // Полная очистка sessionStorage
+    setIsToggled(false);
     sessionStorage.clear();
     const normalized = searchQuery
       .split(/[\s,]+/) 
@@ -56,6 +61,7 @@ const SearchHeader = ({
   const handleClear = () => {
     setSearchQuery('');
     onSearch([]);
+    setIsToggled(false);
     // Полная очистка sessionStorage
     sessionStorage.clear();
   };
@@ -65,7 +71,7 @@ const SearchHeader = ({
       handleSearch();
     }
   };
-
+  
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <h2 style={{
@@ -124,6 +130,12 @@ const SearchHeader = ({
           </div>
         )}
       </div>
+      {/*isSearchActive && <ToggleSwitch
+        checked={isToggled}
+        onChange={setIsToggled}
+        label="Объединить найденные товары в единый слайд (допустимо не более 10 товаров)."
+        size="small"
+      />*/}
     </div>
   );
 };

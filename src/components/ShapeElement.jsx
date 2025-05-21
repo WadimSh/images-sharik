@@ -60,8 +60,8 @@ export const ShapeElement = ({
           transform: `rotate(${rotation}deg)`,
           background: element.gradient 
             ? `linear-gradient(${element.gradient.direction}, 
-              ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
-              ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+              ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])} ${element.gradient.start}%, 
+              ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])} 100%)`
             : color,
           border: 'none',
           opacity: element.opacity,

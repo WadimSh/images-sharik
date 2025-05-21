@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { replacePlaceholders } from '../utils/replacePlaceholders';
 import { PreviewDesign } from './PreviewDesign';
 
-const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
+const ItemsGrid = ({ items, onItemsUpdate, templates, isToggled }) => {
   const navigate = useNavigate();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   
@@ -161,7 +161,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           // Для остальных шаблонов используем обычный выбор
           template = templates[templateKey];
         }
-
+        
         const newDesign = replacePlaceholders(template, itemData);
         sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
       }

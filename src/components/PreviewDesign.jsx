@@ -47,7 +47,7 @@ export const PreviewDesign = ({ elements }) => (
                     opacity: element.opacity,
                     background: element.gradient 
                                 ? `linear-gradient(${element.gradient.direction}, 
-                                  ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
+                                  ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}  ${element.gradient.start}%, 
                                   ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
                                 : element.color,
                     borderRadius: `${element.borderRadius?.topLeft || 0}px ${element.borderRadius?.topRight || 0}px 

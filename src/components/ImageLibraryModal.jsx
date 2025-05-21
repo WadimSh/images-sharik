@@ -46,7 +46,7 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
               <div key={index} className="skeleton-item" />
             ))}
           </div>
-        ) : (<div className="image-grid">
+        ) : images.length > 0 && (<div className="image-grid">
           {images.map((img, index) => (
             <div 
               key={index}

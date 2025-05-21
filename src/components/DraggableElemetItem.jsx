@@ -1,9 +1,21 @@
 import { useDrag, useDrop } from 'react-dnd';
 
-export const DraggableElementItem = ({ element, elements, originalIndex, moveElement, children }) => {
+export const DraggableElementItem = ({ 
+  element, 
+  elements, 
+  originalIndex, 
+  moveElement,
+  disabled, 
+  setExpandedElementId,
+  children 
+}) => {
   const [{ isDragging }, drag] = useDrag({
     type: 'element',
-    item: { id: element.id, originalIndex },
+    item: () => {
+      setExpandedElementId(null); // Закрываем меню при начале перетаскивания
+      return { id: element.id, originalIndex };
+    },
+    canDrag: () => !disabled, // Блокируем перетаскивание при disabled=true
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

@@ -138,13 +138,27 @@ export const Generator = () => {
     const newColor = e.target.value;
     setElements(prev => 
       prev.map(el => 
-        el.id === selectedColorElementId ? {...el, color: newColor} : el
+        el.id === selectedColorElementId ? {...el, color: newColor, gradient: null} : el
       )
     );
   };
 
   // Обработчик клика по кнопке выбора цвета
   const handleColorButtonClick = (elementId) => {
+    setElements(prev => 
+      prev.map(el => {
+        if (el.id === elementId) {
+          // Сбрасываем градиент при выборе цвета
+          return { 
+            ...el, 
+            gradient: null,
+            color: el.color || '#ccc' // Обновляем цвет, если он не задан
+          };
+        }
+        return el;
+      })
+    );
+
     const element = elements.find(el => el.id === elementId);
     if (element && colorInputRef.current) {
       // Устанавливаем значение напрямую в DOM-элемент
@@ -224,6 +238,7 @@ export const Generator = () => {
       if (el.id === elementId) {
         const gradient = el.gradient || {
           direction: 'to right',
+          start: 0,
           colors: ['#000000', '#ffffff'],
           opacity: [1, 0]
         };
@@ -233,6 +248,7 @@ export const Generator = () => {
           gradient: {
             ...gradient,
             ...(type === 'direction' && { direction: value }),
+            ...(type === 'start' && { start: value }),
             ...(type === 'color1' && { colors: [value, gradient.colors[1]] }),
             ...(type === 'color2' && { colors: [gradient.colors[0], value] }),
             ...(type === 'opacity1' && { 
