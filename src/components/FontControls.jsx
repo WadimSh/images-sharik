@@ -64,6 +64,7 @@ export const FontControls = ({ element, onClose, onChange }) => {
       
       <label>
         Цвет:
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <div className="color-picker-wrapper">
           <input
             type="color"
@@ -75,6 +76,8 @@ export const FontControls = ({ element, onClose, onChange }) => {
             className="color-preview"
             style={{ color: element.color || '#333333' }}
           />
+        </div>
+        {element.color}
         </div>
       </label>
 

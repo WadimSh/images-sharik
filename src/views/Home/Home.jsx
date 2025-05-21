@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
+
 import SearchHeader from "../../components/SearchHeader";
 import ItemsGrid from "../../components/ItemsGrid";
+import { SelectionImagesModal } from '../../components/SelectionImagesModal';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
 import { replaceCollage } from '../../utils/replaceCollage';
@@ -15,7 +17,7 @@ export const Home = () => {
   const [validArticles, setValidArticles] = useState(initialData.articles);
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
-
+  
   const [templates, setTemplates] = useState({
     belbal: [],
     gemar: [],
@@ -30,8 +32,7 @@ export const Home = () => {
   const [error, setError] = useState(null);
   const [infoMessage, setInfoMessage] = useState(null);
   const [isToggled, setIsToggled] = useState(false);
-  const [processedMetaResults, setProcessedMetaResults] = useState([]);
-
+  
   useEffect(() => {
     // Только для синхронизации при обновлениях из других вкладок
     const handleStorage = (e) => {
@@ -48,45 +49,6 @@ export const Home = () => {
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
-
-  useEffect(() => {
-    if (!isToggled) {
-      const collageKeys = Object.keys(sessionStorage).filter(key => key.startsWith('collage-'));
-      collageKeys.forEach(key => sessionStorage.removeItem(key));
-      return;
-    }
-    const collageImages = processedMetaResults.reduce((acc, item) => {
-      if (acc.size >= 10) return acc;
-      const baseCode = item.code.split('_')[0];
-      
-      // Добавляем проверку наличия изображения
-      if (item.images?.[0]?.image) {
-        const fullImageUrl = `https://new.sharik.ru${item.images[0].image}`;
-
-        if (!acc.has(baseCode)) {
-          acc.set(baseCode, fullImageUrl);
-        }
-      }
-
-      return acc;
-    }, new Map());
-
-    // 2. Формируем метаданные
-        const collageMeta = {
-          productCodes: Array.from(collageImages.keys()),
-          images: Array.from(collageImages.values())
-        };
-      console.log(collageMeta)
-        // 3. Сначала сохраняем метаданные
-        sessionStorage.setItem('collage-meta', JSON.stringify(collageMeta));
-      
-        // 4. Генерируем дизайн синхронно
-        const collageData = generateCollageData(collageMeta); // Передаем метаданные напрямую
-      
-        // 5. Сохраняем дизайн
-        sessionStorage.setItem('collage-design', JSON.stringify(collageData));
-    
-  }, [isToggled, processedMetaResults]);
 
   // Сохранение данных при изменении
   useEffect(() => {
@@ -251,37 +213,36 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    //setLoading(true);
-    //
-    //const searchQuery = normalizedArticles.join(' ');
-    //const encodedSearch = encodeURIComponent(searchQuery);
-    //
-    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
-    //  .then(response => response.json())
-    //  .then(data => {
-    //    if (data.results.length === 0) {
-    //      const message = normalizedArticles.length === 1 
-    //        ? "Товар с таким артикулом не активен." 
-    //        : "Товары с такими артикулами не активны.";
-    //      setInfoMessage(message);
-    //      return Promise.reject(message);
-    //    }
-    //
-    //    const productIds = data.results.map(product => product.id);
-    //    const idsParam = productIds.join(',');
-    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //  })
-    //  .then(response => response?.json())
-    //  .then(detailedData => {
-    //    if (!detailedData) return;
+    setLoading(true);
+    
+    const searchQuery = normalizedArticles.join(' ');
+    const encodedSearch = encodeURIComponent(searchQuery);
+    
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          const message = normalizedArticles.length === 1 
+            ? "Товар с таким артикулом не активен." 
+            : "Товары с такими артикулами не активны.";
+          setInfoMessage(message);
+          return Promise.reject(message);
+        }
+    
+        const productIds = data.results.map(product => product.id);
+        const idsParam = productIds.join(',');
+        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+      })
+      .then(response => response?.json())
+      .then(detailedData => {
+        if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      const processedResults = processProductsData(data);
-      const processedMetaResults = processProductsMeta(data);
-      setProcessedMetaResults(data);
-      //const processedResults = processProductsData(detailedData);
-      //const processedMetaResults = processProductsMeta(detailedData);
-      //setProcessedMetaResults(detailedData);
+      //const processedResults = processProductsData(data);
+      //const processedMetaResults = processProductsMeta(data);
+      const processedResults = processProductsData(detailedData);
+      const processedMetaResults = processProductsMeta(detailedData);
+      
       
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -311,16 +272,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    //})
-    //.catch(error => {
-    //  console.error('Ошибка:', error);
-    //  setError(error.message || 'Произошла ошибка при поиске');
-    //  setValidArticles([]);
-    //  setIsSearchActive(false);
-    //})
-    //.finally(() => {
-    //  setLoading(false);
-    //});
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+      setError(error.message || 'Произошла ошибка при поиске');
+      setValidArticles([]);
+      setIsSearchActive(false);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {
@@ -346,6 +307,15 @@ const handleSearch = useCallback((normalizedArticles) => {
         templates={templates}
         isToggled={isToggled}
       />
+      {isToggled && (
+        <SelectionImagesModal 
+          isOpen={isToggled}
+          onClose={() => setIsToggled(false)}
+          articles={Array.from(new Set( // Фильтрация уникальных кодов
+            validArticles.map(code => code.split('_')[0])
+          ))}
+        />
+      )}
     </div>
   );
 };

@@ -190,7 +190,7 @@ export const ElementsList = ({
                           borderRadius: '2px'
                         }}
                       />
-                      <span className="color-hex">{element.gradient?.colors?.[0] || element.color}</span>
+                      <span className="color-hex" style={{ userSelect: 'text' }}>{element.gradient?.colors?.[0] || element.color}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -446,18 +446,21 @@ export const ElementsList = ({
                       </label>
 
                       <label>
-                        Цвет:
-                        <div className="color-picker-wrapper">
-                          <input
-                            type="color"
-                            className="color-picker-input"
-                            value={element.color || '#333333'}
-                            onChange={(e) => handleFontChange(element.id, 'color', e.target.value)}
-                          />
-                          <div 
-                            className="color-preview"
-                            style={{ color: element.color || '#333333' }}
-                          />
+                        Цвет: 
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div className="color-picker-wrapper">
+                            <input
+                              type="color"
+                              className="color-picker-input"
+                              value={element.color || '#333333'}
+                              onChange={(e) => handleFontChange(element.id, 'color', e.target.value)}
+                            />
+                            <div 
+                              className="color-preview"
+                              style={{ color: element.color || '#333333' }}
+                            />
+                          </div>
+                          <span className="color-hex" style={{ userSelect: 'text' }}>{element.color}</span>
                         </div>
                       </label>
                     </div>

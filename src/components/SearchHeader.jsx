@@ -130,12 +130,12 @@ const SearchHeader = ({
           </div>
         )}
       </div>
-      {/*isSearchActive && <ToggleSwitch
+      {isSearchActive && <ToggleSwitch
         checked={isToggled}
         onChange={setIsToggled}
-        label="Объединить найденные товары в единый слайд (допустимо не более 10 товаров)."
+        label="Объединить найденные товары в единый слайд (допустимо не более 10 изображений)."
         size="small"
-      />*/}
+      />}
     </div>
   );
 };

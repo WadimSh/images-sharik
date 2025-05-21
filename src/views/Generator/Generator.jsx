@@ -19,15 +19,19 @@ import { FontControls } from '../../components/FontControls';
 
 export const Generator = () => {
   const { id } = useParams();
-  const [baseId, slideNumber] = id.split('_');
+  const isCollageMode = id === 'collage';
+
+  const [baseId, slideNumber] = isCollageMode || !id ? ['', ''] : id.split('_');
   const apiKey = process.env.REACT_APP_API_KEY;
 
   const storageMetaKey = `product-${baseId}`
-  const savedMetaDate = sessionStorage.getItem(storageMetaKey);
+  const savedMetaDate = isCollageMode ? null : sessionStorage.getItem(storageMetaKey);
   const initialMetaDateElement = savedMetaDate ? JSON.parse(savedMetaDate) : [];
  
   // Загрузка из sessionStorage при инициализации
-  const storageKey = `design-${id}`;
+  const storageKey = isCollageMode 
+    ? 'design-collage' 
+    : `design-${id}`;
   const savedDesign = sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
@@ -824,9 +828,12 @@ const moveElement = (fromIndex, toIndex) => {
         handleCreateTemplate={handleCreateTemplate}
       />
       <div className="content-wrapper">
-        <ProductMetaInfo 
-          initialMetaDateElement={initialMetaDateElement}
-        />
+        {!isCollageMode && (
+          <ProductMetaInfo 
+            initialMetaDateElement={initialMetaDateElement}
+          />
+        )}
+        
         <div className="main-content">
           {/* Панель добавления элементов */}
           <div className="element-toolbar">
@@ -863,11 +870,13 @@ const moveElement = (fromIndex, toIndex) => {
           </div>
         </div>
         <div className='design-area'>
-          <ProductImagesGrid 
-            images={initialMetaDateElement?.images}
-            elements={elements}
-            handleImageSelect={handleImageSelect}
-          />
+          {!isCollageMode && (
+            <ProductImagesGrid 
+              images={initialMetaDateElement?.images}
+              elements={elements}
+              handleImageSelect={handleImageSelect}
+            />
+          )}
           <div 
             ref={captureRef} 
             className="design-container"

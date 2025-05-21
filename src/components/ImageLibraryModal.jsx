@@ -32,7 +32,7 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
 
     return () => controller.abort(); // Очистка при размонтировании
   }, [isOpen]);
-  console.log(isLoading)
+  
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>
       <div className="modal-contents">

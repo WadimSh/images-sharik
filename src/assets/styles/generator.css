@@ -591,6 +591,7 @@
 /* --- */
 .design-area {
   display: flex;
+  margin: 0 auto;
 }
 
 .images-grid {
