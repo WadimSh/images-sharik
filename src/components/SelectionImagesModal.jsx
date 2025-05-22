@@ -103,7 +103,7 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
 
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>
-      <div className="modal-contents" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-contente" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Выберите изображения для коллажа</h2>
           <button onClick={onClose} className="close-btn">&times;</button>

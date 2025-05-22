@@ -71,8 +71,9 @@ export const Generator = () => {
     x: 0,
     y: 0,
   });
-  // Состояние для отслеживания обработки при запросе на удаление фона 
+  // Состояние для отслеживания обработки при запросе на удаление фона и добавления тени
   const [processingIds, setProcessingIds] = useState(new Set());
+  const [processingShedowIds, setProcessingShedowIds] = useState(new Set());
   // Добавляем состояние для редактирования текста
   const [editingTextId, setEditingTextId] = useState(null);
   const [elements, setElements] = useState(processedElements);
@@ -92,6 +93,19 @@ export const Generator = () => {
   const [selectedTextEdit, setSelectedTextEdit] = useState(null);
   // Добавили состояние для раскрытия меню со свойствами компонета
   const [expandedElementId, setExpandedElementId] = useState(null);
+  // Состояние для хранения настроек тени
+  const [shadowSetting, setShadowSetting] = useState({
+    offsetX: 15,
+    offsetY: 15,
+  });
+
+  // Функция управлением напралением тени 
+  const handleDirectionChange = (axis, value) => {
+    setShadowSetting(prev => ({
+      ...prev,
+      [axis]: prev[axis] === value ? 15 : value
+    }));
+  };
 
   // Добавим функцию для генерации уникальных ID
   const generateUniqueId = () => Date.now() + Math.floor(Math.random() * 1000);
@@ -355,7 +369,7 @@ export const Generator = () => {
         maxWidthOrHeight: 2000, // Максимальное измерение
         useWebWorker: true, // Использовать многопоточность
         fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
-        initialQuality: 0.8 // Качество сжатия (0-1)
+        initialQuality: 0.6 // Качество сжатия (0-1)
       };
   
       // Сжимаем изображение
@@ -478,7 +492,7 @@ export const Generator = () => {
       const image = UPNG.decode(arrayBuffer);
       
       // Параметры сжатия
-      const compression = 90; // Уровень сжатия (0-100)
+      const compression = 60; // Уровень сжатия (0-100)
             
       // Перекодируем с оптимизацией
       const compressedArray = UPNG.encode(
@@ -535,7 +549,110 @@ export const Generator = () => {
       });
     }
   };
-  
+
+  // Функция добавления тени через PhotoRoom API
+  const handleAddShadow = async (elementId) => {
+  try {
+      const element = elements.find(el => el.id === elementId);
+      if (!element?.image) return;
+
+      setProcessingShedowIds(prev => new Set(prev).add(elementId));
+
+      // Создаем canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Загружаем изображение
+      const img = new Image();
+      img.crossOrigin = 'anonymous'; // Для внешних URL
+
+      // Обрабатываем разные типы изображений
+      let imageSrc = element.image;
+
+      // Если это Blob или File
+      if (element.image instanceof Blob) {
+        imageSrc = URL.createObjectURL(element.image);
+      }
+      // Если это Data URL или обычный URL
+      img.src = imageSrc;
+
+      // Ожидаем загрузки изображения
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = (e) => reject(new Error('Не удалось загрузить изображение'));
+      });
+
+      // Параметры тени (можно вынести в настройки)
+      const shadowSettings = {
+        color: 'rgba(0,0,0,0.4)',
+        blur: 20,
+        offsetX: shadowSetting.offsetX,
+        offsetY: shadowSetting.offsetY,
+        padding: 40
+      };
+
+      // Рассчитываем размеры canvas
+      canvas.width = img.width + shadowSettings.padding;
+      canvas.height = img.height + shadowSettings.padding;
+
+      // Рисуем тень
+      ctx.shadowColor = shadowSettings.color;
+      ctx.shadowBlur = shadowSettings.blur;
+      ctx.shadowOffsetX = shadowSettings.offsetX;
+      ctx.shadowOffsetY = shadowSettings.offsetY;
+
+      // Позиционируем изображение по центру
+      const x = (canvas.width - img.width) / 2;
+      const y = (canvas.height - img.height) / 2;
+
+      // Рисуем изображение
+      ctx.drawImage(img, x, y);
+
+      // Конвертируем в Data URL
+      const dataUrl = canvas.toDataURL('image/png');
+
+      // Очищаем Object URL если создавали
+      if (element.image instanceof Blob) {
+        URL.revokeObjectURL(imageSrc);
+      }
+
+      // Обновляем элементы
+      const updatedElements = elements.map(el => 
+        el.id === elementId ? { ...el, image: dataUrl } : el
+      );
+
+      // Обновляем sessionStorage
+      if (element?.isProduct) {
+        try {
+          const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
+          const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
+
+          if (indexImg >= 0 && indexImg < updatedImages.length) {
+            updatedImages[indexImg] = dataUrl;
+            sessionStorage.setItem(storageMetaKey, JSON.stringify({
+              ...currentMeta,
+              images: updatedImages
+            }));
+          }
+        } catch (e) {
+          console.error('Ошибка обновления sessionStorage:', e);
+        }
+      }
+
+      setElements(updatedElements);
+
+    } catch (error) {
+      console.error('Ошибка добавления тени:', error);
+      alert(`Ошибка: ${error.message}`);
+    } finally {
+      setProcessingShedowIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(elementId);
+        return newSet;
+      });
+    }
+  };
+
   const handleRemoveElement = (id) => {
     setElements(elements.filter(el => el.id !== id));
   };
@@ -1105,10 +1222,14 @@ const moveElement = (fromIndex, toIndex) => {
           handleFlipImage={handleFlipImage}
           handleColorButtonClick={handleColorButtonClick}
           handleRemoveBackground={handleRemoveBackground}
+          handleAddShadow={handleAddShadow}
+          handleDirectionChange={handleDirectionChange}
           handleBorderRadiusChange={handleBorderRadiusChange}
           handleGradientChange={handleGradientChange}
           handleoOpacityChange={handleoOpacityChange}
           processingIds={processingIds}
+          processingShedowIds={processingShedowIds}
+          shadowSetting={shadowSetting}
           handleTextEditToggle={handleTextEditToggle}
           handleColorChange={handleColorChange}
           handleFontChange={handleFontChange}

@@ -4,6 +4,7 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
 import { MdOpacity } from "react-icons/md";
+import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
@@ -15,10 +16,14 @@ export const ElementsList = ({
   handleFlipImage,
   handleColorButtonClick,
   handleRemoveBackground,
+  handleAddShadow,
+  handleDirectionChange,
   handleBorderRadiusChange,
   handleGradientChange,
   handleoOpacityChange,
   processingIds,
+  processingShedowIds,
+  shadowSetting,
   handleTextEditToggle,
   handleColorChange,
   handleFontChange,
@@ -170,6 +175,67 @@ export const ElementsList = ({
                         <><FaWandMagicSparkles /> Удалить фон</>
                       )}
                     </button>
+                  </div>
+                )}
+
+                {(element.type === 'image' || element.type === 'element') && (
+                  <div className="element-controls line">
+                    <span>Направление тени</span>
+                    <div className="font-controls">
+                      <label>Горизонталь:
+                        <div>
+                          <button
+                            className={`direction-btn ${shadowSetting.offsetX === -15 ? 'active' : ''}`}
+                            style={{ marginRight: '8px' }}
+                            onClick={() => handleDirectionChange('offsetX', -15)}
+                          >
+                            <FaArrowLeft />
+                          </button>
+                          <button
+                            className={`direction-btn ${shadowSetting.offsetX === 15 ? 'active' : ''}`}
+                            onClick={() => handleDirectionChange('offsetX', 15)}
+                          >
+                            <FaArrowRight />
+                          </button>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="font-controls">
+                      <label>Вертикаль:
+                        <div>
+                          <button
+                            className={`direction-btn ${shadowSetting.offsetY === -15 ? 'active' : ''}`}
+                            style={{ marginRight: '8px' }}
+                            onClick={() => handleDirectionChange('offsetY', -15)}
+                          >
+                            <FaArrowUp />
+                          </button>
+                          <button
+                            className={`direction-btn ${shadowSetting.offsetY === 15 ? 'active' : ''}`}
+                            onClick={() => handleDirectionChange('offsetY', 15)}
+                          >
+                            <FaArrowDown />
+                          </button>
+                        </div>
+                      </label>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddShadow(element.id, 15, 15);
+                      }}
+                      className="remove-bg-button"
+                      title="Добавить тень"
+                      disabled={processingShedowIds.has(element.id)}
+                    >
+                      {processingShedowIds.has(element.id) ? (
+                        <div className="spinner"></div>
+                      ) : (
+                        <><FaWandMagicSparkles /> Добавить тень</>
+                      )}
+                    </button>
+
                   </div>
                 )}
 
