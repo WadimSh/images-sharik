@@ -1120,6 +1120,7 @@ const moveElement = (fromIndex, toIndex) => {
                       onDrag={(pos) => handleDrag(element.id, pos)}
                       onRemove={() => handleRemoveElement(element.id)}
                       onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                       onTextChange={(newText) => {
                         setElements(prev => prev.map(el => 
                           el.id === element.id ? {...el, text: newText} : el

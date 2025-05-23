@@ -10,6 +10,7 @@ export const TextElement = ({
   containerHeight,
   onTextChange,
   onRotate,
+  onResize,
   isEditing,      // Принимаем состояние редактирования извне
   onEditToggle,    // Колбэк для переключения состояния
   onContextMenu,
@@ -19,16 +20,33 @@ export const TextElement = ({
 }) => {
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
+  const textContainerRef = useRef(null);
 
   const textStyle = {
+    position: 'relative',
     color: element.color || '#333',
     fontSize: `${element.fontSize || 32}px`,
     fontFamily: element.fontFamily || 'HeliosCond',
     fontWeight: element.fontWeight || 'normal',
     fontStyle: element.fontStyle || 'normal',
+    lineHeight: 1,
+    whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
-    maxWidth: '100%',
-    position: 'relative',
+    overflow: 'hidden',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: element.textAlign?.vertical || 'flex-start',
+    justifyContent: element.textAlign?.horizontal || 'left',
+  };
+
+  const handleResize = (newSize) => {
+    onResize({
+      width: newSize.width,
+      height: newSize.height,
+      x: newSize.x ?? position.x, // Сохраняем новую позицию
+      y: newSize.y ?? position.y
+    });
   };
 
   useEffect(() => {
@@ -58,32 +76,52 @@ export const TextElement = ({
       onDrag={onDrag}
       containerWidth={containerWidth}
       containerHeight={containerHeight}
-      dimensions={{ width: 'auto', height: 'auto' }}
+      dimensions={{ 
+        width: element.width || 'auto', 
+        height: element.height || 'auto' 
+      }}
+      onResize={handleResize}
       onRotate={onRotate}
       rotation={element.rotation || 0}
       onContextMenu={onContextMenu}  
       onClick={onClick}
       selectedElementId={selectedElementId}
       onDeselect={onDeselect}
+      splitResizable
+      hideOverlay={isEditing}
     >
-      <div className="text-content-wrapper" style={{ transform: `rotate(${element.rotation}deg)` }}>
+      <div 
+        className="text-content-wrapper" 
+        ref={textContainerRef}
+        style={{ 
+          transform: `rotate(${element.rotation}deg)`,
+          width: element.width ? `${element.width}px` : 'auto',
+          height: element.height ? `${element.height}px` : 'auto',
+          boxSizing: 'border-box'
+        }}
+      >
         {isEditing ? (
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className='text-input'
-            style={{ maxWidth: `${containerWidth - position.x}px` }}
+            style={{
+              ...textStyle,
+              width: '100%',
+              height: '100%',
+              resize: 'none',
+              border: 'none',
+              outline: 'none',
+            }}
           />
         ) : (
-          <span
+          <div
             style={textStyle}
-          >
-            {editedText}
-          </span>
+            dangerouslySetInnerHTML={{ __html: editedText.replace(/\n/g, '<br/>') }}
+          />
         )}
       </div>
     </DraggableElement>

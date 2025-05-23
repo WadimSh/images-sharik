@@ -15,7 +15,8 @@ const DraggableElement = ({
   rotation = 0,
   onContextMenu,
   onClick,
-  onDeselect
+  onDeselect,
+  hideOverlay = false
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -50,7 +51,7 @@ const DraggableElement = ({
   };
 
   useEffect(() => {
-  if (selectedElementId === null) {
+  if (selectedElementId === null || hideOverlay) {
     setIsOverlayVisible(false);
     return;
   }
@@ -64,7 +65,7 @@ const DraggableElement = ({
   } else {
     setIsOverlayVisible(false);
   }
-}, [selectedElementId, id, position, dimensions]);
+}, [selectedElementId, id, position, dimensions, hideOverlay]);
 
   // Клик вне элемента
   useEffect(() => {
@@ -139,6 +140,14 @@ const DraggableElement = ({
       startY: rect.top
     };
     setIsResizing(true);
+
+    // Обновляем размеры в родительском компоненте
+    onResize?.({
+      width: rect.width,
+      height: rect.height,
+      x: position.x,
+      y: position.y
+    });
   };
   
   const handleDirectionalResize = (e, direction) => {

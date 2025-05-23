@@ -27,17 +27,37 @@ export const PreviewDesign = ({ elements }) => (
                   }} className="preview-element" />;
         case 'text':
           return (
-            <span key={element.id} style={{
-              ...style, 
-              fontSize: `${(element.fontSize || 24) * 0.61}px`,
-              fontFamily: element.fontFamily,
-              fontWeight: element.fontWeight || 'normal',
-              fontStyle: element.fontStyle || 'normal',
-              color: element.color,
-              whiteSpace: 'nowrap'
-            }} className="preview-text">
-              {element.text}
-            </span>
+            <div 
+                  key={element.id} 
+                  style={{
+                    ...style,
+                    fontSize: `${(element.fontSize || 24) * 0.62}px`,
+                    fontFamily: element.fontFamily,
+                    fontWeight: element.fontWeight,
+                    fontStyle: element.fontStyle,
+                    color: element.color,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: element.textAlign?.horizontal || 'flex-start',
+                    justifyContent: element.textAlign?.vertical || 'flex-start',
+                    textAlign: element.textAlign?.horizontal || 'left',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                    lineHeight: 1,
+                  }}
+                >
+                  {element.text.split('\n').map((line, i) => (
+                    <span key={i} style={{
+                      width: '100%',
+                      display: 'block'
+                    }}>
+                      {line}
+                    </span>
+                  ))}
+                </div>
+            
           );
         case 'shape':
           return <div key={element.id} 
