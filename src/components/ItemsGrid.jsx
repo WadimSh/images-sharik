@@ -29,40 +29,55 @@ const ItemsGrid = ({ items, onItemsUpdate, templates, isToggled }) => {
 
   // Функция для создания нового дизайна
   const handleCreateNewDesign = (baseCode) => {
-    const existingNumbers = items
-      .filter(item => item.startsWith(`${baseCode}_`))
-      .map(item => parseInt(item.split('_')[1]))
-      .filter(num => !isNaN(num));
-  
-    const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-    const newDesignKey = `${baseCode}_${newNumber}`;
-  
-    // Получаем метаданные продукта
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-  
-    // Базовые данные для шаблона
-    const templateData = {
-      code: newDesignKey,
-      image: productMeta.images?.[0] || '',
-      category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
-      title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
-      multiplicity: productMeta.multiplicity,
-      size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
-      brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || ''
-    };
-  
-    // Генерируем дизайн из шаблона default
-    const defaultTemplate = templates.default || [];
-    const newDesign = replacePlaceholders(defaultTemplate, templateData);
-  
-    // Сохраняем в sessionStorage
-    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
-  
-    // Обновляем состояние
-    onItemsUpdate([...items, newDesignKey]);
+  const existingNumbers = items
+    .filter(item => item.startsWith(`${baseCode}_`))
+    .map(item => parseInt(item.split('_')[1]))
+    .filter(num => !isNaN(num));
+
+  const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+  const newDesignKey = `${baseCode}_${newNumber}`;
+
+  const productMeta = JSON.parse(
+    sessionStorage.getItem(`product-${baseCode}`) || '{}'
+  );
+
+  // Определяем текущий шаблон группы
+  const templateKey = productMeta.templateType || 'default';
+  let selectedTemplate = templates.default;
+
+  // Выбираем подходящий шаблон в зависимости от типа
+  if (templateKey === 'belbal' || templateKey === 'gemar') {
+    const templateArray = templates[templateKey] || [];
+    const imageIndex = newNumber - 1;
+    const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+    selectedTemplate = templateArray[templateIndex] || [];
+  } else if (templates[templateKey]) {
+    selectedTemplate = templates[templateKey];
+  }
+
+  // Выбираем изображение по индексу или первое
+  const imageIndex = newNumber - 1;
+  const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
+
+  // Формируем данные для шаблона
+  const templateData = {
+    code: newDesignKey,
+    image: image,
+    category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+    title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
+    multiplicity: productMeta.multiplicity,
+    size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
+    brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || '',
+    imageIndex: imageIndex
   };
+
+  // Генерируем и сохраняем дизайн
+  const newDesign = replacePlaceholders(selectedTemplate, templateData);
+  sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
+
+  // Обновляем состояние
+  onItemsUpdate([...items, newDesignKey]);
+};
   
   // Функция для получения уникальных базовых артикулов
   const getUniqueBaseCodes = () => {
@@ -184,8 +199,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates, isToggled }) => {
 
   // Объект перевода названий шаблонов
   const templateOptions = {
-    belbal: 'Шаблон Belbal',
-    gemar: 'Шаблон Gemar',
+    belbal: 'Шаблон Belbal (3 слайда)',
+    gemar: 'Шаблон Gemar (3 слайда)',
     main: 'Базовый шаблон',
     default: 'Шаблон картинка',
   };
