@@ -26,6 +26,27 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'FreeSetRegular';
+  src: url('./assets/fonts/ofont.ru_FreeSetTT.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FreeSetBold';
+  src: url('./assets/fonts/ofont.ru_FreeSetBoldTT.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MyriadPro';
+  src: url('./assets/fonts/MyriadPro-BlackCond.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
