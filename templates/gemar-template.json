@@ -203,7 +203,7 @@
             "y": 28.125
         },
         "isFlipped": false,
-        "image": "/images/massege-01.png",
+        "image": "/images/message-01.png",
         "width": 185,
         "height": 74.7,
         "originalWidth": 525,
@@ -262,7 +262,7 @@
             "y": 36
         },
         "isFlipped": false,
-        "image": "/images/massege-02.png",
+        "image": "/images/message-02.png",
         "width": 165,
         "height": 135.5,
         "originalWidth": 358,
