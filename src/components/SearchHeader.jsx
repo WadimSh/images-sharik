@@ -1,4 +1,4 @@
-import { ToggleSwitch } from "./ui/ToggleSwitch/ToggleSwitch";
+import { ToggleSwitch } from "../ui/ToggleSwitch/ToggleSwitch";
 
 const SearchHeader = ({ 
   onSearch, 

@@ -27,7 +27,7 @@ export const HeaderSection = ({
   const getHeaderTitle = () => {
     const slide = slideNumber || 'collage'; // По умолчанию первый слайд
     return slide === 'collage' 
-      ? 'Коллаж' 
+      ? 'Коллаж для WB' 
       : slide === '1' 
         ? 'Основной слайд' 
         : `Слайд ${slide}`;
@@ -166,7 +166,7 @@ export const HeaderSection = ({
         {'< Назад'}
       </button>
       <h2>{getHeaderTitle()}</h2>
-      <div className="template-select-wrapper">
+      {slideNumber && <div className="template-select-wrapper">
         {Object.keys(templates).length > 0 && (
           <div className="template-select-container">
             <div 
@@ -220,10 +220,10 @@ export const HeaderSection = ({
             )}
           </div>
         )}
-      </div>
-      <button onClick={handleCreateTemplate} className="template-button">
+      </div>}
+      {slideNumber && <button onClick={handleCreateTemplate} className="template-button">
         <FaClipboardCheck /> Создать макет
-      </button>
+      </button>}
       <button onClick={handleDownload} className="download-button">
         <FaDownload /> Скачать дизайн
       </button>

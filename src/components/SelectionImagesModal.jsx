@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
+import { getCode } from "../constants/dataMap";
+
 export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -60,45 +62,96 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   };
 
   const handleConfirmSelection = () => {
-  const startPosition = { x: 20, y: 20 };
-  const horizontalStep = 160;
-  const verticalStep = 180; // Шаг между рядами
-  const elementsPerRow = 3;
-  const overlap = 40;
+  const imagesCount = selectedImages.length;
+  let collageElements;
 
-  const collageElements = selectedImages.map(({ imageUrl }, index) => {
-    const row = Math.floor(index / elementsPerRow);
-    const col = index % elementsPerRow;
-
-    // Позиция X с наездом
-    const positionX = startPosition.x + (horizontalStep * col) - (overlap * col);
+  // Функция для создания элементов изображения и текста
+  const createCollageElements = (item, index, imageSize, imageX, imageY) => {
+    const { imageUrl, productCode } = item;
     
-    // Позиция Y без смещения внутри ряда
-    const positionY = startPosition.y + (verticalStep * row) + (overlap * col);
-
-    // Границы холста
-    const maxX = 450 - 146;
-    const maxY = 600 - 146;
-
-    return {
-      id: Date.now() + index,
+    // Элемент изображения
+    const imageElement = {
+      id: Date.now() + index * 2,
       type: "image",
-      position: {
-        x: Math.min(positionX, maxX),
-        y: Math.min(positionY, maxY)
-      },
+      position: { x: imageX, y: imageY },
       isFlipped: false,
       image: imageUrl,
-      width: 146,
-      height: 146,
+      width: imageSize,
+      height: imageSize,
       originalWidth: 750,
       originalHeight: 750
     };
-  });
 
+    // Элемент текста
+    const code = getCode(productCode);
+    const textX = imageX + (imageSize - 128) / 2; // Центрирование текста (предполагаемая ширина текста 128px)
+    const textY = imageY + imageSize - 38; // 28px (fontSize) + 10px (отступ)
+
+    const textElement = {
+      id: Date.now() + index * 2 + 1,
+      type: "text",
+      position: { x: textX, y: textY },
+      text: code,
+      fontSize: 28,
+      color: "#333333",
+      fontFamily: "HeliosCond",
+      fontStyle: "normal",
+      fontWeight: "normal"
+    };
+
+    return [imageElement, textElement];
+  };
+
+  if (imagesCount === 2) {
+    collageElements = selectedImages.flatMap((item, index) => {
+      const imageSize = 250;
+      const positions = [
+        { x: 15, y: 15 },
+        { x: 180, y: 275 }
+      ];
+      return createCollageElements(
+        item,
+        index,
+        imageSize,
+        positions[index].x,
+        positions[index].y
+      );
+    });
+  } else if (imagesCount >= 3 && imagesCount <= 6) {
+    const imageSize = 190;
+    const elementsPerRow = 2;
+    const gap = 10;
+    const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
+    const startY = 5;
+
+    collageElements = selectedImages.flatMap((item, index) => {
+      const row = Math.floor(index / elementsPerRow);
+      const col = index % elementsPerRow;
+      const imageX = startX + col * (imageSize + gap);
+      const imageY = startY + row * (imageSize + gap);
+      
+      return createCollageElements(item, index, imageSize, imageX, imageY);
+    });
+  } else {
+    const imageSize = 145;
+    const elementsPerRow = 3;
+    const gap = 5;
+    const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
+    const startY = 5;
+
+    collageElements = selectedImages.flatMap((item, index) => {
+      const row = Math.floor(index / elementsPerRow);
+      const col = index % elementsPerRow;
+      const imageX = startX + col * (imageSize + gap);
+      const imageY = startY + row * (imageSize + gap);
+      
+      return createCollageElements(item, index, imageSize, imageX, imageY);
+    });
+  }
+
+  // Сохранение данных и переход
   const selectedArticles = [...new Set(selectedImages.map(img => img.productCode))];
   sessionStorage.setItem('collage-articles', JSON.stringify(selectedArticles));
-
   sessionStorage.setItem("design-collage", JSON.stringify(collageElements));
   onClose();
   navigate('/template/collage');
@@ -166,6 +219,7 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
           <button 
             className="confirm-button"
             onClick={handleConfirmSelection}
+            disabled={selectedImages.length <= 1}
           >
             Создать коллаж
           </button>

@@ -157,6 +157,11 @@
   background: #0056b3;
 }
 
+.confirm-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
 .limit-warning {
   background: #fff3cd;
   color: #856404;
