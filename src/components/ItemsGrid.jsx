@@ -103,7 +103,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates, isToggled }) => {
     // Проверяем нужно ли удалять метаданные товара
     const productCode = itemId.split('_').slice(0, -1).join('_');
     const remaining = items.filter(item => item.startsWith(`${productCode}_`));
-    console.log(remaining)
+    
     if (remaining.length === 1) {
       sessionStorage.removeItem(`product-${productCode}`);
     }

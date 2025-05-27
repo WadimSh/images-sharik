@@ -96,6 +96,9 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
     };
   });
 
+  const selectedArticles = [...new Set(selectedImages.map(img => img.productCode))];
+  sessionStorage.setItem('collage-articles', JSON.stringify(selectedArticles));
+
   sessionStorage.setItem("design-collage", JSON.stringify(collageElements));
   onClose();
   navigate('/template/collage');

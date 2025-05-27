@@ -22,13 +22,15 @@ export const HeaderSection = ({
   const handleBack = () => {
     navigate(-1);
   };
-
+  
   // Функция для формирования заголовка
   const getHeaderTitle = () => {
-    const slide = slideNumber || '1'; // По умолчанию первый слайд
-    return slide === '1' 
-      ? 'Основной слайд' 
-      : `Слайд ${slide}`;
+    const slide = slideNumber || 'collage'; // По умолчанию первый слайд
+    return slide === 'collage' 
+      ? 'Коллаж' 
+      : slide === '1' 
+        ? 'Основной слайд' 
+        : `Слайд ${slide}`;
   };
 
   // Функция для удаления макета
@@ -74,10 +76,20 @@ export const HeaderSection = ({
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Формирование имени файла
-      const [baseCode, slideNumber] = id.split('_');
-      const slideType = slideNumber === '1' ? 'main' : `slide${slideNumber}`;
+      let baseCode, slideType;
+      let slideNumberPart = slideNumber;
+      
+      // Определяем базовый код в зависимости от режима
+      if (slideNumber === '') {
+        const articles = JSON.parse(sessionStorage.getItem('collage-articles')) || [];
+        baseCode = articles.length > 0 ? articles.join('_') : 'collage';
+        slideType = 'collage';
+      } else {
+        [baseCode, slideNumberPart] = id.split('_');
+        slideType = slideNumberPart === '1' ? 'main' : `slide${slideNumberPart}`;
+      }
     
+      // Формируем дату и время
       const now = new Date();
       const datePart = [
         String(now.getDate()).padStart(2, '0'),
@@ -90,6 +102,7 @@ export const HeaderSection = ({
         String(now.getMinutes()).padStart(2, '0')
       ].join('');
 
+      // Формирование имени файла
       const fileName = `${baseCode}_WB_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
       // Генерация изображения
