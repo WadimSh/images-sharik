@@ -12,6 +12,7 @@ export const ToggleSwitch = ({
   className = '',
 }) => {
   const [isChecked, setIsChecked] = useState(checked);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     setIsChecked(checked);
@@ -20,8 +21,14 @@ export const ToggleSwitch = ({
   const handleToggle = () => {
     if (!disabled) {
       const newState = !isChecked;
+      setIsAnimating(true);
       setIsChecked(newState);
-      onChange?.(newState);
+
+      // Задержка соответствует времени анимации в CSS (0.25s)
+      setTimeout(() => {
+        setIsAnimating(false);
+        onChange?.(newState);
+      }, 250);
     }
   };
 
@@ -45,7 +52,7 @@ export const ToggleSwitch = ({
         type="checkbox"
         checked={isChecked}
         onChange={handleToggle}
-        disabled={disabled}
+        disabled={disabled || isAnimating}
         aria-checked={isChecked}
         role="switch"
         className="toggle-input"
