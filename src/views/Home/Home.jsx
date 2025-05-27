@@ -187,35 +187,35 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    //setLoading(true);
-    //
-    //const searchQuery = normalizedArticles.join(' ');
-    //const encodedSearch = encodeURIComponent(searchQuery);
-    //
-    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=${normalizedArticles.length}&search=${encodedSearch}`)
-    //  .then(response => response.json())
-    //  .then(data => {
-    //    if (data.results.length === 0) {
-    //      const message = normalizedArticles.length === 1 
-    //        ? "Товар с таким артикулом не активен." 
-    //        : "Товары с такими артикулами не активны.";
-    //      setInfoMessage(message);
-    //      return Promise.reject(message);
-    //    }
-    //
-    //    const productIds = data.results.map(product => product.id);
-    //    const idsParam = productIds.join(',');
-    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //  })
-    //  .then(response => response?.json())
-    //  .then(detailedData => {
-    //    if (!detailedData) return;
+  setLoading(true);
+  
+  const searchQuery = normalizedArticles.join(' ');
+  const encodedSearch = encodeURIComponent(searchQuery);
+  
+  fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=${normalizedArticles.length}&search=${encodedSearch}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.results.length === 0) {
+        const message = normalizedArticles.length === 1 
+          ? "Товар с таким артикулом не активен." 
+          : "Товары с такими артикулами не активны.";
+        setInfoMessage(message);
+        return Promise.reject(message);
+      }
+  
+      const productIds = data.results.map(product => product.id);
+      const idsParam = productIds.join(',');
+      return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+    })
+    .then(response => response?.json())
+    .then(detailedData => {
+      if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      const processedResults = processProductsData(data);
-      const processedMetaResults = processProductsMeta(data);
-      //const processedResults = processProductsData(detailedData);
-      //const processedMetaResults = processProductsMeta(detailedData);
+      //const processedResults = processProductsData(data);
+      //const processedMetaResults = processProductsMeta(data);
+      const processedResults = processProductsData(detailedData);
+      const processedMetaResults = processProductsMeta(detailedData);
       
       
       // Сохраняем в sessionStorage
@@ -246,16 +246,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    //})
-    //.catch(error => {
-    //  console.error('Ошибка:', error);
-    //  setError(error.message || 'Произошла ошибка при поиске');
-    //  setValidArticles([]);
-    //  setIsSearchActive(false);
-    //})
-    //.finally(() => {
-    //  setLoading(false);
-    //});
+  })
+  .catch(error => {
+    console.error('Ошибка:', error);
+    setError(error.message || 'Произошла ошибка при поиске');
+    setValidArticles([]);
+    setIsSearchActive(false);
+  })
+  .finally(() => {
+    setLoading(false);
+  });
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

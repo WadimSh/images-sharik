@@ -16,6 +16,7 @@ import { ElementsElement } from '../../components/ElementsElement';
 import { ImageLibraryModal } from '../../components/ImageLibraryModal';
 import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
+import { CollagePreview } from '../../components/CollagePreview';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -98,6 +99,8 @@ export const Generator = () => {
     offsetX: 15,
     offsetY: 15,
   });
+
+  const [initialCollage] = useState(processedElements);
 
   // Функция управлением напралением тени 
   const handleDirectionChange = (axis, value) => {
@@ -698,6 +701,41 @@ const moveElement = (fromIndex, toIndex) => {
     } 
   };
 
+  const handleProductSelect = (item) => {
+    const newElements = [...elements];
+
+    // Восстанавливаем изображение если оно было удалено
+    if (!elements.some(el => el.id === item.imageId)) {
+      newElements.push({
+        id: item.imageId,
+        type: "image",
+        position: item.imagePosition,
+        image: item.imageUrl,
+        width: item.imageWidth,
+        height: item.imageHeight,
+        originalWidth: item.originalWidth,
+        originalHeight: item.originalHeight
+      });
+    }
+
+    // Восстанавливаем код если он был удален
+    if (item.codeId && !elements.some(el => el.id === item.codeId)) {
+      newElements.push({
+        id: item.codeId,
+        type: "text",
+        position: item.codePosition,
+        text: item.productCode,
+        fontSize: item.fontSize,
+        color: item.textColor,
+        fontFamily: item.fontFamily
+      });
+    }
+
+    if (newElements.length > elements.length) {
+      setElements(newElements);
+    }
+  };
+
   const handleFlipImage = (id) => {
     setElements(prev => prev.map(el => 
       el.id === id ? {...el, isFlipped: !el.isFlipped} : el
@@ -931,7 +969,7 @@ const moveElement = (fromIndex, toIndex) => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleCopy, handlePaste, handleRemoveElement, selectedElementId, copiedElement, editingTextId]);
-  
+  console.log(elements)
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -987,13 +1025,20 @@ const moveElement = (fromIndex, toIndex) => {
           </div>
         </div>
         <div className='design-area'>
-          {!isCollageMode && (
+          {!isCollageMode ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
               elements={elements}
               handleImageSelect={handleImageSelect}
             />
+          ) : (
+            <CollagePreview
+              initialElements={initialCollage} // Передаем исходные элементы
+              currentElements={elements} // Передаем текущие элементы
+              onItemClick={handleProductSelect}
+            />
           )}
+
           <div 
             ref={captureRef} 
             className="design-container"
