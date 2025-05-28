@@ -5091,5 +5091,5 @@ export const codeMapping = {
 };
 
 export const getCode = (key) => {
-  return codeMapping[key] || 'Не найдено';
+  return codeMapping[key] || 'нет на WB';
 };

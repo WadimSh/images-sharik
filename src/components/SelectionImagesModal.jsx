@@ -62,100 +62,102 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   };
 
   const handleConfirmSelection = () => {
-  const imagesCount = selectedImages.length;
-  let collageElements;
+    const imagesCount = selectedImages.length;
+    let collageElements;
 
-  // Функция для создания элементов изображения и текста
-  const createCollageElements = (item, index, imageSize, imageX, imageY) => {
-    const { imageUrl, productCode } = item;
-    
-    // Элемент изображения
-    const imageElement = {
-      id: Date.now() + index * 2,
-      type: "image",
-      position: { x: imageX, y: imageY },
-      isFlipped: false,
-      image: imageUrl,
-      width: imageSize,
-      height: imageSize,
-      originalWidth: 750,
-      originalHeight: 750
+    // Функция для создания элементов изображения и текста
+    const createCollageElements = (item, index, imageSize, imageX, imageY) => {
+      const { imageUrl, productCode } = item;
+
+      // Элемент изображения
+      const imageElement = {
+        id: Date.now() + index * 2,
+        type: "image",
+        position: { x: imageX, y: imageY },
+        isFlipped: false,
+        image: imageUrl,
+        width: imageSize,
+        height: imageSize,
+        originalWidth: 750,
+        originalHeight: 750,
+        isProduct: true
+      };
+
+      // Элемент текста
+      const code = getCode(productCode);
+      const textX = imageX + (imageSize - 128) / 2; // Центрирование текста (предполагаемая ширина текста 128px)
+      const textY = imageY + imageSize - 38; // 28px (fontSize) + 10px (отступ)
+
+      const textElement = {
+        id: Date.now() + index * 2 + 1,
+        type: "text",
+        position: { x: textX, y: textY },
+        text: code,
+        fontSize: 24,
+        color: "#333333",
+        fontFamily: "FreeSetBold",
+        fontStyle: "normal",
+        fontWeight: "normal",
+        isProductCode: true
+      };
+
+      return [imageElement, textElement];
     };
 
-    // Элемент текста
-    const code = getCode(productCode);
-    const textX = imageX + (imageSize - 128) / 2; // Центрирование текста (предполагаемая ширина текста 128px)
-    const textY = imageY + imageSize - 38; // 28px (fontSize) + 10px (отступ)
+    if (imagesCount === 2) {
+      collageElements = selectedImages.flatMap((item, index) => {
+        const imageSize = 250;
+        const positions = [
+          { x: 15, y: 15 },
+          { x: 180, y: 275 }
+        ];
+        return createCollageElements(
+          item,
+          index,
+          imageSize,
+          positions[index].x,
+          positions[index].y
+        );
+      });
+    } else if (imagesCount >= 3 && imagesCount <= 6) {
+      const imageSize = 190;
+      const elementsPerRow = 2;
+      const gap = 10;
+      const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
+      const startY = 5;
 
-    const textElement = {
-      id: Date.now() + index * 2 + 1,
-      type: "text",
-      position: { x: textX, y: textY },
-      text: code,
-      fontSize: 28,
-      color: "#333333",
-      fontFamily: "HeliosCond",
-      fontStyle: "normal",
-      fontWeight: "normal"
-    };
+      collageElements = selectedImages.flatMap((item, index) => {
+        const row = Math.floor(index / elementsPerRow);
+        const col = index % elementsPerRow;
+        const imageX = startX + col * (imageSize + gap);
+        const imageY = startY + row * (imageSize + gap);
 
-    return [imageElement, textElement];
+        return createCollageElements(item, index, imageSize, imageX, imageY);
+      });
+    } else {
+      const imageSize = 145;
+      const elementsPerRow = 3;
+      const gap = 5;
+      const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
+      const startY = 5;
+
+      collageElements = selectedImages.flatMap((item, index) => {
+        const row = Math.floor(index / elementsPerRow);
+        const col = index % elementsPerRow;
+        const imageX = startX + col * (imageSize + gap);
+        const imageY = startY + row * (imageSize + gap);
+
+        return createCollageElements(item, index, imageSize, imageX, imageY);
+      });
+    }
+
+    // Сохранение данных и переход
+    const selectedArticles = [...new Set(selectedImages.map(img => img.productCode))];
+    sessionStorage.setItem('collage-articles', JSON.stringify(selectedArticles));
+    sessionStorage.setItem("design-collage", JSON.stringify(collageElements));
+    onClose();
+    navigate('/template/collage');
   };
-
-  if (imagesCount === 2) {
-    collageElements = selectedImages.flatMap((item, index) => {
-      const imageSize = 250;
-      const positions = [
-        { x: 15, y: 15 },
-        { x: 180, y: 275 }
-      ];
-      return createCollageElements(
-        item,
-        index,
-        imageSize,
-        positions[index].x,
-        positions[index].y
-      );
-    });
-  } else if (imagesCount >= 3 && imagesCount <= 6) {
-    const imageSize = 190;
-    const elementsPerRow = 2;
-    const gap = 10;
-    const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
-    const startY = 5;
-
-    collageElements = selectedImages.flatMap((item, index) => {
-      const row = Math.floor(index / elementsPerRow);
-      const col = index % elementsPerRow;
-      const imageX = startX + col * (imageSize + gap);
-      const imageY = startY + row * (imageSize + gap);
-      
-      return createCollageElements(item, index, imageSize, imageX, imageY);
-    });
-  } else {
-    const imageSize = 145;
-    const elementsPerRow = 3;
-    const gap = 5;
-    const startX = (450 - (elementsPerRow * imageSize + (elementsPerRow - 1) * gap)) / 2;
-    const startY = 5;
-
-    collageElements = selectedImages.flatMap((item, index) => {
-      const row = Math.floor(index / elementsPerRow);
-      const col = index % elementsPerRow;
-      const imageX = startX + col * (imageSize + gap);
-      const imageY = startY + row * (imageSize + gap);
-      
-      return createCollageElements(item, index, imageSize, imageX, imageY);
-    });
-  }
-
-  // Сохранение данных и переход
-  const selectedArticles = [...new Set(selectedImages.map(img => img.productCode))];
-  sessionStorage.setItem('collage-articles', JSON.stringify(selectedArticles));
-  sessionStorage.setItem("design-collage", JSON.stringify(collageElements));
-  onClose();
-  navigate('/template/collage');
-};
 
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>

@@ -11,8 +11,14 @@ export const HeaderSection = ({
   setTemplates,
   selectedTemplate,
   setSelectedTemplate,
+  collageTemples,
+  setCollageTemples,
+  selectedCollageTemple,
+  setSelectedCollageTemple,
   loadTemplate,
-  handleCreateTemplate
+  loadCollageTemplate,
+  handleCreateTemplate,
+  handleCreateCollageTemple
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,6 +46,14 @@ export const HeaderSection = ({
     localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
     setTemplates(updatedTemplates);
     if (selectedTemplate === templateName) setSelectedTemplate('');
+  };
+
+  const handleDeleteCollageTemple = (templateName) => {
+    const updatedTemplates = { ...collageTemples };
+    delete updatedTemplates[templateName];
+    localStorage.setItem('collagesLocal', JSON.stringify(updatedTemplates));
+    setCollageTemples(updatedTemplates);
+    if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
   };
 
   // Функция выгрузки макета в одельный файл
@@ -160,70 +174,138 @@ export const HeaderSection = ({
     return () => window.removeEventListener('storage', loadTemplates);
   }, []);
 
+  useEffect(() => {
+    const loadTemplates = () => {
+      const savedTemplates = localStorage.getItem('collagesLocal');
+      if (savedTemplates) {
+        setCollageTemples(JSON.parse(savedTemplates));
+      }
+    };
+  
+    loadTemplates();
+    // Слушаем изменения в localStorage
+    window.addEventListener('storage', loadTemplates);
+    return () => window.removeEventListener('storage', loadTemplates);
+  }, []);
+
   return (
     <div className="header-section">
       <button onClick={handleBack} className='button-back'>
         {'< Назад'}
       </button>
       <h2>{getHeaderTitle()}</h2>
-      {slideNumber && <div className="template-select-wrapper">
-        {Object.keys(templates).length > 0 && (
-          <div className="template-select-container">
-            <div 
-              className="template-select-header"
-              onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
-            >
-              <span className="selected-template-text">
-                {selectedTemplate || 'Выберите макет'}
-              </span>
-              <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
-            </div>
-            {isTemplateListOpen && (
-              <div className="template-list">
-                {Object.keys(templates).map(name => (
-                  <div key={name} className="template-item">
-                    <span 
-                      className="template-name"
-                      onClick={() => {
-                        setSelectedTemplate(name);
-                        loadTemplate(name);
-                        setIsTemplateListOpen(false);
-                      }}
-                    >
-                      {name}
-                    </span>
-                    <div className="template-buttons">
-                      <button 
-                        className="export-template-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleExportTemplate(name);
-                        }}
-                        title="Сохранить в файл"
-                      >
-                        <FaSave />
-                      </button>
-                      <button 
-                        className="delete-template-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteTemplate(name);
-                        }}
-                        title="Удалить макет"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                ))}
+      {slideNumber ? (
+        <div className="template-select-wrapper">
+          {Object.keys(templates).length > 0 && (
+            <div className="template-select-container">
+              <div 
+                className="template-select-header"
+                onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
+              >
+                <span className="selected-template-text">
+                  {selectedTemplate || 'Выберите макет'}
+                </span>
+                <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
               </div>
-            )}
-          </div>
-        )}
-      </div>}
-      {slideNumber && <button onClick={handleCreateTemplate} className="template-button">
-        <FaClipboardCheck /> Создать макет
-      </button>}
+              {isTemplateListOpen && (
+                <div className="template-list">
+                  {Object.keys(templates).map(name => (
+                    <div key={name} className="template-item">
+                      <span 
+                        className="template-name"
+                        onClick={() => {
+                          setSelectedTemplate(name);
+                          loadTemplate(name);
+                          setIsTemplateListOpen(false);
+                        }}
+                      >
+                        {name}
+                      </span>
+                      <div className="template-buttons">
+                        <button 
+                          className="export-template-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleExportTemplate(name);
+                          }}
+                          title="Сохранить в файл"
+                        >
+                          <FaSave />
+                        </button>
+                        <button 
+                          className="delete-template-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTemplate(name);
+                          }}
+                          title="Удалить макет"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="template-select-wrapper">
+          {Object.keys(collageTemples).length > 0 && (
+            <div className="template-select-container">
+              <div 
+                className="template-select-header"
+                onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
+              >
+                <span className="selected-template-text">
+                  {selectedCollageTemple || 'Выберите макет'}
+                </span>
+                <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
+              </div>
+              {isTemplateListOpen && (
+                <div className="template-list">
+                  {Object.keys(collageTemples).map(name => (
+                    <div key={name} className="template-item">
+                      <span 
+                        className="template-name"
+                        onClick={() => {
+                          setSelectedCollageTemple(name);
+                          loadCollageTemplate(name);
+                          setIsTemplateListOpen(false);
+                        }}
+                      >
+                        {name}
+                      </span>
+                      <div className="template-buttons">
+                        <button 
+                          className="delete-template-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCollageTemple(name);
+                          }}
+                          title="Удалить макет"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {slideNumber ? (
+          <button onClick={handleCreateTemplate} className="template-button">
+            <FaClipboardCheck /> Создать макет
+          </button>
+        ) : (
+          <button onClick={handleCreateCollageTemple} className="template-button">
+            <FaClipboardCheck /> Создать макет
+          </button>
+      )}
       <button onClick={handleDownload} className="download-button">
         <FaDownload /> Скачать дизайн
       </button>

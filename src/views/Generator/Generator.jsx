@@ -17,6 +17,7 @@ import { ImageLibraryModal } from '../../components/ImageLibraryModal';
 import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
+import { CollageTempleModal } from '../../components/CollageTempleModal';
 
 import { getCode } from '../../constants/dataMap';
 
@@ -86,6 +87,11 @@ export const Generator = () => {
   // Для работы с макетами
   const [templates, setTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  // Состояния для модалки создания макетов коллажей
+  const [isCollageTempleModalOpen, setIsCollageTempleModalOpen] = useState(false);
+  // Для работы с макетами коллажей
+  const [collageTemples, setCollageTemples] = useState({});
+  const [selectedCollageTemple, setSelectedCollageTemple] = useState('');
   // Добавили состояние для отслеживания перетаскивания сторонней картинки
   const [isDragging, setIsDragging] = useState(false);
   // Добавили состояние для модалки выбора изображений для элементов
@@ -154,6 +160,62 @@ export const Generator = () => {
 
     setElements(modifiedElements);
     sessionStorage.setItem(storageKey, JSON.stringify(modifiedElements));
+  };
+
+  const loadCollageTemplate = (templateName) => {
+    const template = collageTemples[templateName];
+    if (!template) return;
+
+    // Получаем данные для подстановки
+    const productImages = initialCollage.filter(el => 
+      el.type === 'image' && el.isProduct
+    );
+
+    const productCodes = initialCollage.filter(el => 
+      el.type === 'text' && el.isProductCode
+    );
+
+    let imageIndex = 0;
+    let codeIndex = 0;
+    const resultElements = [];
+
+    // Обрабатываем каждый элемент шаблона
+    template.forEach(element => {
+      // Для элементов с плейсхолдером изображения
+      if (element.type === 'image' && element.image === "{{ITEM_IMAGE}}") {
+        if (imageIndex < productImages.length) {
+          const imgData = productImages[imageIndex];
+          resultElements.push({
+            ...element,
+            image: imgData.image
+          });
+          imageIndex++;
+        }
+        // Пропускаем элемент, если данных недостаточно
+      } 
+      // Для элементов с плейсхолдером кода
+      else if (element.type === 'text' && element.text === "{{ITEM_CODE}}") {
+        if (codeIndex < productCodes.length) {
+          const codeData = productCodes[codeIndex];
+          resultElements.push({
+            ...element,
+            text: codeData.text
+          });
+          codeIndex++;
+        }
+        // Пропускаем элемент, если данных недостаточно
+      } 
+      // Для остальных элементов (без плейсхолдеров)
+      else {
+        resultElements.push(element);
+      }
+    });
+
+    // Обновляем состояние и сохраняем в sessionStorage
+    setElements(resultElements);
+    sessionStorage.setItem('design-collage', JSON.stringify(resultElements));
+
+
   };
 
   // Обработчик изменения цвета
@@ -358,7 +420,7 @@ export const Generator = () => {
           bottomLeft: 0,
           bottomRight: 0
         },
-        gradient: null
+        gradient: null,
       })
     };
     setElements(prev => [...prev, newElement]);
@@ -667,6 +729,10 @@ export const Generator = () => {
     setIsTemplateModalOpen(true);
   };
 
+  const handleCreateCollageTemple = () => {
+    setIsCollageTempleModalOpen(true);
+  }
+
   // Замените старые функции перемещения на новую
 const moveElement = (fromIndex, toIndex) => {
   if (fromIndex === toIndex) return;
@@ -763,7 +829,8 @@ const moveElement = (fromIndex, toIndex) => {
         width: item.imageWidth,
         height: item.imageHeight,
         originalWidth: item.originalWidth,
-        originalHeight: item.originalHeight
+        originalHeight: item.originalHeight,
+        isProduct: true
       });
     }
 
@@ -776,7 +843,8 @@ const moveElement = (fromIndex, toIndex) => {
         text: item.productCode,
         fontSize: item.fontSize,
         color: item.textColor,
-        fontFamily: item.fontFamily
+        fontFamily: item.fontFamily,
+        isProductCode: true
       });
     }
 
@@ -1041,8 +1109,14 @@ const moveElement = (fromIndex, toIndex) => {
         setTemplates={setTemplates}
         selectedTemplate={selectedTemplate}
         setSelectedTemplate={setSelectedTemplate}
+        collageTemples={collageTemples}
+        setCollageTemples={setCollageTemples}
+        selectedCollageTemple={selectedCollageTemple}
+        setSelectedCollageTemple={setSelectedCollageTemple}
         loadTemplate={loadTemplate}
+        loadCollageTemplate={loadCollageTemplate}
         handleCreateTemplate={handleCreateTemplate}
+        handleCreateCollageTemple={handleCreateCollageTemple}
       />
       <div className="content-wrapper">
         {!isCollageMode && (
@@ -1372,7 +1446,12 @@ const moveElement = (fromIndex, toIndex) => {
             onChange={handleFontChange}
           />
         </div>
-      )}     
+      )}  
+      {isCollageTempleModalOpen && <CollageTempleModal 
+        setIsCollageTempleModalOpen={setIsCollageTempleModalOpen}
+        setCollageTemples={setCollageTemples}
+        setSelectedCollageTemple={setSelectedCollageTemple}
+      />}
       {isTemplateModalOpen && <TemplateModal 
         setIsTemplateModalOpen={setIsTemplateModalOpen}
         setTemplates={setTemplates}
