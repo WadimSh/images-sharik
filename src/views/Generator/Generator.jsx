@@ -700,7 +700,54 @@ const moveElement = (fromIndex, toIndex) => {
         } : el
       ));
       setIndexImg(index);
-    } 
+    } else {
+      // Создаем новый элемент с изображением и текстом
+      const img = new Image();
+      img.src = imgUrl;
+    
+      img.onload = () => {
+        const containerWidth = 450;
+        const containerHeight = 600;
+
+        // Рассчитываем масштаб с учетом оригинальных размеров
+        const scale = Math.min(
+          containerWidth / img.naturalWidth,
+          containerHeight / img.naturalHeight,
+          1
+        );
+
+        const newWidth = img.naturalWidth * scale;
+        const newHeight = img.naturalHeight * scale;
+
+        // Центрируем изображение
+        const position = {
+          x: (containerWidth - newWidth) / 2,
+          y: (containerHeight - newHeight) / 2
+        };
+
+        // Создаем элемент изображения
+        const newImageElement = {
+          id: generateUniqueId(),
+          type: 'image',
+          position,
+          image: imgUrl,
+          width: newWidth,
+          height: newHeight,
+          originalWidth: img.naturalWidth,
+          originalHeight: img.naturalHeight,
+          isFlipped: false,
+          rotation: 0,
+          isProduct: true
+        }
+        setElements(prev => [...prev, newImageElement]);
+        setIndexImg(index);
+      }
+
+      img.onerror = () => {
+      console.error('Ошибка загрузки изображения');
+      alert('Не удалось загрузить изображение');
+    };
+  } 
   };
 
   const handleProductSelect = (item) => {
