@@ -430,10 +430,10 @@ export const ElementsList = ({
                           min="0"
                           max="1"
                           step="0.1"
-                          value={element.gradient?.opacity?.[1] || 1}
+                          value={element.gradient?.opacity?.[1] || 0}
                           onChange={(e) => handleGradientChange(element.id, 'opacity2', e.target.value)}
                         />
-                        <span>{(element.gradient?.opacity?.[1] || 1).toFixed(1)}</span>
+                        <span>{(element.gradient?.opacity?.[1] || 0).toFixed(1)}</span>
                       </div>
                     </div>
                   </div>
