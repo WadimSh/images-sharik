@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 export const CollagePreview = ({ 
   initialElements,
-  currentElements,
   onItemClick
 }) => {
   const selectedItems = useMemo(() => {

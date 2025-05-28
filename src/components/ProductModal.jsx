@@ -27,7 +27,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
     
     setSearchQuery(newValue);
   };
-
+  console.log(searchQuery)
   const handleSaveTemplate = () => {
     if (!isValidFormat) return;
   
@@ -174,7 +174,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
                   <img 
                     src={imgUrl} 
                     alt={`Изображение товара ${index + 1}`}
-                    onClick={() => onSelectImage(imgUrl)}
+                    onClick={() => onSelectImage(imgUrl, searchQuery)}
                   />
                 </div>
               ))}

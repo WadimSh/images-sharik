@@ -18,6 +18,8 @@ import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 
+import { getCode } from '../../constants/dataMap';
+
 export const Generator = () => {
   const { id } = useParams();
   const isCollageMode = id === 'collage';
@@ -795,11 +797,11 @@ const moveElement = (fromIndex, toIndex) => {
     }
   };
 
-  const handleSelectImageProduct = async (imgUrl) => {
+  const handleSelectImageProduct = async (imgUrl, productCode) => {
     try {
       const img = new Image();
       img.src = imgUrl;
-      
+      const code = getCode(productCode);
       // Ждем загрузки изображения
       await new Promise((resolve, reject) => {
         img.onload = resolve;
@@ -825,7 +827,7 @@ const moveElement = (fromIndex, toIndex) => {
         y: (containerHeight - newHeight) / 2
       };
   
-      const newElement = {
+      const imageElement = {
         id: generateUniqueId(),
         type: 'image',
         position,
@@ -837,8 +839,21 @@ const moveElement = (fromIndex, toIndex) => {
         isFlipped: false,
         rotation: 0
       };
+
+      const textElement = {
+        id: generateUniqueId(),
+        type: 'text',
+        position: {
+          x: position.x + (newWidth - 128) / 2, // Центрируем по ширине изображения
+          y: position.y + newHeight - 30        // Размещаем внизу изображения
+        },
+        text: code,
+        fontSize: 28,
+        color: "#333333",
+        fontFamily: "HeliosCond"
+      }
   
-      setElements(prev => [...prev, newElement]);
+      setElements(prev => [...prev, imageElement, textElement]);
       setIsProductModalOpen(false);
       
     } catch (error) {
@@ -969,7 +984,7 @@ const moveElement = (fromIndex, toIndex) => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleCopy, handlePaste, handleRemoveElement, selectedElementId, copiedElement, editingTextId]);
-  console.log(elements)
+  
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -1034,7 +1049,6 @@ const moveElement = (fromIndex, toIndex) => {
           ) : (
             <CollagePreview
               initialElements={initialCollage} // Передаем исходные элементы
-              currentElements={elements} // Передаем текущие элементы
               onItemClick={handleProductSelect}
             />
           )}
