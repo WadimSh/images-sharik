@@ -94,6 +94,7 @@ const DraggableElement = ({
   }, []);
 
   const handleRotateStart = (e) => {
+    if (!isOverlayVisible) return;
     e.stopPropagation();
     const rect = elementRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
@@ -126,6 +127,7 @@ const DraggableElement = ({
   };
 
   const handleProportionalResize = (e, direction) => {
+    if (!isOverlayVisible) return;
     e.stopPropagation();
     e.preventDefault();
     const rect = elementRef.current.getBoundingClientRect();
@@ -151,6 +153,7 @@ const DraggableElement = ({
   };
   
   const handleDirectionalResize = (e, direction) => {
+    if (!isOverlayVisible) return;
     e.stopPropagation();
     e.preventDefault();
     const rect = elementRef.current.getBoundingClientRect();
@@ -300,17 +303,19 @@ const DraggableElement = ({
         }}
       >
         {/* Ручка поворота */}
-      <div
-        ref={rotateHandleRef}
-        className='rotate-handle'
-        onMouseDown={handleRotateStart}
-        style={{
-          
-        }}
-      />
+        {isOverlayVisible && (
+          <div
+            ref={rotateHandleRef}
+            className='rotate-handle'
+            onMouseDown={handleRotateStart}
+            style={{
+              
+            }}
+          />
+        )}
       
         {/* Кнопка изменения размера */}
-        {splitResizable && (
+        {splitResizable && isOverlayVisible && (
           <>
             <div className={`resize-handle left ${isOverlayVisible ? 'visible' : ''}`}
               onMouseDown={(e) => handleDirectionalResize(e, 'left')} />
@@ -323,7 +328,7 @@ const DraggableElement = ({
           </>
         )}
         {/* Кнопка пропорционального изменения размера */}
-        {resizeable && (
+        {resizeable && isOverlayVisible && (
           <>
             <div className={`resize-handle top-left ${isOverlayVisible ? 'visible' : ''}`}
               onMouseDown={(e) => handleProportionalResize(e, 'top-left')} />
