@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaDownload, FaClipboardCheck, FaSave } from 'react-icons/fa';
+import { FaDownload, FaClipboardCheck } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
+
+import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 
 export const HeaderSection = ({
   captureRef,
@@ -159,6 +161,18 @@ export const HeaderSection = ({
     }
   };
 
+  const templateProps = {
+    templates: slideNumber ? templates : collageTemples,
+    selectedTemplate: slideNumber ? selectedTemplate : selectedCollageTemple,
+    isTemplateListOpen,
+    setIsTemplateListOpen,
+    onSelect: slideNumber ? setSelectedTemplate : setSelectedCollageTemple,
+    loadTemplate: slideNumber ? loadTemplate : loadCollageTemplate,
+    onExport: slideNumber ? handleExportTemplate : undefined,
+    onDelete: slideNumber ? handleDeleteTemplate : handleDeleteCollageTemple,
+    showExport: !!slideNumber
+  };
+
   // Эффект для загрузки макетов при монтировании и изменении
   useEffect(() => {
     const loadTemplates = () => {
@@ -194,118 +208,10 @@ export const HeaderSection = ({
         {'< Назад'}
       </button>
       <h2>{getHeaderTitle()}</h2>
-      {slideNumber ? (
-        <div className="template-select-wrapper">
-          {Object.keys(templates).length > 0 && (
-            <div className="template-select-container">
-              <div 
-                className="template-select-header"
-                onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
-              >
-                <span className="selected-template-text">
-                  {selectedTemplate || 'Выберите макет'}
-                </span>
-                <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
-              </div>
-              {isTemplateListOpen && (
-                <div className="template-list">
-                  {Object.keys(templates).map(name => (
-                    <div key={name} className="template-item">
-                      <span 
-                        className="template-name"
-                        onClick={() => {
-                          setSelectedTemplate(name);
-                          loadTemplate(name);
-                          setIsTemplateListOpen(false);
-                        }}
-                      >
-                        {name}
-                      </span>
-                      <div className="template-buttons">
-                        <button 
-                          className="export-template-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleExportTemplate(name);
-                          }}
-                          title="Сохранить в файл"
-                        >
-                          <FaSave />
-                        </button>
-                        <button 
-                          className="delete-template-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteTemplate(name);
-                          }}
-                          title="Удалить макет"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="template-select-wrapper">
-          {Object.keys(collageTemples).length > 0 && (
-            <div className="template-select-container">
-              <div 
-                className="template-select-header"
-                onClick={() => setIsTemplateListOpen(!isTemplateListOpen)}
-              >
-                <span className="selected-template-text">
-                  {selectedCollageTemple || 'Выберите макет'}
-                </span>
-                <span className={`arrow ${isTemplateListOpen ? 'up' : 'down'}`}></span>
-              </div>
-              {isTemplateListOpen && (
-                <div className="template-list">
-                  {Object.keys(collageTemples).map(name => (
-                    <div key={name} className="template-item">
-                      <span 
-                        className="template-name"
-                        onClick={() => {
-                          setSelectedCollageTemple(name);
-                          loadCollageTemplate(name);
-                          setIsTemplateListOpen(false);
-                        }}
-                      >
-                        {name}
-                      </span>
-                      <div className="template-buttons">
-                        <button 
-                          className="delete-template-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteCollageTemple(name);
-                          }}
-                          title="Удалить макет"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-      {slideNumber ? (
-          <button onClick={handleCreateTemplate} className="template-button">
-            <FaClipboardCheck /> Создать макет
-          </button>
-        ) : (
-          <button onClick={handleCreateCollageTemple} className="template-button">
-            <FaClipboardCheck /> Создать макет
-          </button>
-      )}
+      <TemplateSelector {...templateProps} />
+      <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
+        <FaClipboardCheck /> Создать макет
+      </button>
       <button onClick={handleDownload} className="download-button">
         <FaDownload /> Скачать дизайн
       </button>

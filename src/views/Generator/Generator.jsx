@@ -1,8 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaImage, FaFont, FaSquare, FaElementor, FaPuzzlePiece } from 'react-icons/fa';
 import UPNG from 'upng-js';
-import imageCompression from 'browser-image-compression';
 
 import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
