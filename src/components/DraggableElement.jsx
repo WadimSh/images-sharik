@@ -282,17 +282,25 @@ const DraggableElement = ({
         position: 'absolute',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
+        width: 'auto',
+        height: 'auto',
+      }} 
+   >
+      <div style={{
         width: dimensions ? `${dimensions.width}px` : 'auto',
         height: dimensions ? `${dimensions.height}px` : 'auto',
+        cursor: isDragging ? 'grabbing' : 'grab',
+        transform: `rotate(${currentRotation}deg)`,
+        transformOrigin: 'center center'
         
-      }} 
+      }}
       onMouseDown={handleMouseDown}
       onContextMenu={onContextMenu}
       onClick={onClick}
-    >
-      {children}
+      >
+        {children}
+      </div>
       <div 
         ref={overlayRef}
         className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}

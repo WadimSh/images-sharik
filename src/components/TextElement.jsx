@@ -94,7 +94,6 @@ export const TextElement = ({
         className="text-content-wrapper" 
         ref={textContainerRef}
         style={{ 
-          transform: `rotate(${element.rotation}deg)`,
           width: element.width ? `${element.width}px` : 'auto',
           height: element.height ? `${element.height}px` : 'auto',
           boxSizing: 'border-box'

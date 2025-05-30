@@ -85,7 +85,7 @@ export const ImageElement = ({
           height: `${height}px`,
           pointerEvents: 'none',
           objectFit: 'cover',
-          transform: `rotate(${rotation}deg) scaleX(${isFlipped ? -1 : 1})`,
+          transform: `scaleX(${isFlipped ? -1 : 1})`,
           transformOrigin: 'center',
         }}
       />}

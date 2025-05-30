@@ -57,7 +57,6 @@ export const ShapeElement = ({
           position: 'relative',
           width: `${width}px`,
           height: `${height}px`,
-          transform: `rotate(${rotation}deg)`,
           background: element.gradient 
             ? `linear-gradient(${element.gradient.direction}, 
               ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])} ${element.gradient.start}%, 
