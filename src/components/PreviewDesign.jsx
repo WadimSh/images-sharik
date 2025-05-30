@@ -46,8 +46,8 @@ export const PreviewDesign = ({ elements }) => (
                     overflow: 'hidden',
                     boxSizing: 'border-box',
                     lineHeight: 1,
-                    width: element.width,
-                    height: element.height
+                    width: `${(element.width / 450) * 100}%`,
+                    height: `${(element.height / 600) * 100}%`,
                   }}
                 >
                   {element.text.split('\n').map((line, i) => (

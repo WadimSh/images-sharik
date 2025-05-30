@@ -27,7 +27,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
     
     setSearchQuery(newValue);
   };
-  console.log(searchQuery)
+  
   const handleSaveTemplate = () => {
     if (!isValidFormat) return;
   

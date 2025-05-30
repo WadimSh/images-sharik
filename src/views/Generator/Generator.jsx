@@ -18,6 +18,9 @@ import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 import { CollageTempleModal } from '../../components/CollageTempleModal';
+import { ElementToolbar } from '../../components/ElementToolbar';
+import { useElementToolbar } from '../../components/ElementToolbar/useElementToolbar';
+import { handleFileUpload } from '../../components/ElementToolbar/utils';
 
 import { getCode } from '../../constants/dataMap';
 
@@ -109,6 +112,13 @@ export const Generator = () => {
   });
 
   const [initialCollage] = useState(processedElements);
+
+  const { handleAddElement } = useElementToolbar(
+    setElements,
+    fileInputRef,
+    setIsImageLibraryOpen,
+    setIsProductModalOpen
+  );
 
   // Функция управлением напралением тени 
   const handleDirectionChange = (axis, value) => {
@@ -382,110 +392,6 @@ export const Generator = () => {
   // Обработчик переключения редактирования
   const handleTextEditToggle = (elementId, isEditing) => {
     setEditingTextId(isEditing ? elementId : null);
-  };
-
-  const handleAddElement = (type) => {
-    if (type === 'image') {
-      fileInputRef.current.click();
-      return;
-    };
-    if (type === 'element') {
-      setIsImageLibraryOpen(true);
-      return;
-    };
-    if (type === 'product') {
-      setIsProductModalOpen(true);
-      return;
-    };
-    const newElement = {
-      id: generateUniqueId(),
-      type,
-      position: { x: 50, y: 50 },
-      ...(type === 'text' && {
-        text: 'Новый текст',
-        fontSize: 32,       
-        color: '#333333',   
-        fontFamily: 'HeliosCond', 
-        fontWeight: 'normal', 
-        fontStyle: 'normal',  
-      }),
-      image: null,
-      ...(type === 'shape' && { 
-        color: '#ccc',
-        width: 100,
-        height: 100,
-         borderRadius: {
-          topLeft: 0,
-          topRight: 0,
-          bottomLeft: 0,
-          bottomRight: 0
-        },
-        gradient: null,
-      })
-    };
-    setElements(prev => [...prev, newElement]);
-  };
-
-  const handleFileUpload = async (file) => {
-    if (!file) return;
-  
-    try {
-      // Настройки компрессии
-      const options = {
-        maxSizeMB: 1, // Максимальный размер файла
-        maxWidthOrHeight: 2000, // Максимальное измерение
-        useWebWorker: true, // Использовать многопоточность
-        fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
-        initialQuality: 0.6 // Качество сжатия (0-1)
-      };
-  
-      // Сжимаем изображение
-      const compressedFile = await imageCompression(file, options);
-      
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const containerWidth = 450;
-          const containerHeight = 600;
-  
-          const scale = Math.min(
-            containerWidth / img.width,
-            containerHeight / img.height,
-            1
-          );
-  
-          const newWidth = img.width * scale;
-          const newHeight = img.height * scale;
-  
-          const position = {
-            x: (containerWidth - newWidth) / 2,
-            y: (containerHeight - newHeight) / 2
-          };
-  
-          const newElement = {
-            id: Date.now(),
-            type: 'image',
-            position,
-            image: event.target.result,
-            width: newWidth,
-            height: newHeight,
-            originalWidth: img.width,
-            originalHeight: img.height,
-            isFlipped: false
-          };
-  
-          setElements(prev => [...prev, newElement]);
-        };
-        img.onerror = () => alert('Ошибка загрузки изображения');
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(compressedFile);
-  
-    } catch (error) {
-      console.error('Ошибка сжатия:', error);
-      alert('Не удалось обработать изображение');
-    }
   };
 
   const handleDrag = (id, newPosition, newRotation) => {
@@ -1127,38 +1033,7 @@ const moveElement = (fromIndex, toIndex) => {
         
         <div className="main-content">
           {/* Панель добавления элементов */}
-          <div className="element-toolbar">
-            <button 
-              onClick={() => handleAddElement('image')}
-              title="Добавить изображение"
-            >
-              <FaImage size={20} />
-            </button>
-            <button 
-              onClick={() => handleAddElement('text')}
-              title="Добавить текст"
-            >
-              <FaFont size={20} />
-            </button>
-            <button 
-              onClick={() => handleAddElement('shape')}
-              title="Добавить фигуру"
-            >
-              <FaSquare size={20} />
-            </button>
-            <button 
-              onClick={() => handleAddElement('element')}
-              title="Добавить элемент"
-            >
-              <FaElementor size={20} />
-            </button>
-            <button 
-              onClick={() => handleAddElement('product')}
-              title="Добавить товар"
-            >
-              <FaPuzzlePiece size={20} />
-            </button>
-          </div>
+          <ElementToolbar onAddElement={handleAddElement} />
         </div>
         <div className='design-area'>
           {!isCollageMode ? (
@@ -1197,7 +1072,7 @@ const moveElement = (fromIndex, toIndex) => {
               const imageFile = files.find(file => file.type.startsWith('image/'));
 
               if (imageFile) {
-                handleFileUpload(imageFile);
+                handleFileUpload(imageFile, setElements);
               }
             }}
           >
@@ -1427,7 +1302,7 @@ const moveElement = (fromIndex, toIndex) => {
       <input
         type="file"
         accept="image/*"
-        onChange={(e) => handleFileUpload(e.target.files[0])}
+        onChange={(e) => handleFileUpload(e.target.files[0], setElements)}
         ref={fileInputRef}
         className="hidden-input"
       />
