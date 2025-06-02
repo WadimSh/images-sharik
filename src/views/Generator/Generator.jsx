@@ -70,6 +70,7 @@ export const Generator = () => {
 
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const [selectedElementId, setSelectedElementId] = useState(null);
+  const [selectedElementIds, setSelectedElementIds] = useState([]);
   const [copiedElement, setCopiedElement] = useState(null);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -900,42 +901,58 @@ const moveElement = (fromIndex, toIndex) => {
   
   // Копирование
   const handleCopy = () => {
-    const element = elements.find(el => el.id === selectedElementId);
-    if (!element) return;
+    // Собираем все выбранные элементы (из единичного выделения и массива)
+    const elementIds = new Set([
+      ...(selectedElementId ? [selectedElementId] : []),
+      ...selectedElementIds
+    ]);
 
-    const copied = JSON.parse(JSON.stringify(element));
+    const elementsToCopy = elements.filter(el => elementIds.has(el.id));
+    if (elementsToCopy.length === 0) return;
 
-    // Удаляем флаг isProduct, если он существует
-    if (copied.hasOwnProperty('isProduct')) {
-      delete copied.isProduct;
-    }
+    const copiedElements = elementsToCopy.map(element => {
+      const copied = JSON.parse(JSON.stringify(element));
+      // Удаляем флаг isProduct, если он существует
+      if (copied.hasOwnProperty('isProduct')) {
+        delete copied.isProduct;
+      }
+      copied.id = generateUniqueId();
+      return copied;
+    });
 
-    copied.id = generateUniqueId();
-    setCopiedElement(copied);
+    setCopiedElement(copiedElements);
     closeContextMenu();
   };
 
   // Вставка
   const handlePaste = () => {
-    if (!copiedElement) return;
+    if (!copiedElement || !Array.isArray(copiedElement)) return;
 
-    const newElement = {
-      ...copiedElement,
+    const newElements = copiedElement.map((element, index) => ({
+      ...element,
       id: generateUniqueId(),
       position: {
-        x: copiedElement.position.x + 20,
-        y: copiedElement.position.y + 20
+        x: element.position.x + 20,
+        y: element.position.y + 20
       }
-    };
+    }));
 
-    setElements(prev => [...prev, newElement]);
+    setElements(prev => [...prev, ...newElements]);
     closeContextMenu();
   };
 
   const handleDelete = () => {
-    const element = elements.find(el => el.id === selectedElementId);
-    if (!element) return;
-    handleRemoveElement(element.id);
+    // Собираем все выбранные элементы (из единичного выделения и массива)
+    const elementIds = new Set([
+      ...(selectedElementId ? [selectedElementId] : []),
+      ...selectedElementIds
+    ]);
+
+    if (elementIds.size === 0) return;
+
+    setElements(prev => prev.filter(el => !elementIds.has(el.id)));
+    setSelectedElementId(null);
+    setSelectedElementIds([]);
     closeContextMenu();
   };
 
@@ -977,9 +994,12 @@ const moveElement = (fromIndex, toIndex) => {
     const handleKeyDown = (e) => {
       const isDelete = e.code === 'Delete';
     
-      if (isDelete && selectedElementId && !editingTextId) {
+      // Проверяем есть ли выделенные элементы (единичное или множественное выделение)
+      const hasSelectedElements = selectedElementId || selectedElementIds.length > 0;
+    
+      if (isDelete && hasSelectedElements && !editingTextId) {
         e.preventDefault();
-        handleRemoveElement(selectedElementId);
+        handleDelete();
         return;
       }
 
@@ -988,7 +1008,7 @@ const moveElement = (fromIndex, toIndex) => {
       const isPaste = e.code === 'KeyV' || e.key.toLowerCase() === 'м'; // v - русская
         
       if ((e.ctrlKey || e.metaKey) && !editingTextId) {
-        if (isCopy && selectedElementId) {
+        if (isCopy && hasSelectedElements) {
           e.preventDefault();
           handleCopy();
         }
@@ -1002,8 +1022,8 @@ const moveElement = (fromIndex, toIndex) => {
   
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleCopy, handlePaste, handleRemoveElement, selectedElementId, copiedElement, editingTextId]);
-  
+  }, [handleCopy, handlePaste, handleDelete, selectedElementId, selectedElementIds, copiedElement, editingTextId]);
+  console.log(selectedElementIds);
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -1105,10 +1125,19 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedElementId(element.id);
+                        //setSelectedElementId(element.id);
+                        if (e.shiftKey) {
+                          setSelectedElementIds(prev => [...prev, element.id]);
+                        } else {
+                          setSelectedElementId(element.id);
+                        }
                       }}
                       selectedElementId={selectedElementId}
-                      onDeselect={() => setSelectedElementId(null)}
+                      selectedElementIds={selectedElementIds}
+                      onDeselect={() => {
+                        setSelectedElementId(null);
+                        setSelectedElementIds([]);
+                      }}
                     />
                   );
                 case 'element':
@@ -1132,10 +1161,19 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedElementId(element.id);
+                        //setSelectedElementId(element.id);
+                        if (e.shiftKey) {
+                          setSelectedElementIds(prev => [...prev, element.id]);
+                        } else {
+                          setSelectedElementId(element.id);
+                        }
                       }}
                       selectedElementId={selectedElementId}
-                      onDeselect={() => setSelectedElementId(null)}
+                      selectedElementIds={selectedElementIds}
+                      onDeselect={() => {
+                        setSelectedElementId(null);
+                        setSelectedElementIds([]);
+                      }}
                     />
                   );
                 case 'shape':
@@ -1157,10 +1195,19 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedElementId(element.id);
+                        //setSelectedElementId(element.id);
+                        if (e.shiftKey) {
+                          setSelectedElementIds(prev => [...prev, element.id]);
+                        } else {
+                          setSelectedElementId(element.id);
+                        }
                       }}
                       selectedElementId={selectedElementId}
-                      onDeselect={() => setSelectedElementId(null)}
+                      selectedElementIds={selectedElementIds}
+                      onDeselect={() => {
+                        setSelectedElementId(null);
+                        setSelectedElementIds([]);
+                      }}
                     />
                   );
                 case 'text':
@@ -1186,10 +1233,19 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedElementId(element.id);
+                        //setSelectedElementId(element.id);
+                        if (e.shiftKey) {
+                          setSelectedElementIds(prev => [...prev, element.id]);
+                        } else {
+                          setSelectedElementId(element.id);
+                        }
                       }}
                       selectedElementId={selectedElementId}
-                      onDeselect={() => setSelectedElementId(null)}
+                      selectedElementIds={selectedElementIds}
+                      onDeselect={() => {
+                        setSelectedElementId(null);
+                        setSelectedElementIds([]);
+                      }}
                     />
                   );
                 default:
@@ -1219,7 +1275,8 @@ const moveElement = (fromIndex, toIndex) => {
                   >
                     Вставить (Ctrl+V)
                   </button>
-                  <div className='separator'></div>
+                  {selectedElementIds.length === 0 && <>
+                  <div className='separator'/>
                   <button 
                     onClick={() => handleTextEditToggle(element.id, true)}
                     disabled={element?.type !== 'text'}
@@ -1255,6 +1312,7 @@ const moveElement = (fromIndex, toIndex) => {
                     Изменить цвет
                   </button>
                   
+                  </>}
                   <div className='separator'></div>
 
                   <button

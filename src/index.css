@@ -47,6 +47,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Bosk';
+  src: url('./assets/fonts/Bosk.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

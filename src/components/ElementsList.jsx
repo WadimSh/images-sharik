@@ -480,6 +480,7 @@ export const ElementsList = ({
                           <option value="FreeSetRegular">FreeSetRegular</option>
                           <option value="FreeSetBold">FreeSetBold</option>
                           <option value="MyriadPro">MyriadPro</option>
+                          <option value="Bosk">Bosk</option>
                           <option value="Arial">Arial</option>
                           <option value="Times New Roman">Times New Roman</option>
                           <option value="Verdana">Verdana</option>

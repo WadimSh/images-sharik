@@ -16,6 +16,7 @@ export const TextElement = ({
   onContextMenu,
   onClick,
   selectedElementId,
+  selectedElementIds,
   onDeselect
 }) => {
   const [editedText, setEditedText] = useState(element.text);
@@ -86,6 +87,7 @@ export const TextElement = ({
       onContextMenu={onContextMenu}  
       onClick={onClick}
       selectedElementId={selectedElementId}
+      selectedElementIds={selectedElementIds}
       onDeselect={onDeselect}
       splitResizable
       hideOverlay={isEditing}

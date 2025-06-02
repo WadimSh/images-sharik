@@ -19,6 +19,7 @@ export const ImageElement = ({
   onContextMenu,
   onClick,
   selectedElementId,
+  selectedElementIds, 
   onDeselect
 }) => {
   const [imageSrc, setImageSrc] = useState('');
@@ -75,6 +76,7 @@ export const ImageElement = ({
       onContextMenu={onContextMenu}
       onClick={onClick}
       selectedElementId={selectedElementId}
+      selectedElementIds={selectedElementIds}
       onDeselect={onDeselect}
     >
       {imageSrc && <img // Добавляем проверку на наличие src

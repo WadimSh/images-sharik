@@ -19,6 +19,7 @@ export const ShapeElement = ({
   onClick,
   element,
   selectedElementId,
+  selectedElementIds,
   onDeselect
 }) => {
   const containerRef = useRef(null);
@@ -49,6 +50,7 @@ export const ShapeElement = ({
       onContextMenu={onContextMenu}
       onClick={onClick}
       selectedElementId={selectedElementId}
+      selectedElementIds={selectedElementIds}
       onDeselect={onDeselect}
     >
       <div 

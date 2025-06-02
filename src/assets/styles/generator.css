@@ -233,48 +233,6 @@
   pointer-events: none;
 }
 
-.context-menu {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  z-index: 999999999;
-}
-
-.context-menu button {
-  display: block;
-  width: 100%;
-  padding: 8px 16px;
-  text-align: left;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.context-menu button:hover {
-  background: #f5f5f5;
-}
-
-.context-menu button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.context-delete {
-  color: red;
-}
-
-.context-menu .separator {
-  border-top: 1px solid #ddd;
-  margin: 5px 0;
-}
-
-.draggable-element {
-  transition: transform 0.1s;
-  transform-origin: center center;  
-}
-
 .dragging-overlay {
   position: fixed;
   pointer-events: none;
@@ -284,13 +242,18 @@
   opacity: 0;
   transition: none;
   background: rgba(0,123,255,0.1);
-  will-change: transform; /* Оптимизация для анимации */
+  will-change: transform;
   transform-origin: center center;
 }
 
 .dragging-overlay.visible {
   opacity: 1;
-  transition: none; /* Убираем переход для мгновенного появления */
+  transition: none;
+}
+
+.dragging-overlay.selected {
+  border: 2px solid #007bff;
+  background: rgba(0,123,255,0.15);
 }
 
 .resize-handle {
@@ -1472,4 +1435,49 @@
   font-family: 'HeliosCond', sans-serif;
   font-size: 14px;
   color: #333;
+}
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 999999999;
+  min-width: 150px;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.context-menu button:hover {
+  background: #f5f5f5;
+}
+
+.context-menu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.context-menu .separator {
+  border-top: 1px solid #ddd;
+  margin: 4px 0;
+}
+
+.context-delete {
+  color: #dc3545 !important;
+}
+
+.context-menu button.context-delete:hover {
+  background: #ffebee;
 }

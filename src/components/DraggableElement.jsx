@@ -5,6 +5,7 @@ const DraggableElement = ({
   children, 
   id,
   selectedElementId,
+  selectedElementIds = [],
   position, 
   onDrag, 
   onResize,
@@ -29,7 +30,7 @@ const DraggableElement = ({
   const overlayRef = useRef(null);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const animationFrameRef = useRef(null);
-
+  
   useEffect(() => {
     setCurrentRotation(rotation);
   }, [rotation]);
@@ -51,28 +52,27 @@ const DraggableElement = ({
   };
 
   useEffect(() => {
-  if (selectedElementId === null || hideOverlay) {
-    setIsOverlayVisible(false);
-    return;
-  }
+    if (hideOverlay) {
+      setIsOverlayVisible(false);
+      return;
+    }
 
-  if (id === selectedElementId) {
-    // Добавляем задержку для корректного позиционирования
-    requestAnimationFrame(() => {
-      updateOverlayPosition();
+    if (selectedElementId === id || selectedElementIds.includes(id)) {
       setIsOverlayVisible(true);
-    });
-  } else {
-    setIsOverlayVisible(false);
-  }
-}, [selectedElementId, id, position, dimensions, hideOverlay]);
+      updateOverlayPosition();
+    } else {
+      setIsOverlayVisible(false);
+    }
+  }, [selectedElementId, selectedElementIds, id, position, dimensions, hideOverlay]);
 
   // Клик вне элемента
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (elementRef.current && 
+      if (!e.shiftKey && 
+          elementRef.current && 
           !elementRef.current.contains(e.target) && 
-          !contextMenuRef.current?.contains(e.target)) { // Игнорируем клики по меню
+          !contextMenuRef.current?.contains(e.target) && 
+          !selectedElementIds.includes(id)) {
         setIsOverlayVisible(false);
         onDeselect?.();
       }
@@ -80,18 +80,20 @@ const DraggableElement = ({
     
     document.addEventListener('click', handleClickOutside, true);
     return () => document.removeEventListener('click', handleClickOutside, true);
-  }, []);
+  }, [selectedElementIds, id]);
 
   // Обработка скролла
   useEffect(() => {
     const handleScroll = () => {
-      setIsOverlayVisible(false);
-      onDeselect?.();
+      if (!selectedElementIds.includes(id)) {
+        setIsOverlayVisible(false);
+        onDeselect?.();
+      }
     };
   
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [selectedElementIds, id]);
 
   const handleRotateStart = (e) => {
     if (!isOverlayVisible) return;
