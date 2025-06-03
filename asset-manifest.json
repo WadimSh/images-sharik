@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.825f802b.css",
-    "main.js": "./static/js/main.f46c4088.js",
+    "main.css": "./static/css/main.e6c17d24.css",
+    "main.js": "./static/js/main.a5fe0dc1.js",
     "static/js/453.48c6c0fd.chunk.js": "./static/js/453.48c6c0fd.chunk.js",
     "static/media/9887.otf": "./static/media/9887.c8cdb23bf53b66746cc7.otf",
     "static/media/Troubleside.ttf": "./static/media/Troubleside.9879b07310972fc2997b.ttf",
@@ -15,12 +15,12 @@
     "static/media/aa_badaboom.ttf": "./static/media/aa_badaboom.8f0fd95679075dcc294a.ttf",
     "static/media/item.jpg": "./static/media/item.8cb3bae9c03441195ea1.jpg",
     "index.html": "./index.html",
-    "main.825f802b.css.map": "./static/css/main.825f802b.css.map",
-    "main.f46c4088.js.map": "./static/js/main.f46c4088.js.map",
+    "main.e6c17d24.css.map": "./static/css/main.e6c17d24.css.map",
+    "main.a5fe0dc1.js.map": "./static/js/main.a5fe0dc1.js.map",
     "453.48c6c0fd.chunk.js.map": "./static/js/453.48c6c0fd.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.825f802b.css",
-    "static/js/main.f46c4088.js"
+    "static/css/main.e6c17d24.css",
+    "static/js/main.a5fe0dc1.js"
   ]
 }
