@@ -204,7 +204,7 @@ export const HeaderSection = ({
   }, []);
 
   return (
-    <div className="header-section">
+    <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
         {'< Назад'}
       </button>

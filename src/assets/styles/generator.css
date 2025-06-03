@@ -20,7 +20,7 @@
 }
 
 .header-section h2 {
-  color: #333;
+  color: #f5f5f5;
   font-size: 24px;
   margin: 0;
   flex-grow: 1;
@@ -29,6 +29,7 @@
 .button-back {
   background: none;
   border: none;
+  color: #f5f5f5;
   cursor: pointer;
   padding: 5px 10px;
   display: flex;
