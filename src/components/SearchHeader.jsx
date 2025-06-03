@@ -1,4 +1,6 @@
-import { ToggleSwitch } from "../ui/ToggleSwitch/ToggleSwitch";
+import { FaClipboardCheck } from "react-icons/fa";
+
+import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -114,7 +116,7 @@ const SearchHeader = ({
           Найти
         </button>
       </div>
-      <div className="status-messages">
+      {(loading || infoMessage || error) && <div className="status-messages">
         {loading && (
           <div className="message loading">
             Подождите немножко, мы ищем интересующие вас товары...
@@ -129,13 +131,13 @@ const SearchHeader = ({
             {error}
           </div>
         )}
-      </div>
-      {isSearchActive && <ToggleSwitch
-        checked={isToggled}
-        onChange={setIsToggled}
-        label="Объединить найденные товары в единый слайд (допустимо не более 10 изображений)."
-        size="small"
-      />}
+      </div>}
+      {isSearchActive && <div className="template-button-container">
+      <MarketplaceSwitcher />
+      <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
+        <FaClipboardCheck /> Создать коллаж
+      </button>
+      </div>}
     </div>
   );
 };

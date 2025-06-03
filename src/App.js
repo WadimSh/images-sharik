@@ -1,8 +1,11 @@
 import Views from "./views/Views";
+import { MarketplaceProvider } from "./context/contextMarketplace";
 
 function App() {
   return (
-    <Views />
+    <MarketplaceProvider>
+      <Views />
+    </MarketplaceProvider>
   );
 }
 

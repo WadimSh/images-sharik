@@ -54,6 +54,20 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Troubleside';
+  src: url('./assets/fonts/Troubleside.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Badaboom';
+  src: url('./assets/fonts/aa_badaboom.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

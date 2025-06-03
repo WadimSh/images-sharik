@@ -111,3 +111,10 @@ h2 {
 .info {
   color: #ef6c00;
 }
+
+.template-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}

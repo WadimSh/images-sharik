@@ -1,4 +1,4 @@
-export const codeMapping = {
+export const codeMappingWB = {
   "1111-0104":	"14601875",
   "1111-0352":	"14601876",
   "1111-0805":	"14601877",
@@ -5088,8 +5088,4 @@ export const codeMapping = {
   "1207-6024":	"386514866",
   "1207-6025":	"386514868",
   "1103-3161":	"388893896",
-};
-
-export const getCode = (key) => {
-  return codeMapping[key] || 'нет на WB';
 };

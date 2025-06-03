@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
 
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
+import { useMarketplace } from '../context/contextMarketplace';
 
 export const HeaderSection = ({
   captureRef,
@@ -24,7 +25,7 @@ export const HeaderSection = ({
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+  const { marketplace } = useMarketplace();
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
 
   const handleBack = () => {
@@ -35,7 +36,7 @@ export const HeaderSection = ({
   const getHeaderTitle = () => {
     const slide = slideNumber || 'collage'; // По умолчанию первый слайд
     return slide === 'collage' 
-      ? 'Коллаж для WB' 
+      ? marketplace === 'WB' ? 'Коллаж для WB' : 'Коллаж для OZON' 
       : slide === '1' 
         ? 'Основной слайд' 
         : `Слайд ${slide}`;
@@ -119,7 +120,7 @@ export const HeaderSection = ({
       ].join('');
 
       // Формирование имени файла
-      const fileName = `${baseCode}_WB_${slideType}_900x1200_${datePart}_${timePart}.png`;
+      const fileName = `${baseCode}_${marketplace}_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
       // Генерация изображения
       const canvas = await html2canvas(captureRef.current, {

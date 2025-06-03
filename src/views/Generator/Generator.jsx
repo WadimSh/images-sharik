@@ -20,7 +20,8 @@ import { ElementToolbar } from '../../components/ElementToolbar';
 import { useElementToolbar } from '../../components/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../components/ElementToolbar/utils';
 
-import { getCode } from '../../constants/dataMap';
+import { useMarketplace } from '../../context/contextMarketplace';
+import { getCode } from '../../utils/getCodeProduct';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -62,6 +63,8 @@ export const Generator = () => {
     }
     return element;
   });
+
+  const { marketplace } = useMarketplace();
 
   const captureRef = useRef(null);
   const contextMenuRef = useRef(null);
@@ -821,7 +824,7 @@ const moveElement = (fromIndex, toIndex) => {
     try {
       const img = new Image();
       img.src = imgUrl;
-      const code = getCode(productCode);
+      const code = getCode(productCode, marketplace);
       // Ждем загрузки изображения
       await new Promise((resolve, reject) => {
         img.onload = resolve;
@@ -1023,7 +1026,7 @@ const moveElement = (fromIndex, toIndex) => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleCopy, handlePaste, handleDelete, selectedElementId, selectedElementIds, copiedElement, editingTextId]);
-  console.log(selectedElementIds);
+  
   return (
     <div className="generator-container">
       <HeaderSection 

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
-import { getCode } from "../constants/dataMap";
+import { useMarketplace } from "../context/contextMarketplace";
+import { getCode } from "../utils/getCodeProduct";
 
 export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   const navigate = useNavigate();
+  const { marketplace } = useMarketplace();
   const [products, setProducts] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [limitReached, setLimitReached] = useState(false);
@@ -84,7 +86,7 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
       };
 
       // Элемент текста
-      const code = getCode(productCode);
+      const code = getCode(productCode, marketplace);
       const textX = imageX + (imageSize - 128) / 2; // Центрирование текста (предполагаемая ширина текста 128px)
       const textY = imageY + imageSize - 38; // 28px (fontSize) + 10px (отступ)
 
