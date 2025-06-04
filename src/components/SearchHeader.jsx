@@ -1,4 +1,4 @@
-import { FaClipboardCheck } from "react-icons/fa";
+import { RiCollageFill } from "react-icons/ri";
 
 import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
 
@@ -135,7 +135,7 @@ const SearchHeader = ({
       {isSearchActive && <div className="template-button-container">
       <MarketplaceSwitcher />
       <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
-        <FaClipboardCheck /> Создать коллаж
+        <RiCollageFill /> Создать коллаж
       </button>
       </div>}
     </div>

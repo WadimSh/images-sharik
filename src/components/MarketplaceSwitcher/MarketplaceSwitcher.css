@@ -11,8 +11,8 @@
 
 .switch {
   position: absolute;
-  top: 6px;
-  height: calc(100% - 12px);
+  top: 4px;
+  height: calc(100% - 7px);
   border-radius: 10px;
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   z-index: 1;
@@ -20,13 +20,13 @@
 }
 
 .switch.wb-active {
-  left: 6px;
+  left: 4px;
   background: linear-gradient(35deg,  #7D256F 0%, #8D297F 25%, #BC3D96 45%, #EC238D 100%);
   box-shadow: 0 4px 8px rgba(125, 60, 242, 0.2);
 }
 
 .switch.oz-active {
-  left: calc(50% - 6px);
+  left: calc(50% - 4px);
   background: linear-gradient(135deg, #005bff 0%, #0481CB 100%);
   box-shadow: 0 4px 8px rgba(255, 154, 25, 0.2);
 }
@@ -42,7 +42,7 @@
   cursor: pointer;
   transition: color 0.3s ease;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   color: #6c757d;
 }
 

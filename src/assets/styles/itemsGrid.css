@@ -188,14 +188,20 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  min-width: 34px; /* Prevent shrinking */
-  min-height: 34px; /* Prevent shrinking */
-  border-radius: 4px;
+  min-width: 34px; 
+  min-height: 34px; 
+  border-radius: 8px;
   background: transparent;
   cursor: pointer;
   padding: 0;
   border: none;
-  overflow: hidden; /* Prevent image overflow */
+  overflow: hidden;
+  transition: all .3s;
+}
+
+.template-selector-control:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .items-grid {
