@@ -1,7 +1,26 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
-export const FontControls = ({ element, onClose, onChange }) => {
+export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMulti, selectedElementIds, elements }) => {
   const controlsRef = useRef(null);
+  const [fontSize, setFontSize] = useState(element?.fontSize || 24);
+  const [fontFamily, setFontFamily] = useState(element?.fontFamily || 'Arial');
+  
+  // Функция для проверки состояния стиля у всех выбранных элементов
+  const checkMultiStyleState = (property, value) => {
+    if (!isMulti || !selectedElementIds || !elements) return false;
+    return selectedElementIds.every(id => 
+      elements.find(el => el.id === id)?.[property] === value
+    );
+  };
+
+  // Обновляем fontSize когда меняется element
+  useEffect(() => {
+    setFontSize(element?.fontSize || 24);
+  }, [element?.fontSize]);
+
+  useEffect(() => {
+    setFontFamily(element?.fontFamily || 'Arial');
+  }, [element?.fontFamily]);
   
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -24,28 +43,48 @@ export const FontControls = ({ element, onClose, onChange }) => {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
-
+  
   return (
     <div className="font-controls" ref={controlsRef}>
       <div className="style-controls">
         <button
-          className={`style-button bold ${element.fontWeight === 'bold' ? 'active' : ''}`}
-          onClick={() => 
-            onChange(element.id, 'fontWeight', 
-              element.fontWeight === 'bold' ? 'normal' : 'bold'
-            )
-          }
+          className={`style-button bold ${
+            isMulti 
+              ? checkMultiStyleState('fontWeight', 'bold') ? 'active' : ''
+              : element?.fontWeight === 'bold' ? 'active' : ''
+          }`}
+          onClick={() => {
+            if (isMulti) {
+              // Определяем новое состояние на основе текущего состояния всех элементов
+              const newState = !checkMultiStyleState('fontWeight', 'bold') ? 'bold' : 'normal';
+              onChangeMulti(selectedElementIds, 'fontWeight', newState);
+            } else {
+              onChange(element?.id, 'fontWeight', 
+                element?.fontWeight === 'bold' ? 'normal' : 'bold'
+              );
+            }
+          }}
         >
           B
         </button>
         
         <button
-          className={`style-button italic ${element.fontStyle === 'italic' ? 'active' : ''}`}
-          onClick={() => 
-            onChange(element.id, 'fontStyle', 
-              element.fontStyle === 'italic' ? 'normal' : 'italic'
-            )
-          }
+          className={`style-button italic ${
+            isMulti 
+              ? checkMultiStyleState('fontStyle', 'italic') ? 'active' : ''
+              : element?.fontStyle === 'italic' ? 'active' : ''
+          }`}
+          onClick={() => {
+            if (isMulti) {
+              // Определяем новое состояние на основе текущего состояния всех элементов
+              const newState = !checkMultiStyleState('fontStyle', 'italic') ? 'italic' : 'normal';
+              onChangeMulti(selectedElementIds, 'fontStyle', newState);
+            } else {
+              onChange(element?.id, 'fontStyle', 
+                element?.fontStyle === 'italic' ? 'normal' : 'italic'
+              );
+            }
+          }}
         >
           I
         </button>
@@ -55,8 +94,16 @@ export const FontControls = ({ element, onClose, onChange }) => {
         Размер:
         <input
           type="number"
-          value={element.fontSize || 24}
-          onChange={(e) => onChange(element.id, 'fontSize', parseInt(e.target.value))}
+          value={fontSize}
+          onChange={(e) => {
+            const value = parseInt(e.target.value) || 24;
+            setFontSize(value);
+            if (isMulti) {
+              onChangeMulti(selectedElementIds, 'fontSize', value);
+            } else {
+              onChange(element?.id, 'fontSize', value);
+            }
+          }}
           min="8"
           max="72"
         />
@@ -69,23 +116,36 @@ export const FontControls = ({ element, onClose, onChange }) => {
           <input
             type="color"
             className="color-picker-input"
-            value={element.color || '#333333'}
-            onChange={(e) => onChange(element.id, 'color', e.target.value)}
+            value={isMulti ? '#333333' : element?.color || '#333333'}
+            onChange={(e) => {
+              setFontFamily(e.target.value);
+              if (isMulti) {
+                onChangeMulti(selectedElementIds, 'color', e.target.value);
+              } else {
+                onChange(element?.id, 'color', e.target.value);
+              }
+            }}
           />
           <div 
             className="color-preview"
-            style={{ color: element.color || '#333333' }}
+            style={{ color: isMulti ? '#333333' : element?.color || '#333333' }}
           />
         </div>
-        {element.color}
+        {isMulti ? '#333333' : element?.color || '#333333'}
         </div>
       </label>
 
       <label>
         Шрифт:&emsp;
         <select
-          value={element.fontFamily || 'Arial'}
-          onChange={(e) => onChange(element.id, 'fontFamily', e.target.value)}
+          value={fontFamily}
+          onChange={(e) => {
+            if (isMulti) {
+              onChangeMulti(selectedElementIds, 'fontFamily', e.target.value);
+            } else {
+              onChange(element?.id, 'fontFamily', e.target.value);
+            }
+          }}
         >
           <option value="HeliosCond">HeliosCond</option>
           <option value="GemarFont">GemarFont</option>

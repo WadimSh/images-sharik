@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import UPNG from 'upng-js';
 
@@ -104,13 +104,13 @@ export const Generator = () => {
   // Добавили состояние для модалки добавления дополнительного товара
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   // Добавили состояние для окрытия меню редактирования шрифта для контекстного меню
-  const [selectedTextEdit, setSelectedTextEdit] = useState(null);
+  const [selectedTextEdit, setSelectedTextEdit] = useState(null); // { elementId, isMulti, selectedIds }
   // Добавили состояние для раскрытия меню со свойствами компонета
   const [expandedElementId, setExpandedElementId] = useState(null);
   // Состояние для хранения настроек тени
   const [shadowSetting, setShadowSetting] = useState({
-    offsetX: 15,
-    offsetY: 15,
+    offsetX: 20,
+    offsetY: 20,
   });
 
   const [initialCollage] = useState(processedElements);
@@ -233,46 +233,63 @@ export const Generator = () => {
   // Обработчик изменения цвета
   const handleColorChange = (e) => {
     const newColor = e.target.value;
+    const ids = Array.isArray(selectedColorElementId) 
+      ? selectedColorElementId 
+      : [selectedColorElementId];
+
     setElements(prev => 
       prev.map(el => 
-        el.id === selectedColorElementId ? {...el, color: newColor, gradient: null} : el
+        ids.includes(el.id) ? {...el, color: newColor, gradient: null} : el
       )
     );
   };
 
   // Обработчик клика по кнопке выбора цвета
   const handleColorButtonClick = (elementId) => {
-    setElements(prev => 
-      prev.map(el => {
-        if (el.id === elementId) {
-          // Сбрасываем градиент при выборе цвета
-          return { 
-            ...el, 
-            gradient: null,
-            color: el.color || '#ccc' // Обновляем цвет, если он не задан
-          };
-        }
-        return el;
-      })
-    );
-
-    const element = elements.find(el => el.id === elementId);
-    if (element && colorInputRef.current) {
+    const isMulti = Array.isArray(elementId);
+    const ids = isMulti ? elementId : [elementId];
+    
+    // Находим первый элемент для определения начального цвета
+    const firstElement = elements.find(el => el.id === ids[0]);
+    
+    if (firstElement && colorInputRef.current) {
       // Устанавливаем значение напрямую в DOM-элемент
-      colorInputRef.current.value = element.color || '#ccc';
+      colorInputRef.current.value = firstElement.color || '#ccc';
       colorInputRef.current.click();
-      setSelectedColorElementId(elementId);
+      setSelectedColorElementId(elementId); // Сохраняем либо массив ID, либо одиночный ID
     }
   };
 
+  
   // Обработчик изменений параметров шрифта
   const handleFontChange = (elementId, property, value) => {
-    console.log(elementId)
-    console.log(property)
     setElements(prev => 
       prev.map(el => 
         el.id === elementId ? { ...el, [property]: value } : el
       )
+    );
+  };
+
+  // Обработчик изменений параметров шрифта для множественного выделения
+  const handleFontChangeMulti = (elementIds, property, value) => {
+    // Преобразуем в массив, если передана строка (для обратной совместимости)
+    const ids = Array.isArray(elementIds) ? elementIds : [elementIds];
+
+    setElements(prev => 
+      prev.map(el => {
+        if (ids.includes(el.id)) {
+          // Для свойств fontWeight и fontStyle нужна специальная логика переключения
+          if (property === 'fontWeight') {
+            return { ...el, fontWeight: el.fontWeight === 'bold' ? 'normal' : 'bold' };
+          }
+          if (property === 'fontStyle') {
+            return { ...el, fontStyle: el.fontStyle === 'italic' ? 'normal' : 'italic' };
+          }
+          // Для остальных свойств просто устанавливаем значение
+          return { ...el, [property]: value };
+        }
+        return el;
+      })
     );
   };
 
@@ -396,17 +413,40 @@ export const Generator = () => {
     setEditingTextId(isEditing ? elementId : null);
   };
 
-  const handleDrag = (id, newPosition, newRotation) => {
-    setElements(prev => prev.map(el => {
-      if (el.id === id) {
-        return {
-          ...el,
-          position: newPosition,
-          rotation: newRotation !== undefined ? newRotation : el.rotation
-        };
-      }
-      return el;
-    }));
+  const handleDrag = (id, newPosition, delta) => {
+    // Получаем все выбранные ID
+    const allSelectedIds = [
+      ...(selectedElementId ? [selectedElementId] : []),
+      ...selectedElementIds
+    ];
+
+    // Если есть множественное выделение и перетаскиваемый элемент в нем
+    if (allSelectedIds.length > 1 && allSelectedIds.includes(id) && delta) {
+      // Обновляем позиции всех выбранных элементов на величину смещения мыши
+      setElements(prev => prev.map(el => {
+        if (allSelectedIds.includes(el.id)) {
+          return {
+            ...el,
+            position: {
+              x: el.position.x + delta.deltaX,
+              y: el.position.y + delta.deltaY
+            }
+          };
+        }
+        return el;
+      }));
+    } else {
+      // Стандартная логика для одиночного элемента
+      setElements(prev => prev.map(el => {
+        if (el.id === id) {
+          return {
+            ...el,
+            position: newPosition
+          };
+        }
+        return el;
+      }));
+    }
   };
 
   // Добавляем новый обработчик для комплексного обновления
@@ -559,11 +599,11 @@ export const Generator = () => {
 
       // Параметры тени (можно вынести в настройки)
       const shadowSettings = {
-        color: 'rgba(0,0,0,0.4)',
-        blur: 20,
+        color: 'rgba(0,0,0,0.3)',
+        blur: 15,
         offsetX: shadowSetting.offsetX,
         offsetY: shadowSetting.offsetY,
-        padding: 40
+        padding: 80
       };
 
       // Рассчитываем размеры canvas
@@ -963,6 +1003,32 @@ const moveElement = (fromIndex, toIndex) => {
     setSelectedElementId(elementId);
   };
 
+  const areAllSelectedText = useMemo(() => {
+    const allSelectedIds = [
+      ...(selectedElementId ? [selectedElementId] : []),
+      ...selectedElementIds
+    ];
+    
+    if (allSelectedIds.length <= 1) return false;
+    
+    return elements.every(el => 
+      allSelectedIds.includes(el.id) ? el.type === 'text' : true
+    );
+  }, [selectedElementId, selectedElementIds, elements]);
+
+  const areAllSelectedShape = useMemo(() => {
+    const allSelectedIds = [
+      ...(selectedElementId ? [selectedElementId] : []),
+      ...selectedElementIds
+    ];
+    
+    if (allSelectedIds.length <= 1) return false;
+    
+    return elements.every(el => 
+      allSelectedIds.includes(el.id) ? el.type === 'shape' : true
+    );
+  }, [selectedElementId, selectedElementIds, elements]);
+
   useEffect(() => {
     // Найти индекс активного изображения
     const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
@@ -1073,7 +1139,16 @@ const moveElement = (fromIndex, toIndex) => {
           <div 
             ref={captureRef} 
             className="design-container"
-            onClick={closeContextMenu}
+            onClick={(e) => {
+              // Проверяем, не происходит ли клик внутри панели шрифтов
+              const fontControlsWrapper = document.querySelector('.font-controls-wrapper');
+              if (fontControlsWrapper && fontControlsWrapper.contains(e.target)) {
+                return;
+              }
+              closeContextMenu();
+              setSelectedElementId(null);
+              setSelectedElementIds([]);
+            }}
             onContextMenu={(e) => {
               e.preventDefault();
             }}
@@ -1118,7 +1193,7 @@ const moveElement = (fromIndex, toIndex) => {
                       width={element.width}
                       height={element.height}
                       isFlipped={element.isFlipped}
-                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
                       onRemove={() => handleRemoveElement(element.id)}
                       onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                       rotation={element.rotation} // Передаем поворот
@@ -1154,7 +1229,7 @@ const moveElement = (fromIndex, toIndex) => {
                       width={element.width}
                       height={element.height}
                       isFlipped={element.isFlipped}
-                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
                       onRemove={() => handleRemoveElement(element.id)}
                       onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                       rotation={element.rotation} // Передаем поворот
@@ -1189,7 +1264,7 @@ const moveElement = (fromIndex, toIndex) => {
                       width={element.width}
                       height={element.height}
                       color={element.color || '#ccc'} // Добавляем цвет
-                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
                       onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
                       rotation={element.rotation} // Передаем поворот
                       onRotate={(newRotation) => handleRotate(element.id, newRotation)}
@@ -1220,7 +1295,7 @@ const moveElement = (fromIndex, toIndex) => {
                       element={element}
                       key={element.id}
                       position={element.position}
-                      onDrag={(pos) => handleDrag(element.id, pos)}
+                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
                       onRemove={() => handleRemoveElement(element.id)}
                       onRotate={(newRotation) => handleRotate(element.id, newRotation)}
                       onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
@@ -1278,44 +1353,63 @@ const moveElement = (fromIndex, toIndex) => {
                   >
                     Вставить (Ctrl+V)
                   </button>
-                  {selectedElementIds.length === 0 && <>
+                  
                   <div className='separator'/>
+                  
                   <button 
-                    onClick={() => handleTextEditToggle(element.id, true)}
-                    disabled={element?.type !== 'text'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTextEditToggle(element.id, true);
+                    }}
+                    disabled={selectedElementIds.length > 0 || element?.type !== 'text'}
+                    className="remove-bg-button"
+                    title="Измененить текст"
                   >
                     Редактировать текст
                   </button>
+                  
                   <button 
                     onClick={() => {
-                      setSelectedTextEdit(element.id);
+                      setSelectedTextEdit({
+                        elementId: element.id,
+                        isMulti: areAllSelectedText,
+                        selectedIds: selectedElementIds
+                      });
                       closeContextMenu();
                     }}
-                    disabled={element?.type !== 'text'}
+                    disabled={
+                      (selectedElementIds.length === 0 && element?.type !== 'text') || 
+                      (selectedElementIds.length > 0 && !areAllSelectedText)
+                    }
                   >
                     Шрифт...
                   </button>
+
                   <button 
                     onClick={() => handleFlipImage(element.id)}
-                    disabled={element?.type !== 'image' && element?.type !== 'element' }
+                    disabled={selectedElementIds.length > 0 || (element?.type !== 'image' && element?.type !== 'element')}
                   >
                     Отобразить зеркально
                   </button>
                   
                   <button 
                     onClick={() => handleRemoveBackground(element.id)}
-                    disabled={element?.type !== 'image'}
+                    disabled={selectedElementIds.length > 0 || element?.type !== 'image'}
                   >
                     Удалить фон
                   </button>
+
                   <button 
-                    onClick={() => handleColorButtonClick(element.id)}
-                    disabled={element?.type !== 'shape'}
+                    onClick={() => handleColorButtonClick(areAllSelectedShape ? selectedElementIds : element.id)}
+                    disabled={
+                      (selectedElementIds.length === 0 && element?.type !== 'shape') || 
+                      (selectedElementIds.length > 0 && !areAllSelectedShape)
+                    }
                   >
                     Изменить цвет
                   </button>
                   
-                  </>}
+                 
                   <div className='separator'></div>
 
                   <button
@@ -1367,17 +1461,24 @@ const moveElement = (fromIndex, toIndex) => {
       />
       {/* Панель настроек шрифта вне цикла элементов */}
       {selectedTextEdit && (
-        <div className="font-controls-wrapper"
+        <div 
+          className="font-controls-wrapper"
           style={{
             position: 'fixed',
             left: contextMenu.x,
             top: contextMenu.y,
+            zIndex: 1000
           }}
+          onClick={(e) => e.stopPropagation()} // Предотвращаем всплытие события
         >
           <FontControls
-            element={elements.find(el => el.id === selectedTextEdit)}
+            element={elements.find(el => el.id === selectedTextEdit.elementId)}
+            isMulti={selectedTextEdit.isMulti}
+            selectedElementIds={selectedTextEdit.selectedIds}
             onClose={() => setSelectedTextEdit(null)}
             onChange={handleFontChange}
+            onChangeMulti={handleFontChangeMulti}
+            elements={elements}
           />
         </div>
       )}  

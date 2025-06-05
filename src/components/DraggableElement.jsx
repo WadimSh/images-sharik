@@ -183,7 +183,7 @@ const DraggableElement = ({
   };
 
   const handleMouseMove = (e) => {
-    if (isResizing) {
+    if (isResizing && elementRef.current) {
       const deltaX = e.clientX - initialSize.current.x;
       const deltaY = e.clientY - initialSize.current.y;
   
@@ -253,7 +253,17 @@ const DraggableElement = ({
       const parentRect = elementRef.current.parentNode.getBoundingClientRect();
       const newX = e.clientX - parentRect.left - offset.x;
       const newY = e.clientY - parentRect.top - offset.y;
-      onDrag?.({ x: newX, y: newY });
+
+      if ((selectedElementIds.includes(id) || selectedElementId === id) && selectedElementIds.length > 0) {
+        // Для группового перетаскивания передаем только дельту
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onDrag({ x: newX, y: newY }, { deltaX, deltaY });
+      } else {
+        // Для одиночного элемента используем абсолютные координаты
+        onDrag({ x: newX, y: newY });
+      }
+      
       updateOverlayPosition();
     }
   };

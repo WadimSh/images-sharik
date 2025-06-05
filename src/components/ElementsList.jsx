@@ -185,15 +185,15 @@ export const ElementsList = ({
                       <label>Горизонталь:
                         <div>
                           <button
-                            className={`direction-btn ${shadowSetting.offsetX === -15 ? 'active' : ''}`}
+                            className={`direction-btn ${shadowSetting.offsetX === -20 ? 'active' : ''}`}
                             style={{ marginRight: '8px' }}
-                            onClick={() => handleDirectionChange('offsetX', -15)}
+                            onClick={() => handleDirectionChange('offsetX', -20)}
                           >
                             <FaArrowLeft />
                           </button>
                           <button
-                            className={`direction-btn ${shadowSetting.offsetX === 15 ? 'active' : ''}`}
-                            onClick={() => handleDirectionChange('offsetX', 15)}
+                            className={`direction-btn ${shadowSetting.offsetX === 20 ? 'active' : ''}`}
+                            onClick={() => handleDirectionChange('offsetX', 20)}
                           >
                             <FaArrowRight />
                           </button>
@@ -205,15 +205,15 @@ export const ElementsList = ({
                       <label>Вертикаль:
                         <div>
                           <button
-                            className={`direction-btn ${shadowSetting.offsetY === -15 ? 'active' : ''}`}
+                            className={`direction-btn ${shadowSetting.offsetY === -20 ? 'active' : ''}`}
                             style={{ marginRight: '8px' }}
-                            onClick={() => handleDirectionChange('offsetY', -15)}
+                            onClick={() => handleDirectionChange('offsetY', -20)}
                           >
                             <FaArrowUp />
                           </button>
                           <button
-                            className={`direction-btn ${shadowSetting.offsetY === 15 ? 'active' : ''}`}
-                            onClick={() => handleDirectionChange('offsetY', 15)}
+                            className={`direction-btn ${shadowSetting.offsetY === 20 ? 'active' : ''}`}
+                            onClick={() => handleDirectionChange('offsetY', 20)}
                           >
                             <FaArrowDown />
                           </button>
@@ -223,7 +223,7 @@ export const ElementsList = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddShadow(element.id, 15, 15);
+                        handleAddShadow(element.id, 20, 20);
                       }}
                       className="remove-bg-button"
                       title="Добавить тень"
