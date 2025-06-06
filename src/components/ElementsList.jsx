@@ -30,6 +30,8 @@ export const ElementsList = ({
   moveElement,
   selectedElementId,
   setSelectedElementId,
+  selectedElementIds,
+  setSelectedElementIds,
   expandedElementId,
   setExpandedElementId,
   onPositionChange,
@@ -51,13 +53,24 @@ export const ElementsList = ({
             originalIndex={originalIndex}
             moveElement={moveElement}
             elements={elements}
-            isSelected={element.id === selectedElementId} // Передаем флаг выделения
+            isSelected={selectedElementIds.includes(element.id)}
             disabled={isExpanded}
             setExpandedElementId={setExpandedElementId}
           >
             <div 
-              className={`element-item ${element.id === selectedElementId ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
-              onClick={() => setSelectedElementId(element.id)}
+              className={`element-item ${element.id === selectedElementId ? 'selected' : ''} ${selectedElementIds.includes(element.id) ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
+              onClick={(e) => {
+                if (e.shiftKey) {
+                  if (selectedElementIds.includes(element.id)) {
+                    setSelectedElementIds(prev => prev.filter(id => id !== element.id));
+                  } else {
+                    setSelectedElementIds(prev => [...prev, element.id]);
+                  }
+                } else {
+                  setSelectedElementId(element.id);
+                  setSelectedElementIds([]);
+                }
+              }}
             >
 
               <div 

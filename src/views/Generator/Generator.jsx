@@ -1444,6 +1444,8 @@ const moveElement = (fromIndex, toIndex) => {
           handleFontChange={handleFontChange}
           selectedElementId={selectedElementId}
           setSelectedElementId={handleElementClick}
+          selectedElementIds={selectedElementIds}
+          setSelectedElementIds={setSelectedElementIds}
           expandedElementId={expandedElementId}
           setExpandedElementId={setExpandedElementId}
           onPositionChange={handlePositionChange}
