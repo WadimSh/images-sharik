@@ -122,25 +122,43 @@ export const HeaderSection = ({
       // Формирование имени файла
       const fileName = `${baseCode}_${marketplace}_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
+      // Получаем ключ для sessionStorage
+      const sessionKey = slideNumber 
+      ? `design-${id}` 
+      : 'design-collage';
+  
+      // Сохраняем дизайн в localStorage
+      const designData = sessionStorage.getItem(sessionKey);
+      if (designData) {
+        const localStorageKey = fileName.replace('.png', '');
+        localStorage.setItem(localStorageKey, designData);
+      }
+
       // Генерация изображения
       const canvas = await html2canvas(captureRef.current, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#FFFFFF' // Убираем прозрачность для уменьшения размера
+        backgroundColor: '#FFFFFF',
+        imageRendering: 'pixelated' // Улучшаем рендеринг
       });
 
       // Получаем сырые данные изображения
       const ctx = canvas.getContext('2d');
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     
-      // Оптимизация с UPNG
+      // Оптимизация с UPNG с лучшими настройками для градиентов
       const pngBuffer = UPNG.encode(
-        [imageData.data.buffer], // Пиксельные данные
+        [imageData.data.buffer],
         canvas.width,
         canvas.height,
-        256, // Количество цветов (256 = 8-битная палитра)
-        0    // Задержка для анимации
+        0,    // 0 = 32-bit RGBA, сохраняем полное качество цвета
+        0,    // Задержка для анимации
+        {
+          cnum: 50000,  // Увеличиваем количество цветов в палитре
+          dith: 1,      // Включаем дизеринг для лучших градиентов
+          filter: 0     // Используем адаптивную фильтрацию
+        }
       );
 
       // Создаем Blob и URL

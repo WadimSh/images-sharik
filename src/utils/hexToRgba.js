@@ -1,6 +1,15 @@
-export const hexToRgba = (hex, alpha) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+export const hexToRgba = (hex, alpha = 1) => {
+  // Убираем # если есть
+  const cleanHex = hex.replace('#', '');
+  
+  // Парсим RGB значения
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+  
+  // Обрабатываем особые случаи для градиентов
+  const processedAlpha = alpha === 0 ? 0.0001 : alpha; // Предотвращаем полную прозрачность
+  
+  // Возвращаем rgba строку
+  return `rgba(${r}, ${g}, ${b}, ${processedAlpha})`;
 };

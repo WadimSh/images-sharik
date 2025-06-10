@@ -1,4 +1,7 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
+import { IoFolderOpen } from "react-icons/io5";
 
 import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
 
@@ -13,6 +16,9 @@ const SearchHeader = ({
   isToggled, 
   setIsToggled
 }) => {
+  const navigate = useNavigate();
+  const [hasKeys, setHasKeys] = useState(false);
+
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
     
@@ -60,6 +66,10 @@ const SearchHeader = ({
     }
   };
 
+  const handleGalleryClick = () => {
+    navigate('/gallery');
+  };
+
   const handleClear = () => {
     setSearchQuery('');
     onSearch([]);
@@ -73,7 +83,14 @@ const SearchHeader = ({
       handleSearch();
     }
   };
-  
+
+  useEffect(() => {
+    const articlePattern = /^\d{4}-\d{4}/;
+    const keys = Object.keys(localStorage);
+    const hasKeys = keys.some(key => articlePattern.test(key));
+    setHasKeys(hasKeys);
+  }, []);
+
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <h2 style={{
@@ -133,10 +150,18 @@ const SearchHeader = ({
         )}
       </div>}
       {isSearchActive && <div className="template-button-container">
-      <MarketplaceSwitcher />
-      <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
-        <RiCollageFill /> Создать коллаж
-      </button>
+        <MarketplaceSwitcher />
+        <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
+          <RiCollageFill /> Создать коллаж
+        </button>
+        <button 
+          onClick={handleGalleryClick} 
+          className="template-button" 
+          style={{ background: 'transparent' }}
+          disabled={!hasKeys}
+        >
+          <IoFolderOpen /> Галерея дизайнов
+        </button>
       </div>}
     </div>
   );

@@ -1,499 +1,402 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { PreviewDesign } from '../../components/PreviewDesign';
+import { useMarketplace } from '../../context/contextMarketplace';
 
 export const Gallery = () => {
-  const [folders, setFolders] = useState([]);
-  const [selectedFolder, setSelectedFolder] = useState('');
-  const [files, setFiles] = useState([]);
-  const [error, setError] = useState(null);
-  const [downloadUrl, setDownloadUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  
-  const fileInputRef = useRef(null);
-  const token = process.env.REACT_APP_YANDEX_APP_API_KEY;
+  const navigate = useNavigate();
+  const [designs, setDesigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { marketplace, toggleMarketplace } = useMarketplace();
 
-  // Получение списка папок
-  const fetchFolders = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const url = new URL('https://cloud-api.yandex.net/v1/disk/resources');
-      url.searchParams.append('path', 'disk:/');
-      url.searchParams.append('limit', '100');
-      url.searchParams.append('fields', '_embedded.items.name,_embedded.items.path,_embedded.items.type');
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `OAuth ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.description || data.message || 'Ошибка при получении данных');
-      }
-
-      // Фильтруем только папки
-      const folderItems = data._embedded.items.filter(item => item.type === 'dir');
-      setFolders(folderItems);
-      
-    } catch (error) {
-      console.error('Ошибка при получении папок:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
+  const processProductsMeta = (productsData) => {
+    if (!Array.isArray(productsData)) {
+      console.error('Некорректные данные для обработки:', productsData);
+      return [];
     }
-  };
-
-  // Получение файлов в выбранной папке
-  const fetchFiles = async () => {
-    if (!selectedFolder) return;
-    
-    setIsLoading(true);
-    setError(null);
-    setFiles([]);
-    setDownloadUrl(null);
-    
-    try {
-      // Используем URLSearchParams для автоматического кодирования
-      const url = new URL('https://cloud-api.yandex.net/v1/disk/resources');
-      url.searchParams.append('path', selectedFolder); // Путь в исходном формате
-      url.searchParams.append('limit', '100');
-      url.searchParams.append('fields', '_embedded.items.name,_embedded.items.path,_embedded.items.preview,_embedded.items.mime_type');
   
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `OAuth ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.description || data.message || 'Ошибка при получении файлов');
+    return productsData.map(item => {
+      if (!item || !item.images || !Array.isArray(item.images)) {
+        console.warn('Некорректный элемент товара:', item);
+        return null;
       }
   
-      // Фильтруем элементы, считая файлами все, у которых есть mime_type
-      const fileItems = data._embedded.items
-        .filter(item => item.mime_type)
-        .map(file => ({
-          ...file,
-          isImage: file.mime_type && file.mime_type.startsWith('image/')
-        }));
-      
-      setFiles(fileItems);
-      
-    } catch (error) {
-      console.error('Ошибка при получении файлов:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+      const properties = item.properties || [];
+      const originProperties = item.origin_properties || [];
+  
+      // Формируем массив ссылок на изображения
+      const images = item.images.map(image => 
+        `https://new.sharik.ru${image.image}`
+      );
+
+      const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
+      const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
+
+      // Добавляем определение типа шаблона
+      const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
+      const brand = brandProperty ? brandProperty.value : '';
+      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : 'main';
+  
+      return {
+        code: item.code,
+        name: item.name,
+        multiplicity: item.multiplicity,
+        link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
+        images: images, // Массив ссылок на все изображения товара
+        properties: propertiesList,
+        originProperties: originPropertiesList,
+        templateType: templateType, // Добавлено новое поле
+      };
+    }); // Фильтруем некорректные элементы
   };
 
-  // Получение ссылки на скачивание файла
-  const fetchDownloadUrl = async (filePath) => {
-    setError(null);
-    setDownloadUrl(null);
-    
-    try {
-      const url = new URL('https://cloud-api.yandex.net/v1/disk/resources/download');
-      url.searchParams.append('path', filePath);
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `OAuth ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.description || data.message || 'Ошибка при получении ссылки');
-      }
-
-      setDownloadUrl(data.href);
-      
-    } catch (error) {
-      console.error('Ошибка при получении ссылки:', error);
-      setError(error.message);
-    }
+  // Функция для удаления дизайна
+  const handleDelete = (key) => {
+    localStorage.removeItem(key);
+    setDesigns(prev => prev.filter(item => item.key !== key));
   };
 
-  // Обработчик изменения выбранной папки
-  const handleFolderChange = (e) => {
-    setSelectedFolder(e.target.value);
-    setFiles([]);
-    setDownloadUrl(null);
-    setUploadStatus(null);
-  };
-
-  // Обработчик выбора файла для загрузки
-  const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      setUploadStatus(null);
-    }
-  };
-
-  // Загрузка файла на Яндекс.Диск
-  const uploadFileToYandexDisk = async () => {
-    if (!selectedFile || !selectedFolder) {
-      setError('Выберите файл и папку для загрузки');
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // 1. Получаем URL для загрузки
-      const fileName = selectedFile.name;
-      const filePath = `${selectedFolder}/${fileName}`;
-            
-      const url = new URL('https://cloud-api.yandex.net/v1/disk/resources/upload');
-      url.searchParams.append('path', filePath);
-      url.searchParams.append('overwrite', 'true');
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `OAuth ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.description || data.message || 'Ошибка при получении URL для загрузки');
-      }
-
-      // 2. Загружаем файл по полученному URL
-      const uploadResponse = await fetch(data.href, {
-        method: 'PUT',
-        body: selectedFile,
-        headers: {
-          'Content-Type': selectedFile.type || 'application/octet-stream'
-        }
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Ошибка при загрузке файла');
-      }
-
-      setUploadStatus('success');
-      setSelectedFile(null);
-      
-      // Очищаем input файла
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      
-      // Обновляем список файлов
-      fetchFiles();
-      
-    } catch (error) {
-      console.error('Ошибка загрузки файла:', error);
-      setError(error.message);
-      setUploadStatus('error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  console.log(files);
-  return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Галерея Яндекс.Диска</h1>
-      
-      {/* Блок управления папками */}
-      <div style={{ 
-        backgroundColor: '#f8f9fa', 
-        padding: '20px', 
-        borderRadius: '8px',
-        marginBottom: '30px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-          <button 
-            onClick={fetchFolders}
-            disabled={isLoading}
-            style={{
-              padding: '10px 15px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              minWidth: '200px'
-            }}
-          >
-            {isLoading ? 'Загрузка...' : 'Получить список папок'}
-          </button>
-          
-          {folders.length > 0 && (
-            <div style={{ flexGrow: 1 }}>
-              <label htmlFor="folder-select" style={{ marginRight: '10px', fontWeight: 'bold' }}>
-                Выберите папку: 
-              </label>
-              <select 
-                id="folder-select"
-                value={selectedFolder}
-                onChange={handleFolderChange}
-                style={{
-                  padding: '8px',
-                  width: '50%',
-                  minWidth: '300px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd'
-                }}
-              >
-                <option value="">-- Выберите папку --</option>
-                {folders.map(folder => (
-                  <option key={folder.path} value={folder.path}>
-                    {folder.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
+  const handleItemClick = async (key) => {
         
-        {/* Блок загрузки файлов */}
-        {selectedFolder && (
-          <div style={{ 
-            backgroundColor: '#e8f4f8', 
-            padding: '15px', 
-            borderRadius: '6px',
-            marginTop: '15px'
-          }}>
-            <h3 style={{ marginTop: 0, marginBottom: '15px' }}>Загрузить файл в папку</h3>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-              
-              <button
-                onClick={() => fileInputRef.current.click()}
-                style={{
-                  padding: '8px 15px',
-                  backgroundColor: '#2196F3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Выбрать файл
-              </button>
-              
-              {selectedFile && (
-                <div style={{ flexGrow: 1 }}>
-                  <span style={{ marginRight: '10px' }}>Выбран: {selectedFile.name}</span>
-                  <span>({Math.round(selectedFile.size / 1024)} KB)</span>
-                </div>
-              )}
-              
-              <button
-                onClick={uploadFileToYandexDisk}
-                disabled={!selectedFile || isLoading}
-                style={{
-                  padding: '8px 15px',
-                  backgroundColor: '#FF9800',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  minWidth: '150px'
-                }}
-              >
-                {isLoading ? 'Загрузка...' : 'Загрузить на Диск'}
-              </button>
-            </div>
-            
-            {uploadStatus === 'success' && (
-              <div style={{ 
-                marginTop: '15px', 
-                padding: '10px',
-                backgroundColor: '#e8f5e9',
-                color: '#2e7d32',
-                borderRadius: '4px'
-              }}>
-                Файл успешно загружен!
-              </div>
-            )}
-            
-            {uploadStatus === 'error' && (
-              <div style={{ 
-                marginTop: '15px', 
-                padding: '10px',
-                backgroundColor: '#ffebee',
-                color: '#c62828',
-                borderRadius: '4px'
-              }}>
-                Ошибка при загрузке файла
-              </div>
-            )}
-          </div>
-        )}
+    // Проверяем, является ли дизайн коллажем
+    if (key.includes('_collage')) {
+      try {
+        // Получаем данные дизайна
+        const designData = JSON.parse(localStorage.getItem(key));
+        
+        // Сохраняем основной объект коллажа
+        sessionStorage.setItem('design-collage', JSON.stringify(designData));
+        
+        // Извлекаем артикулы из ключа
+        const articles = extractArticlesFromKey(key);
+        
+        // Сохраняем массив артикулов
+        sessionStorage.setItem('collage-articles', JSON.stringify(articles));
+        
+        // Перенаправляем на страницу коллажа
+        navigate('/template/collage');
+        return;
+      } catch (error) {
+        console.error('Ошибка при обработке коллажа:', error);
+      }
+    }
+
+    // Обработка обычных дизайнов (не коллажей)
+    try {
+      // Получаем данные дизайна
+      const designData = JSON.parse(localStorage.getItem(key));
+
+      // Извлекаем информацию о типе дизайна
+      const designInfo = extractDesignInfo(key);
+
+      // Формируем ключ для sessionStorage
+      const storageKey = `design-${designInfo.article}_${designInfo.slideNumber}`;
+
+      // Сохраняем данные в sessionStorage
+      sessionStorage.setItem(storageKey, JSON.stringify(designData));
+
+    // Выполняем запросы последовательно с await
+    const searchResponse = await fetch(
+      `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${designInfo.article}`
+    );
+    
+    const searchData = await searchResponse.json();
+    
+    if (!searchData.results || searchData.results.length === 0) {
+      throw new Error("Товар с таким артикулом не активен.");
+    }
+    
+    const productIds = searchData.results.map(product => product.id);
+    const idsParam = productIds.join(',');
+    
+    const detailedResponse = await fetch(
+      `https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`
+    );
+    
+    if (!detailedResponse.ok) {
+      throw new Error('Ошибка при получении детальной информации');
+    }
+    
+    const detailedData = await detailedResponse.json();
+    
+    // Обрабатываем полученные данные API
+    const processedMetaResults = processProductsMeta(detailedData);
+    
+    // Сохраняем обработанные данные
+    processedMetaResults.forEach(item => {
+      if (item) {
+        sessionStorage.setItem(
+          `product-${item.code}`, 
+          JSON.stringify(item)
+        );
+      }
+    });
+
+      // Формируем роут для перехода
+      const route = `/template/${designInfo.article}_${designInfo.slideNumber}`;
+
+      // Перенаправляем
+      navigate(route);
+    } catch (error) {
+      console.error('Ошибка при обработке дизайна:', error);
+    }
+  };
+
+  // Функция для извлечения информации о дизайне из ключа
+  const extractDesignInfo = (key) => {
+    const parts = key.split('_');
+
+    // Извлекаем артикул (первая часть)
+    const article = parts[0];
+
+    // Определяем номер слайда
+    let slideNumber = 1; // По умолчанию main = 1
+
+    // Ищем часть, содержащую информацию о типе слайда
+    const slidePart = parts.find(part => 
+      part === 'main' || part.startsWith('slide')
+    );
+
+    if (slidePart) {
+      if (slidePart === 'main') {
+        slideNumber = 1;
+      } else if (slidePart.startsWith('slide')) {
+        // Извлекаем номер из slide2, slide3 и т.д.
+        const numberPart = slidePart.replace('slide', '');
+        const parsedNumber = parseInt(numberPart, 10);
+        if (!isNaN(parsedNumber)) {
+          slideNumber = parsedNumber;
+        }
+      }
+    }
+
+    return {
+      article,
+      slideNumber
+    };
+  };
+
+  // Функция для извлечения артикулов из ключа
+  const extractArticlesFromKey = (key) => {
+    // Разбиваем ключ на части
+    const parts = key.split('_');
+    
+    // Первая часть содержит артикулы
+    const articlesPart = parts[0];
+    
+    // Разделяем артикулы (могут быть через дефис или подчеркивание)
+    const articlePattern = /\d{4}-\d{4}/g;
+    const matches = articlesPart.match(articlePattern);
+    
+    return matches || [];
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // Функция для загрузки дизайнов из localStorage
+  const loadDesigns = () => {
+    const loadedDesigns = [];
+    
+    // Регулярное выражение для поиска ключей с артикулами
+    const articlePattern = /^\d{4}-\d{4}/;
+    
+    // Перебираем все элементы в localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      
+      // Проверяем, соответствует ли ключ шаблону артикула
+      if (articlePattern.test(key)) {
+        try {
+          const designData = JSON.parse(localStorage.getItem(key));
+          loadedDesigns.push({
+            key,
+            data: designData,
+            title: key // Используем ключ как заголовок
+          });
+        } catch (error) {
+          console.error(`Ошибка при парсинге дизайна ${key}:`, error);
+        }
+      }
+    }
+    
+    setDesigns(loadedDesigns);
+    setLoading(false);
+  };
+
+   // Функция для парсинга и форматирования заголовка
+   const parseDesignTitle = (title) => {
+    const parts = title.split('_');
+    
+    // Проверяем минимальное количество частей
+    if (parts.length < 6) {
+      return {
+        articles: title,
+        marketplace: 'Неизвестно',
+        designType: 'Неизвестно',
+        dimensions: 'Неизвестно',
+        date: 'Неизвестно',
+        time: 'Неизвестно'
+      };
+    }
+    
+    // Определяем индекс типа дизайна (коллаж или слайд)
+    let designTypeIndex = -1;
+    let designType = 'Неизвестно';
+    
+    // Сначала ищем "collage" или "main"
+    if (parts.includes('collage')) {
+      designTypeIndex = parts.indexOf('collage');
+      designType = 'Коллаж';
+    } else if (parts.includes('main')) {
+      designTypeIndex = parts.indexOf('main');
+      designType = 'Дизайн';
+    } else {
+      // Ищем любой слайд (slideX)
+      for (let i = 0; i < parts.length; i++) {
+        if (parts[i].startsWith('slide')) {
+          designTypeIndex = i;
+          designType = 'Дизайн';
+          break;
+        }
+      }
+    }
+    
+    // Если не нашли тип дизайна, возвращаем неизвестные значения
+    if (designTypeIndex === -1) {
+      return {
+        articles: title,
+        marketplace: 'Неизвестно',
+        designType: 'Неизвестно',
+        dimensions: 'Неизвестно',
+        date: 'Неизвестно',
+        time: 'Неизвестно'
+      };
+    }
+    
+    // Извлекаем данные
+    const articles = parts.slice(0, designTypeIndex - 1).join(', ');
+    const marketplace = parts[designTypeIndex - 1];
+    const dimensions = parts[designTypeIndex + 1];
+    const date = parts[designTypeIndex + 2];
+    const time = parts[designTypeIndex + 3];
+    
+    // Форматируем дату
+    const formattedDate = date.length === 8 
+      ? `${date.substring(0,2)}.${date.substring(2,4)}.${date.substring(4)}`
+      : date;
+    
+    // Форматируем время
+    const formattedTime = time.length === 4 
+      ? `${time.substring(0,2)}:${time.substring(2)}`
+      : time;
+    
+    return {
+      articles,
+      marketplace,
+      marketplaceName: marketplace === 'WB' ? 'Wildberries' : marketplace === 'OZ' ? 'Ozon' : marketplace,
+      designType, // Уже определили как "Коллаж" или "Дизайн"
+      dimensions,
+      date: formattedDate,
+      time: formattedTime
+    };
+  };
+
+  useEffect(() => {
+    loadDesigns();
+    
+    // Обработчик для обновления при изменении localStorage
+    const handleStorageChange = () => loadDesigns();
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
       </div>
-      
-      {/* Кнопка показа файлов */}
-      {selectedFolder && folders.length > 0 && (
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <button 
-            onClick={fetchFiles}
-            disabled={isLoading}
-            style={{
-              padding: '10px 25px',
-              backgroundColor: '#9C27B0',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            {files.length ? 'Обновить список файлов' : 'Показать файлы в папке'}
-          </button>
-        </div>
-      )}
-      
-      {/* Отображение ошибок */}
-      {error && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '15px', 
-          backgroundColor: '#ffebee', 
-          borderRadius: '5px',
-          color: '#c62828'
-        }}>
-          <h3>Ошибка:</h3>
-          <pre>{error}</pre>
-        </div>
-      )}
-      
-      {/* Сетка файлов */}
-      {files.length > 0 && (
-        <div>
-          <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-            Файлы в папке: {
-              folders.find(f => f.path === selectedFolder)?.name || selectedFolder
-            }
-          </h2>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
-            gap: '25px',
-            marginTop: '20px'
-          }}>
-            {files.map(file => (
-              <div 
-                key={file.path} 
-                style={{
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  padding: '15px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  ':hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 6px 12px rgba(0,0,0,0.15)'
-                  }
+    );
+  }
+
+  return (
+    <div>
+      <div className='header-section' style={{ margin: '10px'}}>
+        <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
+          {'< Назад'}
+        </button>
+        <h2 style={{ color: '#333'}}>Созданные дизайны</h2>
+      </div>
+      <div className="items-grid-container">
+        {designs.length === 0 ? (
+          <div 
+          style={{ color: '#333', fontSize: '16px', textAlign: 'center', marginTop: '20px' }}>
+            <p>Нет сохраненных дизайнов</p>
+            <p>Создайте и сохраните дизайн или коллаж</p>
+          </div>
+        ) : (
+        <div className="items-grid">
+          {designs.map((design) => {
+            const info = parseDesignTitle(design.title);
+            return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div 
+              key={design.key} 
+              className="item-card" 
+              style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                marketplace !== info.marketplace && toggleMarketplace();
+                handleItemClick(design.key);
+              }}
+              role="button"
+              tabIndex={0}
+            >
+              <button
+                className="delete-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(design.key);
                 }}
-                onClick={() => fetchDownloadUrl(file.path)}
+                title="Удалить дизайн"
               >
-                {file.isImage && file.preview ? (
-                  <img 
-                    src={`https://images.weserv.nl/?url=${encodeURIComponent(file.preview)}&w=500`} 
-                    alt={file.name} 
-                    style={{ 
-                      width: '100%', 
-                      height: '180px', 
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                      border: '1px solid #eee'
-                    }} 
-                  />
-                ) : (
-                  <div style={{
-                    width: '100%',
-                    height: '180px',
-                    backgroundColor: '#f5f5f5',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '4px',
-                    border: '1px solid #eee',
-                    fontSize: '60px',
-                    color: '#607d8b'
-                  }}>
-                    {file.mime_type?.includes('pdf') ? '📄' : '📁'}
-                  </div>
-                )}
-                <div style={{ 
-                  marginTop: '12px', 
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {file.name}
-                </div>
+                ×
+              </button>
+
+              <div className="item-content">
+                <PreviewDesign elements={design.data} />
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* Ссылка на скачивание */}
-      {downloadUrl && (
-        <div style={{ 
-          marginTop: '40px', 
-          padding: '25px', 
-          backgroundColor: '#e8f5e9', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <h3>Ссылка для скачивания:</h3>
-          <a 
-            href={downloadUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '12px 25px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              marginTop: '15px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            Скачать файл
-          </a>
-          <div style={{ 
-            marginTop: '20px', 
-            wordBreak: 'break-all',
-            backgroundColor: 'white',
-            padding: '15px',
-            borderRadius: '4px',
-            fontFamily: 'monospace',
-            fontSize: '14px'
-          }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Прямая ссылка:</div> 
-            {downloadUrl}
-          </div>
-        </div>
-      )}
+
+            </div>
+            <div className="design-info-plate">
+                <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
+                  <span className="info-label">{info.designType} для {info.marketplaceName}</span>
+                </div>
+
+                <div className="info-row">
+                  <span className="info-label">Товары:</span>
+                  <span className="info-value">{info.articles}</span>
+                </div>
+                
+                <div className="info-row">
+                  <span className="info-label">Размер слайда:</span>
+                  <span className="info-value">{info.dimensions}</span>
+                </div>
+                
+                <div className="info-row">
+                  <span className="info-label">Создан:</span>
+                  <span className="info-value">{info.date} в {info.time}</span>
+                </div>
+                
+                </div>
+            </div>
+          );
+        })} 
+        </div>)}
+      </div>
     </div>
   );
-}; 
+};

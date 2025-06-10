@@ -61,18 +61,18 @@ export const ShapeElement = ({
           height: `${height}px`,
           background: element.gradient 
             ? `linear-gradient(${element.gradient.direction}, 
-              ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])} ${element.gradient.start}%, 
-              ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])} 100%)`
+                ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])} ${element.gradient.start}%, 
+                ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])} 100%)`
             : color,
+          backgroundBlendMode: element.gradient ? 'normal' : 'unset',
           border: 'none',
           opacity: element.opacity,
           borderRadius: `${element.borderRadius?.topLeft || 0}px ${element.borderRadius?.topRight || 0}px 
-                 ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`
+                 ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`,
+          isolation: 'isolate' // Создаем новый контекст наложения
         }}
         onContextMenu={onContextMenu}
-      >
-        
-      </div>
+      />
     </DraggableElement>
   );
 };

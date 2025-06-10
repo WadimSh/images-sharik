@@ -118,3 +118,10 @@ h2 {
   align-items: center;
   gap: 10px;
 }
+
+.template-button:disabled {
+  border: 2px solid #66717d;
+  color: #66717d;
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -25,14 +25,14 @@ import { getCode } from '../../utils/getCodeProduct';
 
 export const Generator = () => {
   const { id } = useParams();
+  
   const isCollageMode = id === 'collage';
-
   const [baseId, slideNumber] = isCollageMode || !id ? ['', ''] : id.split('_');
   const apiKey = process.env.REACT_APP_API_KEY;
 
   const storageMetaKey = `product-${baseId}`
   const savedMetaDate = isCollageMode ? null : sessionStorage.getItem(storageMetaKey);
-  const initialMetaDateElement = savedMetaDate ? JSON.parse(savedMetaDate) : [];
+  const initialMetaDateElement = savedMetaDate ? JSON.parse(savedMetaDate) : null;
  
   // Загрузка из sessionStorage при инициализации
   const storageKey = isCollageMode 
@@ -114,7 +114,7 @@ export const Generator = () => {
   });
 
   const [initialCollage] = useState(processedElements);
-
+  
   const { handleAddElement } = useElementToolbar(
     setElements,
     fileInputRef,
@@ -506,15 +506,57 @@ export const Generator = () => {
       // Декодируем изображение
       const image = UPNG.decode(arrayBuffer);
       
-      // Параметры сжатия
-      const compression = 60; // Уровень сжатия (0-100)
-            
-      // Перекодируем с оптимизацией
+      // Функция получения настроек сжатия в зависимости от размера изображения
+      const getCompressionSettings = (width, height) => {
+        const totalPixels = width * height;
+        
+        if (totalPixels > 2000000) { // Очень большие изображения (>2MP)
+          return {
+            colors: 256,
+            cnum: 10000,
+            dith: 1,
+            filter: 0
+          };
+        } else if (totalPixels > 1000000) { // Большие изображения (1-2MP)
+          return {
+            colors: 256,
+            cnum: 15000,
+            dith: 1,
+            filter: 0
+          };
+        } else if (totalPixels > 500000) { // Средние изображения (0.5-1MP)
+          return {
+            colors: 256,
+            cnum: 20000,
+            dith: 1,
+            filter: 0
+          };
+        } else { // Маленькие изображения (<0.5MP)
+          return {
+            colors: 256, // Используем 8-бит цвет для всех размеров
+            cnum: 25000,
+            dith: 1,
+            filter: 0
+          };
+        }
+      };
+
+      // Получаем настройки сжатия для текущего изображения
+      const compressionSettings = getCompressionSettings(image.width, image.height);
+      
+      // Оптимизированные параметры сжатия с адаптивной логикой
       const compressedArray = UPNG.encode(
         [image.data.buffer],
         image.width,
         image.height,
-        compression
+        compressionSettings.colors,
+        0, // Задержка анимации
+        {
+          cnum: compressionSettings.cnum,
+          dith: compressionSettings.dith,
+          filter: compressionSettings.filter,
+          tabs: { pHYs: [2834, 2834, 1] } // Сохраняем информацию о DPI для лучшего качества
+        }
       );
       
       // Создаем Blob из сжатых данных
@@ -565,7 +607,7 @@ export const Generator = () => {
     }
   };
 
-  // Функция добавления тени через PhotoRoom API
+  // Функция добавления тени
   const handleAddShadow = async (elementId) => {
   try {
       const element = elements.find(el => el.id === elementId);
@@ -1112,7 +1154,7 @@ const moveElement = (fromIndex, toIndex) => {
         handleCreateCollageTemple={handleCreateCollageTemple}
       />
       <div className="content-wrapper">
-        {!isCollageMode && (
+        {(!isCollageMode && initialMetaDateElement !== null) && (
           <ProductMetaInfo 
             initialMetaDateElement={initialMetaDateElement}
           />
@@ -1123,7 +1165,7 @@ const moveElement = (fromIndex, toIndex) => {
           <ElementToolbar onAddElement={handleAddElement} />
         </div>
         <div className='design-area'>
-          {!isCollageMode ? (
+          {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
               elements={elements}
