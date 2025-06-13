@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "./static/css/main.7d6702af.css",
-    "main.js": "./static/js/main.c0a00804.js",
+    "main.js": "./static/js/main.c3cb2598.js",
     "static/js/453.48c6c0fd.chunk.js": "./static/js/453.48c6c0fd.chunk.js",
     "static/media/9887.otf": "./static/media/9887.c8cdb23bf53b66746cc7.otf",
     "static/media/Troubleside.ttf": "./static/media/Troubleside.9879b07310972fc2997b.ttf",
@@ -16,11 +16,11 @@
     "static/media/item.jpg": "./static/media/item.8cb3bae9c03441195ea1.jpg",
     "index.html": "./index.html",
     "main.7d6702af.css.map": "./static/css/main.7d6702af.css.map",
-    "main.c0a00804.js.map": "./static/js/main.c0a00804.js.map",
+    "main.c3cb2598.js.map": "./static/js/main.c3cb2598.js.map",
     "453.48c6c0fd.chunk.js.map": "./static/js/453.48c6c0fd.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.7d6702af.css",
-    "static/js/main.c0a00804.js"
+    "static/js/main.c3cb2598.js"
   ]
 }
