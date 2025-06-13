@@ -6,6 +6,7 @@ import UPNG from 'upng-js';
 
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { useMarketplace } from '../context/contextMarketplace';
+import { designsDB, collageDB } from '../utils/handleDB';
 
 export const HeaderSection = ({
   captureRef,
@@ -29,6 +30,8 @@ export const HeaderSection = ({
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
 
   const handleBack = () => {
+    localStorage.removeItem('design-collage');
+    localStorage.removeItem('collage-articles');
     navigate(-1);
   };
   
@@ -43,21 +46,40 @@ export const HeaderSection = ({
   };
 
   // Функция для удаления макета
-  const handleDeleteTemplate = (templateName) => {
-    const updatedTemplates = { ...templates };
-    delete updatedTemplates[templateName];
-    localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
-    setTemplates(updatedTemplates);
-    if (selectedTemplate === templateName) setSelectedTemplate('');
+  const handleDeleteTemplate = async(templateName) => {
+    try {
+      await designsDB.delete(templateName);
+
+      const updatedTemplates = await designsDB.getAll();
+      const updatedTemplatesObj = updatedTemplates.reduce((acc, template) => {
+        acc[template.code] = template.data;
+        return acc;
+      }, {});
+
+      setTemplates(updatedTemplatesObj);
+      if (selectedTemplate === templateName) setSelectedTemplate('');
+    } catch (error) {
+      console.error('Ошибка удаления макета:', error);
+    }
   };
 
-  const handleDeleteCollageTemple = (templateName) => {
-    const updatedTemplates = { ...collageTemples };
-    delete updatedTemplates[templateName];
-    localStorage.setItem('collagesLocal', JSON.stringify(updatedTemplates));
-    setCollageTemples(updatedTemplates);
-    if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
+  const handleDeleteCollageTemple = async(templateName) => {
+    try {
+      await collageDB.delete(templateName);
+
+      const updatedCollages = await collageDB.getAll();
+      const updatedCollagesObj = updatedCollages.reduce((acc, collage) => {
+        acc[collage.code] = collage.elements;
+        return acc;
+      }, {});
+
+      setCollageTemples(updatedCollagesObj);
+      if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
+    } catch (error) {
+      console.error('Ошибка удаления макета:', error);
+    }
   };
+
 
   // Функция выгрузки макета в одельный файл
   const handleExportTemplate = (templateName) => {
@@ -123,9 +145,9 @@ export const HeaderSection = ({
       const fileName = `${baseCode}_${marketplace}_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
       // Получаем ключ для sessionStorage
-      const sessionKey = slideNumber 
-      ? `design-${id}` 
-      : 'design-collage';
+      //const sessionKey = slideNumber 
+      //? `design-${id}` 
+      //: 'design-collage';
   
       // Сохраняем дизайн в localStorage
       //const designData = sessionStorage.getItem(sessionKey);
@@ -194,31 +216,103 @@ export const HeaderSection = ({
 
   // Эффект для загрузки макетов при монтировании и изменении
   useEffect(() => {
-    const loadTemplates = () => {
-      const savedTemplates = localStorage.getItem('templatesLocal');
-      if (savedTemplates) {
-        setTemplates(JSON.parse(savedTemplates));
+    const loadTemplates = async () => {
+      try {
+        const savedLocalTemplates = JSON.parse(localStorage.getItem('templatesLocal') || '{}');
+        const hasLocalTemplates = Object.keys(savedLocalTemplates).length > 0;
+        if (hasLocalTemplates) {
+          try {
+            // Переносим каждый шаблон в базу
+            await Promise.all(
+              Object.entries(savedLocalTemplates).map(async ([name, data]) => {
+                try {
+                  // Проверяем, нет ли уже такого шаблона в базе
+                  const existing = await designsDB.get(name);
+                  if (!existing) {
+                    await designsDB.add({
+                      code: name,
+                      data: data,
+                    });
+                  }
+                } catch (e) {
+                  console.error(`Ошибка переноса шаблона ${name}:`, e);
+                }
+              })
+            );
+            
+            // Очищаем localStorage после успешного переноса
+            localStorage.removeItem('templatesLocal');
+            console.log('Все шаблоны перенесены в IndexedDB');
+          } catch (migrationError) {
+            console.error('Ошибка миграции шаблонов:', migrationError);
+          }
+        }
+
+        const designsFromDB = await designsDB.getAll();
+        if (designsFromDB.length > 0) {
+          const templatesObj = designsFromDB.reduce((acc, template) => {
+            acc[template.code] = template.data;
+            return acc;
+          }, {});
+          setTemplates(templatesObj);
+        }
+
+      } catch (error) {
+        console.error('Ошибка загрузки макетов:', error);
       }
     };
   
     loadTemplates();
-    // Слушаем изменения в localStorage
-    window.addEventListener('storage', loadTemplates);
-    return () => window.removeEventListener('storage', loadTemplates);
   }, []);
 
   useEffect(() => {
-    const loadTemplates = () => {
-      const savedTemplates = localStorage.getItem('collagesLocal');
-      if (savedTemplates) {
-        setCollageTemples(JSON.parse(savedTemplates));
+    const loadTemplates = async () => {
+      try {
+        const savedLocalCollages = JSON.parse(localStorage.getItem('collagesLocal') || '{}');
+        const hasLocalCollages = Object.keys(savedLocalCollages).length > 0;
+
+        if (hasLocalCollages) {
+          try {
+            // Переносим каждый шаблон в базу
+            await Promise.all(
+              Object.entries(savedLocalCollages).map(async ([name, data]) => {
+                try {
+                  // Проверяем, нет ли уже такого шаблона в базе
+                  const existing = await collageDB.get(name);
+                  if (!existing) {
+                    await collageDB.add({
+                      code: name,
+                      elements: data,
+                    });
+                  }
+                } catch (e) {
+                  console.error(`Ошибка переноса шаблона ${name}:`, e); 
+                }
+              })
+            );
+            
+            // Очищаем localStorage после успешного переноса
+            localStorage.removeItem('collagesLocal');
+            console.log('Все шаблоны перенесены в IndexedDB');
+          } catch (migrationError) {
+            console.error('Ошибка миграции шаблонов:', migrationError);
+          }
+        }
+
+        const collagesFromDB = await collageDB.getAll();
+        if (collagesFromDB.length > 0) {
+          const collagesObj = collagesFromDB.reduce((acc, collage) => {
+            acc[collage.code] = collage.elements;
+            return acc;
+          }, {});
+          setCollageTemples(collagesObj);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки макетов:', error);
       }
     };
   
     loadTemplates();
-    // Слушаем изменения в localStorage
-    window.addEventListener('storage', loadTemplates);
-    return () => window.removeEventListener('storage', loadTemplates);
   }, []);
 
   return (

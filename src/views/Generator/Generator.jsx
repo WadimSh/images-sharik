@@ -38,7 +38,7 @@ export const Generator = () => {
   const storageKey = isCollageMode 
     ? 'design-collage' 
     : `design-${id}`;
-  const savedDesign = sessionStorage.getItem(storageKey);
+  const savedDesign = isCollageMode ? localStorage.getItem(storageKey) : sessionStorage.getItem(storageKey);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
   // Добавляем размеры по умолчанию для старых данных
@@ -136,9 +136,17 @@ export const Generator = () => {
   // Сохранение в sessionStorage при изменениях
   useEffect(() => {
     if (elements.length > 0) {
-      sessionStorage.setItem(storageKey, JSON.stringify(elements));
+      if (!isCollageMode) {
+        sessionStorage.setItem(storageKey, JSON.stringify(elements));
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify(elements));
+      }
     } else {
-      sessionStorage.removeItem(storageKey);
+      if (!isCollageMode) {
+        sessionStorage.removeItem(storageKey);
+      } else {
+        localStorage.removeItem(storageKey);
+      }
     }
   }, [elements, storageKey]);
 
@@ -157,7 +165,10 @@ export const Generator = () => {
 
   // Функция для загрузки макетов
   const loadTemplate = (templateName) => {
+    console.log('loadTemplate', templateName);
+    console.log('templates', templates);
     const template = templates[templateName];
+    console.log('template', template);
     if (!template) return;
 
     // Заменяем плейсхолдер на текущее изображение товара
@@ -175,7 +186,10 @@ export const Generator = () => {
   };
 
   const loadCollageTemplate = (templateName) => {
+    console.log('loadCollageTemplate', templateName);
+    console.log('collageTemples', collageTemples);
     const template = collageTemples[templateName];
+    console.log('template', template);
     if (!template) return;
 
     // Получаем данные для подстановки
@@ -225,9 +239,7 @@ export const Generator = () => {
 
     // Обновляем состояние и сохраняем в sessionStorage
     setElements(resultElements);
-    sessionStorage.setItem('design-collage', JSON.stringify(resultElements));
-
-
+    localStorage.setItem('design-collage', JSON.stringify(resultElements));
   };
 
   // Обработчик изменения цвета
@@ -575,22 +587,21 @@ export const Generator = () => {
         );
   
         // Обновляем sessionStorage только для продуктовых изображений
-        if (element?.isProduct && !isCollageMode) {
-          try {
-            const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
-            const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
-
-            if (indexImg >= 0 && indexImg < updatedImages.length) {
-              updatedImages[indexImg] = compressedDataURL;
-              sessionStorage.setItem(storageMetaKey, JSON.stringify({
-                ...currentMeta,
-                images: updatedImages
-              }));
-            }
-          } catch (e) {
-            console.error('Ошибка обновления sessionStorage:', e);
-          }
-        }
+        //if (element?.isProduct || !isCollageMode) {
+        //  try {
+        //    const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
+        //    const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
+        //    if (indexImg >= 0 && indexImg < updatedImages.length) {
+        //      updatedImages[indexImg] = compressedDataURL;
+        //      sessionStorage.setItem(storageMetaKey, JSON.stringify({
+        //        ...currentMeta,
+        //        images: updatedImages
+        //      }));
+        //    }
+        //  } catch (e) {
+        //    console.error('Ошибка обновления sessionStorage:', e);
+        //  }
+        //}
   
         setElements(updatedElements);
       };
@@ -679,22 +690,21 @@ export const Generator = () => {
       );
 
       // Обновляем sessionStorage
-      if (element?.isProduct && !isCollageMode) {
-        try {
-          const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
-          const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
-
-          if (indexImg >= 0 && indexImg < updatedImages.length) {
-            updatedImages[indexImg] = dataUrl;
-            sessionStorage.setItem(storageMetaKey, JSON.stringify({
-              ...currentMeta,
-              images: updatedImages
-            }));
-          }
-        } catch (e) {
-          console.error('Ошибка обновления sessionStorage:', e);
-        }
-      }
+      //if (element?.isProduct || !isCollageMode) {
+      //  try {
+      //    const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
+      //    const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
+      //    if (indexImg >= 0 && indexImg < updatedImages.length) {
+      //      updatedImages[indexImg] = dataUrl;
+      //      sessionStorage.setItem(storageMetaKey, JSON.stringify({
+      //        ...currentMeta,
+      //        images: updatedImages
+      //      }));
+      //    }
+      //  } catch (e) {
+      //    console.error('Ошибка обновления sessionStorage:', e);
+      //  }
+      //}
 
       setElements(updatedElements);
 

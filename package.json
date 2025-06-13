@@ -9,6 +9,7 @@
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
     "browser-image-compression": "^2.0.2",
+    "dexie": "^4.0.11",
     "html2canvas": "^1.4.1",
     "react": "^19.0.0",
     "react-dnd": "^16.0.1",

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { collageDB } from '../utils/handleDB';
+
 export const CollageTempleModal = ({
   setIsCollageTempleModalOpen,
   setCollageTemples,
@@ -14,12 +16,11 @@ export const CollageTempleModal = ({
       const name = templateName.trim().toLowerCase();
       if (!name) return;
   
-      // Получаем существующие шаблоны
-      const existingTemplates = JSON.parse(localStorage.getItem('collagesLocal')) || {};
-      console.log(isOverwrite)
-      // Проверка на существующий шаблон
-      const existingNames = Object.keys(existingTemplates).map(n => n.toLowerCase());
-      if (!isOverwrite && existingNames.includes(name)) {
+      // Проверяем дубликаты в IndexedDB
+      const existingInDB = await collageDB.getAll();
+      const dbDuplicate = existingInDB.some(d => d.code.toLowerCase() === name);
+
+      if (!isOverwrite && dbDuplicate) {
         setModalStep('overwrite');
         setModalMessage('Макет с таким именем уже существует!');
         return;
@@ -27,7 +28,7 @@ export const CollageTempleModal = ({
   
       // Логика сохранения
       const storageKey = 'design-collage';
-      const savedDesign = sessionStorage.getItem(storageKey);
+      const savedDesign = localStorage.getItem(storageKey);
       const currentDesign = savedDesign ? JSON.parse(savedDesign) : [];
   
       const modifiedDesign = currentDesign.map(element => ({
@@ -36,27 +37,42 @@ export const CollageTempleModal = ({
         text: element.type === 'text' && element.isProductCode ? "{{ITEM_CODE}}" : element.text
       }));
   
-      const updatedTemplates = {
-        ...existingTemplates,
-        [name]: modifiedDesign
-      };
-  
-      localStorage.setItem('collagesLocal', JSON.stringify(updatedTemplates));
-      
-      // Успешное сохранение
-      setModalStep('success');
-      setModalMessage('Макет успешно сохранён!');
+      try {
+        if (isOverwrite) {
+          // Удаляем старую версию, если перезаписываем
+          await collageDB.delete(name);
+        }
+        
+        await collageDB.add({
+          code: name,
+          elements: modifiedDesign
+        });
 
-      setCollageTemples(updatedTemplates); // Обновляем состояние шаблонов
-      setSelectedCollageTemple(name); // Выбираем новый шаблон
-      
-      // Автоматическое закрытие через 2 сек
-      setTimeout(() => {
-        setIsCollageTempleModalOpen(false);
-        setModalStep('input');
-        setTemplateName('');
-      }, 2000);
-  
+        // Обновляем список шаблонов из базы
+        const updatedCollages = await collageDB.getAll();
+        const updatedTemplates = updatedCollages.reduce((acc, collage) => {
+          acc[collage.code] = collage.elements;
+          return acc;
+        }, {});
+
+        // Успешное сохранение
+        setModalStep('success');
+        setModalMessage('Макет успешно сохранён!');
+
+        setCollageTemples(updatedTemplates); // Обновляем состояние шаблонов
+        setSelectedCollageTemple(name); // Выбираем новый шаблон
+
+        // Автоматическое закрытие через 2 сек
+        setTimeout(() => {
+          setIsCollageTempleModalOpen(false);
+          setModalStep('input');
+          setTemplateName('');
+        }, 2000);
+        
+      } catch (dbError) {
+        console.error('Ошибка IndexedDB:', dbError);
+        throw new Error('Не удалось сохранить в базу данных');
+      }
     } catch (error) {
       setModalStep('error');
       setModalMessage('Ошибка при сохранении: ' + error.message);

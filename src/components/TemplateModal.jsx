@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { designsDB } from '../utils/handleDB';
+
 export const TemplateModal = ({
   setIsTemplateModalOpen,
   setTemplates,
@@ -17,12 +19,11 @@ export const TemplateModal = ({
       const name = templateName.trim().toLowerCase();
       if (!name) return;
   
-      // Получаем существующие шаблоны
-      const existingTemplates = JSON.parse(localStorage.getItem('templatesLocal')) || {};
-      console.log(isOverwrite)
-      // Проверка на существующий шаблон
-      const existingNames = Object.keys(existingTemplates).map(n => n.toLowerCase());
-      if (!isOverwrite && existingNames.includes(name)) {
+      // Проверяем дубликаты в IndexedDB
+      const existingInDB = await designsDB.getAll();
+      const dbDuplicate = existingInDB.some(d => d.code.toLowerCase() === name);
+
+      if (!isOverwrite && dbDuplicate) {
         setModalStep('overwrite');
         setModalMessage('Макет с таким именем уже существует!');
         return;
@@ -38,27 +39,45 @@ export const TemplateModal = ({
         image: element.type === 'image' && element.isProduct ? "{{ITEM_IMAGE}}" : element.image
       }));
   
-      const updatedTemplates = {
-        ...existingTemplates,
-        [name]: modifiedDesign
-      };
-  
-      localStorage.setItem('templatesLocal', JSON.stringify(updatedTemplates));
-      
-      // Успешное сохранение
-      setModalStep('success');
-      setModalMessage('Макет успешно сохранён!');
+      try {
+        if (isOverwrite) {
+          // Удаляем старую версию, если перезаписываем
+          await designsDB.delete(name);
+        }
+        
+        await designsDB.add({
+          code: name,          // Имя шаблона как ключ
+          data: modifiedDesign // Сам дизайн
+        });
 
-      setTemplates(updatedTemplates); // Обновляем состояние шаблонов
-      setSelectedTemplate(name); // Выбираем новый шаблон
+        // Обновляем список шаблонов из базы
+        const updatedDesigns = await designsDB.getAll();
+        const updatedTemplates = updatedDesigns.reduce((acc, design) => {
+          acc[design.code] = design.data;
+          return acc;
+        }, {});
+        
+        // Успешное сохранение
+        setModalStep('success');
+        setModalMessage('Макет успешно сохранён!');
+
+        setTemplates(updatedTemplates); // Обновляем состояние шаблонов
+        setSelectedTemplate(name); // Выбираем новый шаблон
+
+        // Автоматическое закрытие через 2 сек
+        setTimeout(() => {
+          setIsTemplateModalOpen(false);
+          setModalStep('input');
+          setTemplateName('');
+        }, 2000);
+
+      } catch (dbError) {
+        console.error('Ошибка IndexedDB:', dbError);
+        throw new Error('Не удалось сохранить в базу данных');
+      }
       
-      // Автоматическое закрытие через 2 сек
-      setTimeout(() => {
-        setIsTemplateModalOpen(false);
-        setModalStep('input');
-        setTemplateName('');
-      }, 2000);
-  
+      
+      
     } catch (error) {
       setModalStep('error');
       setModalMessage('Ошибка при сохранении: ' + error.message);
