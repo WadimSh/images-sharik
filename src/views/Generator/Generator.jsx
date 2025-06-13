@@ -575,7 +575,7 @@ export const Generator = () => {
         );
   
         // Обновляем sessionStorage только для продуктовых изображений
-        if (element?.isProduct) {
+        if (element?.isProduct && !isCollageMode) {
           try {
             const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
             const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
@@ -679,7 +679,7 @@ export const Generator = () => {
       );
 
       // Обновляем sessionStorage
-      if (element?.isProduct) {
+      if (element?.isProduct && !isCollageMode) {
         try {
           const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
           const updatedImages = currentMeta.images ? [...currentMeta.images] : [];

@@ -154,14 +154,14 @@ const SearchHeader = ({
         <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
           <RiCollageFill /> Создать коллаж
         </button>
-        <button 
+        {/*<button 
           onClick={handleGalleryClick} 
           className="template-button" 
           style={{ background: 'transparent' }}
           disabled={!hasKeys}
         >
           <IoFolderOpen /> Галерея дизайнов
-        </button>
+        </button>*/}
       </div>}
     </div>
   );

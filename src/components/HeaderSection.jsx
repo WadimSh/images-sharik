@@ -128,11 +128,11 @@ export const HeaderSection = ({
       : 'design-collage';
   
       // Сохраняем дизайн в localStorage
-      const designData = sessionStorage.getItem(sessionKey);
-      if (designData) {
-        const localStorageKey = fileName.replace('.png', '');
-        localStorage.setItem(localStorageKey, designData);
-      }
+      //const designData = sessionStorage.getItem(sessionKey);
+      //if (designData) {
+      //  const localStorageKey = fileName.replace('.png', '');
+      //  localStorage.setItem(localStorageKey, designData);
+      //}
 
       // Генерация изображения
       const canvas = await html2canvas(captureRef.current, {
