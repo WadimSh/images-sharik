@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 
+import { db } from "../utils/handleDB";
+
 import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
 
 const SearchHeader = ({ 
@@ -85,10 +87,18 @@ const SearchHeader = ({
   };
 
   useEffect(() => {
-    const articlePattern = /^\d{4}-\d{4}/;
-    const keys = Object.keys(localStorage);
-    const hasKeys = keys.some(key => articlePattern.test(key));
-    setHasKeys(hasKeys);
+    const checkHistory = async () => {
+      try {
+        // Получаем количество записей в таблице
+        const count = await db.history.count();
+        setHasKeys(count > 0);
+      } catch (error) {
+        console.error('Ошибка при проверке истории:', error);
+        setHasKeys(false);
+      }
+    };
+  
+    checkHistory();
   }, []);
 
   return (
@@ -154,14 +164,14 @@ const SearchHeader = ({
         <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
           <RiCollageFill /> Создать коллаж
         </button>
-        {/*<button 
+        <button 
           onClick={handleGalleryClick} 
           className="template-button" 
           style={{ background: 'transparent' }}
           disabled={!hasKeys}
         >
           <IoFolderOpen /> Галерея дизайнов
-        </button>*/}
+        </button>
       </div>}
     </div>
   );

@@ -6,7 +6,7 @@ import UPNG from 'upng-js';
 
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { useMarketplace } from '../context/contextMarketplace';
-import { designsDB, collageDB } from '../utils/handleDB';
+import { designsDB, collageDB, historyDB } from '../utils/handleDB';
 
 export const HeaderSection = ({
   captureRef,
@@ -120,7 +120,7 @@ export const HeaderSection = ({
       
       // Определяем базовый код в зависимости от режима
       if (slideNumber === '') {
-        const articles = JSON.parse(sessionStorage.getItem('collage-articles')) || [];
+        const articles = JSON.parse(localStorage.getItem('collage-articles')) || [];
         baseCode = articles.length > 0 ? articles.join('_') : 'collage';
         slideType = 'collage';
       } else {
@@ -144,17 +144,22 @@ export const HeaderSection = ({
       // Формирование имени файла
       const fileName = `${baseCode}_${marketplace}_${slideType}_900x1200_${datePart}_${timePart}.png`;
 
-      // Получаем ключ для sessionStorage
-      //const sessionKey = slideNumber 
-      //? `design-${id}` 
-      //: 'design-collage';
-  
-      // Сохраняем дизайн в localStorage
-      //const designData = sessionStorage.getItem(sessionKey);
-      //if (designData) {
-      //  const localStorageKey = fileName.replace('.png', '');
-      //  localStorage.setItem(localStorageKey, designData);
-      //}
+      // Получаем ключ для хранилища
+      const sessionKey = slideNumber ? `design-${id}` : 'design-collage';
+
+      // Достаём данные из соответствующего хранилища
+      const designData = sessionKey === 'design-collage' 
+        ? localStorage.getItem(sessionKey) 
+        : sessionStorage.getItem(sessionKey);
+
+      // Если данные есть и fileName определён - сохраняем в историю
+      if (designData && fileName) {
+        const historyKey = fileName.replace('.png', '');
+        await historyDB.add({
+          code: historyKey,  // Используем имя файла как ключ
+          data: JSON.parse(designData)   // Сохраняем сырые данные
+        });
+      }
 
       // Генерация изображения
       const canvas = await html2canvas(captureRef.current, {

@@ -3,8 +3,9 @@ import Dexie from 'dexie';
 export const db = new Dexie('SharikDatabase');
 
 db.version(1).stores({
-  designs: 'code', // Код дизайна
-  collage: 'code', // Данные коллажа
+  designs: 'code', // Данные макетов дизайнов
+  collage: 'code', // Данные макетов коллажей
+  history: 'code' // Данные о созданных слайдах
 });
 
 // Методы для работы с таблицей designs
@@ -108,6 +109,59 @@ export const collageDB = {
       return await db.collage.delete(code);
     } catch (error) {
       console.error('Ошибка при удалении шаблона коллажа:', error);
+      throw error;
+    }
+  }
+};
+
+// Методы для работы с таблицей history
+export const historyDB = {
+  // Добавление новой записи в историю
+  async add(record) {
+    try {
+      return await db.history.add(record);
+    } catch (error) {
+      console.error('Ошибка при добавлении записи в историю:', error);
+      throw error;
+    }
+  },
+
+  // Получение записи по коду
+  async get(code) {
+    try {
+      return await db.history.get(code);
+    } catch (error) {
+      console.error('Ошибка при получении записи из истории:', error);
+      throw error;
+    }
+  },
+
+  // Получение всей истории
+  async getAll() {
+    try {
+      return await db.history.toArray();
+    } catch (error) {
+      console.error('Ошибка при получении всей истории:', error);
+      throw error;
+    }
+  },
+
+  // Обновление записи
+  async update(code, changes) {
+    try {
+      return await db.history.update(code, changes);
+    } catch (error) {
+      console.error('Ошибка при обновлении записи в истории:', error);
+      throw error;
+    }
+  },
+
+  // Удаление записи
+  async delete(code) {
+    try {
+      return await db.history.delete(code);
+    } catch (error) {
+      console.error('Ошибка при удалении записи из истории:', error);
       throw error;
     }
   }

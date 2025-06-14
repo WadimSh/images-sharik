@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../context/contextMarketplace';
+import { historyDB } from '../../utils/handleDB';
 
 export const Gallery = () => {
   const navigate = useNavigate();
@@ -52,27 +53,32 @@ export const Gallery = () => {
   };
 
   // Функция для удаления дизайна
-  const handleDelete = (key) => {
-    localStorage.removeItem(key);
+  const handleDelete = async (key) => {
+    await historyDB.delete(key);
     setDesigns(prev => prev.filter(item => item.key !== key));
   };
 
+  // Функция извлечения данных для построения структуры данных для страницы генерации
   const handleItemClick = async (key) => {
         
     // Проверяем, является ли дизайн коллажем
     if (key.includes('_collage')) {
       try {
-        // Получаем данные дизайна
-        const designData = JSON.parse(localStorage.getItem(key));
+        // Получаем данные дизайна из таблицы history
+        const historyItem = await historyDB.get(key);
+            
+        if (!historyItem) {
+            throw new Error('Дизайн не найден в истории');
+        }
         
         // Сохраняем основной объект коллажа
-        sessionStorage.setItem('design-collage', JSON.stringify(designData));
+        localStorage.setItem('design-collage', JSON.stringify(historyItem.data));
         
         // Извлекаем артикулы из ключа
         const articles = extractArticlesFromKey(key);
         
         // Сохраняем массив артикулов
-        sessionStorage.setItem('collage-articles', JSON.stringify(articles));
+        localStorage.setItem('collage-articles', JSON.stringify(articles));
         
         // Перенаправляем на страницу коллажа
         navigate('/template/collage');
@@ -84,8 +90,12 @@ export const Gallery = () => {
 
     // Обработка обычных дизайнов (не коллажей)
     try {
-      // Получаем данные дизайна
-      const designData = JSON.parse(localStorage.getItem(key));
+      // Получаем данные дизайна из таблицы history
+      const historyItem = await historyDB.get(key);
+            
+      if (!historyItem) {
+          throw new Error('Дизайн не найден в истории');
+      }
 
       // Извлекаем информацию о типе дизайна
       const designInfo = extractDesignInfo(key);
@@ -94,7 +104,7 @@ export const Gallery = () => {
       const storageKey = `design-${designInfo.article}_${designInfo.slideNumber}`;
 
       // Сохраняем данные в sessionStorage
-      sessionStorage.setItem(storageKey, JSON.stringify(designData));
+      sessionStorage.setItem(storageKey, JSON.stringify(historyItem.data));
 
     // Выполняем запросы последовательно с await
     const searchResponse = await fetch(
@@ -196,34 +206,33 @@ export const Gallery = () => {
     navigate(-1);
   };
 
-  // Функция для загрузки дизайнов из localStorage
-  const loadDesigns = () => {
-    const loadedDesigns = [];
-    
-    // Регулярное выражение для поиска ключей с артикулами
-    const articlePattern = /^\d{4}-\d{4}/;
-    
-    // Перебираем все элементы в localStorage
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      
-      // Проверяем, соответствует ли ключ шаблону артикула
-      if (articlePattern.test(key)) {
-        try {
-          const designData = JSON.parse(localStorage.getItem(key));
-          loadedDesigns.push({
-            key,
-            data: designData,
-            title: key // Используем ключ как заголовок
-          });
-        } catch (error) {
-          console.error(`Ошибка при парсинге дизайна ${key}:`, error);
-        }
-      }
+  // Функция для загрузки дизайнов из истории
+  const loadDesigns = async () => {
+    try {
+      setLoading(true);
+
+      // Регулярное выражение для поиска ключей с артикулами
+      const articlePattern = /^\d{4}-\d{4}/;
+
+      // Получаем все записи из таблицы history
+      const allHistoryItems = await historyDB.getAll();
+
+      // Фильтруем и преобразуем данные
+      const loadedDesigns = allHistoryItems
+      .filter(item => articlePattern.test(item.code)) // Фильтруем по шаблону артикула
+      .map(item => ({
+        key: item.code,
+        data: item.data,
+        title: item.code // Используем code как заголовок
+      }));
+  
+      setDesigns(loadedDesigns);
+
+    } catch (error) {
+      console.error('Ошибка при загрузке дизайнов из базы данных:', error);
+    } finally {
+      setLoading(false);
     }
-    
-    setDesigns(loadedDesigns);
-    setLoading(false);
   };
 
    // Функция для парсинга и форматирования заголовка
@@ -305,13 +314,10 @@ export const Gallery = () => {
   };
 
   useEffect(() => {
-    loadDesigns();
-    
-    // Обработчик для обновления при изменении localStorage
-    const handleStorageChange = () => loadDesigns();
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    const fetchData = async () => {
+      await loadDesigns();
+    };
+    fetchData();
   }, []);
 
   if (loading) {
