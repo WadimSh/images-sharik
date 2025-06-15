@@ -22,6 +22,7 @@ import { handleFileUpload } from '../../components/ElementToolbar/utils';
 
 import { useMarketplace } from '../../context/contextMarketplace';
 import { getCode } from '../../utils/getCodeProduct';
+import { slidesDB } from '../../utils/handleDB';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -135,19 +136,38 @@ export const Generator = () => {
  
   // Сохранение в sessionStorage при изменениях
   useEffect(() => {
-    if (elements.length > 0) {
-      if (!isCollageMode) {
-        sessionStorage.setItem(storageKey, JSON.stringify(elements));
+    const saveData = async () => {
+      if (elements.length > 0) {
+        // Сохраняем данные
+        if (!isCollageMode) {
+          try {
+            await slidesDB.put({ 
+              code: `design-${id}`, 
+              data: elements
+            });
+            sessionStorage.setItem(storageKey, JSON.stringify(elements));
+          } catch (error) {
+            console.error('Ошибка сохранения дизайна:', error);
+          }
+        } else {
+          localStorage.setItem(storageKey, JSON.stringify(elements));
+        }
       } else {
-        localStorage.setItem(storageKey, JSON.stringify(elements));
+        // Удаляем данные
+        if (!isCollageMode) {
+          try {
+            await slidesDB.delete(`design-${id}`);
+            sessionStorage.removeItem(storageKey);
+          } catch (error) {
+            console.error('Ошибка удаления дизайна:', error);
+          }
+        } else {
+          localStorage.removeItem(storageKey);
+        }
       }
-    } else {
-      if (!isCollageMode) {
-        sessionStorage.removeItem(storageKey);
-      } else {
-        localStorage.removeItem(storageKey);
-      }
-    }
+    };
+  
+    saveData();
   }, [elements, storageKey]);
 
   // Добавляем начальный текстовый элемент с ID
@@ -513,70 +533,72 @@ export const Generator = () => {
       
       // Конвертируем ответ в ArrayBuffer
       const processedBlob = await apiResponse.blob();
-      const arrayBuffer = await processedBlob.arrayBuffer();
-      
-      // Декодируем изображение
-      const image = UPNG.decode(arrayBuffer);
-      
-      // Функция получения настроек сжатия в зависимости от размера изображения
-      const getCompressionSettings = (width, height) => {
-        const totalPixels = width * height;
-        
-        if (totalPixels > 2000000) { // Очень большие изображения (>2MP)
-          return {
-            colors: 256,
-            cnum: 10000,
-            dith: 1,
-            filter: 0
-          };
-        } else if (totalPixels > 1000000) { // Большие изображения (1-2MP)
-          return {
-            colors: 256,
-            cnum: 15000,
-            dith: 1,
-            filter: 0
-          };
-        } else if (totalPixels > 500000) { // Средние изображения (0.5-1MP)
-          return {
-            colors: 256,
-            cnum: 20000,
-            dith: 1,
-            filter: 0
-          };
-        } else { // Маленькие изображения (<0.5MP)
-          return {
-            colors: 256, // Используем 8-бит цвет для всех размеров
-            cnum: 25000,
-            dith: 1,
-            filter: 0
-          };
-        }
-      };
 
-      // Получаем настройки сжатия для текущего изображения
-      const compressionSettings = getCompressionSettings(image.width, image.height);
-      
-      // Оптимизированные параметры сжатия с адаптивной логикой
-      const compressedArray = UPNG.encode(
-        [image.data.buffer],
-        image.width,
-        image.height,
-        compressionSettings.colors,
-        0, // Задержка анимации
-        {
-          cnum: compressionSettings.cnum,
-          dith: compressionSettings.dith,
-          filter: compressionSettings.filter,
-          tabs: { pHYs: [2834, 2834, 1] } // Сохраняем информацию о DPI для лучшего качества
-        }
-      );
-      
-      // Создаем Blob из сжатых данных
-      const compressedBlob = new Blob([compressedArray], {type: 'image/png'});
+      //const arrayBuffer = await processedBlob.arrayBuffer();
+      //
+      //// Декодируем изображение
+      //const image = UPNG.decode(arrayBuffer);
+      //
+      //// Функция получения настроек сжатия в зависимости от размера изображения
+      //const getCompressionSettings = (width, height) => {
+      //  const totalPixels = width * height;
+      //  
+      //  if (totalPixels > 2000000) { // Очень большие изображения (>2MP)
+      //    return {
+      //      colors: 256,
+      //      cnum: 10000,
+      //      dith: 1,
+      //      filter: 0
+      //    };
+      //  } else if (totalPixels > 1000000) { // Большие изображения (1-2MP)
+      //    return {
+      //      colors: 256,
+      //      cnum: 15000,
+      //      dith: 1,
+      //      filter: 0
+      //    };
+      //  } else if (totalPixels > 500000) { // Средние изображения (0.5-1MP)
+      //    return {
+      //      colors: 256,
+      //      cnum: 20000,
+      //      dith: 1,
+      //      filter: 0
+      //    };
+      //  } else { // Маленькие изображения (<0.5MP)
+      //    return {
+      //      colors: 256, // Используем 8-бит цвет для всех размеров
+      //      cnum: 25000,
+      //      dith: 1,
+      //      filter: 0
+      //    };
+      //  }
+      //};
+//
+      //// Получаем настройки сжатия для текущего изображения
+      //const compressionSettings = getCompressionSettings(image.width, image.height);
+      //
+      //// Оптимизированные параметры сжатия с адаптивной логикой
+      //const compressedArray = UPNG.encode(
+      //  [image.data.buffer],
+      //  image.width,
+      //  image.height,
+      //  compressionSettings.colors,
+      //  0, // Задержка анимации
+      //  {
+      //    cnum: compressionSettings.cnum,
+      //    dith: compressionSettings.dith,
+      //    filter: compressionSettings.filter,
+      //    tabs: { pHYs: [2834, 2834, 1] } // Сохраняем информацию о DPI для лучшего качества
+      //  }
+      //);
+      //
+      //// Создаем Blob из сжатых данных
+      //const compressedBlob = new Blob([compressedArray], {type: 'image/png'});
       
       // Конвертируем в Data URL
       const reader = new FileReader();
-      reader.readAsDataURL(compressedBlob);
+      //reader.readAsDataURL(compressedBlob);
+      reader.readAsDataURL(processedBlob);
       
       reader.onloadend = () => {
         const compressedDataURL = reader.result;

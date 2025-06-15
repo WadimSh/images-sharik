@@ -1,45 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 
+import { LanguageContext } from '../context/contextLanguage';
 import { useMarketplace } from "../context/contextMarketplace";
 import { getCode } from "../utils/getCodeProduct";
+import { productsDB } from "../utils/handleDB";
 
 export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   const navigate = useNavigate();
   const { marketplace } = useMarketplace();
+  const { t } = useContext(LanguageContext);
   const [products, setProducts] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [limitReached, setLimitReached] = useState(false);
   
   useEffect(() => {
-    if (isOpen && articles) {
-      const loadedProducts = articles.map(baseCode => {
-        // Ищем все записи для этого базового кода
-        const productKeys = Object.keys(sessionStorage)
-          .filter(key => key.startsWith(`product-${baseCode}`));
-        
-        // Собираем все изображения со всех вариантов товара
-        const allImages = productKeys.flatMap(key => {
-          const data = JSON.parse(sessionStorage.getItem(key));
-          return data?.images || [];
-        });
-        
-        // Берем метаданные из первой найденной записи
-        const firstProductData = productKeys.length > 0 
-          ? JSON.parse(sessionStorage.getItem(productKeys[0]))
-          : null;
-
-        return firstProductData 
-          ? { 
-              ...firstProductData,
-              code: baseCode,
-              images: [...new Set(allImages)] // Убираем дубликаты
-            }
-          : null;
-      }).filter(Boolean);
-      
-      setProducts(loadedProducts);
-    }
+    const loadProducts = async () => {
+      if (isOpen && articles) {
+        try {
+          const loadedProducts = await Promise.all(
+            articles.map(async (baseCode) => {
+              // Получаем товар по точному совпадению кода
+              const product = await productsDB.get(`product-${baseCode}`);
+              
+              if (!product?.data) return null;
+  
+              return {
+                ...product.data,
+                code: baseCode,
+                images: product.data.images || []
+              };
+            })
+          );
+          setProducts(loadedProducts.filter(Boolean));
+        } catch (error) {
+          console.error('Ошибка при загрузке продуктов:', error);
+        }
+      }
+    };
+  
+    loadProducts();
   }, [isOpen, articles]);
 
   useEffect(() => {
@@ -165,13 +165,13 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>
       <div className="modal-contente" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Выберите изображения для коллажа</h2>
-          <button onClick={onClose} className="close-btn">&times;</button>
+          <h2>{t('selection.title')}</h2>
+          <button onClick={onClose} className="close-btn" aria-label={t('modals.close')}>&times;</button>
         </div>
 
         {limitReached && (
           <div className="limit-warning">
-            Выбрано максимальное количество изображений (10). Снимите выделение с ненужных изображений, чтобы добавить новые.
+            {t('selection.limitWarning')}
           </div>
         )}
 
@@ -196,7 +196,7 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
                     >
                       <img 
                         src={image} 
-                        alt={`Изображение ${index + 1}`}
+                        alt={`${t('selection.imageAlt')} ${ index + 1 }`}
                         className="product-image"
                       />
                       <label className="checkbox-label">
@@ -218,14 +218,14 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
 
         <div className="modal-footer">
           <div className="selection-counter">
-            Выбрано: {selectedImages.length}/10 изображений
+            {`${t('selection.counter')} ${selectedImages.length}/10`}
           </div>
           <button 
             className="confirm-button"
             onClick={handleConfirmSelection}
             disabled={selectedImages.length <= 1}
           >
-            Создать коллаж
+            {t('selection.createCollage')}
           </button>
         </div>
       </div>

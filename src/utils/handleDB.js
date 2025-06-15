@@ -5,8 +5,22 @@ export const db = new Dexie('SharikDatabase');
 db.version(1).stores({
   designs: 'code', // Данные макетов дизайнов
   collage: 'code', // Данные макетов коллажей
-  history: 'code' // Данные о созданных слайдах
+  history: 'code', // Данные о созданных слайдах
+  products: 'code', // Данные о товарах
+  slides: 'code' // Данные слайдов
 });
+
+// Общий метод для очистки таблицы
+const clearTable = async (table) => {
+  try {
+    await table.clear();
+    console.log(`Все записи из таблицы ${table.name} успешно удалены`);
+    return true;
+  } catch (error) {
+    console.error(`Ошибка при очистке таблицы ${table.name}:`, error);
+    throw error;
+  }
+};
 
 // Методы для работы с таблицей designs
 export const designsDB = {
@@ -166,3 +180,140 @@ export const historyDB = {
     }
   }
 };
+
+// Методы для работы с таблицей products
+export const productsDB = {
+  // Добавление новой записи
+  async add(record) {
+    try {
+      return await db.products.add(record);
+    } catch (error) {
+      console.error('Ошибка при добавлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Получение записи по коду
+  async get(code) {
+    try {
+      return await db.products.get(code);
+    } catch (error) {
+      console.error('Ошибка при получении записи:', error);
+      throw error;
+    }
+  },
+
+  // Получение всех записей
+  async getAll() {
+    try {
+      return await db.products.toArray();
+    } catch (error) {
+      console.error('Ошибка при получении всех записей:', error);
+      throw error;
+    }
+  },
+
+  // Upsert-операция (создать или обновить)
+  async put(record) {
+    try {
+      return await db.products.put(record);
+    } catch (error) {
+      console.error('Ошибка при обновлении/добавлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Обновление записи
+  async update(code, changes) {
+    try {
+      return await db.products.update(code, changes);
+    } catch (error) {
+      console.error('Ошибка при обновлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Удаление записи
+  async delete(code) {
+    try {
+      return await db.products.delete(code);
+    } catch (error) {
+      console.error('Ошибка при удалении записи:', error);
+      throw error;
+    }
+  },
+
+  // Удаление всех записей
+  async clearAll() {
+    return await clearTable(db.products);
+  }
+};
+
+// Методы для работы с таблицей slides
+export const slidesDB = {
+  // Добавление новой записи
+  async add(record) {
+    try {
+      return await db.slides.add(record);
+    } catch (error) {
+      console.error('Ошибка при добавлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Получение записи по коду
+  async get(code) {
+    try {
+      return await db.slides.get(code);
+    } catch (error) {
+      console.error('Ошибка при получении записи:', error);
+      throw error;
+    }
+  },
+
+  // Получение всех записей
+  async getAll() {
+    try {
+      return await db.slides.toArray();
+    } catch (error) {
+      console.error('Ошибка при получении всех записей:', error);
+      throw error;
+    }
+  },
+
+  // Upsert-операция (создать или обновить)
+  async put(record) {
+    try {
+      return await db.slides.put(record);
+    } catch (error) {
+      console.error('Ошибка при обновлении/добавлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Обновление записи
+  async update(code, changes) {
+    try {
+      return await db.slides.update(code, changes);
+    } catch (error) {
+      console.error('Ошибка при обновлении записи:', error);
+      throw error;
+    }
+  },
+
+  // Удаление записи
+  async delete(code) {
+    try {
+      return await db.slides.delete(code);
+    } catch (error) {
+      console.error('Ошибка при удалении записи:', error);
+      throw error;
+    }
+  },
+
+  // Удаление всех записей
+  async clearAll() {
+    return await clearTable(db.slides);
+  }
+};
+

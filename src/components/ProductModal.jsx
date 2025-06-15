@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { LanguageContext } from '../context/contextLanguage';
 
 export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -6,6 +7,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [productImages, setProductImages] = useState([]);
+  const { t } = useContext(LanguageContext);
 
   useEffect(() => {
     // Проверка формата при изменении значения
@@ -40,14 +42,14 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
     fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
       .then(response => {
         if (!response.ok) {
-          setError(`HTTP error! status: ${response.status}`);
+          setError(t('errors.loading'));
         }
         return response.json();
       })
       .then(data => {
         // Проверка наличия результатов
         if (!data?.results?.length) {
-          setError("Товар с таким артикулом не активен.");
+          setError(t('errors.productNotFound'));
         }
   
         // Получаем ID первого товара (или обрабатываем несколько)
@@ -57,7 +59,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
           .filter(Boolean);
   
         if (productIds.length === 0) {
-         setError("Не удалось получить ID товара");
+         setError(t('errors.productIdNotFound'));
         }
   
         return fetch(
@@ -66,7 +68,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
       })
       .then(response => {
         if (!response.ok) {
-          setError(`HTTP error! status: ${response.status}`);
+          setError(t('errors.loading'));
         }
         return response.json();
       })
@@ -81,21 +83,21 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
             );
             setProductImages(images);
           } else {
-            setError("У товара нет изображений");
+            setError(t('errors.noImages'));
             setProductImages([]);
           }
         } else {
-          setError("Не удалось получить данные о товаре");
+          setError(t('errors.productDataNotFound'));
           setProductImages([]);
         }
       })
       .catch(error => {
-        console.error('Ошибка:', error);
-        setError(error.message || 'Произошла ошибка при поиске');
+        console.error('Error:', error);
+        setError(error.message || t('errors.general'));
         
         // Для необработанных ошибок
         if (!error.message) {
-          setError("Неизвестная ошибка при обращении к серверу");
+          setError(t('errors.unknown'));
         }
       })
       .finally(() => {
@@ -118,8 +120,8 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
     <div className={`modal ${isOpen ? 'open' : ''}`} onClick={onClose}>
       <div className="modal-contents" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Добавить товар</h2>
-          <button onClick={onClose} className="close-btn">&times;</button>
+          <h2>{t('modals.addProduct')}</h2>
+          <button onClick={onClose} className="close-btn" aria-label={t('modals.close')}>&times;</button>
         </div>
         <div className="wrapper-input">
           <div className="input-search">
@@ -128,7 +130,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
               value={searchQuery}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Укажите код товара в виде XXXX-XXXX"
+              placeholder={t('product.articlePlaceholder')}
               maxLength={9}
               pattern="\d{4}-\d{4}"
               inputMode="numeric"
@@ -137,7 +139,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
               <button 
                 className="clear-button"
                 onClick={handleClear}
-                aria-label="Очистить поле"
+                aria-label={t('header.clearButton')}
               >
                 ×
               </button>
@@ -149,7 +151,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
             onClick={handleSaveTemplate}
             disabled={!isValidFormat}
           >
-            Найти
+            {t('header.searchButton')}
           </button>
         </div>
 
@@ -173,7 +175,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
                 <div key={index} className="image-item">
                   <img 
                     src={imgUrl} 
-                    alt={`Изображение товара ${index + 1}`}
+                    alt={`${t('product.imageAlt')} ${ index + 1 }`}
                     onClick={() => onSelectImage(imgUrl, searchQuery)}
                   />
                 </div>

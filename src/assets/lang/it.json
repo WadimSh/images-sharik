@@ -1,0 +1,76 @@
+{
+  "switcher": {
+    "ru": "Russo",
+    "it": "Italiano",
+    "en": "Inglese"
+  },
+  "errors": {
+    "general": "Si è verificato un errore",
+    "loading": "Errore di caricamento",
+    "save": "Errore di salvataggio",
+    "delete": "Errore di eliminazione",
+    "upload": "Errore di caricamento file",
+    "productNotFound": "Il prodotto con questo numero articolo non è attivo",
+    "productIdNotFound": "Impossibile ottenere l'ID del prodotto",
+    "noImages": "Il prodotto non ha immagini",
+    "productDataNotFound": "Impossibile ottenere i dati del prodotto",
+    "unknown": "Errore sconosciuto del server"
+  },
+  "modals": {
+    "close": "Chiudi",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "select": "Seleziona",
+    "upload": "Carica",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "preview": "Anteprima",
+    "loading": "Caricamento...",
+    "addProduct": "Aggiungi prodotto"
+  },
+  "header": {
+    "title": "Generatore di immagini per marketplace",
+    "description": "Con questo generatore puoi facilmente creare immagini accattivanti per i tuoi prodotti.",
+    "searchPlaceholder": "Inserisci i codici articolo ...",
+    "searchButton": "Cerca",
+    "clearButton": "Cancella campo",
+    "loadingMessage": "Attendere prego, stiamo cercando i prodotti che ti interessano...",
+    "createCollage": "Crea collage",
+    "gallery": "Galleria dei design",
+    "back": "< Indietro",
+    "createLayout": "Crea modello",
+    "downloadDesign": "Scarica design",
+    "wbCollage": "Collage per WB",
+    "ozonCollage": "Collage per OZON",
+    "mainSlide": "Slide principale",
+    "slideNumber": "Slide"
+  },
+  "template": {
+    "create": "Crea template",
+    "namePlaceholder": "Inserisci il nome del template",
+    "exists": "Esiste già un template con questo nome!",
+    "saved": "Template salvato con successo!",
+    "warning": "Attenzione!",
+    "overwrite": "Sovrascrivi",
+    "success": "Successo!",
+    "error": "Errore!"
+  },
+  "selection": {
+    "title": "Seleziona immagini per il collage",
+    "limitWarning": "Numero massimo di immagini (10) selezionate. Deseleziona le immagini non necessarie per aggiungerne di nuove.",
+    "imageAlt": "Immagine",
+    "counter": "Immagini selezionate:",
+    "createCollage": "Crea collage"
+  },
+  "product": {
+    "name": "Nome",
+    "article": "Articolo",
+    "articlePlaceholder": "Inserisci il codice prodotto nel formato XXXX-XXXX",
+    "price": "Prezzo",
+    "description": "Descrizione",
+    "characteristics": "Caratteristiche",
+    "noData": "Nessun dato",
+    "imageAlt": "Immagine prodotto"
+  }  
+  
+} 

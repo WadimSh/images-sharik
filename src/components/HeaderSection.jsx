@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaDownload, FaClipboardCheck } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
@@ -7,6 +7,7 @@ import UPNG from 'upng-js';
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { useMarketplace } from '../context/contextMarketplace';
 import { designsDB, collageDB, historyDB } from '../utils/handleDB';
+import { LanguageContext } from '../context/contextLanguage';
 
 export const HeaderSection = ({
   captureRef,
@@ -26,23 +27,37 @@ export const HeaderSection = ({
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
-
+  
   const handleBack = () => {
-    localStorage.removeItem('design-collage');
-    localStorage.removeItem('collage-articles');
+    if (!slideNumber) {
+      localStorage.removeItem('design-collage');
+      localStorage.removeItem('collage-articles');
+    } else {
+      const baseCode = id.split('_').slice(0, -1).join('_');
+      sessionStorage.removeItem(`design-${id}`);
+      sessionStorage.removeItem(`product-${baseCode}`);
+    }
     navigate(-1);
   };
   
   // Функция для формирования заголовка
   const getHeaderTitle = () => {
     const slide = slideNumber || 'collage'; // По умолчанию первый слайд
-    return slide === 'collage' 
-      ? marketplace === 'WB' ? 'Коллаж для WB' : 'Коллаж для OZON' 
-      : slide === '1' 
-        ? 'Основной слайд' 
-        : `Слайд ${slide}`;
+    
+    if (slide === 'collage') {
+      return marketplace === 'WB' 
+        ? t('header.wbCollage') 
+        : t('header.ozonCollage');
+    }
+
+    if (slide === '1') {
+      return t('header.mainSlide');
+    }
+
+    return `${t('header.slideNumber')} ${slide}`;
   };
 
   // Функция для удаления макета
@@ -298,7 +313,6 @@ export const HeaderSection = ({
             
             // Очищаем localStorage после успешного переноса
             localStorage.removeItem('collagesLocal');
-            console.log('Все шаблоны перенесены в IndexedDB');
           } catch (migrationError) {
             console.error('Ошибка миграции шаблонов:', migrationError);
           }
@@ -323,15 +337,15 @@ export const HeaderSection = ({
   return (
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
-        {'< Назад'}
+        {`${t('header.back')}`}
       </button>
       <h2>{getHeaderTitle()}</h2>
       <TemplateSelector {...templateProps} />
       <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
-        <FaClipboardCheck /> Создать макет
+        <FaClipboardCheck /> {`${t('header.createLayout')}`}
       </button>
       <button onClick={handleDownload} className="download-button">
-        <FaDownload /> Скачать дизайн
+        <FaDownload /> {`${t('header.downloadDesign')}`}
       </button>
     </div>
   );

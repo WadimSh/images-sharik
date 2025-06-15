@@ -5,11 +5,61 @@ import { replacePlaceholders } from '../utils/replacePlaceholders';
 import { useMarketplace } from '../context/contextMarketplace';
 import { getCode } from '../utils/getCodeProduct';
 import { PreviewDesign } from './PreviewDesign';
+import { productsDB, slidesDB } from '../utils/handleDB';
 
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const { marketplace } = useMarketplace();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
+  const [productMetas, setProductMetas] = useState({});
+  const [designsData, setDesignsData] = useState({});
+
+  // Загрузка метаданных продуктов
+  useEffect(() => {
+    const loadProductMetas = async () => {
+      const metas = {};
+      const uniqueBaseCodes = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+      
+      await Promise.all(uniqueBaseCodes.map(async (baseCode) => {
+        try {
+          const product = await productsDB.get(`product-${baseCode}`);
+          metas[baseCode] = product?.data || { templateType: 'default' };
+        } catch (error) {
+          console.error(`Error loading product meta for ${baseCode}:`, error);
+          metas[baseCode] = { templateType: 'default' };
+        }
+      }));
+
+      setProductMetas(metas);
+    };
+
+    if (items.length > 0) {
+      loadProductMetas();
+    }
+  }, [items]);
+
+  // Загрузка данных дизайнов
+  useEffect(() => {
+    const loadDesignsData = async () => {
+      const designs = {};
+      
+      await Promise.all(items.map(async (item) => {
+        try {
+          const slide = await slidesDB.get(`design-${item}`);
+          designs[item] = slide?.data || null;
+        } catch (error) {
+          console.error(`Error loading design for ${item}:`, error);
+          designs[item] = null;
+        }
+      }));
+
+      setDesignsData(designs);
+    };
+
+    if (items.length > 0) {
+      loadDesignsData();
+    }
+  }, [items]);
   
   // Инициализируем порядок при первом рендере
   useEffect(() => {
@@ -22,7 +72,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     const newCodes = items.map(item => item.split('_').slice(0, -1).join('_'));
     const uniqueNewCodes = [...new Set(newCodes)];
     
-    // Сохраняем исходный порядок, добавляя новые группы в конец
     setBaseCodesOrder(prev => {
       const preservedOrder = prev.filter(code => uniqueNewCodes.includes(code));
       const newGroups = uniqueNewCodes.filter(code => !prev.includes(code));
@@ -31,58 +80,63 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   }, [items]);
 
   // Функция для создания нового дизайна
-  const handleCreateNewDesign = (baseCode) => {
-    const existingNumbers = items
-      .filter(item => item.startsWith(`${baseCode}_`))
-      .map(item => parseInt(item.split('_')[1]))
-      .filter(num => !isNaN(num));
+  const handleCreateNewDesign = async (baseCode) => {
+    try {
+      const existingNumbers = items
+        .filter(item => item.startsWith(`${baseCode}_`))
+        .map(item => parseInt(item.split('_')[1]))
+        .filter(num => !isNaN(num));
+      
+      const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+      const newDesignKey = `${baseCode}_${newNumber}`;
+      
+      const product = await productsDB.get(`product-${baseCode}`);
+      const productMeta = product?.data || {};
     
-    const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-    const newDesignKey = `${baseCode}_${newNumber}`;
+      // Определяем текущий шаблон группы
+      const templateKey = productMeta.templateType || 'default';
+      let selectedTemplate = templates.default;
     
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-  
-    // Определяем текущий шаблон группы
-    const templateKey = productMeta.templateType || 'default';
-    let selectedTemplate = templates.default;
-  
-    // Выбираем подходящий шаблон в зависимости от типа
-    if (templateKey === 'belbal' || templateKey === 'gemar') {
-      const templateArray = templates[templateKey] || [];
+      // Выбираем подходящий шаблон
+      if (templateKey === 'belbal' || templateKey === 'gemar') {
+        const templateArray = templates[templateKey] || [];
+        const imageIndex = newNumber - 1;
+        const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+        selectedTemplate = templateArray[templateIndex] || [];
+      } else if (templates[templateKey]) {
+        selectedTemplate = templates[templateKey];
+      }
+    
+      // Выбираем изображение
       const imageIndex = newNumber - 1;
-      const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-      selectedTemplate = templateArray[templateIndex] || [];
-    } else if (templates[templateKey]) {
-      selectedTemplate = templates[templateKey];
+      const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
+    
+      // Формируем данные для шаблона
+      const templateData = {
+        code: newDesignKey,
+        image: image,
+        category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+        title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
+        multiplicity: productMeta.multiplicity,
+        size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
+        brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || '',
+        imageIndex: imageIndex
+      };
+    
+      // Генерируем и сохраняем дизайн
+      const newDesign = replacePlaceholders(selectedTemplate, templateData);
+      await slidesDB.add({
+        code: `design-${newDesignKey}`,
+        data: newDesign
+      });
+    
+      // Обновляем состояние
+      onItemsUpdate([...items, newDesignKey]);
+    } catch (error) {
+      console.error('Error creating new design:', error);
     }
-  
-    // Выбираем изображение по индексу или первое
-    const imageIndex = newNumber - 1;
-    const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
-  
-    // Формируем данные для шаблона
-    const templateData = {
-      code: newDesignKey,
-      image: image,
-      category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
-      title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
-      multiplicity: productMeta.multiplicity,
-      size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
-      brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || '',
-      imageIndex: imageIndex
-    };
-  
-    // Генерируем и сохраняем дизайн
-    const newDesign = replacePlaceholders(selectedTemplate, templateData);
-    sessionStorage.setItem(`design-${newDesignKey}`, JSON.stringify(newDesign));
-  
-    // Обновляем состояние
-    onItemsUpdate([...items, newDesignKey]);
   };
   
-  // Функция для получения уникальных базовых артикулов
   const getUniqueBaseCodes = () => {
     return baseCodesOrder.filter(baseCode => 
       items.some(item => item.startsWith(`${baseCode}_`))
@@ -91,24 +145,42 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   const uniqueBaseCodes = getUniqueBaseCodes();
   
-  const handleItemClick = (itemId) => {
+  const handleItemClick = async (itemId) => {
+    const baseCode = itemId.split('_').slice(0, -1).join('_');
+
+    const designData = await slidesDB.get(`design-${itemId}`);
+    const productData = await productsDB.get(`product-${baseCode}`);
+
+    if (designData?.data) {
+      sessionStorage.setItem(`design-${itemId}`, JSON.stringify(designData.data));
+    }
+    
+    if (productData?.data) {
+      sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(productData.data));
+    }
+
     navigate(`/template/${itemId}`);
   };
 
   // Функция удаления элемента
-  const handleDeleteItem = (itemId) => {
-    // Удаляем из sessionStorage
-    sessionStorage.removeItem(`design-${itemId}`);
-    // Обновляем список элементов
-    const updatedItems = items.filter(item => item !== itemId);
-    onItemsUpdate(updatedItems);
+  const handleDeleteItem = async (itemId) => {
+    try {
+      // Удаляем из базы данных
+      await slidesDB.delete(`design-${itemId}`);
+      
+      // Обновляем список элементов
+      const updatedItems = items.filter(item => item !== itemId);
+      onItemsUpdate(updatedItems);
 
-    // Проверяем нужно ли удалять метаданные товара
-    const productCode = itemId.split('_').slice(0, -1).join('_');
-    const remaining = items.filter(item => item.startsWith(`${productCode}_`));
-    
-    if (remaining.length === 1) {
-      sessionStorage.removeItem(`product-${productCode}`);
+      // Проверяем нужно ли удалять метаданные товара
+      const productCode = itemId.split('_').slice(0, -1).join('_');
+      const remaining = items.filter(item => item.startsWith(`${productCode}_`));
+      
+      if (remaining.length === 1) {
+        await productsDB.delete(`product-${productCode}`);
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
     }
   };
 
@@ -122,83 +194,86 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   
   // Обработчик изменения шаблона
   const handleTemplateChange = async (baseCode, templateKey) => {
-    // Получаем метаданные товара для группы
-    const productMeta = JSON.parse(
-      sessionStorage.getItem(`product-${baseCode}`) || '{}'
-    );
-    const updatedMeta = {
-      ...productMeta,
-      templateType: templateKey
-    };
-    sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(updatedMeta));
+    try {
+      // Получаем и обновляем метаданные товара
+      const product = await productsDB.get(`product-${baseCode}`);
+      const updatedMeta = {
+        ...(product?.data || {}),
+        templateType: templateKey
+      };
+      
+      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
 
-    const updatedItems = items.map(item => {
-      if (item.startsWith(`${baseCode}_`)) {
-        // Получаем текущий дизайн
-        const currentDesign = JSON.parse(sessionStorage.getItem(`design-${item}`) || '[]');
+      // Обновляем все связанные слайды
+      const updatePromises = items.map(async (item) => {
+        if (item.startsWith(`${baseCode}_`)) {
+          // Получаем текущий дизайн
+          const slide = await slidesDB.get(`design-${item}`);
+          const currentDesign = slide?.data || [];
 
-        // Находим все изображения с реальными URL
-        const validImages = currentDesign.filter(el => 
-          el.type === 'image' && 
-          el.image?.startsWith('https://')
-        );
+          // Находим все изображения с реальными URL
+          const validImages = currentDesign.filter(el => 
+            el.type === 'image' && 
+            el.image?.startsWith('https://')
+          );
 
-        // Берем последнее добавленное изображение или из метаданных
-        const currentImage = validImages.length > 0 
-          ? validImages[validImages.length - 1].image 
-          : productMeta.images?.[0];
+          // Берем последнее добавленное изображение или из метаданных
+          const currentImage = validImages.length > 0 
+            ? validImages[validImages.length - 1].image 
+            : updatedMeta.images?.[0];
 
-        // Извлекаем индекс изображения из кода
-        const parts = item.split('_');
-        const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+          // Извлекаем индекс изображения из кода
+          const parts = item.split('_');
+          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
 
-        const itemData = {
-          ...productMeta,
-          code: item,
-          image: currentImage,
-          category: getPropertyValue(productMeta, 'Тип латексных шаров'),
-          title: getPropertyValue(productMeta, 'Событие'),
-          multiplicity: productMeta.multiplicity,
-          size: getPropertyValue(productMeta, 'Размер').split("/")[0]?.trim() || '',
-          brand: getOriginPropertyValue(productMeta, 'Торговая марка'),
-          // Добавляем индекс изображения в данные
-          imageIndex: imageIndex
-        };
+          const itemData = {
+            ...updatedMeta,
+            code: item,
+            image: currentImage,
+            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
+            title: getPropertyValue(updatedMeta, 'Событие'),
+            multiplicity: updatedMeta.multiplicity,
+            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
+            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
+            imageIndex: imageIndex
+          };
 
-        // Выбираем подходящий шаблон
-        let template;
-        if (
-          (templateKey === 'gemar' || templateKey === 'belbal') && 
-          Array.isArray(templates[templateKey])
-        ) {
-          // Для Gemar и Belbal выбираем шаблон по индексу изображения
-          const templateArray = templates[templateKey];
-          const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-          template = templateArray[templateIndex];
-        } else {
-          // Для остальных шаблонов используем обычный выбор
-          template = templates[templateKey];
+          // Выбираем подходящий шаблон
+          let template;
+          if (
+            (templateKey === 'gemar' || templateKey === 'belbal') && 
+            Array.isArray(templates[templateKey])
+          ) {
+            const templateArray = templates[templateKey];
+            const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+            template = templateArray[templateIndex];
+          } else {
+            template = templates[templateKey];
+          }
+          
+          const newDesign = replacePlaceholders(template, itemData);
+          await slidesDB.update(`design-${item}`, { data: newDesign });
         }
-        
-        const newDesign = replacePlaceholders(template, itemData);
-        sessionStorage.setItem(`design-${item}`, JSON.stringify(newDesign));
-      }
-      return item;
-    });
+        return item;
+      });
 
-    onItemsUpdate([...updatedItems]);
+      await Promise.all(updatePromises);
+      onItemsUpdate([...items]);
+    } catch (error) {
+      console.error('Error updating template:', error);
+    }
   };
   
   // Вспомогательная функция для получения метаданных
-  const getProductMeta = (baseCode) => {
-    try {
-      const storedData = sessionStorage.getItem(`product-${baseCode}`);
-      return storedData ? JSON.parse(storedData) : { templateType: 'default' };
-    } catch (error) {
-      console.error('Error parsing product meta:', error);
-      return { templateType: 'default' };
-    }
-  };
+  //const getProductMeta = async (baseCode) => {
+  //  try {
+  //    const product = await productsDB.get(`product-${baseCode}`);
+  //    return product?.data || { templateType: 'default' };
+  //  } catch (error) {
+  //    console.error('Error getting product meta:', error);
+  //    return { templateType: 'default' };
+  //  }
+  //};
 
   // Объект перевода названий шаблонов
   const templateOptions = {
@@ -276,9 +351,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
-        const productMeta = getProductMeta(baseCode);
+        const productMeta = productMetas[baseCode] || { templateType: 'default' };
         const currentTemplate = productMeta.templateType || 'default';
-        // Находим все элементы относящиеся к этому базовому коду
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
         
         return (
@@ -289,44 +363,37 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
             </h2>
             {renderTemplateControls(baseCode, currentTemplate)}
             <div className="items-grid">
-              {relatedItems.map((item, index) => {
-                const designData = sessionStorage.getItem(`design-${item}`);
-                const elements = designData ? JSON.parse(designData) : null;
-
-                return (
-                  <div 
-                    key={item} 
-                    className="item-card"
-                    onClick={() => handleItemClick(item)}
-                    role="button"
-                    tabIndex={0}
+              {relatedItems.map((item) => (
+                <div 
+                  key={item} 
+                  className="item-card"
+                  onClick={() => handleItemClick(item)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <button
+                    className="delete-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteItem(item);
+                    }}
+                    title="Удалить дизайн"
                   >
-                    {/* Кнопка удаления */}
-                    <button
-                      className="delete-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteItem(item);
-                      }}
-                      title="Удалить дизайн"
-                    >
-                      ×
-                    </button>
-                    
-                    <div className="item-content">
-                      {elements ? (
-                        <PreviewDesign elements={elements} />
-                      ) : (
-                        <div className="loader-container">
-                          <div className="loader"></div>
-                        </div>
-                      )}
-                    </div>
+                    ×
+                  </button>
+                  
+                  <div className="item-content">
+                    {designsData[item] ? (
+                      <PreviewDesign elements={designsData[item]} />
+                    ) : (
+                      <div className="loader-container">
+                        <div className="loader"></div>
+                      </div>
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              ))}
 
-              {/* Карточка для создания нового дизайна */}
               <div
                 className="item-card new-design-card"
                 onClick={() => handleCreateNewDesign(baseCode)}
@@ -338,7 +405,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
                   <div className="create-text">Создать новый слайдер</div>
                 </div>
               </div>
-
             </div>
           </div>
         );

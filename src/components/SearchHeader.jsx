@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
+import { useContext } from "react";
+import { LanguageContext } from "../context/contextLanguage";
 
-import { db } from "../utils/handleDB";
-
+import { db, productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
+import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -20,6 +22,7 @@ const SearchHeader = ({
 }) => {
   const navigate = useNavigate();
   const [hasKeys, setHasKeys] = useState(false);
+  const { t } = useContext(LanguageContext);
 
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
@@ -47,6 +50,8 @@ const SearchHeader = ({
   const handleSearch = () => {
     // Полная очистка sessionStorage
     setIsToggled(false);
+    productsDB.clearAll();
+    slidesDB.clearAll();
     sessionStorage.clear();
     const normalized = searchQuery
       .split(/[\s,]+/) 
@@ -77,6 +82,8 @@ const SearchHeader = ({
     onSearch([]);
     setIsToggled(false);
     // Полная очистка sessionStorage
+    productsDB.clearAll();
+    slidesDB.clearAll();
     sessionStorage.clear();
   };
 
@@ -103,19 +110,25 @@ const SearchHeader = ({
 
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
-      <h2 style={{
-        paddingBottom: '12px'
-      }}>
-        Генератор изображений для маркетплейсов
-      </h2>
-      <p style={{
-        fontSize: '20px',
-        color: 'rgba(0,0,0,0.8)',
-        margin: '0px',
-        paddingBottom: '18px'
-      }}>
-        С помощью этого генератора вы легко создадите привлекательные изображения для ваших товаров.
-      </p>
+      <div className="header-right">
+        <LanguageSwitcher />
+      </div>
+      <div className="header-top">
+        <h2 style={{
+          paddingBottom: '12px',
+          margin: 0
+        }}>
+          {t('header.title')}
+        </h2>
+        <p style={{
+          fontSize: '20px',
+          color: 'rgba(0,0,0,0.8)',
+          margin: '0px',
+          paddingBottom: '18px'
+        }}>
+          {t('header.description')}
+        </p>
+      </div>
       <div className="search-wrapper">
         <div className="input-container">
           <input
@@ -123,14 +136,14 @@ const SearchHeader = ({
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Введите артикулы ..."
+            placeholder={t('header.searchPlaceholder')}
             pattern="[\d\s,+-]+"
           />
           {searchQuery && (
             <button 
               className="clear-button"
               onClick={handleClear}
-              aria-label="Очистить поле"
+              aria-label={t('header.clearButton')}
             >
               ×
             </button>
@@ -140,13 +153,13 @@ const SearchHeader = ({
           className="search-button"
           onClick={handleSearch}
         >
-          Найти
+          {t('header.searchButton')}
         </button>
       </div>
       {(loading || infoMessage || error) && <div className="status-messages">
         {loading && (
           <div className="message loading">
-            Подождите немножко, мы ищем интересующие вас товары...
+            {t('header.loadingMessage')}
           </div>
         )}
         {infoMessage ? (
@@ -162,7 +175,7 @@ const SearchHeader = ({
       {isSearchActive && <div className="template-button-container">
         <MarketplaceSwitcher />
         <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
-          <RiCollageFill /> Создать коллаж
+          <RiCollageFill /> {t('header.createCollage')}
         </button>
         <button 
           onClick={handleGalleryClick} 
@@ -170,7 +183,7 @@ const SearchHeader = ({
           style={{ background: 'transparent' }}
           disabled={!hasKeys}
         >
-          <IoFolderOpen /> Галерея дизайнов
+          <IoFolderOpen /> {t('header.gallery')}
         </button>
       </div>}
     </div>

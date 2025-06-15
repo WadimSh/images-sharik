@@ -1,5 +1,5 @@
-import { useState } from 'react';
-
+import { useState, useContext } from 'react';
+import { LanguageContext } from '../context/contextLanguage';
 import { collageDB } from '../utils/handleDB';
 
 export const CollageTempleModal = ({
@@ -7,6 +7,7 @@ export const CollageTempleModal = ({
   setCollageTemples,
   setSelectedCollageTemple
 }) => {
+  const { t } = useContext(LanguageContext);
   const [templateName, setTemplateName] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
@@ -22,7 +23,7 @@ export const CollageTempleModal = ({
 
       if (!isOverwrite && dbDuplicate) {
         setModalStep('overwrite');
-        setModalMessage('Макет с таким именем уже существует!');
+        setModalMessage(t('template.exists'));
         return;
       }
   
@@ -57,7 +58,7 @@ export const CollageTempleModal = ({
 
         // Успешное сохранение
         setModalStep('success');
-        setModalMessage('Макет успешно сохранён!');
+        setModalMessage(t('template.saved'));
 
         setCollageTemples(updatedTemplates); // Обновляем состояние шаблонов
         setSelectedCollageTemple(name); // Выбираем новый шаблон
@@ -70,12 +71,12 @@ export const CollageTempleModal = ({
         }, 2000);
         
       } catch (dbError) {
-        console.error('Ошибка IndexedDB:', dbError);
-        throw new Error('Не удалось сохранить в базу данных');
+        console.error('DB Error:', dbError);
+        throw new Error(t('errors.save'));
       }
     } catch (error) {
       setModalStep('error');
-      setModalMessage('Ошибка при сохранении: ' + error.message);
+      setModalMessage(t('errors.save') + ': ' + error.message);
     }
   };
   
@@ -88,12 +89,12 @@ export const CollageTempleModal = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {modalStep === 'input' ? (
           <>
-            <h2>Создай свой макет</h2>
+            <h2>{t('template.create')}</h2>
             <input
               type="text"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Введите название макета"
+              placeholder={t('template.namePlaceholder')}
               className="template-input"
               maxLength={50} // Ограничение длины
               onKeyDown={(e) => { 
@@ -110,39 +111,39 @@ export const CollageTempleModal = ({
                   setTemplateName('');
                 }}
               >
-                Отменить
+                {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(false)}
                 disabled={!templateName.trim()}
               >
-                Создать
+                {t('template.create')}
               </button>
             </div>
           </>
         ) : modalStep === 'overwrite' ? (
           <>
-            <h2>Внимание!</h2>
+            <h2>{t('template.warning')}</h2>
             <p>{modalMessage}</p>
             <div className="modal-actions">
               <button
                 className="cancel-button"
                 onClick={() => setModalStep('input')}
               >
-                Отменить
+                {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(true)}
               >
-                Перезаписать
+                {t('template.overwrite')}
               </button>
             </div>
           </>
         ) : (
           <>
-            <h2>{modalStep === 'success' ? 'Успешно!' : 'Ошибка!'}</h2>
+            <h2>{modalStep === 'success' ? t('template.success') : t('template.error')}</h2>
             <p>{modalMessage}</p>
             <div className="modal-actions">
               <button
@@ -153,7 +154,7 @@ export const CollageTempleModal = ({
                   setTemplateName('');
                 }}
               >
-                Закрыть
+                {t('modals.close')}
               </button>
             </div>
           </>

@@ -9,7 +9,7 @@
 }
 
 .search-header.active {
-  margin-top: 20px;
+  margin-top: 10px;
   background-color: #f0f0f0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
@@ -125,3 +125,14 @@ h2 {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.header-right {
+  position: fixed;
+  top: 15px;
+  right: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+

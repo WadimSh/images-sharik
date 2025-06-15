@@ -6,6 +6,7 @@ import { SelectionImagesModal } from '../../components/SelectionImagesModal';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
 import { data } from "../../assets/data";
+import { productsDB, slidesDB } from '../../utils/handleDB';
 
 export const Home = () => {
   const savedData = sessionStorage.getItem('searchData');
@@ -221,17 +222,25 @@ const handleSearch = useCallback((normalizedArticles) => {
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
         const designData = generateDesignData(item);
-        sessionStorage.setItem(
-          `design-${item.code}`, 
-          JSON.stringify(designData)
-        );
+        slidesDB.add({
+          code: `design-${item.code}`, 
+          data: designData
+        });
+        //sessionStorage.setItem(
+        //  `design-${item.code}`, 
+        //  JSON.stringify(designData)
+        //);
       });
 
       processedMetaResults.forEach(item => {
-        sessionStorage.setItem(
-          `product-${item.code}`, 
-          JSON.stringify(item)
-        );
+        productsDB.add({
+          code: `product-${item.code}`, 
+          data: item   
+        });
+        //sessionStorage.setItem(
+        //  `product-${item.code}`, 
+        //  JSON.stringify(item)
+        //);
       });
 
       // Обновляем состояние
