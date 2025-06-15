@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../context/contextMarketplace';
+import { LanguageContext } from '../../context/contextLanguage';
 import { historyDB } from '../../utils/handleDB';
 
 export const Gallery = () => {
   const navigate = useNavigate();
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useContext(LanguageContext)
   const { marketplace, toggleMarketplace } = useMarketplace();
 
   const processProductsMeta = (productsData) => {
@@ -332,9 +334,9 @@ export const Gallery = () => {
     <div>
       <div className='header-section' style={{ margin: '10px'}}>
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
-          {'< Назад'}
+        {t('header.back')}
         </button>
-        <h2 style={{ color: '#333'}}>Созданные дизайны</h2>
+        <h2 style={{ color: '#333'}}>{t('header.subtitle')}</h2>
       </div>
       <div className="items-grid-container">
         {designs.length === 0 ? (

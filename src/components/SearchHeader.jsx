@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
@@ -21,8 +21,11 @@ const SearchHeader = ({
   setIsToggled
 }) => {
   const navigate = useNavigate();
-  const [hasKeys, setHasKeys] = useState(false);
   const { t } = useContext(LanguageContext);
+  const headerRightRef = useRef(null);
+  const [hasKeys, setHasKeys] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  
 
   // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
   const allowedCharactersRegex = /^[\d\s,+-]*$/;
@@ -94,6 +97,22 @@ const SearchHeader = ({
   };
 
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsHeaderHidden(true);
+      } else {
+        setIsHeaderHidden(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     const checkHistory = async () => {
       try {
         // Получаем количество записей в таблице
@@ -110,7 +129,7 @@ const SearchHeader = ({
 
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
-      <div className="header-right">
+      <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
         <LanguageSwitcher />
       </div>
       <div className="header-top">

@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import { replacePlaceholders } from '../utils/replacePlaceholders';
 import { useMarketplace } from '../context/contextMarketplace';
+import { LanguageContext } from '../context/contextLanguage';
 import { getCode } from '../utils/getCodeProduct';
 import { PreviewDesign } from './PreviewDesign';
 import { productsDB, slidesDB } from '../utils/handleDB';
 
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
@@ -277,10 +279,10 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   // Объект перевода названий шаблонов
   const templateOptions = {
-    belbal: 'Шаблон Belbal (3 слайда)',
-    gemar: 'Шаблон Gemar (3 слайда)',
-    main: 'Базовый шаблон',
-    default: 'Шаблон картинка',
+    belbal: t('grid.belbal'),
+    gemar: t('grid.gemar'),
+    main: t('grid.main'),
+    default: t('grid.default'),
   };
 
   // Вспомогательная функция для рендеринга контролов выбора шаблона
@@ -301,7 +303,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           ))}
         </select>
         <div className="template-selector-controls">
-          {(wbCode !== 'нет на WB' || ozCode !== 'нет на OZON') ? <span>ссылки на товар в:</span> : <span>товара нет на маркетплейсах</span>}
+          {(wbCode !== 'нет на WB' || ozCode !== 'нет на OZON') ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
           {wbCode !== 'нет на WB' && <a 
             className="template-selector-control"
             href={`https://www.wildberries.ru/catalog/${wbCode}/detail.aspx`}

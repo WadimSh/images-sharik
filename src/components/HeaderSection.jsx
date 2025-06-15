@@ -231,7 +231,8 @@ export const HeaderSection = ({
     loadTemplate: slideNumber ? loadTemplate : loadCollageTemplate,
     onExport: slideNumber ? handleExportTemplate : undefined,
     onDelete: slideNumber ? handleDeleteTemplate : handleDeleteCollageTemple,
-    showExport: !!slideNumber
+    showExport: !!slideNumber,
+    placeholder: t('header.placeholder')
   };
 
   // Эффект для загрузки макетов при монтировании и изменении
@@ -337,7 +338,7 @@ export const HeaderSection = ({
   return (
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
-        {`${t('header.back')}`}
+        {t('header.back')}
       </button>
       <h2>{getHeaderTitle()}</h2>
       <TemplateSelector {...templateProps} />

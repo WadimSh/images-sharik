@@ -16,6 +16,33 @@
     "productDataNotFound": "Impossibile ottenere i dati del prodotto",
     "unknown": "Errore sconosciuto del server"
   },
+  "header": {
+    "title": "Generatore di immagini per marketplace",
+    "description": "Con questo generatore puoi facilmente creare immagini accattivanti per i tuoi prodotti.",
+    "subtitle": "Disegni creati",
+    "searchPlaceholder": "Inserisci i codici articolo ...",
+    "searchButton": "Cerca",
+    "clearButton": "Cancella campo",
+    "loadingMessage": "Attendere prego, stiamo cercando i prodotti che ti interessano...",
+    "createCollage": "Crea collage",
+    "gallery": "Galleria dei design",
+    "back": "< Indietro",
+    "placeholder": "Scegli modello",
+    "createLayout": "Crea modello",
+    "downloadDesign": "Scarica design",
+    "wbCollage": "Collage per WB",
+    "ozonCollage": "Collage per OZON",
+    "mainSlide": "Slide principale",
+    "slideNumber": "Slide"
+  },
+  "grid": {
+    "belbal": "Modello Belbal (3 diapo)",
+    "gemar": "Modello Gemar (3 diapo)",
+    "main": "Modello base",
+    "default": "Modello immagine",
+    "linkTo": "collegamenti al prodotto su:",
+    "linkNo": "prodotto non disponibile sui marketplace"
+  },
   "modals": {
     "close": "Chiudi",
     "save": "Salva",
@@ -27,23 +54,6 @@
     "preview": "Anteprima",
     "loading": "Caricamento...",
     "addProduct": "Aggiungi prodotto"
-  },
-  "header": {
-    "title": "Generatore di immagini per marketplace",
-    "description": "Con questo generatore puoi facilmente creare immagini accattivanti per i tuoi prodotti.",
-    "searchPlaceholder": "Inserisci i codici articolo ...",
-    "searchButton": "Cerca",
-    "clearButton": "Cancella campo",
-    "loadingMessage": "Attendere prego, stiamo cercando i prodotti che ti interessano...",
-    "createCollage": "Crea collage",
-    "gallery": "Galleria dei design",
-    "back": "< Indietro",
-    "createLayout": "Crea modello",
-    "downloadDesign": "Scarica design",
-    "wbCollage": "Collage per WB",
-    "ozonCollage": "Collage per OZON",
-    "mainSlide": "Slide principale",
-    "slideNumber": "Slide"
   },
   "template": {
     "create": "Crea template",

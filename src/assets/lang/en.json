@@ -16,6 +16,33 @@
     "productDataNotFound": "Failed to get product data",
     "unknown": "Unknown server error"
   },
+  "header": {
+    "title": "Marketplace Image Generator",
+    "description": "With this generator, you can easily create attractive images for your products.",
+    "subtitle": "Created designs",
+    "searchPlaceholder": "Enter SKU numbers ...",
+    "searchButton": "Search",
+    "clearButton": "Clear field",
+    "loadingMessage": "Please wait, we are searching for the products you are interested in...",
+    "createCollage": "Create collage",
+    "gallery": "Design gallery",
+    "placeholder": "Select a layout",
+    "back": "< Back",
+    "createLayout": "Create layout",
+    "downloadDesign": "Download design",
+    "wbCollage": "WB Collage",
+    "ozonCollage": "OZON Collage",
+    "mainSlide": "Main slide",
+    "slideNumber": "Slide"
+  },
+  "grid": {
+    "belbal": "Belbal template (3 slides)",
+    "gemar": "Gemar template (3 slides)",
+    "main": "Basic template",
+    "default": "Image template",
+    "linkTo": "product links on:",
+    "linkNo": "product not available on marketplaces"
+  },
   "modals": {
     "close": "Close",
     "save": "Save",
@@ -27,23 +54,6 @@
     "preview": "Preview",
     "loading": "Loading...",
     "addProduct": "Add product"
-  },
-  "header": {
-    "title": "Marketplace Image Generator",
-    "description": "With this generator, you can easily create attractive images for your products.",
-    "searchPlaceholder": "Enter SKU numbers ...",
-    "searchButton": "Search",
-    "clearButton": "Clear field",
-    "loadingMessage": "Please wait, we are searching for the products you are interested in...",
-    "createCollage": "Create collage",
-    "gallery": "Design gallery",
-    "back": "< Back",
-    "createLayout": "Create layout",
-    "downloadDesign": "Download design",
-    "wbCollage": "WB Collage",
-    "ozonCollage": "OZON Collage",
-    "mainSlide": "Main slide",
-    "slideNumber": "Slide"
   },
   "template": {
     "create": "Create template",
