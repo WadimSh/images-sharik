@@ -43,6 +43,10 @@
     "linkTo": "product links on:",
     "linkNo": "product not available on marketplaces"
   },
+  "views": {
+    "galleryMessageTitle": "No saved designs",
+    "galleryMessageSubtitle": "Create and save your design or collage"
+  },
   "modals": {
     "close": "Close",
     "save": "Save",

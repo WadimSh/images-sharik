@@ -43,6 +43,10 @@
     "linkTo": "collegamenti al prodotto su:",
     "linkNo": "prodotto non disponibile sui marketplace"
   },
+  "views": {
+    "galleryMessageTitle": "Non ci sono design salvati",
+    "galleryMessageSubtitle": "Crea e salva una grafica o un collage"
+  },
   "modals": {
     "close": "Chiudi",
     "save": "Salva",

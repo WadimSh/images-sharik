@@ -16,9 +16,9 @@ import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 import { CollageTempleModal } from '../../components/CollageTempleModal';
-import { ElementToolbar } from '../../components/ElementToolbar';
-import { useElementToolbar } from '../../components/ElementToolbar/useElementToolbar';
-import { handleFileUpload } from '../../components/ElementToolbar/utils';
+import { ElementToolbar } from '../../ui/ElementToolbar';
+import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
+import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 
 import { useMarketplace } from '../../context/contextMarketplace';
 import { getCode } from '../../utils/getCodeProduct';

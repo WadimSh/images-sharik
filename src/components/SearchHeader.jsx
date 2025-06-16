@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { LanguageContext } from "../context/contextLanguage";
 
 import { db, productsDB, slidesDB } from "../utils/handleDB";
-import MarketplaceSwitcher from "./MarketplaceSwitcher/MarketplaceSwitcher";
+import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
 
 const SearchHeader = ({ 

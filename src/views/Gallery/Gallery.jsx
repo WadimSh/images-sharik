@@ -10,6 +10,7 @@ export const Gallery = () => {
   const navigate = useNavigate();
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingItem, setLoadingItem] = useState(false);
   const { t } = useContext(LanguageContext)
   const { marketplace, toggleMarketplace } = useMarketplace();
 
@@ -108,42 +109,46 @@ export const Gallery = () => {
       // Сохраняем данные в sessionStorage
       sessionStorage.setItem(storageKey, JSON.stringify(historyItem.data));
 
-    // Выполняем запросы последовательно с await
-    const searchResponse = await fetch(
-      `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${designInfo.article}`
-    );
-    
-    const searchData = await searchResponse.json();
-    
-    if (!searchData.results || searchData.results.length === 0) {
-      throw new Error("Товар с таким артикулом не активен.");
-    }
-    
-    const productIds = searchData.results.map(product => product.id);
-    const idsParam = productIds.join(',');
-    
-    const detailedResponse = await fetch(
-      `https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`
-    );
-    
-    if (!detailedResponse.ok) {
-      throw new Error('Ошибка при получении детальной информации');
-    }
-    
-    const detailedData = await detailedResponse.json();
-    
-    // Обрабатываем полученные данные API
-    const processedMetaResults = processProductsMeta(detailedData);
-    
-    // Сохраняем обработанные данные
-    processedMetaResults.forEach(item => {
-      if (item) {
-        sessionStorage.setItem(
-          `product-${item.code}`, 
-          JSON.stringify(item)
-        );
+      setLoadingItem(true);
+
+      // Выполняем запросы последовательно с await
+      const searchResponse = await fetch(
+        `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${designInfo.article}`
+      );
+
+      const searchData = await searchResponse.json();
+
+      if (!searchData.results || searchData.results.length === 0) {
+        throw new Error("Товар с таким артикулом не активен.");
       }
-    });
+
+      const productIds = searchData.results.map(product => product.id);
+      const idsParam = productIds.join(',');
+
+      const detailedResponse = await fetch(
+        `https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`
+      );
+
+      if (!detailedResponse.ok) {
+        throw new Error('Ошибка при получении детальной информации');
+      }
+
+      const detailedData = await detailedResponse.json();
+
+      // Обрабатываем полученные данные API
+      const processedMetaResults = processProductsMeta(detailedData);
+
+      // Сохраняем обработанные данные
+      processedMetaResults.forEach(item => {
+        if (item) {
+          sessionStorage.setItem(
+            `product-${item.code}`, 
+            JSON.stringify(item)
+          );
+        }
+      });
+
+      setLoadingItem(false);
 
       // Формируем роут для перехода
       const route = `/template/${designInfo.article}_${designInfo.slideNumber}`;
@@ -342,8 +347,8 @@ export const Gallery = () => {
         {designs.length === 0 ? (
           <div 
           style={{ color: '#333', fontSize: '16px', textAlign: 'center', marginTop: '20px' }}>
-            <p>Нет сохраненных дизайнов</p>
-            <p>Создайте и сохраните дизайн или коллаж</p>
+            <p>{t('views.galleryMessageTitle')}</p>
+            <p>{t('views.galleryMessageSubtitle')}</p>
           </div>
         ) : (
         <div className="items-grid">
@@ -376,6 +381,13 @@ export const Gallery = () => {
 
               <div className="item-content">
                 <PreviewDesign elements={design.data} />
+                
+                {loadingItem && 
+                  <div className="loader-container-gallery">
+                    <div className="loader"></div>
+                  </div>
+                }
+                
               </div>
 
             </div>
