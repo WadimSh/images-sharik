@@ -2,8 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { PreviewDesign } from '../../components/PreviewDesign';
-import { useMarketplace } from '../../context/contextMarketplace';
-import { LanguageContext } from '../../context/contextLanguage';
+import { useMarketplace } from '../../contexts/contextMarketplace';
+import { LanguageContext } from '../../contexts/contextLanguage';
 import { historyDB } from '../../utils/handleDB';
 
 export const Gallery = () => {

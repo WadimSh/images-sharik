@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 
 import { replacePlaceholders } from '../utils/replacePlaceholders';
-import { useMarketplace } from '../context/contextMarketplace';
-import { LanguageContext } from '../context/contextLanguage';
+import { useMarketplace } from '../contexts/contextMarketplace';
+import { LanguageContext } from '../contexts/contextLanguage';
 import { getCode } from '../utils/getCodeProduct';
 import { PreviewDesign } from './PreviewDesign';
 import { productsDB, slidesDB } from '../utils/handleDB';

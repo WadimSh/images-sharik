@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 import { useContext } from "react";
-import { LanguageContext } from "../context/contextLanguage";
+import { LanguageContext } from "../contexts/contextLanguage";
 
 import { db, productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";

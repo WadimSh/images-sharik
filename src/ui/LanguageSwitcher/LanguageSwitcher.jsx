@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { FaGlobe } from 'react-icons/fa';
 
-import { LanguageContext } from '../../context/contextLanguage';
+import { LanguageContext } from '../../contexts/contextLanguage';
 import './LanguageSwitcher.css';
 
 const LanguageSwitcher = () => {

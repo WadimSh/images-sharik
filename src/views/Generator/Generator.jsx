@@ -19,10 +19,10 @@ import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 
-import { useMarketplace } from '../../context/contextMarketplace';
+import { useMarketplace } from '../../contexts/contextMarketplace';
 import { getCode } from '../../utils/getCodeProduct';
 import { slidesDB } from '../../utils/handleDB';
-import { LanguageContext } from '../../context/contextLanguage';
+import { LanguageContext } from '../../contexts/contextLanguage';
 
 export const Generator = () => {
   const { id } = useParams();

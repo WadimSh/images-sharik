@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMarketplace } from '../../context/contextMarketplace';
+import { useMarketplace } from '../../contexts/contextMarketplace';
 import './MarketplaceSwitcher.css';
 
 const MarketplaceSwitcher = () => {

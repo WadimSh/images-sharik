@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { LanguageContext } from '../context/contextLanguage';
+import { LanguageContext } from '../contexts/contextLanguage';
 import { collageDB } from '../utils/handleDB';
 
 export const CollageTempleModal = ({

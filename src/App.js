@@ -1,6 +1,6 @@
 import Views from "./views/Views";
-import { MarketplaceProvider } from "./context/contextMarketplace";
-import { LanguageProvider } from "./context/contextLanguage";
+import { MarketplaceProvider } from "./contexts/contextMarketplace";
+import { LanguageProvider } from "./contexts/contextLanguage";
 
 function App() {
   

@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { LanguageContext } from '../context/contextLanguage';
+import { LanguageContext } from '../contexts/contextLanguage';
 import { designsDB } from '../utils/handleDB';
 
 export const TemplateModal = ({

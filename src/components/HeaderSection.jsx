@@ -5,9 +5,9 @@ import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
 
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
-import { useMarketplace } from '../context/contextMarketplace';
+import { useMarketplace } from '../contexts/contextMarketplace';
 import { designsDB, collageDB, historyDB } from '../utils/handleDB';
-import { LanguageContext } from '../context/contextLanguage';
+import { LanguageContext } from '../contexts/contextLanguage';
 
 export const HeaderSection = ({
   captureRef,

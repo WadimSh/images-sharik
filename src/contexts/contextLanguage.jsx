@@ -12,14 +12,14 @@ const languages = {
 };
 
 export const LanguageProvider = ({ children }) => {
-  const [currentLanguage, setCurrentLanguage] = useState('ru'); // Default to Russian
+  const [currentLanguage, setCurrentLanguage] = useState('ru'); // Язык по умолчанию
   const [translations, setTranslations] = useState(languages.ru);
 
   useEffect(() => {
-    // Get browser language
+    // Получаем язык выбранный на браузере
     const browserLang = navigator.language.split('-')[0];
     
-    // Check if browser language is supported, otherwise use Russian
+    // Проверяем, поддерживается ли язык браузера, в противном случае используйте русский
     const initialLang = Object.keys(languages).includes(browserLang) ? browserLang : 'ru';
     
     setCurrentLanguage(initialLang);

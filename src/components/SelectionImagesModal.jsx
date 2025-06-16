@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 
-import { LanguageContext } from '../context/contextLanguage';
-import { useMarketplace } from "../context/contextMarketplace";
+import { LanguageContext } from '../contexts/contextLanguage';
+import { useMarketplace } from "../contexts/contextMarketplace";
 import { getCode } from "../utils/getCodeProduct";
 import { productsDB } from "../utils/handleDB";
 

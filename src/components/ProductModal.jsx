@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { LanguageContext } from '../context/contextLanguage';
+import { LanguageContext } from '../contexts/contextLanguage';
 
 export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
   const [searchQuery, setSearchQuery] = useState('');

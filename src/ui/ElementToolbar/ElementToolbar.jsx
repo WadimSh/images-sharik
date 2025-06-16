@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { FaImage, FaFont, FaSquare, FaElementor, FaPuzzlePiece } from 'react-icons/fa';
 
-import { LanguageContext } from '../../context/contextLanguage';
+import { LanguageContext } from '../../contexts/contextLanguage';
 
 export const ElementToolbar = ({ onAddElement }) => {
   const { t } = useContext(LanguageContext);
