@@ -250,31 +250,31 @@ export const Gallery = () => {
     if (parts.length < 6) {
       return {
         articles: title,
-        marketplace: 'Неизвестно',
-        designType: 'Неизвестно',
-        dimensions: 'Неизвестно',
-        date: 'Неизвестно',
-        time: 'Неизвестно'
+        marketplace: t('views.galleryUndefined'),
+        designType: t('views.galleryUndefined'),
+        dimensions: t('views.galleryUndefined'),
+        date: t('views.galleryUndefined'),
+        time: t('views.galleryUndefined'),
       };
     }
     
     // Определяем индекс типа дизайна (коллаж или слайд)
     let designTypeIndex = -1;
-    let designType = 'Неизвестно';
+    let designType = t('views.galleryUndefined');
     
     // Сначала ищем "collage" или "main"
     if (parts.includes('collage')) {
       designTypeIndex = parts.indexOf('collage');
-      designType = 'Коллаж';
+      designType = t('views.galleryCollage');
     } else if (parts.includes('main')) {
       designTypeIndex = parts.indexOf('main');
-      designType = 'Дизайн';
+      designType = t('views.galleryDesign');
     } else {
       // Ищем любой слайд (slideX)
       for (let i = 0; i < parts.length; i++) {
         if (parts[i].startsWith('slide')) {
           designTypeIndex = i;
-          designType = 'Дизайн';
+          designType = t('views.galleryDesign');
           break;
         }
       }
@@ -284,11 +284,11 @@ export const Gallery = () => {
     if (designTypeIndex === -1) {
       return {
         articles: title,
-        marketplace: 'Неизвестно',
-        designType: 'Неизвестно',
-        dimensions: 'Неизвестно',
-        date: 'Неизвестно',
-        time: 'Неизвестно'
+        marketplace: t('views.galleryUndefined'),
+        designType: t('views.galleryUndefined'),
+        dimensions: t('views.galleryUndefined'),
+        date: t('views.galleryUndefined'),
+        time: t('views.galleryUndefined'),
       };
     }
     
@@ -374,7 +374,6 @@ export const Gallery = () => {
                   e.stopPropagation();
                   handleDelete(design.key);
                 }}
-                title="Удалить дизайн"
               >
                 ×
               </button>
@@ -393,22 +392,22 @@ export const Gallery = () => {
             </div>
             <div className="design-info-plate">
                 <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
-                  <span className="info-label">{info.designType} для {info.marketplaceName}</span>
+                  <span className="info-label">{info.designType} {t('views.galleryLabelFor')} {info.marketplaceName}</span>
                 </div>
 
                 <div className="info-row">
-                  <span className="info-label">Товары:</span>
+                  <span className="info-label">{t('views.galleryLabelProducts')}</span>
                   <span className="info-value">{info.articles}</span>
                 </div>
                 
                 <div className="info-row">
-                  <span className="info-label">Размер слайда:</span>
+                  <span className="info-label">{t('views.galleryLabelSlideSize')}</span>
                   <span className="info-value">{info.dimensions}</span>
                 </div>
                 
                 <div className="info-row">
-                  <span className="info-label">Создан:</span>
-                  <span className="info-value">{info.date} в {info.time}</span>
+                  <span className="info-label">{t('views.galleryLabelGenerated')}</span>
+                  <span className="info-value">{info.date} {t('views.galleryLabelAt')} {info.time}</span>
                 </div>
                 
                 </div>

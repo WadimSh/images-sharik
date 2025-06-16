@@ -45,7 +45,24 @@
   },
   "views": {
     "galleryMessageTitle": "Нет сохраненных дизайнов",
-    "galleryMessageSubtitle": "Создайте и сохраните дизайн или коллаж"
+    "galleryMessageSubtitle": "Создайте и сохраните дизайн или коллаж",
+    "galleryUndefined": "Неизвестно",
+    "galleryCollage": "Коллаж",
+    "galleryDesign": "Дизайн",
+    "galleryLabelProducts": "Товары:",
+    "galleryLabelSlideSize": "Размер слайда:",
+    "galleryLabelGenerated": "Создан:",
+    "galleryLabelFor": "для",
+    "galleryLabelAt": "в",
+    "generatorMenuCopy": "Копировать (Ctrl+C)",
+    "generatorMenuPaste": "Вставить (Ctrl+V)",
+    "generatorMenuTextEdit": "Редактировать текст",
+    "generatorMenuFont": "Шрифт...",
+    "generatorMenuFlipImage": "Отобразить зеркально",
+    "generatorMenuRemoveBackground": "Удалить фон",
+    "generatorMenuChangeColor": "Изменить цвет",
+    "generatorMenuDelete": "Удалить (Del)",
+    "generatorMessageInput": "Перетащите изображение сюда"
   },
   "modals": {
     "close": "Закрыть",

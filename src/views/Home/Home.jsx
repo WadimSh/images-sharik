@@ -226,10 +226,6 @@ const handleSearch = useCallback((normalizedArticles) => {
           code: `design-${item.code}`, 
           data: designData
         });
-        //sessionStorage.setItem(
-        //  `design-${item.code}`, 
-        //  JSON.stringify(designData)
-        //);
       });
 
       processedMetaResults.forEach(item => {
@@ -237,10 +233,6 @@ const handleSearch = useCallback((normalizedArticles) => {
           code: `product-${item.code}`, 
           data: item   
         });
-        //sessionStorage.setItem(
-        //  `product-${item.code}`, 
-        //  JSON.stringify(item)
-        //);
       });
 
       // Обновляем состояние

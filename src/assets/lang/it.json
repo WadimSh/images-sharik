@@ -45,7 +45,24 @@
   },
   "views": {
     "galleryMessageTitle": "Non ci sono design salvati",
-    "galleryMessageSubtitle": "Crea e salva una grafica o un collage"
+    "galleryMessageSubtitle": "Crea e salva una grafica o un collage",
+    "galleryUndefined": "Non specificato",
+    "galleryCollage": "Collage",
+    "galleryDesign": "Grafica",
+    "galleryLabelProducts": "Prodotti:",
+    "galleryLabelSlideSize": "Dimensione slide:",
+    "galleryLabelGenerated": "Creato:",
+    "galleryLabelFor": "per",
+    "galleryLabelAt": "alle",
+    "generatorMenuCopy": "Copia (Ctrl+C)",
+    "generatorMenuPaste": "Incolla (Ctrl+V)",
+    "generatorMenuTextEdit": "Modifica testo",
+    "generatorMenuFont": "Carattere...",
+    "generatorMenuFlipImage": "Rifletti immagine",
+    "generatorMenuRemoveBackground": "Rimuovi sfondo",
+    "generatorMenuChangeColor": "Cambia colore",
+    "generatorMenuDelete": "Elimina (Del)",
+    "generatorMessageInput": "Trascina un'immagine qui"
   },
   "modals": {
     "close": "Chiudi",

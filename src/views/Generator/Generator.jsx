@@ -1,6 +1,5 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import UPNG from 'upng-js';
 
 import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
@@ -23,10 +22,11 @@ import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 import { useMarketplace } from '../../context/contextMarketplace';
 import { getCode } from '../../utils/getCodeProduct';
 import { slidesDB } from '../../utils/handleDB';
+import { LanguageContext } from '../../context/contextLanguage';
 
 export const Generator = () => {
   const { id } = useParams();
-  
+  const { t } = useContext(LanguageContext);
   const isCollageMode = id === 'collage';
   const [baseId, slideNumber] = isCollageMode || !id ? ['', ''] : id.split('_');
   const apiKey = process.env.REACT_APP_API_KEY;
@@ -257,7 +257,7 @@ export const Generator = () => {
       }
     });
 
-    // Обновляем состояние и сохраняем в sessionStorage
+    // Обновляем состояние и сохраняем
     setElements(resultElements);
     localStorage.setItem('design-collage', JSON.stringify(resultElements));
   };
@@ -291,7 +291,6 @@ export const Generator = () => {
       setSelectedColorElementId(elementId); // Сохраняем либо массив ID, либо одиночный ID
     }
   };
-
   
   // Обработчик изменений параметров шрифта
   const handleFontChange = (elementId, property, value) => {
@@ -503,8 +502,7 @@ export const Generator = () => {
   const handleRemoveBackground = async (elementId) => {
     try {
       const element = elements.find(el => el.id === elementId);
-      //if (!element || !element.image?.startsWith('http')) return;
-  
+        
       setProcessingIds(prev => new Set(prev).add(elementId));
   
       // Скачиваем изображение
@@ -534,70 +532,8 @@ export const Generator = () => {
       // Конвертируем ответ в ArrayBuffer
       const processedBlob = await apiResponse.blob();
 
-      //const arrayBuffer = await processedBlob.arrayBuffer();
-      //
-      //// Декодируем изображение
-      //const image = UPNG.decode(arrayBuffer);
-      //
-      //// Функция получения настроек сжатия в зависимости от размера изображения
-      //const getCompressionSettings = (width, height) => {
-      //  const totalPixels = width * height;
-      //  
-      //  if (totalPixels > 2000000) { // Очень большие изображения (>2MP)
-      //    return {
-      //      colors: 256,
-      //      cnum: 10000,
-      //      dith: 1,
-      //      filter: 0
-      //    };
-      //  } else if (totalPixels > 1000000) { // Большие изображения (1-2MP)
-      //    return {
-      //      colors: 256,
-      //      cnum: 15000,
-      //      dith: 1,
-      //      filter: 0
-      //    };
-      //  } else if (totalPixels > 500000) { // Средние изображения (0.5-1MP)
-      //    return {
-      //      colors: 256,
-      //      cnum: 20000,
-      //      dith: 1,
-      //      filter: 0
-      //    };
-      //  } else { // Маленькие изображения (<0.5MP)
-      //    return {
-      //      colors: 256, // Используем 8-бит цвет для всех размеров
-      //      cnum: 25000,
-      //      dith: 1,
-      //      filter: 0
-      //    };
-      //  }
-      //};
-//
-      //// Получаем настройки сжатия для текущего изображения
-      //const compressionSettings = getCompressionSettings(image.width, image.height);
-      //
-      //// Оптимизированные параметры сжатия с адаптивной логикой
-      //const compressedArray = UPNG.encode(
-      //  [image.data.buffer],
-      //  image.width,
-      //  image.height,
-      //  compressionSettings.colors,
-      //  0, // Задержка анимации
-      //  {
-      //    cnum: compressionSettings.cnum,
-      //    dith: compressionSettings.dith,
-      //    filter: compressionSettings.filter,
-      //    tabs: { pHYs: [2834, 2834, 1] } // Сохраняем информацию о DPI для лучшего качества
-      //  }
-      //);
-      //
-      //// Создаем Blob из сжатых данных
-      //const compressedBlob = new Blob([compressedArray], {type: 'image/png'});
-      
       // Конвертируем в Data URL
       const reader = new FileReader();
-      //reader.readAsDataURL(compressedBlob);
       reader.readAsDataURL(processedBlob);
       
       reader.onloadend = () => {
@@ -607,23 +543,6 @@ export const Generator = () => {
         const updatedElements = elements.map(el => 
           el.id === elementId ? { ...el, image: compressedDataURL } : el
         );
-  
-        // Обновляем sessionStorage только для продуктовых изображений
-        //if (element?.isProduct || !isCollageMode) {
-        //  try {
-        //    const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
-        //    const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
-        //    if (indexImg >= 0 && indexImg < updatedImages.length) {
-        //      updatedImages[indexImg] = compressedDataURL;
-        //      sessionStorage.setItem(storageMetaKey, JSON.stringify({
-        //        ...currentMeta,
-        //        images: updatedImages
-        //      }));
-        //    }
-        //  } catch (e) {
-        //    console.error('Ошибка обновления sessionStorage:', e);
-        //  }
-        //}
   
         setElements(updatedElements);
       };
@@ -642,7 +561,7 @@ export const Generator = () => {
 
   // Функция добавления тени
   const handleAddShadow = async (elementId) => {
-  try {
+    try {
       const element = elements.find(el => el.id === elementId);
       if (!element?.image) return;
 
@@ -711,23 +630,6 @@ export const Generator = () => {
         el.id === elementId ? { ...el, image: dataUrl } : el
       );
 
-      // Обновляем sessionStorage
-      //if (element?.isProduct || !isCollageMode) {
-      //  try {
-      //    const currentMeta = JSON.parse(sessionStorage.getItem(storageMetaKey) || '{}');
-      //    const updatedImages = currentMeta.images ? [...currentMeta.images] : [];
-      //    if (indexImg >= 0 && indexImg < updatedImages.length) {
-      //      updatedImages[indexImg] = dataUrl;
-      //      sessionStorage.setItem(storageMetaKey, JSON.stringify({
-      //        ...currentMeta,
-      //        images: updatedImages
-      //      }));
-      //    }
-      //  } catch (e) {
-      //    console.error('Ошибка обновления sessionStorage:', e);
-      //  }
-      //}
-
       setElements(updatedElements);
 
     } catch (error) {
@@ -756,13 +658,13 @@ export const Generator = () => {
   }
 
   // Замените старые функции перемещения на новую
-const moveElement = (fromIndex, toIndex) => {
-  if (fromIndex === toIndex) return;
-  const newElements = [...elements];
-  const [movedElement] = newElements.splice(fromIndex, 1);
-  newElements.splice(toIndex, 0, movedElement);
-  setElements(newElements);
-};
+  const moveElement = (fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return;
+    const newElements = [...elements];
+    const [movedElement] = newElements.splice(fromIndex, 1);
+    newElements.splice(toIndex, 0, movedElement);
+    setElements(newElements);
+  };
 
   // Обработчик поворота
   const handleRotate = (id, newRotation) => {
@@ -1250,7 +1152,7 @@ const moveElement = (fromIndex, toIndex) => {
             <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
               {isDragging && (
                 <div className="drop-message">
-                  Перетащите изображение сюда
+                  {t('views.generatorMessageInput')}
                 </div>
               )}
             </div>            
@@ -1277,7 +1179,6 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        //setSelectedElementId(element.id);
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1313,7 +1214,6 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        //setSelectedElementId(element.id);
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1347,7 +1247,6 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        //setSelectedElementId(element.id);
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1385,7 +1284,6 @@ const moveElement = (fromIndex, toIndex) => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
-                        //setSelectedElementId(element.id);
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1419,13 +1317,13 @@ const moveElement = (fromIndex, toIndex) => {
                   }}
                 >
                   <button onClick={handleCopy}>
-                    Копировать (Ctrl+C)
+                    {t('views.generatorMenuCopy')}
                   </button>
                   <button 
                     onClick={handlePaste}
                     disabled={!copiedElement}
                   >
-                    Вставить (Ctrl+V)
+                    {t('views.generatorMenuPaste')}
                   </button>
                   
                   <div className='separator'/>
@@ -1437,9 +1335,8 @@ const moveElement = (fromIndex, toIndex) => {
                     }}
                     disabled={selectedElementIds.length > 0 || element?.type !== 'text'}
                     className="remove-bg-button"
-                    title="Измененить текст"
                   >
-                    Редактировать текст
+                    {t('views.generatorMenuTextEdit')}
                   </button>
                   
                   <button 
@@ -1456,21 +1353,21 @@ const moveElement = (fromIndex, toIndex) => {
                       (selectedElementIds.length > 0 && !areAllSelectedText)
                     }
                   >
-                    Шрифт...
+                    {t('views.generatorMenuFont')}
                   </button>
 
                   <button 
                     onClick={() => handleFlipImage(element.id)}
                     disabled={selectedElementIds.length > 0 || (element?.type !== 'image' && element?.type !== 'element')}
                   >
-                    Отобразить зеркально
+                    {t('views.generatorMenuFlipImage')}
                   </button>
                   
                   <button 
                     onClick={() => handleRemoveBackground(element.id)}
                     disabled={selectedElementIds.length > 0 || element?.type !== 'image'}
                   >
-                    Удалить фон
+                    {t('views.generatorMenuRemoveBackground')}
                   </button>
 
                   <button 
@@ -1480,17 +1377,16 @@ const moveElement = (fromIndex, toIndex) => {
                       (selectedElementIds.length > 0 && !areAllSelectedShape)
                     }
                   >
-                    Изменить цвет
+                    {t('views.generatorMenuChangeColor')}
                   </button>
-                  
-                 
+                                   
                   <div className='separator'></div>
 
                   <button
                     className='context-delete'
                     onClick={handleDelete}
                   >
-                    Удалить (Del)
+                    {t('views.generatorMenuDelete')}
                   </button>
                 </div>
               );

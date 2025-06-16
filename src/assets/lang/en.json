@@ -45,7 +45,24 @@
   },
   "views": {
     "galleryMessageTitle": "No saved designs",
-    "galleryMessageSubtitle": "Create and save your design or collage"
+    "galleryMessageSubtitle": "Create and save your design or collage",
+    "galleryUndefined": "Not specified",
+    "galleryCollage": "Collage",
+    "galleryDesign": "Design",
+    "galleryLabelProducts": "Products:",
+    "galleryLabelSlideSize": "Slide size:",
+    "galleryLabelGenerated": "Created:",
+    "galleryLabelFor": "for",
+    "galleryLabelAt": "at",
+    "generatorMenuCopy": "Copy (Ctrl+C)",
+    "generatorMenuPaste": "Paste (Ctrl+V)",
+    "generatorMenuTextEdit": "Edit text",
+    "generatorMenuFont": "Font...",
+    "generatorMenuFlipImage": "Flip image",
+    "generatorMenuRemoveBackground": "Remove background",
+    "generatorMenuChangeColor": "Change color",
+    "generatorMenuDelete": "Delete (Del)",
+    "generatorMessageInput": "Drag and drop an image here"
   },
   "modals": {
     "close": "Close",

@@ -379,7 +379,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
                       e.stopPropagation();
                       handleDeleteItem(item);
                     }}
-                    title="Удалить дизайн"
                   >
                     ×
                   </button>
