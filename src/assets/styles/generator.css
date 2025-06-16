@@ -51,7 +51,9 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-width: 180px;
   transition: background 0.2s;
 }
 

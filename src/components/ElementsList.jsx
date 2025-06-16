@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
@@ -9,6 +9,7 @@ import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/f
 
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
+import { LanguageContext } from '../contexts/contextLanguage';
 
 export const ElementsList = ({
   elements,
@@ -46,6 +47,8 @@ export const ElementsList = ({
   const elementRefs = useRef(new Map());
   // Создаем Map для хранения refs меню элементов
   const menuRefs = useRef(new Map());
+
+  const { t } = useContext(LanguageContext);
 
   // Эффект для прокрутки к выделенному элементу
   useEffect(() => {
@@ -120,7 +123,7 @@ export const ElementsList = ({
   return (
     <div className="sidebar">
       <div className="elements-list" ref={listContainerRef}>
-        <h3 style={{ marginTop: '0' }}>Компоненты дизайна</h3>
+        <h3 style={{ marginTop: '0' }}>{t('elements.title')}</h3>
         {[...elements].reverse().map((element, index) => {
           const originalIndex = elements.length - 1 - index;
           const isExpanded = expandedElementId === element.id;
@@ -186,7 +189,7 @@ export const ElementsList = ({
                           verticalAlign: 'text-bottom',
                           borderRadius: '2px'
                         }}
-                        alt="Превью"
+                        alt="alt"
                       />
                     )}
                     {element.type === 'shape' && (
@@ -208,10 +211,10 @@ export const ElementsList = ({
                   {element.type === 'text' && <span className="quoted-truncate">
                     "<span className="truncated-text">{element.text}</span>"
                   </span>}
-                  {(element.type === 'image' && !element.isProduct) && 'Изображение'}
-                  {element.isProduct && 'Основной товар'}
-                  {element.type === 'element' && 'Элемент'}
-                  {element.type === 'shape' && 'Фигура'}
+                  {(element.type === 'image' && !element.isProduct) && t('elements.labelImage')}
+                  {element.isProduct && t('elements.labelMainProduct')}
+                  {element.type === 'element' && t('elements.labelElement')}
+                  {element.type === 'shape' && t('elements.labelShape')}
                 </div>
                 <button 
                   className={`expand-button ${isExpanded ? 'expanded' : ''}`}
@@ -245,9 +248,8 @@ export const ElementsList = ({
                           handleTextEditToggle(element.id, true);
                         }}
                         className="remove-bg-button"
-                        title="Измененить текст"
                       >
-                        <><FaPencil /> Измененить текст</>
+                        <><FaPencil /> {t('views.generatorMenuTextEdit')}</>
                       </button>
                     </div>
                   )}
@@ -260,9 +262,8 @@ export const ElementsList = ({
                           handleFlipImage(element.id);
                         }}
                         className="remove-bg-button"
-                        title="Отобразить зеркально"
                       >
-                        <><FaArrowRightArrowLeft /> Отобразить зеркально</>
+                        <><FaArrowRightArrowLeft /> {t('views.generatorMenuFlipImage')}</>
                       </button>
                     </div>
                   )}  
@@ -275,13 +276,12 @@ export const ElementsList = ({
                           handleRemoveBackground(element.id);
                         }}
                         className="remove-bg-button"
-                        title="Удалить фон"
                         disabled={processingIds.has(element.id)}
                       >
                         {processingIds.has(element.id) ? (
                           <div className="spinner"></div>
                         ) : (
-                          <><FaWandMagicSparkles /> Удалить фон</>
+                          <><FaWandMagicSparkles /> {t('views.generatorMenuRemoveBackground')}</>
                         )}
                       </button>
                     </div>
@@ -289,9 +289,10 @@ export const ElementsList = ({
 
                   {(element.type === 'image' || element.type === 'element') && (
                     <div className="element-controls line">
-                      <span>Направление тени</span>
+                      <span>{t('elements.subtitleShadow')}</span>
+
                       <div className="font-controls">
-                        <label>Горизонталь:
+                        <label>{t('elements.labelHorizontal')}
                           <div>
                             <button
                               className={`direction-btn ${shadowSetting.offsetX === -20 ? 'active' : ''}`}
@@ -311,7 +312,7 @@ export const ElementsList = ({
                       </div>
 
                       <div className="font-controls">
-                        <label>Вертикаль:
+                        <label>{t('elements.labelVertical')}
                           <div>
                             <button
                               className={`direction-btn ${shadowSetting.offsetY === -20 ? 'active' : ''}`}
@@ -329,28 +330,27 @@ export const ElementsList = ({
                           </div>
                         </label>
                       </div>
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddShadow(element.id, 20, 20);
                         }}
                         className="remove-bg-button"
-                        title="Добавить тень"
                         disabled={processingShedowIds.has(element.id)}
                       >
                         {processingShedowIds.has(element.id) ? (
                           <div className="spinner"></div>
                         ) : (
-                          <><FaWandMagicSparkles /> Добавить тень</>
+                          <><FaWandMagicSparkles /> {t('elements.buttonAddShadow')}</>
                         )}
                       </button>
-
                     </div>
                   )}
 
                   {element.type === 'shape' && (
                     <div className="element-controls">
-                      <span>Цвет</span>
+                      <span>{t('elements.subtitleColor')}</span>
                       <div className="color-control">
                         <div 
                           style={{
@@ -403,7 +403,7 @@ export const ElementsList = ({
 
                   {element.type === 'shape' && (
                     <div className="element-controls line">
-                      <span>Скругление углов</span>
+                      <span>{t('elements.subtitleRadiusChange')}</span>
                       <div className="radius-controls">
                         <div className="radius-row">
                           <div className="radius-block">
@@ -463,35 +463,31 @@ export const ElementsList = ({
 
                   {element.type === 'shape' && (
                     <div className="element-controls line">
-                      <span>Линейный градиент</span>
+                      <span>{t('elements.subtitleGradient')}</span>
                       <div className="gradient-controls">
                         {/* Выбор направления */}
                         <div className="direction-buttons">
                           <button
                             onClick={() => handleGradientChange(element.id, 'direction', 'to right')}
                             className={element.gradient?.direction === 'to right' ? 'active' : ''}
-                            title="Слева направо"
                           >
                             →
                           </button>
                           <button
                             onClick={() => handleGradientChange(element.id, 'direction', 'to left')}
                             className={element.gradient?.direction === 'to left' ? 'active' : ''}
-                            title="Справа налево"
                           >
                             ←
                           </button>
                           <button
                             onClick={() => handleGradientChange(element.id, 'direction', 'to bottom')}
                             className={element.gradient?.direction === 'to bottom' ? 'active' : ''}
-                            title="Сверху вниз"
                           >
                             ↓
                           </button>
                           <button
                             onClick={() => handleGradientChange(element.id, 'direction', 'to top')}
                             className={element.gradient?.direction === 'to top' ? 'active' : ''}
-                            title="Снизу вверх"
                           >
                             ↑
                           </button>
@@ -499,7 +495,7 @@ export const ElementsList = ({
 
                         {/* Выбор цветов */}
                         <div className="opacity-control">
-                          <label>Стартовая точка:</label>
+                          <label>{t('elements.labelPointStart')}</label>
                           <input
                             type="range"
                             min="0"
@@ -511,7 +507,7 @@ export const ElementsList = ({
                           <span>{(element.gradient?.start || 0)} %</span>
                         </div>
                         <div className="opacity-control">
-                          <label>Цвет 1:</label>
+                          <label>{t('elements.subtitleColor')} 1:</label>
                           <input
                             type="color"
                             value={element.gradient?.colors?.[0] || '#000000'}
@@ -528,7 +524,7 @@ export const ElementsList = ({
                           <span>{(element.gradient?.opacity?.[0] || 1).toFixed(1)}</span>
                         </div>
                         <div className="opacity-control">
-                          <label>Цвет 2:</label>
+                          <label>{t('elements.subtitleColor')} 2:</label>
                           <input
                             type="color"
                             value={element.gradient?.colors?.[1] || '#ffffff'}
@@ -550,7 +546,7 @@ export const ElementsList = ({
 
                   {element.type === 'text' && (
                     <div className="element-controls line">
-                      <span>Типографика</span>
+                      <span>{t('elements.subtitleTextFont')}</span>
                       <div className="font-controls">
                         <div className="style-controls">
                           <button
@@ -577,7 +573,7 @@ export const ElementsList = ({
                         </div>
 
                         <label>
-                          Шрифт:
+                          {t('elements.labelFont')}
                           <select
                             value={element.fontFamily || 'Arial'}
                             onChange={(e) => handleFontChange(element.id, 'fontFamily', e.target.value)}
@@ -616,18 +612,17 @@ export const ElementsList = ({
                         </label>
 
                         <label>
-                          Размер:
+                          {t('elements.labelFontSize')}
                           <input
                             type="number"
                             value={element.fontSize || 24}
                             onChange={(e) => handleFontChange(element.id, 'fontSize', parseInt(e.target.value))}
                             min="8"
-                            max="72"
                           />
                         </label>
 
                         <label>
-                          Цвет: 
+                          {t('elements.labelFontColor')} 
                           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <div className="color-picker-wrapper">
                               <input
@@ -649,10 +644,10 @@ export const ElementsList = ({
                   )}  
                   
                   <div className="element-controls line">
-                    <span>Позиционирование</span>
+                    <span>{t('elements.subtitlePosition')}</span>
                     <div className="font-controls">
                       <label>
-                        По горизотали, px:
+                        {t('elements.labelHorizontally')}, px:
                         <input
                           type="number"
                           value={(element.position.x).toFixed(0)}
@@ -660,7 +655,7 @@ export const ElementsList = ({
                         />
                       </label>
                       <label>
-                        По вертикали, px:
+                        {t('elements.labelVertically')}, px:
                         <input
                           type="number"
                           value={(element.position.y).toFixed(0)}
@@ -672,10 +667,10 @@ export const ElementsList = ({
 
                   {element.type === 'shape' && ( 
                     <div className="element-controls line">
-                      <span>Размеры</span>
+                      <span>{t('elements.subtitleSize')}</span>
                       <div className="font-controls">
                       <label>
-                        Ширина, px:
+                        {t('elements.labelWidth')}, px:
                         <input
                           type="number"
                           value={(element.width).toFixed(0)}
@@ -683,7 +678,7 @@ export const ElementsList = ({
                         />
                       </label>
                       <label>
-                        Высота, px:
+                        {t('elements.labelHeight')}, px:
                         <input
                           type="number"
                           value={(element.height).toFixed(0)}
@@ -696,10 +691,10 @@ export const ElementsList = ({
 
                   {(element.type === 'image' || element.type === 'element') && ( 
                     <div className="element-controls line">
-                      <span>Размеры</span>
+                      <span>{t('elements.subtitleSize')}</span>
                       <div className="font-controls">
                       <label>
-                        Ширина, px:
+                        {t('elements.labelWidth')}, px:
                         <input
                           type="number"
                           value={(element.width).toFixed(0)}
@@ -707,7 +702,7 @@ export const ElementsList = ({
                         />
                       </label>
                       <label>
-                        Высота, px:
+                        {t('elements.labelHeight')}, px:
                         <input
                           type="number"
                           value={(element.height).toFixed(0)}
@@ -720,10 +715,10 @@ export const ElementsList = ({
 
 
                   <div className="element-controls line">
-                    <span>Поворот</span>
+                    <span>{t('elements.subtitleRotation')}</span>
                     <div className="font-controls">
                       <label>
-                        Поворот, deg:
+                        {t('elements.subtitleRotation')}, deg:
                         <input
                           type="number"
                           value={(element.rotation || 0).toFixed(0)}
@@ -737,9 +732,8 @@ export const ElementsList = ({
                     <button 
                       onClick={() => handleRemoveElement(element.id)}
                       className="remove-button"
-                      title="Удалить компонент"
                     >
-                      <RiDeleteBin2Line /> Удалить
+                      <RiDeleteBin2Line /> {t('modals.delete')}
                     </button>
                   </div>  
                   

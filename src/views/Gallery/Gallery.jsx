@@ -10,7 +10,7 @@ export const Gallery = () => {
   const navigate = useNavigate();
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingItem, setLoadingItem] = useState(false);
+  const [loadingItemKey, setLoadingItemKey] = useState(null);
   const { t } = useContext(LanguageContext)
   const { marketplace, toggleMarketplace } = useMarketplace();
 
@@ -63,7 +63,8 @@ export const Gallery = () => {
 
   // Функция извлечения данных для построения структуры данных для страницы генерации
   const handleItemClick = async (key) => {
-        
+    setLoadingItemKey(key); // Устанавливаем ключ загружаемой карточки
+    
     // Проверяем, является ли дизайн коллажем
     if (key.includes('_collage')) {
       try {
@@ -88,9 +89,11 @@ export const Gallery = () => {
         return;
       } catch (error) {
         console.error('Ошибка при обработке коллажа:', error);
+      } finally {
+        setLoadingItemKey(null); // Изменено здесь
       }
     }
-
+    
     // Обработка обычных дизайнов (не коллажей)
     try {
       // Получаем данные дизайна из таблицы history
@@ -108,8 +111,6 @@ export const Gallery = () => {
 
       // Сохраняем данные в sessionStorage
       sessionStorage.setItem(storageKey, JSON.stringify(historyItem.data));
-
-      setLoadingItem(true);
 
       // Выполняем запросы последовательно с await
       const searchResponse = await fetch(
@@ -148,8 +149,6 @@ export const Gallery = () => {
         }
       });
 
-      setLoadingItem(false);
-
       // Формируем роут для перехода
       const route = `/template/${designInfo.article}_${designInfo.slideNumber}`;
 
@@ -157,6 +156,8 @@ export const Gallery = () => {
       navigate(route);
     } catch (error) {
       console.error('Ошибка при обработке дизайна:', error);
+    } finally {
+      setLoadingItemKey(null); // Сбрасываем после завершения
     }
   };
 
@@ -355,65 +356,65 @@ export const Gallery = () => {
           {designs.map((design) => {
             const info = parseDesignTitle(design.title);
             return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div 
-              key={design.key} 
-              className="item-card" 
-              style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                marketplace !== info.marketplace && toggleMarketplace();
-                handleItemClick(design.key);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              <button
-                className="delete-button"
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div 
+                key={design.key} 
+                className="item-card" 
+                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px' }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(design.key);
+                  marketplace !== info.marketplace && toggleMarketplace();
+                  handleItemClick(design.key);
                 }}
+                role="button"
+                tabIndex={0}
               >
-                ×
-              </button>
+                <button
+                  className="delete-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(design.key);
+                  }}
+                >
+                  ×
+                </button>
 
-              <div className="item-content">
-                <PreviewDesign elements={design.data} />
-                
-                {loadingItem && 
-                  <div className="loader-container-gallery">
-                    <div className="loader"></div>
-                  </div>
-                }
-                
+                <div className="item-content">
+                  <PreviewDesign elements={design.data} />
+
+                  {loadingItemKey === design.key && 
+                    <div className="loader-container-gallery">
+                      <div className="loader"></div>
+                    </div>
+                  }
+
+                </div>
+
               </div>
+              <div className="design-info-plate">
+                  <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
+                    <span className="info-label">{info.designType} {t('views.galleryLabelFor')} {info.marketplaceName}</span>
+                  </div>
 
-            </div>
-            <div className="design-info-plate">
-                <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
-                  <span className="info-label">{info.designType} {t('views.galleryLabelFor')} {info.marketplaceName}</span>
-                </div>
+                  <div className="info-row">
+                    <span className="info-label">{t('views.galleryLabelProducts')}</span>
+                    <span className="info-value">{info.articles}</span>
+                  </div>
 
-                <div className="info-row">
-                  <span className="info-label">{t('views.galleryLabelProducts')}</span>
-                  <span className="info-value">{info.articles}</span>
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">{t('views.galleryLabelSlideSize')}</span>
-                  <span className="info-value">{info.dimensions}</span>
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">{t('views.galleryLabelGenerated')}</span>
-                  <span className="info-value">{info.date} {t('views.galleryLabelAt')} {info.time}</span>
-                </div>
-                
-                </div>
-            </div>
-          );
-        })} 
+                  <div className="info-row">
+                    <span className="info-label">{t('views.galleryLabelSlideSize')}</span>
+                    <span className="info-value">{info.dimensions}</span>
+                  </div>
+
+                  <div className="info-row">
+                    <span className="info-label">{t('views.galleryLabelGenerated')}</span>
+                    <span className="info-value">{info.date} {t('views.galleryLabelAt')} {info.time}</span>
+                  </div>
+
+                  </div>
+              </div>
+            );
+          })} 
         </div>)}
       </div>
     </div>

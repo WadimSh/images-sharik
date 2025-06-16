@@ -36,7 +36,8 @@
     "main": "Базовый шаблон",
     "default": "Шаблон картинка",
     "linkTo": "ссылки на товар в:",
-    "linkNo": "товара нет на маркетплейсах"
+    "linkNo": "товара нет на маркетплейсах",
+    "placeholder": "Создать новый слайдер"
   },
   "views": {
     "galleryMessageTitle": "Нет сохраненных дизайнов",
@@ -69,6 +70,32 @@
     "addElement": "Добавить элемент",
     "addProduct": "Добавить товар"
   },
+  "elements": {
+    "title": "Компоненты дизайна",
+    "labelImage": "Изображение",
+    "labelMainProduct": "Основной товар",
+    "labelElement": "Элемент",
+    "labelShape": "Фигура",
+    "subtitleShadow": "Направление тени",
+    "labelHorizontal": "Горизонталь:",
+    "labelVertical": "Вертикаль:",
+    "buttonAddShadow": "Добавить тень",
+    "subtitleColor": "Цвет",
+    "subtitleRadiusChange": "Скругление углов",
+    "subtitleGradient": "Линейный градиент",
+    "labelPointStart": "Стартовая точка:",
+    "subtitleTextFont": "Типографика",
+    "labelFont": "Шрифт:",
+    "labelFontSize": "Размер:",
+    "labelFontColor": "Цвет:",
+    "subtitlePosition": "Позиционирование",
+    "labelHorizontally": "По горизонтали",
+    "labelVertically": "По вертикали",
+    "subtitleSize": "Размеры",
+    "labelWidth": "Ширина",
+    "labelHeight": "Высота",
+    "subtitleRotation": "Поворот"
+  },
   "modals": {
     "close": "Закрыть",
     "save": "Сохранить",
@@ -79,7 +106,8 @@
     "edit": "Редактировать",
     "preview": "Предпросмотр",
     "loading": "Загрузка...",
-    "addProduct": "Добавить товар"
+    "addProduct": "Добавить товар",
+    "titleImageLibrary": "Библиотека изображений"
   },
   "template": {
     "create": "Создать макет",
@@ -99,13 +127,7 @@
     "createCollage": "Создать коллаж"
   },
   "product": {
-    "name": "Название",
-    "article": "Артикул",
     "articlePlaceholder": "Укажите код товара в виде XXXX-XXXX",
-    "price": "Цена",
-    "description": "Описание",
-    "characteristics": "Характеристики",
-    "noData": "Нет данных",
     "imageAlt": "Изображение товара"
   }  
   

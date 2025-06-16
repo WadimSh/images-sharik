@@ -36,7 +36,8 @@
     "main": "Modello base",
     "default": "Modello immagine",
     "linkTo": "collegamenti al prodotto su:",
-    "linkNo": "prodotto non disponibile sui marketplace"
+    "linkNo": "prodotto non disponibile sui marketplace",
+    "placeholder": "Crea nuovo slider"
   },
   "views": {
     "galleryMessageTitle": "Non ci sono design salvati",
@@ -69,6 +70,32 @@
     "addElement": "Aggiungi elemento",
     "addProduct": "Aggiungi prodotto"
   },
+  "elements": {
+    "title": "Componenti di design",
+    "labelImage": "Immagine",
+    "labelMainProduct": "Prodotto principale",
+    "labelElement": "Elemento",
+    "labelShape": "Forma",
+    "subtitleShadow": "Direzione dell'ombra",
+    "labelHorizontal": "Orizzontale:",
+    "labelVertical": "Verticale:",
+    "buttonAddShadow": "Aggiungi ombra",
+    "subtitleColor": "Colore",
+    "subtitleRadiusChange": "Raggio degli angoli",
+    "subtitleGradient": "Gradiente lineare",
+    "labelPointStart": "Punto di inizio:",
+    "subtitleTextFont": "Tipografia",
+    "labelFont": "Carattere:",
+    "labelFontSize": "Dimensione:",
+    "labelFontColor": "Colore:",
+    "subtitlePosition": "Posizione",
+    "labelHorizontally": "Orizzontale",
+    "labelVertically": "Verticale",
+    "subtitleSize": "Dimensioni",
+    "labelWidth": "Larghezza",
+    "labelHeight": "Altezza",
+    "subtitleRotation": "Rotazione"
+  },
   "modals": {
     "close": "Chiudi",
     "save": "Salva",
@@ -79,7 +106,8 @@
     "edit": "Modifica",
     "preview": "Anteprima",
     "loading": "Caricamento...",
-    "addProduct": "Aggiungi prodotto"
+    "addProduct": "Aggiungi prodotto",
+    "titleImageLibrary": "Libreria immagini"
   },
   "template": {
     "create": "Crea template",
@@ -99,13 +127,7 @@
     "createCollage": "Crea collage"
   },
   "product": {
-    "name": "Nome",
-    "article": "Articolo",
     "articlePlaceholder": "Inserisci il codice prodotto nel formato XXXX-XXXX",
-    "price": "Prezzo",
-    "description": "Descrizione",
-    "characteristics": "Caratteristiche",
-    "noData": "Nessun dato",
     "imageAlt": "Immagine prodotto"
   }  
   

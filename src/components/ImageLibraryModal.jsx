@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+
+import { LanguageContext } from '../contexts/contextLanguage';
 
 export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
+  const { t } = useContext(LanguageContext);
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +40,7 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
     <div className={`modal ${isOpen ? 'open' : ''}`}  onClick={onClose}>
       <div className="modal-contents">
         <div className="modal-header">
-          <h2>Библиотека изображений</h2>
+          <h2>{t('modals.titleImageLibrary')}</h2>
           <button onClick={onClose} className="close-btn">&times;</button>
         </div>
         {isLoading ? (

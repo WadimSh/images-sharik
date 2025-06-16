@@ -266,17 +266,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   };
   
-  // Вспомогательная функция для получения метаданных
-  //const getProductMeta = async (baseCode) => {
-  //  try {
-  //    const product = await productsDB.get(`product-${baseCode}`);
-  //    return product?.data || { templateType: 'default' };
-  //  } catch (error) {
-  //    console.error('Error getting product meta:', error);
-  //    return { templateType: 'default' };
-  //  }
-  //};
-
   // Объект перевода названий шаблонов
   const templateOptions = {
     belbal: t('grid.belbal'),
@@ -403,7 +392,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
               >
                 <div className="item-content new-design-content">
                   <div className="plus-sign">+</div>
-                  <div className="create-text">Создать новый слайдер</div>
+                  <div className="create-text">{t('grid.placeholder')}</div>
                 </div>
               </div>
             </div>

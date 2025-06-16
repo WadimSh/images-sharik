@@ -36,7 +36,8 @@
     "main": "Basic template",
     "default": "Image template",
     "linkTo": "product links on:",
-    "linkNo": "product not available on marketplaces"
+    "linkNo": "product not available on marketplaces",
+    "placeholder": "Create new slider"
   },
   "views": {
     "galleryMessageTitle": "No saved designs",
@@ -69,6 +70,32 @@
     "addElement": "Add element",
     "addProduct": "Add product"
   },
+  "elements": {
+    "title": "Design сomponents",
+    "labelImage": "Image",
+    "labelMainProduct": "Main product",
+    "labelElement": "Element",
+    "labelShape": "Shape",
+    "subtitleShadow": "Shadow direction",
+    "labelHorizontal": "Horizontal:",
+    "labelVertical": "Vertical:",
+    "buttonAddShadow": "Add shadow",
+    "subtitleColor": "Color",
+    "subtitleRadiusChange": "Corner radius",
+    "subtitleGradient": "Linear gradient",
+    "labelPointStart": "Start point:",
+    "subtitleTextFont": "Typography",
+    "labelFont": "Font:",
+    "labelFontSize": "Size:",
+    "labelFontColor": "Color:",
+    "subtitlePosition": "Position",
+    "labelHorizontally": "Horizontal",
+    "labelVertically": "Vertical",
+    "subtitleSize": "Size",
+    "labelWidth": "Width",
+    "labelHeight": "Height",
+    "subtitleRotation": "Rotation"
+  },
   "modals": {
     "close": "Close",
     "save": "Save",
@@ -79,7 +106,8 @@
     "edit": "Edit",
     "preview": "Preview",
     "loading": "Loading...",
-    "addProduct": "Add product"
+    "addProduct": "Add product",
+    "titleImageLibrary": "Image library"
   },
   "template": {
     "create": "Create template",
@@ -99,13 +127,7 @@
     "createCollage": "Create collage"
   },
   "product": {
-    "name": "Name",
-    "article": "Article",
     "articlePlaceholder": "Enter product code in XXXX-XXXX format",
-    "price": "Price",
-    "description": "Description",
-    "characteristics": "Characteristics",
-    "noData": "No data",
     "imageAlt": "Product image"
   }
   

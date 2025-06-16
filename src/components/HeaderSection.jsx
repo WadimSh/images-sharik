@@ -30,6 +30,7 @@ export const HeaderSection = ({
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const handleBack = () => {
     if (!slideNumber) {
@@ -128,6 +129,7 @@ export const HeaderSection = ({
   // Функция выгрузки слайда в формате png
   const handleDownload = async () => {
     try {
+      setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 500));
 
       let baseCode, slideType;
@@ -170,7 +172,7 @@ export const HeaderSection = ({
       // Если данные есть и fileName определён - сохраняем в историю
       if (designData && fileName) {
         const historyKey = fileName.replace('.png', '');
-        await historyDB.add({
+        await historyDB.put({
           code: historyKey,  // Используем имя файла как ключ
           data: JSON.parse(designData)   // Сохраняем сырые данные
         });
@@ -212,7 +214,7 @@ export const HeaderSection = ({
       link.href = url;
       document.body.appendChild(link);
       link.click();
-
+      setLoading(false);
       // Очистка
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
@@ -346,7 +348,11 @@ export const HeaderSection = ({
         <FaClipboardCheck /> {`${t('header.createLayout')}`}
       </button>
       <button onClick={handleDownload} className="download-button">
-        <FaDownload /> {`${t('header.downloadDesign')}`}
+        {!loading ? (
+          <><FaDownload /> {`${t('header.downloadDesign')}`}</>
+        ) : (
+          <div className="spinner"></div>
+        )}
       </button>
     </div>
   );

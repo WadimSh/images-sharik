@@ -140,6 +140,16 @@ export const historyDB = {
     }
   },
 
+  // Upsert-операция (создать или обновить)
+  async put(record) {
+    try {
+      return await db.history.put(record);
+    } catch (error) {
+      console.error('Ошибка при обновлении/добавлении записи:', error);
+      throw error;
+    }
+  },
+
   // Получение записи по коду
   async get(code) {
     try {

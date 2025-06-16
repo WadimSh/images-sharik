@@ -1,7 +1,10 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useContext } from "react";
+
+import { LanguageContext } from "../contexts/contextLanguage";
 
 export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMulti, selectedElementIds, elements }) => {
   const controlsRef = useRef(null);
+  const { t } = useContext(LanguageContext);
   const [fontSize, setFontSize] = useState(element?.fontSize || 24);
   const [fontFamily, setFontFamily] = useState(element?.fontFamily || 'Arial');
   
@@ -91,7 +94,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
       </div>
 
       <label>
-        Размер:
+        {t('elements.labelFontSize')}
         <input
           type="number"
           value={fontSize}
@@ -110,7 +113,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
       </label>
       
       <label>
-        Цвет:
+        {t('elements.labelFontColor')} 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <div className="color-picker-wrapper">
           <input
@@ -136,7 +139,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
       </label>
 
       <label>
-        Шрифт:&emsp;
+        {t('elements.labelFont')}&emsp;
         <select
           value={fontFamily}
           onChange={(e) => {
