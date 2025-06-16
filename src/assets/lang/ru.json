@@ -1,9 +1,4 @@
 {
-  "switcher": {
-    "ru": "Русский",
-    "it": "Итальянский",
-    "en": "Английский"
-  },
   "errors": {
     "general": "Произошла ошибка",
     "loading": "Ошибка загрузки",
@@ -63,6 +58,16 @@
     "generatorMenuChangeColor": "Изменить цвет",
     "generatorMenuDelete": "Удалить (Del)",
     "generatorMessageInput": "Перетащите изображение сюда"
+  },
+  "ui": {
+    "ru": "Русский",
+    "it": "Итальянский",
+    "en": "Английский",
+    "addImage": "Добавить изображение",
+    "addText": "Добавить текст",
+    "addSquare": "Добавить фигуру",
+    "addElement": "Добавить элемент",
+    "addProduct": "Добавить товар"
   },
   "modals": {
     "close": "Закрыть",

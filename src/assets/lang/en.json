@@ -1,9 +1,4 @@
 {
-  "switcher": {
-    "ru": "Russian",
-    "it": "Italian",
-    "en": "English"
-  },
   "errors": {
     "general": "An error occurred",
     "loading": "Loading error",
@@ -63,6 +58,16 @@
     "generatorMenuChangeColor": "Change color",
     "generatorMenuDelete": "Delete (Del)",
     "generatorMessageInput": "Drag and drop an image here"
+  },
+  "ui": {
+    "ru": "Russian",
+    "it": "Italian",
+    "en": "English",
+    "addImage": "Add image",
+    "addText": "Add text",
+    "addSquare": "Add shape",
+    "addElement": "Add element",
+    "addProduct": "Add product"
   },
   "modals": {
     "close": "Close",

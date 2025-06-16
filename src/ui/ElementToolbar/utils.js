@@ -7,7 +7,7 @@ export const handleFileUpload = async (file, setElements) => {
     // Настройки компрессии
     const options = {
       maxSizeMB: 1,
-      maxWidthOrHeight: 2000,
+      maxWidthOrHeight: 1200,
       useWebWorker: true,
       fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
       initialQuality: 0.6

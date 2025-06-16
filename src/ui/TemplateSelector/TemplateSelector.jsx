@@ -49,7 +49,6 @@ export const TemplateSelector = ({
                         e.stopPropagation();
                         onExport(name);
                       }}
-                      title="Сохранить в файл"
                     >
                       <FaSave />
                     </button>
@@ -60,7 +59,6 @@ export const TemplateSelector = ({
                       e.stopPropagation();
                       onDelete(name);
                     }}
-                    title="Удалить макет"
                   >
                     ×
                   </button>

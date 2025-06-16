@@ -1,9 +1,4 @@
 {
-  "switcher": {
-    "ru": "Russo",
-    "it": "Italiano",
-    "en": "Inglese"
-  },
   "errors": {
     "general": "Si è verificato un errore",
     "loading": "Errore di caricamento",
@@ -63,6 +58,16 @@
     "generatorMenuChangeColor": "Cambia colore",
     "generatorMenuDelete": "Elimina (Del)",
     "generatorMessageInput": "Trascina un'immagine qui"
+  },
+  "ui": {
+    "ru": "Russo",
+    "it": "Italiano",
+    "en": "Inglese",
+    "addImage": "Aggiungi immagine",
+    "addText": "Aggiungi testo",
+    "addSquare": "Aggiungi forma",
+    "addElement": "Aggiungi elemento",
+    "addProduct": "Aggiungi prodotto"
   },
   "modals": {
     "close": "Chiudi",
