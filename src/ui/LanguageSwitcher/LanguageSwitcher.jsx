@@ -11,6 +11,7 @@ const LanguageSwitcher = () => {
     { code: 'ru', name: 'ui.ru' },
     { code: 'it', name: 'ui.it' },
     { code: 'en', name: 'ui.en' },
+    { code: 'de', name: 'ui.de' },
   ];
 
   return (

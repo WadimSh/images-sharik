@@ -15,7 +15,7 @@
     "title": "Generatore di immagini per marketplace",
     "description": "Con questo generatore puoi facilmente creare immagini accattivanti per i tuoi prodotti.",
     "subtitle": "Disegni creati",
-    "searchPlaceholder": "Inserisci i codici articolo ...",
+    "searchPlaceholder": "Inserisci codici articolo, nomi o parole chiave per la ricerca",
     "searchButton": "Cerca",
     "clearButton": "Cancella campo",
     "loadingMessage": "Attendere prego, stiamo cercando i prodotti che ti interessano...",
@@ -40,6 +40,7 @@
     "placeholder": "Crea nuovo slider"
   },
   "views": {
+    "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",
     "galleryMessageTitle": "Non ci sono design salvati",
     "galleryMessageSubtitle": "Crea e salva una grafica o un collage",
     "galleryUndefined": "Non specificato",
@@ -64,6 +65,7 @@
     "ru": "Russo",
     "it": "Italiano",
     "en": "Inglese",
+    "de": "Tedesco",
     "addImage": "Aggiungi immagine",
     "addText": "Aggiungi testo",
     "addSquare": "Aggiungi forma",

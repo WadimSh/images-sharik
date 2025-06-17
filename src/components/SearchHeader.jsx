@@ -25,56 +25,82 @@ const SearchHeader = ({
   const headerRightRef = useRef(null);
   const [hasKeys, setHasKeys] = useState(false);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-  
 
-  // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
-  const allowedCharactersRegex = /^[\d\s,+-]*$/;
-    
   const handleInputChange = (event) => {
-    let value = event.target.value;
-    
-    value = value
-      .replace(/[^\d\s,+-]/g, '')
-      .replace(/(\d{4}-\d{4})[^\s,+]|$/g, '$1')
-      .replace(/([,\s+])\1+/g, '$1')
-      .replace(/([,+])/g, ' ')
-      .replace(/\s+/g, ' ')
-      .replace(/(\d)-(\d)/g, '$1$2')
-      .replace(/(\d{4})-?(\d{4})/g, '$1-$2');
-
-    if (allowedCharactersRegex.test(value)) {
-      setSearchQuery(value);
-      if (value === '') {
-        onSearch([]);
-      }
+    setSearchQuery(event.target.value);
+    if (event.target.value === '') {
+      onSearch([]);
     }
   };
 
   const handleSearch = () => {
-    // Полная очистка sessionStorage
     setIsToggled(false);
     productsDB.clearAll();
     slidesDB.clearAll();
     sessionStorage.clear();
-    const normalized = searchQuery
-      .split(/[\s,]+/) 
-      .map(item => {
-        const formatted = item
-          .replace(/-/g, '') 
-          .replace(/(\d{4})(\d{4})/, '$1-$2') 
-          .substring(0, 9); 
-        
-        return /^\d{4}-\d{4}$/.test(formatted) ? formatted : null;
-      })
-      .filter(item => item !== null);
 
-    if (normalized.length > 0) {
-      onSearch(normalized);
+    if (searchQuery.trim()) {
+      // Нормализация введенных данных перед сохранением
+      const normalized = searchQuery
+        .replace(/\//g, '-')    // Замена / на -
+        .replace(/[,+]/g, ' ')  // Замена запятых и плюсов на пробелы
+        .replace(/\s+/g, ' ')   // Удаление лишних пробелов
+        .trim();
+      
+      onSearch([normalized]);
     } else {
       onSearch([]);
-      alert('Пожалуйста, введите артикулы в формате ХХХХ-ХХХХ, разделенные пробелом, запятой или +');
     }
   };
+  
+
+  // Разрешенные символы: цифры, дефис, пробелы, запятые, плюсы
+  //const allowedCharactersRegex = /^[\d\s,+-]*$/;
+    
+  //const handleInputChange = (event) => {
+  //  let value = event.target.value;
+  //  
+  //  value = value
+  //    .replace(/[^\d\s,+-]/g, '')
+  //    .replace(/(\d{4}-\d{4})[^\s,+]|$/g, '$1')
+  //    .replace(/([,\s+])\1+/g, '$1')
+  //    .replace(/([,+])/g, ' ')
+  //    .replace(/\s+/g, ' ')
+  //    .replace(/(\d)-(\d)/g, '$1$2')
+  //    .replace(/(\d{4})-?(\d{4})/g, '$1-$2');
+  //  if (allowedCharactersRegex.test(value)) {
+  //    setSearchQuery(value);
+  //    if (value === '') {
+  //      onSearch([]);
+  //    }
+  //  }
+  //};
+
+  //const handleSearch = () => {
+  //  // Полная очистка sessionStorage
+  //  setIsToggled(false);
+  //  productsDB.clearAll();
+  //  slidesDB.clearAll();
+  //  sessionStorage.clear();
+  //  const normalized = searchQuery
+  //    .split(/[\s,]+/) 
+  //    .map(item => {
+  //      const formatted = item
+  //        .replace(/-/g, '') 
+  //        .replace(/(\d{4})(\d{4})/, '$1-$2') 
+  //        .substring(0, 9); 
+  //      
+  //      return /^\d{4}-\d{4}$/.test(formatted) ? formatted : null;
+  //    })
+  //    .filter(item => item !== null);
+  //  if (normalized.length > 0) {
+  //    console.log(encodeURIComponent(normalized.join(' ')))
+  //    onSearch(normalized);
+  //  } else {
+  //    onSearch([]);
+  //    alert('Пожалуйста, введите артикулы в формате ХХХХ-ХХХХ, разделенные пробелом, запятой или +');
+  //  }
+  //};
 
   const handleGalleryClick = () => {
     navigate('/gallery');

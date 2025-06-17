@@ -2,13 +2,15 @@ import React, { createContext, useState, useEffect } from 'react';
 import en from '../assets/lang/en.json';
 import ru from '../assets/lang/ru.json';
 import it from '../assets/lang/it.json';
+import de from '../assets/lang/de.json';
 
 export const LanguageContext = createContext();
 
 const languages = {
   en,
   ru,
-  it
+  it,
+  de
 };
 
 export const LanguageProvider = ({ children }) => {

@@ -28,13 +28,17 @@
 }
 
 .input-container input {
-  width: 95.5%;
+  width: 100%;
   padding: 15px;
   border: 2px solid #007bff;
   border-radius: 25px 0 0 25px;
   font-size: 16px;
   outline: none;
   transition: all 0.3s ease;
+  box-sizing: border-box; /* Учитываем padding в ширине */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .input-container input:invalid {
@@ -44,6 +48,24 @@
 
 .input-container input:focus:invalid {
   box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
+}
+
+.input-container input::placeholder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block; /* Измените на block */
+  width: 100%; /* Установите 100% вместо 95.5% */
+}
+
+.input-container input::-webkit-input-placeholder { /* Chrome/Safari */
+  text-overflow: ellipsis;
+}
+.input-container input::-moz-placeholder { /* Firefox */
+  text-overflow: ellipsis;
+}
+.input-container input:-ms-input-placeholder { /* IE10+ */
+  text-overflow: ellipsis;
 }
 
 .clear-button {

@@ -15,7 +15,7 @@
     "title": "Marketplace Image Generator",
     "description": "With this generator, you can easily create attractive images for your products.",
     "subtitle": "Created designs",
-    "searchPlaceholder": "Enter SKU numbers ...",
+    "searchPlaceholder": "Enter SKU numbers, names, or keywords to search",
     "searchButton": "Search",
     "clearButton": "Clear field",
     "loadingMessage": "Please wait, we are searching for the products you are interested in...",
@@ -40,6 +40,7 @@
     "placeholder": "Create new slider"
   },
   "views": {
+    "homeMissingCode": "Try changing your search parameters or use different keywords.",
     "galleryMessageTitle": "No saved designs",
     "galleryMessageSubtitle": "Create and save your design or collage",
     "galleryUndefined": "Not specified",
@@ -64,6 +65,7 @@
     "ru": "Russian",
     "it": "Italian",
     "en": "English",
+    "de": "German",
     "addImage": "Add image",
     "addText": "Add text",
     "addSquare": "Add shape",
