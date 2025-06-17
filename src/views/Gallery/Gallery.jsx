@@ -218,24 +218,49 @@ export const Gallery = () => {
   const loadDesigns = async () => {
     try {
       setLoading(true);
-
+  
       // Регулярное выражение для поиска ключей с артикулами
       const articlePattern = /^\d{4}-\d{4}/;
-
+  
       // Получаем все записи из таблицы history
       const allHistoryItems = await historyDB.getAll();
-
-      // Фильтруем и преобразуем данные
+  
+      // Фильтруем, преобразуем и сортируем данные
       const loadedDesigns = allHistoryItems
-      .filter(item => articlePattern.test(item.code)) // Фильтруем по шаблону артикула
-      .map(item => ({
-        key: item.code,
-        data: item.data,
-        title: item.code // Используем code как заголовок
-      }));
+        .filter(item => articlePattern.test(item.code)) // Фильтруем по шаблону артикула
+        .map(item => {
+          // Парсим дату и время из ключа
+          const parts = item.code.split('_');
+          let date = '';
+          let time = '';
+          
+          // Ищем индекс части с датой (обычно это предпоследняя часть)
+          if (parts.length >= 6) {
+            date = parts[parts.length - 2];
+            time = parts[parts.length - 1];
+          }
+          
+          // Преобразуем дату и время в формат для сортировки
+          const sortableDate = date.length === 8 
+            ? `${date.substring(4)}-${date.substring(2, 4)}-${date.substring(0, 2)}` 
+            : '1970-01-01'; // Если дата не распознана, ставим минимальную
+          
+          const sortableTime = time.length >= 4 
+            ? `${time.substring(0, 2)}:${time.substring(2, 4)}:${time.length >= 6 ? time.substring(4, 6) : '00'}` 
+            : '00:00:00';
+          
+          return {
+            key: item.code,
+            data: item.data,
+            title: item.code,
+            sortKey: `${sortableDate} ${sortableTime}` // Ключ для сортировки
+          };
+        })
+        // Сортируем по убыванию (новые сначала)
+        .sort((a, b) => b.sortKey.localeCompare(a.sortKey));
   
       setDesigns(loadedDesigns);
-
+  
     } catch (error) {
       console.error('Ошибка при загрузке дизайнов из базы данных:', error);
     } finally {
@@ -306,9 +331,11 @@ export const Gallery = () => {
       : date;
     
     // Форматируем время
-    const formattedTime = time.length === 4 
-      ? `${time.substring(0,2)}:${time.substring(2)}`
-      : time;
+    const formattedTime = time.length === 6 
+      ? `${time.substring(0,2)}:${time.substring(2,4)}`
+      : time.length === 4 
+        ? `${time.substring(0,2)}:${time.substring(2)}`
+        : time;
     
     return {
       articles,
