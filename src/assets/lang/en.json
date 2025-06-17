@@ -128,8 +128,9 @@
   },
   "product": {
     "articlePlaceholder": "Enter product code in XXXX-XXXX format",
-    "imageAlt": "Product image"
+    "imageAlt": "Product image",
+    "notWB": "not on WB",
+    "notOZ": "not on OZON",
+    "notData": "no data"
   }
-  
-  
 } 

@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 import { LanguageContext } from '../contexts/contextLanguage';
 import { useMarketplace } from "../contexts/contextMarketplace";
-import { getCode } from "../utils/getCodeProduct";
+import { useGetCode } from "../hooks/useGetCode";
 import { productsDB } from "../utils/handleDB";
 
 export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
   const navigate = useNavigate();
   const { marketplace } = useMarketplace();
+  const getCode = useGetCode();
   const { t } = useContext(LanguageContext);
   const [products, setProducts] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);

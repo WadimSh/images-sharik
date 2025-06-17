@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import { replacePlaceholders } from '../utils/replacePlaceholders';
 import { useMarketplace } from '../contexts/contextMarketplace';
 import { LanguageContext } from '../contexts/contextLanguage';
-import { getCode } from '../utils/getCodeProduct';
+import { useGetCode } from '../hooks/useGetCode';
 import { PreviewDesign } from './PreviewDesign';
 import { productsDB, slidesDB } from '../utils/handleDB';
 
@@ -12,6 +12,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
+  const getCode = useGetCode();
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
@@ -292,8 +293,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           ))}
         </select>
         <div className="template-selector-controls">
-          {(wbCode !== 'нет на WB' || ozCode !== 'нет на OZON') ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
-          {wbCode !== 'нет на WB' && <a 
+          {(wbCode !== t('product.notWB') || ozCode !== t('product.notOZ')) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
+          {wbCode !== t('product.notWB') && <a 
             className="template-selector-control"
             href={`https://www.wildberries.ru/catalog/${wbCode}/detail.aspx`}
             target="_blank"
@@ -315,7 +316,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
               </defs>
             </svg>
           </a>}
-          {ozCode !== 'нет на OZON' && <a 
+          {ozCode !== t('product.notOZ') && <a 
             className="template-selector-control"
             href={`https://www.ozon.ru/product/${ozCode}`}
             target="_blank"

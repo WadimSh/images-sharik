@@ -14,7 +14,6 @@ db.version(1).stores({
 const clearTable = async (table) => {
   try {
     await table.clear();
-    console.log(`Все записи из таблицы ${table.name} успешно удалены`);
     return true;
   } catch (error) {
     console.error(`Ошибка при очистке таблицы ${table.name}:`, error);

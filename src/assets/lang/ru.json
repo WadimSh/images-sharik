@@ -128,7 +128,10 @@
   },
   "product": {
     "articlePlaceholder": "Укажите код товара в виде XXXX-XXXX",
-    "imageAlt": "Изображение товара"
+    "imageAlt": "Изображение товара",
+    "notWB": "нет на WB",
+    "notOZ": "нет на OZON",
+    "notData": "нет данных"
   }  
   
   

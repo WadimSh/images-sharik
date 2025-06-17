@@ -128,7 +128,9 @@
   },
   "product": {
     "articlePlaceholder": "Inserisci il codice prodotto nel formato XXXX-XXXX",
-    "imageAlt": "Immagine prodotto"
+    "imageAlt": "Immagine prodotto",
+    "notWB": "non su WB",
+    "notOZ": "non su OZON",
+    "notData": "nessun dato"
   }  
-  
 } 

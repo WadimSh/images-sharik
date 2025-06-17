@@ -20,13 +20,14 @@ import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 
 import { useMarketplace } from '../../contexts/contextMarketplace';
-import { getCode } from '../../utils/getCodeProduct';
+import { useGetCode } from '../../hooks/useGetCode';
 import { slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 
 export const Generator = () => {
   const { id } = useParams();
   const { t } = useContext(LanguageContext);
+  const getCode = useGetCode();
   const isCollageMode = id === 'collage';
   const [baseId, slideNumber] = isCollageMode || !id ? ['', ''] : id.split('_');
   const apiKey = process.env.REACT_APP_API_KEY;
