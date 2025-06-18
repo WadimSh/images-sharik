@@ -387,7 +387,7 @@ export const Gallery = () => {
               <div 
                 key={design.key} 
                 className="item-card" 
-                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px' }}
+                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   marketplace !== info.marketplace && toggleMarketplace();

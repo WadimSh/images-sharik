@@ -151,37 +151,86 @@ export const Home = () => {
         image: `https://new.sharik.ru${image.image}`,
         category: getPropertyValue('Тип латексных шаров'),
         brand: getOriginPropertyValue('Торговая марка'),
+        properties: getPropertyValue('Товарная номенклатура'),
       }));
     });
   };
 
   const generateDesignData = useCallback((item) => {
-    if (item.brand === 'Gemar' && templates.gemar.length > 0) {
+    // Универсальная функция для обработки сложных шаблонов (с несколькими слайдами)
+    const processTemplate = (templateArray) => {
       const parts = item.code.split('_');
       const imageIndex = parseInt(parts[parts.length - 1]) - 1;
-      // Выбираем индекс шаблона: 
-      // - для первых N картинок (где N = количество шаблонов) берем соответствующий шаблон
-      // - для картинок сверх этого количества берем последний шаблон
-      const templateIndex = Math.min(imageIndex, templates.gemar.length - 1);
-      return replacePlaceholders(templates.gemar[templateIndex], item);
+      const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+      return replacePlaceholders(templateArray[templateIndex], item);
+    };
+  
+    // Система шаблонов с иерархией: свойство → бренд → шаблон
+    const TEMPLATE_SYSTEM = {
+      // Основной шаблон по умолчанию
+      _default: templates.main,
+      
+      // Специальные обработчики для определенных свойств
+      properties: {
+        'Шарики из латекса': {
+          _default: templates.main, // основной шаблон, если бренд не указан или не найден
+          
+          brands: {
+            'Gemar': templates.gemar,
+            'Belbal': templates.belbal
+          }
+        }
+      },
+      
+      // Все остальные свойства будут использовать основной шаблон
+      // пока не будет сосзданы под них шаблоны
+      useMainTemplate: [
+        'Bubble', 'Баннеры', 'Барные аксессуары', 'Бижутерия', 'Боа',
+        'Бумага упаковочная', 'Гавайи', 'Газовое оборудование', 'Галстук',
+        'Гелий, баллоны', 'Гирлянды', 'Гирлянды-буквы', 'Гирлянды вертикальные',
+        'Гирлянды-вымпелы', 'Головные уборы', 'Горн', 'Грим', 'Грузики для шаров',
+        'Декорации', 'Декорации подвески', 'Держатели', 'Дисплеи', 'Дудочка',
+        'Дым цветной', 'Значок', 'Игра', 'Игрушки', 'Карнавальный костюм',
+        'Клоунский нос', 'Компрессор для шаров', 'Конфетти', 'Краска для шаров',
+        'Лента', 'Лента для шаров', 'Маски', 'Медаль', 'Мишура', 'Мыльные пузыри',
+        'Наборы в упаковках', 'Надувная игрушка', 'Наклейки', 'Насос для шаров',
+        'Очки', 'Пакет', 'Парик', 'Пиньята', 'Пиротехника', 'Пленка упаковочная',
+        'Полимерный гель для шаров', 'Праздничные аксессуары', 'Рекламные шары',
+        'Салфетки', 'Светящиеся сувениры', 'Свечи для торта', 'Свечи-цифры',
+        'Серпантин', 'Сеть', 'Скатерти', 'Сладкий стол', 'Спецэффекты', 'Спирали',
+        'Спрей', 'Стаканы', 'Столовые приборы', 'Тарелки', 'Тассел, бахрома',
+        'Украшения на голову', 'Упаковочный', 'Учебные материалы', 'Фант',
+        'Фигурка на торт', 'Фотобутафория', 'Хлопушка', 'Шарики из фольги', 'Язычки'
+      ]
+    };
+  
+    // 1. Проверяем специальные свойства с особыми шаблонами
+    if (TEMPLATE_SYSTEM.properties[item.properties]) {
+      const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
+      
+      // Если есть бренд и для него есть шаблон
+      if (item.brand && propertyConfig.brands && propertyConfig.brands[item.brand]) {
+        const brandTemplate = propertyConfig.brands[item.brand];
+        return Array.isArray(brandTemplate) 
+          ? processTemplate(brandTemplate)
+          : replacePlaceholders(brandTemplate, item);
+      }
+      
+      // Используем шаблон по умолчанию для этого свойства
+      return replacePlaceholders(propertyConfig._default, item);
     }
-    if (item.brand === 'Belbal' && templates.belbal.length > 0) {
-      const parts = item.code.split('_');
-      const imageIndex = parseInt(parts[parts.length - 1]) - 1;
-      // Выбираем индекс шаблона: 
-      // - для первых N картинок (где N = количество шаблонов) берем соответствующий шаблон
-      // - для картинок сверх этого количества берем последний шаблон
-      const templateIndex = Math.min(imageIndex, templates.belbal.length - 1);
-      return replacePlaceholders(templates.belbal[templateIndex], item);
+  
+    // 2. Проверяем свойства, которые используют основной шаблон
+    if (TEMPLATE_SYSTEM.useMainTemplate.includes(item.properties)) {
+      return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
     }
-    const template = templates.main;
-    
-    return replacePlaceholders(template, item);
+  
+    // 3. Для всех остальных случаев (включая отсутствие свойства) - основной шаблон
+    return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
   }, [templates]);
   
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {
-  console.log(normalizedArticles.join(' '))
   setError(null);
   setInfoMessage(null);
 
@@ -191,35 +240,34 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    setLoading(true);
-    
-    const searchQuery = normalizedArticles.join(' ');
-    const encodedSearch = encodeURIComponent(searchQuery);
-    
-    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.results.length === 0) {
-          const message = t('views.homeMissingCode');
-          setInfoMessage(message);
-          return Promise.reject(message);
-        }
-    
-        const productIds = data.results.map(product => product.id);
-        const idsParam = productIds.join(',');
-        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-      })
-      .then(response => response?.json())
-      .then(detailedData => {
-        if (!detailedData) return;
+    //setLoading(true);
+    //
+    //const searchQuery = normalizedArticles.join(' ');
+    //const encodedSearch = encodeURIComponent(searchQuery);
+    //
+    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}`)
+    //  .then(response => response.json())
+    //  .then(data => {
+    //    if (data.results.length === 0) {
+    //      const message = t('views.homeMissingCode');
+    //      setInfoMessage(message);
+    //      return Promise.reject(message);
+    //    }
+    //
+    //    const productIds = data.results.map(product => product.id);
+    //    const idsParam = productIds.join(',');
+    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+    //  })
+    //  .then(response => response?.json())
+    //  .then(detailedData => {
+    //    if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      //const processedResults = processProductsData(data);
-      //const processedMetaResults = processProductsMeta(data);
-      const processedResults = processProductsData(detailedData);
-      const processedMetaResults = processProductsMeta(detailedData);
-      
-      
+      const processedResults = processProductsData(data);
+      const processedMetaResults = processProductsMeta(data);
+      //const processedResults = processProductsData(detailedData);
+      //const processedMetaResults = processProductsMeta(detailedData);
+            
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
         const designData = generateDesignData(item);
@@ -248,16 +296,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    })
-    .catch(error => {
-      console.error('Ошибка:', error);
-      setError(error.message || 'Произошла ошибка при поиске');
-      setValidArticles([]);
-      setIsSearchActive(false);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
+    //})
+    //.catch(error => {
+    //  console.error('Ошибка:', error);
+    //  setError(error.message || 'Произошла ошибка при поиске');
+    //  setValidArticles([]);
+    //  setIsSearchActive(false);
+    //})
+    //.finally(() => {
+    //  setLoading(false);
+    //});
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

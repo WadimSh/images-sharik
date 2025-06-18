@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { FaSave } from 'react-icons/fa';
 import './TemplateSelector.css';
 
@@ -13,10 +14,25 @@ export const TemplateSelector = ({
   showExport = true,
   placeholder = 'Выберите макет'
 }) => {
-  if (Object.keys(templates).length === 0) return null;
+  const selectRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (selectRef.current && !selectRef.current.contains(event.target)) {
+        setIsTemplateListOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  if (Object.keys(templates).length === 0) return null;
+  
   return (
-    <div className="template-select-wrapper">
+    <div className="template-select-wrapper" ref={selectRef}>
       <div className="template-select-container">
         <div 
           className="template-select-header"

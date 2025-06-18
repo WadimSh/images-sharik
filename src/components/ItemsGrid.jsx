@@ -6,6 +6,7 @@ import { useMarketplace } from '../contexts/contextMarketplace';
 import { LanguageContext } from '../contexts/contextLanguage';
 import { useGetCode } from '../hooks/useGetCode';
 import { PreviewDesign } from './PreviewDesign';
+import { CustomSelect } from '../ui/CustomSelect/CustomSelect';
 import { productsDB, slidesDB } from '../utils/handleDB';
 
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
@@ -250,8 +251,10 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
             const templateArray = templates[templateKey];
             const templateIndex = Math.min(imageIndex, templateArray.length - 1);
             template = templateArray[templateIndex];
-          } else {
+          } else if (templateKey === 'main' || templateKey === 'default') {
             template = templates[templateKey];
+          } else {
+            template = templates['main'];
           }
           
           const newDesign = replacePlaceholders(template, itemData);
@@ -273,6 +276,82 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     gemar: t('grid.gemar'),
     main: t('grid.main'),
     default: t('grid.default'),
+    bubble: t('grid.bubble'),
+    banners: t('grid.banners'),
+    barAccessories: t('grid.barAccessories'),
+    bijouterie: t('grid.bijouterie'),
+    boa: t('grid.boa'),
+    packagingPaper: t('grid.packagingPaper'),
+    hawaii: t('grid.hawaii'),
+    gasEquipment: t('grid.gasEquipment'),
+    tie: t('grid.tie'),
+    heliumCylinders: t('grid.heliumCylinders'),
+    garlands: t('grid.garlands'),
+    garlandsLetters: t('grid.garlandsLetters'),
+    garlandsVertical: t('grid.garlandsVertical'),
+    garlandsPennants: t('grid.garlandsPennants'),
+    hats: t('grid.hats'),
+    horn: t('grid.horn'),
+    makeup: t('grid.makeup'),
+    weightsForBalloons: t('grid.weightsForBalloons'),
+    scenery: t('grid.scenery'),
+    pendantDecorations: t('grid.pendantDecorations'),
+    holders: t('grid.holders'),
+    displays: t('grid.displays'),
+    pipe: t('grid.pipe'),
+    coloredSmoke: t('grid.coloredSmoke'),
+    icon: t('grid.icon'),
+    game: t('grid.game'),
+    toys: t('grid.toys'),
+    carnivalCostume: t('grid.carnivalCostume'),
+    clownNose: t('grid.clownNose'),
+    balloonCompressor: t('grid.balloonCompressor'),
+    confetti: t('grid.confetti'),
+    paintForBalls: t('grid.paintForBalls'),
+    ribbon: t('grid.ribbon'),
+    ribbonForBalloons: t('grid.ribbonForBalloons'),
+    masks: t('grid.masks'),
+    medal: t('grid.medal'),
+    tinsel: t('grid.tinsel'),
+    soapBubbles: t('grid.soapBubbles'),
+    packagedKits: t('grid.packagedKits'),
+    inflatableToy: t('grid.inflatableToy'),
+    stickers: t('grid.stickers'),
+    balloonPump: t('grid.balloonPump'),
+    sunglasses: t('grid.sunglasses'),
+    package: t('grid.package'),
+    wig: t('grid.wig'),
+    pinata: t('grid.pinata'),
+    pyrotechnics: t('grid.pyrotechnics'),
+    packagingFilm: t('grid.packagingFilm'),
+    hiFloat: t('grid.hiFloat'),
+    holidayAccessories: t('grid.holidayAccessories'),
+    advertisingBalls: t('grid.advertisingBalls'),
+    napkins: t('grid.napkins'),
+    luminousSouvenirs: t('grid.luminousSouvenirs'),
+    candlesForCake: t('grid.candlesForCake'),
+    candlesDigit: t('grid.candlesDigit'),
+    serpentine: t('grid.serpentine'),
+    net: t('grid.net'),
+    tablecloth: t('grid.tablecloth'),
+    sweetTable: t('grid.sweetTable'),
+    specialEffects: t('grid.specialEffects'),
+    spirals: t('grid.spirals'),
+    spray: t('grid.spray'),
+    glasses: t('grid.glasses'),
+    cutlery: t('grid.cutlery'),
+    dishes: t('grid.dishes'),
+    tasselFringe: t('grid.tasselFringe'),
+    headOrnaments: t('grid.headOrnaments'),
+    packing: t('grid.packing'),
+    educationalMaterials: t('grid.educationalMaterials'),
+    fant: t('grid.fant'),
+    cakeFigurine: t('grid.cakeFigurine'),
+    photoProps: t('grid.photoProps'),
+    partyPopper: t('grid.partyPopper'),
+    latexBalls: t('grid.latexBalls'),
+    foilBalls: t('grid.foilBalls'),
+    blowouts: t('grid.blowouts'),
   };
 
   // Вспомогательная функция для рендеринга контролов выбора шаблона
@@ -281,17 +360,12 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     const ozCode = getCode(baseCode, "OZ");
     return (
       <div className={`template-selector ${marketplace}`} >
-        <select
+        <CustomSelect 
+          options={templateOptions}
           value={currentTemplate}
-          onChange={(e) => handleTemplateChange(baseCode, e.target.value)}
-          className="template-select"
-        >
-          {Object.entries(templateOptions).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
+          onChange={(value) => handleTemplateChange(baseCode, value)}
+          dropdownMaxHeight="300px"
+        />
         <div className="template-selector-controls">
           {(wbCode !== t('product.notWB') || ozCode !== t('product.notOZ')) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
           {wbCode !== t('product.notWB') && <a 
@@ -359,6 +433,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
                 <div 
                   key={item} 
                   className="item-card"
+                  style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
                   onClick={() => handleItemClick(item)}
                   role="button"
                   tabIndex={0}
@@ -387,6 +462,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
               <div
                 className="item-card new-design-card"
+                style={{ width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
                 onClick={() => handleCreateNewDesign(baseCode)}
                 role="button"
                 tabIndex={0}
