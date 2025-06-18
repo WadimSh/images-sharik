@@ -19,8 +19,8 @@
     "slideNumber": "Slide"
   },
   "grid": {
-    "belbal": "Modello Belbal (3 diapo)",
-    "gemar": "Modello Gemar (3 diapo)",
+    "belbal": "Belbal (3 diapo)",
+    "gemar": "Gemar (3 diapo)",
     "main": "Modello base",
     "default": "Modello immagine",
     "bubble": "Bolla",

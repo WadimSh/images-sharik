@@ -19,8 +19,8 @@
     "slideNumber": "Слайд"
   },
   "grid": {
-    "belbal": "Шаблон Belbal (3 слайда)",
-    "gemar": "Шаблон Gemar (3 слайда)",
+    "belbal": "Belbal (3 слайда)",
+    "gemar": "Gemar (3 слайда)",
     "main": "Базовый шаблон",
     "default": "Шаблон картинка",
     "bubble": "Bubble",

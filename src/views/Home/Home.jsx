@@ -245,7 +245,7 @@ const handleSearch = useCallback((normalizedArticles) => {
     const searchQuery = normalizedArticles.join(' ');
     const encodedSearch = encodeURIComponent(searchQuery);
     
-    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}`)
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
       .then(response => response.json())
       .then(data => {
         if (data.results.length === 0) {

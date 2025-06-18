@@ -19,8 +19,8 @@
     "slideNumber": "Slide"
   },
   "grid": {
-    "belbal": "Belbal template (3 slides)",
-    "gemar": "Gemar template (3 slides)",
+    "belbal": "Belbal (3 slides)",
+    "gemar": "Gemar (3 slides)",
     "main": "Basic template",
     "default": "Image template",
     "bubble": "Bubble",
