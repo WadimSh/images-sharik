@@ -35,7 +35,7 @@ export const SelectionImagesModal = ({ isOpen, onClose, articles }) => {
           );
           setProducts(loadedProducts.filter(Boolean));
         } catch (error) {
-          console.error('Ошибка при загрузке продуктов:', error);
+          console.error('Error when uploading product data:', error);
         }
       }
     };

@@ -51,13 +51,13 @@ export const handleFileUpload = async (file, setElements) => {
 
         setElements(prev => [...prev, newElement]);
       };
-      img.onerror = () => alert('Ошибка загрузки изображения');
+      img.onerror = () => alert('Image upload error');
       img.src = event.target.result;
     };
     reader.readAsDataURL(compressedFile);
 
   } catch (error) {
-    console.error('Ошибка сжатия:', error);
-    alert('Не удалось обработать изображение');
+    console.error('Compression error:', error);
+    alert('Couldn`t process the image');
   }
 }; 

@@ -16,13 +16,13 @@ export const Gallery = () => {
 
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
-      console.error('Некорректные данные для обработки:', productsData);
+      console.error('Incorrect data for processing:', productsData);
       return [];
     }
   
     return productsData.map(item => {
       if (!item || !item.images || !Array.isArray(item.images)) {
-        console.warn('Некорректный элемент товара:', item);
+        console.warn('Incorrect product element:', item);
         return null;
       }
   
@@ -72,7 +72,7 @@ export const Gallery = () => {
         const historyItem = await historyDB.get(key);
             
         if (!historyItem) {
-            throw new Error('Дизайн не найден в истории');
+            throw new Error('The design was not found in the history');
         }
         
         // Сохраняем основной объект коллажа
@@ -88,7 +88,7 @@ export const Gallery = () => {
         navigate('/template/collage');
         return;
       } catch (error) {
-        console.error('Ошибка при обработке коллажа:', error);
+        console.error('Error in collage processing:', error);
       } finally {
         setLoadingItemKey(null); // Изменено здесь
       }
@@ -100,7 +100,7 @@ export const Gallery = () => {
       const historyItem = await historyDB.get(key);
             
       if (!historyItem) {
-          throw new Error('Дизайн не найден в истории');
+          throw new Error('The design was not found in the history');
       }
 
       // Извлекаем информацию о типе дизайна
@@ -120,7 +120,7 @@ export const Gallery = () => {
       const searchData = await searchResponse.json();
 
       if (!searchData.results || searchData.results.length === 0) {
-        throw new Error("Товар с таким артикулом не активен.");
+        throw new Error("A product with this item number is not active.");
       }
 
       const productIds = searchData.results.map(product => product.id);
@@ -131,7 +131,7 @@ export const Gallery = () => {
       );
 
       if (!detailedResponse.ok) {
-        throw new Error('Ошибка при получении детальной информации');
+        throw new Error('Error when receiving detailed information');
       }
 
       const detailedData = await detailedResponse.json();
@@ -155,7 +155,7 @@ export const Gallery = () => {
       // Перенаправляем
       navigate(route);
     } catch (error) {
-      console.error('Ошибка при обработке дизайна:', error);
+      console.error('Design processing error:', error);
     } finally {
       setLoadingItemKey(null); // Сбрасываем после завершения
     }
@@ -262,7 +262,7 @@ export const Gallery = () => {
       setDesigns(loadedDesigns);
   
     } catch (error) {
-      console.error('Ошибка при загрузке дизайнов из базы данных:', error);
+      console.error('Error loading designs from the database:', error);
     } finally {
       setLoading(false);
     }

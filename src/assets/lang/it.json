@@ -1,16 +1,4 @@
 {
-  "errors": {
-    "general": "Si è verificato un errore",
-    "loading": "Errore di caricamento",
-    "save": "Errore di salvataggio",
-    "delete": "Errore di eliminazione",
-    "upload": "Errore di caricamento file",
-    "productNotFound": "Il prodotto con questo numero articolo non è attivo",
-    "productIdNotFound": "Impossibile ottenere l'ID del prodotto",
-    "noImages": "Il prodotto non ha immagini",
-    "productDataNotFound": "Impossibile ottenere i dati del prodotto",
-    "unknown": "Errore sconosciuto del server"
-  },
   "header": {
     "title": "Generatore di immagini per marketplace",
     "description": "Con questo generatore puoi facilmente creare immagini accattivanti per i tuoi prodotti.",

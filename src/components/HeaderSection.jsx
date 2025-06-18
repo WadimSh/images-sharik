@@ -75,7 +75,7 @@ export const HeaderSection = ({
       setTemplates(updatedTemplatesObj);
       if (selectedTemplate === templateName) setSelectedTemplate('');
     } catch (error) {
-      console.error('Ошибка удаления макета:', error);
+      console.error('Layout deletion error:', error);
     }
   };
 
@@ -92,7 +92,7 @@ export const HeaderSection = ({
       setCollageTemples(updatedCollagesObj);
       if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
     } catch (error) {
-      console.error('Ошибка удаления макета:', error);
+      console.error('Layout deletion error:', error);
     }
   };
 
@@ -220,8 +220,8 @@ export const HeaderSection = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Ошибка генерации:', error);
-      alert('Ошибка при генерации изображения!');
+      console.error('Generation error:', error);
+      alert('Error during image generation!');
     }
   };
 
@@ -259,16 +259,15 @@ export const HeaderSection = ({
                     });
                   }
                 } catch (e) {
-                  console.error(`Ошибка переноса шаблона ${name}:`, e);
+                  console.error(`Template migration error ${name}:`, e);
                 }
               })
             );
             
             // Очищаем localStorage после успешного переноса
             localStorage.removeItem('templatesLocal');
-            console.log('Все шаблоны перенесены в IndexedDB');
           } catch (migrationError) {
-            console.error('Ошибка миграции шаблонов:', migrationError);
+            console.error('Template migration error:', migrationError);
           }
         }
 
@@ -282,7 +281,7 @@ export const HeaderSection = ({
         }
 
       } catch (error) {
-        console.error('Ошибка загрузки макетов:', error);
+        console.error('Error loading layouts:', error);
       }
     };
   
@@ -310,7 +309,7 @@ export const HeaderSection = ({
                     });
                   }
                 } catch (e) {
-                  console.error(`Ошибка переноса шаблона ${name}:`, e); 
+                  console.error(`Template migration error ${name}:`, e); 
                 }
               })
             );
@@ -318,7 +317,7 @@ export const HeaderSection = ({
             // Очищаем localStorage после успешного переноса
             localStorage.removeItem('collagesLocal');
           } catch (migrationError) {
-            console.error('Ошибка миграции шаблонов:', migrationError);
+            console.error('Template migration error:', migrationError);
           }
         }
 
@@ -331,7 +330,7 @@ export const HeaderSection = ({
           setCollageTemples(collagesObj);
         }
       } catch (error) {
-        console.error('Ошибка загрузки макетов:', error);
+        console.error('Error loading layouts:', error);
       }
     };
   

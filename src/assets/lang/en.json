@@ -1,16 +1,4 @@
 {
-  "errors": {
-    "general": "An error occurred",
-    "loading": "Loading error",
-    "save": "Save error",
-    "delete": "Delete error",
-    "upload": "File upload error",
-    "productNotFound": "Product with this article number is not active",
-    "productIdNotFound": "Failed to get product ID",
-    "noImages": "Product has no images",
-    "productDataNotFound": "Failed to get product data",
-    "unknown": "Unknown server error"
-  },
   "header": {
     "title": "Marketplace Image Generator",
     "description": "With this generator, you can easily create attractive images for your products.",

@@ -42,14 +42,14 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
     fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?search=${encodedSearch}`)
       .then(response => {
         if (!response.ok) {
-          setError(t('errors.loading'));
+          setError("Loading error");
         }
         return response.json();
       })
       .then(data => {
         // Проверка наличия результатов
         if (!data?.results?.length) {
-          setError(t('errors.productNotFound'));
+          setError("Failed to get product ID");
         }
   
         // Получаем ID первого товара (или обрабатываем несколько)
@@ -59,7 +59,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
           .filter(Boolean);
   
         if (productIds.length === 0) {
-         setError(t('errors.productIdNotFound'));
+         setError("Failed to get product ID");
         }
   
         return fetch(
@@ -68,7 +68,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
       })
       .then(response => {
         if (!response.ok) {
-          setError(t('errors.loading'));
+          setError("Loading error");
         }
         return response.json();
       })
@@ -83,21 +83,21 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
             );
             setProductImages(images);
           } else {
-            setError(t('errors.noImages'));
+            setError("Product has no images");
             setProductImages([]);
           }
         } else {
-          setError(t('errors.productDataNotFound'));
+          setError("Failed to get product data");
           setProductImages([]);
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        setError(error.message || t('errors.general'));
+        setError(error.message || "An error occurred");
         
         // Для необработанных ошибок
         if (!error.message) {
-          setError(t('errors.unknown'));
+          setError("Unknown server error");
         }
       })
       .finally(() => {

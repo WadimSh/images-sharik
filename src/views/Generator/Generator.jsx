@@ -148,7 +148,7 @@ export const Generator = () => {
             });
             sessionStorage.setItem(storageKey, JSON.stringify(elements));
           } catch (error) {
-            console.error('Ошибка сохранения дизайна:', error);
+            console.error('Error saving the design:', error);
           }
         } else {
           localStorage.setItem(storageKey, JSON.stringify(elements));
@@ -160,7 +160,7 @@ export const Generator = () => {
             await slidesDB.delete(`design-${id}`);
             sessionStorage.removeItem(storageKey);
           } catch (error) {
-            console.error('Ошибка удаления дизайна:', error);
+            console.error('Design deletion error:', error);
           }
         } else {
           localStorage.removeItem(storageKey);
@@ -186,10 +186,8 @@ export const Generator = () => {
 
   // Функция для загрузки макетов
   const loadTemplate = (templateName) => {
-    console.log('loadTemplate', templateName);
-    console.log('templates', templates);
     const template = templates[templateName];
-    console.log('template', template);
+    
     if (!template) return;
 
     // Заменяем плейсхолдер на текущее изображение товара
@@ -207,10 +205,8 @@ export const Generator = () => {
   };
 
   const loadCollageTemplate = (templateName) => {
-    console.log('loadCollageTemplate', templateName);
-    console.log('collageTemples', collageTemples);
     const template = collageTemples[templateName];
-    console.log('template', template);
+    
     if (!template) return;
 
     // Получаем данные для подстановки
@@ -528,7 +524,7 @@ export const Generator = () => {
       // Отправляем запрос
       const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
       
-      if (!apiResponse.ok) throw new Error('Ошибка API');
+      if (!apiResponse.ok) throw new Error('API error');
       
       // Конвертируем ответ в ArrayBuffer
       const processedBlob = await apiResponse.blob();
@@ -549,8 +545,8 @@ export const Generator = () => {
       };
   
     } catch (error) {
-      console.error('Ошибка:', error);
-      alert(`Ошибка обработки изображения: ${error.message}`);
+      console.error('Error:', error);
+      alert(`Image processing error: ${error.message}`);
     } finally {
       setProcessingIds(prev => {
         const newSet = new Set(prev);
@@ -589,7 +585,7 @@ export const Generator = () => {
       // Ожидаем загрузки изображения
       await new Promise((resolve, reject) => {
         img.onload = resolve;
-        img.onerror = (e) => reject(new Error('Не удалось загрузить изображение'));
+        img.onerror = (e) => reject(new Error('Failed to upload image'));
       });
 
       // Параметры тени (можно вынести в настройки)
@@ -634,8 +630,8 @@ export const Generator = () => {
       setElements(updatedElements);
 
     } catch (error) {
-      console.error('Ошибка добавления тени:', error);
-      alert(`Ошибка: ${error.message}`);
+      console.error('Error:', error);
+      alert(`Shadow addition error: ${error.message}`);
     } finally {
       setProcessingShedowIds(prev => {
         const newSet = new Set(prev);
@@ -735,8 +731,8 @@ export const Generator = () => {
       }
 
       img.onerror = () => {
-      console.error('Ошибка загрузки изображения');
-      alert('Не удалось загрузить изображение');
+      console.error('Error loading image');
+      alert('Couldn`t upload image');
     };
   } 
   };
@@ -833,7 +829,7 @@ export const Generator = () => {
       
     } catch (error) {
       console.error('Error loading image:', error);
-      alert('Не удалось загрузить изображение');
+      alert('Couldn`t upload image');
     }
   };
 
@@ -898,7 +894,7 @@ export const Generator = () => {
       
     } catch (error) {
       console.error('Error loading image:', error);
-      alert('Не удалось загрузить изображение');
+      alert('Couldn`t upload image');
     }
     
   };

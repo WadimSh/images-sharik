@@ -1,16 +1,4 @@
 {
-  "errors": {
-    "general": "Ein Fehler ist aufgetreten",
-    "loading": "Ladefehler",
-    "save": "Speicherfehler",
-    "delete": "Löschfehler",
-    "upload": "Datei-Upload-Fehler",
-    "productNotFound": "Produkt mit dieser Artikelnummer ist nicht aktiv",
-    "productIdNotFound": "Produkt-ID konnte nicht abgerufen werden",
-    "noImages": "Produkt hat keine Bilder",
-    "productDataNotFound": "Produktdaten konnten nicht abgerufen werden",
-    "unknown": "Unbekannter Serverfehler"
-  },
   "header": {
     "title": "Bildgenerator für Marktplätze",
     "description": "Mit diesem Generator können Sie einfach ansprechende Bilder für Ihre Produkte erstellen.",

@@ -73,7 +73,7 @@ export const Home = () => {
         ]);
         setTemplates({ belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
       } catch (error) {
-        console.error('Ошибка загрузки шаблонов:', error);
+        console.error('Error loading templates:', error);
       }
     };
 
@@ -82,13 +82,13 @@ export const Home = () => {
 
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
-      console.error('Некорректные данные для обработки:', productsData);
+      console.error('Invalid data for processing:', productsData);
       return [];
     }
   
     return productsData.map(item => {
       if (!item || !item.images || !Array.isArray(item.images)) {
-        console.warn('Некорректный элемент товара:', item);
+        console.warn('Invalid product item:', item);
         return null;
       }
   
@@ -124,13 +124,13 @@ export const Home = () => {
   // Выносим функцию обработки данных в отдельную утилиту
   const processProductsData = (productsData) => {
     if (!Array.isArray(productsData)) {
-      console.error('Некорректные данные для обработки:', productsData);
+      console.error('Invalid data for processing:', productsData);
       return [];
     }
   
     return productsData.flatMap(item => {
       if (!item || !item.images || !Array.isArray(item.images)) {
-        console.warn('Некорректный элемент товара:', item);
+        console.warn('Invalid product item:', item);
         return [];
       }
   
@@ -240,33 +240,33 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    //setLoading(true);
-    //
-    //const searchQuery = normalizedArticles.join(' ');
-    //const encodedSearch = encodeURIComponent(searchQuery);
-    //
-    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}`)
-    //  .then(response => response.json())
-    //  .then(data => {
-    //    if (data.results.length === 0) {
-    //      const message = t('views.homeMissingCode');
-    //      setInfoMessage(message);
-    //      return Promise.reject(message);
-    //    }
-    //
-    //    const productIds = data.results.map(product => product.id);
-    //    const idsParam = productIds.join(',');
-    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //  })
-    //  .then(response => response?.json())
-    //  .then(detailedData => {
-    //    if (!detailedData) return;
+    setLoading(true);
+    
+    const searchQuery = normalizedArticles.join(' ');
+    const encodedSearch = encodeURIComponent(searchQuery);
+    
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          const message = t('views.homeMissingCode');
+          setInfoMessage(message);
+          return Promise.reject(message);
+        }
+    
+        const productIds = data.results.map(product => product.id);
+        const idsParam = productIds.join(',');
+        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+      })
+      .then(response => response?.json())
+      .then(detailedData => {
+        if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      const processedResults = processProductsData(data);
-      const processedMetaResults = processProductsMeta(data);
-      //const processedResults = processProductsData(detailedData);
-      //const processedMetaResults = processProductsMeta(detailedData);
+      //const processedResults = processProductsData(data);
+      //const processedMetaResults = processProductsMeta(data);
+      const processedResults = processProductsData(detailedData);
+      const processedMetaResults = processProductsMeta(detailedData);
             
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -296,16 +296,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    //})
-    //.catch(error => {
-    //  console.error('Ошибка:', error);
-    //  setError(error.message || 'Произошла ошибка при поиске');
-    //  setValidArticles([]);
-    //  setIsSearchActive(false);
-    //})
-    //.finally(() => {
-    //  setLoading(false);
-    //});
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setError(error.message || "An error occurred");
+      setValidArticles([]);
+      setIsSearchActive(false);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

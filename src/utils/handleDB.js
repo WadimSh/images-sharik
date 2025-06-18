@@ -16,7 +16,7 @@ const clearTable = async (table) => {
     await table.clear();
     return true;
   } catch (error) {
-    console.error(`Ошибка при очистке таблицы ${table.name}:`, error);
+    console.error(`Error when clearing the table ${table.name}:`, error);
     throw error;
   }
 };
@@ -28,7 +28,7 @@ export const designsDB = {
     try {
       return await db.designs.add(design);
     } catch (error) {
-      console.error('Ошибка при добавлении шаблона дизайна:', error);
+      console.error('Error when adding an entry:', error);
       throw error;
     }
   },
@@ -38,7 +38,7 @@ export const designsDB = {
     try {
       return await db.designs.get(code);
     } catch (error) {
-      console.error('Ошибка при получении шаблона дизайна:', error);
+      console.error('Error receiving the record:', error);
       throw error;
     }
   },
@@ -48,7 +48,7 @@ export const designsDB = {
     try {
       return await db.designs.toArray();
     } catch (error) {
-      console.error('Ошибка при получении всех шаблонов дизайнов:', error);
+      console.error('Error when receiving all records:', error);
       throw error;
     }
   },
@@ -58,7 +58,7 @@ export const designsDB = {
     try {
       return await db.designs.update(code, changes);
     } catch (error) {
-      console.error('Ошибка при обновлении шаблона дизайна:', error);
+      console.error('Error updating the record:', error);
       throw error;
     }
   },
@@ -68,7 +68,7 @@ export const designsDB = {
     try {
       return await db.designs.delete(code);
     } catch (error) {
-      console.error('Ошибка при удалении шаблона дизайна:', error);
+      console.error('Error deleting an entry:', error);
       throw error;
     }
   }
@@ -81,7 +81,7 @@ export const collageDB = {
     try {
       return await db.collage.add(collage);
     } catch (error) {
-      console.error('Ошибка при добавлении шаблона коллажа:', error);
+      console.error('Error when adding an entry:', error);
       throw error;
     }
   },
@@ -91,7 +91,7 @@ export const collageDB = {
     try {
       return await db.collage.get(code);
     } catch (error) {
-      console.error('Ошибка при получении шаблона коллажа:', error);
+      console.error('Error receiving the record:', error);
       throw error;
     }
   },
@@ -101,7 +101,7 @@ export const collageDB = {
     try {
       return await db.collage.toArray();
     } catch (error) {
-      console.error('Ошибка при получении всех шаблонов коллажей:', error);
+      console.error('Error when receiving all records:', error);
       throw error;
     }
   },
@@ -111,7 +111,7 @@ export const collageDB = {
     try {
       return await db.collage.update(code, changes);
     } catch (error) {
-      console.error('Ошибка при обновлении шаблона коллажа:', error);
+      console.error('Error updating the record:', error);
       throw error;
     }
   },
@@ -121,7 +121,7 @@ export const collageDB = {
     try {
       return await db.collage.delete(code);
     } catch (error) {
-      console.error('Ошибка при удалении шаблона коллажа:', error);
+      console.error('Error deleting an entry:', error);
       throw error;
     }
   }
@@ -134,7 +134,7 @@ export const historyDB = {
     try {
       return await db.history.add(record);
     } catch (error) {
-      console.error('Ошибка при добавлении записи в историю:', error);
+      console.error('Error when adding an entry:', error);
       throw error;
     }
   },
@@ -144,7 +144,7 @@ export const historyDB = {
     try {
       return await db.history.put(record);
     } catch (error) {
-      console.error('Ошибка при обновлении/добавлении записи:', error);
+      console.error('Error updating/adding an entry:', error);
       throw error;
     }
   },
@@ -154,7 +154,7 @@ export const historyDB = {
     try {
       return await db.history.get(code);
     } catch (error) {
-      console.error('Ошибка при получении записи из истории:', error);
+      console.error('Error receiving the record:', error);
       throw error;
     }
   },
@@ -164,7 +164,7 @@ export const historyDB = {
     try {
       return await db.history.toArray();
     } catch (error) {
-      console.error('Ошибка при получении всей истории:', error);
+      console.error('Error when receiving all records:', error);
       throw error;
     }
   },
@@ -174,7 +174,7 @@ export const historyDB = {
     try {
       return await db.history.update(code, changes);
     } catch (error) {
-      console.error('Ошибка при обновлении записи в истории:', error);
+      console.error('Error updating the record:', error);
       throw error;
     }
   },
@@ -184,7 +184,7 @@ export const historyDB = {
     try {
       return await db.history.delete(code);
     } catch (error) {
-      console.error('Ошибка при удалении записи из истории:', error);
+      console.error('Error deleting an entry:', error);
       throw error;
     }
   }
@@ -197,7 +197,7 @@ export const productsDB = {
     try {
       return await db.products.add(record);
     } catch (error) {
-      console.error('Ошибка при добавлении записи:', error);
+      console.error('Error when adding an entry:', error);
       throw error;
     }
   },
@@ -207,7 +207,7 @@ export const productsDB = {
     try {
       return await db.products.get(code);
     } catch (error) {
-      console.error('Ошибка при получении записи:', error);
+      console.error('Error receiving the record:', error);
       throw error;
     }
   },
@@ -217,7 +217,7 @@ export const productsDB = {
     try {
       return await db.products.toArray();
     } catch (error) {
-      console.error('Ошибка при получении всех записей:', error);
+      console.error('Error when receiving all records:', error);
       throw error;
     }
   },
@@ -227,7 +227,7 @@ export const productsDB = {
     try {
       return await db.products.put(record);
     } catch (error) {
-      console.error('Ошибка при обновлении/добавлении записи:', error);
+      console.error('Error updating/adding an entry:', error);
       throw error;
     }
   },
@@ -237,7 +237,7 @@ export const productsDB = {
     try {
       return await db.products.update(code, changes);
     } catch (error) {
-      console.error('Ошибка при обновлении записи:', error);
+      console.error('Error updating the record:', error);
       throw error;
     }
   },
@@ -247,7 +247,7 @@ export const productsDB = {
     try {
       return await db.products.delete(code);
     } catch (error) {
-      console.error('Ошибка при удалении записи:', error);
+      console.error('Error deleting an entry:', error);
       throw error;
     }
   },
@@ -265,7 +265,7 @@ export const slidesDB = {
     try {
       return await db.slides.add(record);
     } catch (error) {
-      console.error('Ошибка при добавлении записи:', error);
+      console.error('Error when adding an entry:', error);
       throw error;
     }
   },
@@ -275,7 +275,7 @@ export const slidesDB = {
     try {
       return await db.slides.get(code);
     } catch (error) {
-      console.error('Ошибка при получении записи:', error);
+      console.error('Error receiving the record:', error);
       throw error;
     }
   },
@@ -285,7 +285,7 @@ export const slidesDB = {
     try {
       return await db.slides.toArray();
     } catch (error) {
-      console.error('Ошибка при получении всех записей:', error);
+      console.error('Error when receiving all records:', error);
       throw error;
     }
   },
@@ -295,7 +295,7 @@ export const slidesDB = {
     try {
       return await db.slides.put(record);
     } catch (error) {
-      console.error('Ошибка при обновлении/добавлении записи:', error);
+      console.error('Error updating/adding an entry:', error);
       throw error;
     }
   },
@@ -305,7 +305,7 @@ export const slidesDB = {
     try {
       return await db.slides.update(code, changes);
     } catch (error) {
-      console.error('Ошибка при обновлении записи:', error);
+      console.error('Error updating the record:', error);
       throw error;
     }
   },
@@ -315,7 +315,7 @@ export const slidesDB = {
     try {
       return await db.slides.delete(code);
     } catch (error) {
-      console.error('Ошибка при удалении записи:', error);
+      console.error('Error deleting an entry:', error);
       throw error;
     }
   },

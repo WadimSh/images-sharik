@@ -72,11 +72,11 @@ export const CollageTempleModal = ({
         
       } catch (dbError) {
         console.error('DB Error:', dbError);
-        throw new Error(t('errors.save'));
+        throw new Error("Save error");
       }
     } catch (error) {
       setModalStep('error');
-      setModalMessage(t('errors.save') + ': ' + error.message);
+      setModalMessage("Save error" + ': ' + error.message);
     }
   };
   
