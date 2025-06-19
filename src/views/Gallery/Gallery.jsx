@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HiOutlineChevronLeft } from "react-icons/hi2";
 
 import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
@@ -11,7 +12,7 @@ export const Gallery = () => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingItemKey, setLoadingItemKey] = useState(null);
-  const { t } = useContext(LanguageContext)
+  const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
 
   const processProductsMeta = (productsData) => {
@@ -367,7 +368,7 @@ export const Gallery = () => {
     <div>
       <div className='header-section' style={{ margin: '10px'}}>
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
-        {t('header.back')}
+        <HiOutlineChevronLeft /> {t('header.back')}
         </button>
         <h2 style={{ color: '#333'}}>{t('header.subtitle')}</h2>
       </div>

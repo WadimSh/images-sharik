@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaDownload, FaClipboardCheck } from 'react-icons/fa';
+import { HiOutlineChevronLeft } from "react-icons/hi2";
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
 
@@ -340,7 +341,7 @@ export const HeaderSection = ({
   return (
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
-        {t('header.back')}
+        <HiOutlineChevronLeft /> {t('header.back')}
       </button>
       <h2>{getHeaderTitle()}</h2>
       <TemplateSelector {...templateProps} />

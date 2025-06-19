@@ -8,7 +8,7 @@ export const hexToRgba = (hex, alpha = 1) => {
   const b = parseInt(cleanHex.substring(4, 6), 16);
   
   // Обрабатываем особые случаи для градиентов
-  const processedAlpha = alpha === 0 ? 0.0001 : alpha; // Предотвращаем полную прозрачность
+  const processedAlpha = alpha === 0 ? 0.01 : alpha; // Предотвращаем полную прозрачность
   
   // Возвращаем rgba строку
   return `rgba(${r}, ${g}, ${b}, ${processedAlpha})`;

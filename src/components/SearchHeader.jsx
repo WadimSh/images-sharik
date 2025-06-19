@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
-import { useContext } from "react";
-import { LanguageContext } from "../contexts/contextLanguage";
+import { MdCreateNewFolder } from "react-icons/md";
 
+
+import { LanguageContext } from "../contexts/contextLanguage";
 import { db, productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
@@ -57,6 +58,10 @@ const SearchHeader = ({
     navigate('/gallery');
   };
 
+  const handleCreateTamplete = () => {
+    navigate('/create');
+  }
+
   const handleClear = () => {
     setSearchQuery('');
     onSearch([]);
@@ -107,6 +112,11 @@ const SearchHeader = ({
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
+        {/*
+          <button onClick={handleCreateTamplete} className="creat-temp-button">
+            <MdCreateNewFolder className="creat-temp-icon" />
+          </button>
+        */}
         <LanguageSwitcher />
       </div>
       <div className="header-top">

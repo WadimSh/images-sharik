@@ -1091,12 +1091,7 @@ export const Generator = () => {
           />
         )}
         
-        {/* <div className="main-content">
-          Панель добавления элементов
-          
-        </div> */}
         <div className='design-area'>
-          
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
@@ -1300,6 +1295,7 @@ export const Generator = () => {
                   return null;
               }
             })}
+
             {/* Контекстное меню */}
             {contextMenu.visible && (() => {
               const element = elements.find(el => el.id === selectedElementId);
@@ -1391,38 +1387,40 @@ export const Generator = () => {
             })()}
           </div>
         </div> 
+
         <div>
-        <ElementToolbar onAddElement={handleAddElement} />
-        <DraggableElementsList 
-          elements={elements}
-          moveElement={moveElement}
-          colorInputRef={colorInputRef}
-          handleRemoveElement={handleRemoveElement}
-          handleFlipImage={handleFlipImage}
-          handleColorButtonClick={handleColorButtonClick}
-          handleRemoveBackground={handleRemoveBackground}
-          handleAddShadow={handleAddShadow}
-          handleDirectionChange={handleDirectionChange}
-          handleBorderRadiusChange={handleBorderRadiusChange}
-          handleGradientChange={handleGradientChange}
-          handleoOpacityChange={handleoOpacityChange}
-          processingIds={processingIds}
-          processingShedowIds={processingShedowIds}
-          shadowSetting={shadowSetting}
-          handleTextEditToggle={handleTextEditToggle}
-          handleColorChange={handleColorChange}
-          handleFontChange={handleFontChange}
-          selectedElementId={selectedElementId}
-          setSelectedElementId={handleElementClick}
-          selectedElementIds={selectedElementIds}
-          setSelectedElementIds={setSelectedElementIds}
-          expandedElementId={expandedElementId}
-          setExpandedElementId={setExpandedElementId}
-          onPositionChange={handlePositionChange}
-          onSizeChange={handleSizeChange}
-          onRotationChange={handleRotationChange}
-          onProportionalResize={handleProportionalResize}
-        /> 
+          <ElementToolbar onAddElement={handleAddElement} />
+
+          <DraggableElementsList 
+            elements={elements}
+            moveElement={moveElement}
+            colorInputRef={colorInputRef}
+            handleRemoveElement={handleRemoveElement}
+            handleFlipImage={handleFlipImage}
+            handleColorButtonClick={handleColorButtonClick}
+            handleRemoveBackground={handleRemoveBackground}
+            handleAddShadow={handleAddShadow}
+            handleDirectionChange={handleDirectionChange}
+            handleBorderRadiusChange={handleBorderRadiusChange}
+            handleGradientChange={handleGradientChange}
+            handleoOpacityChange={handleoOpacityChange}
+            processingIds={processingIds}
+            processingShedowIds={processingShedowIds}
+            shadowSetting={shadowSetting}
+            handleTextEditToggle={handleTextEditToggle}
+            handleColorChange={handleColorChange}
+            handleFontChange={handleFontChange}
+            selectedElementId={selectedElementId}
+            setSelectedElementId={handleElementClick}
+            selectedElementIds={selectedElementIds}
+            setSelectedElementIds={setSelectedElementIds}
+            expandedElementId={expandedElementId}
+            setExpandedElementId={setExpandedElementId}
+            onPositionChange={handlePositionChange}
+            onSizeChange={handleSizeChange}
+            onRotationChange={handleRotationChange}
+            onProportionalResize={handleProportionalResize}
+          /> 
         </div>     
       </div>  
       <input
