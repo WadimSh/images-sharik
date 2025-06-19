@@ -31,7 +31,7 @@ export const PreviewDesign = ({ elements }) => (
                   key={element.id} 
                   style={{
                     ...style,
-                    fontSize: `${(element.fontSize || 24) * 0.62}px`,
+                    fontSize: `${(element.fontSize || 24) * 0.6}px`,
                     fontFamily: element.fontFamily,
                     fontWeight: element.fontWeight,
                     fontStyle: element.fontStyle,
