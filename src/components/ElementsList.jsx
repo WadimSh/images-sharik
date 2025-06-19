@@ -122,8 +122,9 @@ export const ElementsList = ({
 
   return (
     <div className="sidebar">
+      <h3 style={{ marginTop: '0', marginBottom: '10px' }}>{t('elements.title')}</h3>
       <div className="elements-list" ref={listContainerRef}>
-        <h3 style={{ marginTop: '0' }}>{t('elements.title')}</h3>
+        
         {[...elements].reverse().map((element, index) => {
           const originalIndex = elements.length - 1 - index;
           const isExpanded = expandedElementId === element.id;

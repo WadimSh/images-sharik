@@ -1,29 +1,27 @@
 .element-toolbar {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 8px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 5px;
+  background: #f5f5f5;
+  border-radius: 8px;
 }
 
 .element-toolbar button {
+  padding: 10px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .element-toolbar button:hover {
-  background-color: #e0e0e0;
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
 }
-
-.element-toolbar button:active {
-  transform: scale(0.95);
-} 

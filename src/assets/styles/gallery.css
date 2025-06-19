@@ -26,3 +26,12 @@
   color: #212529;
   word-break: break-all;
 }
+
+.loader-container-gallery {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 100vh;
+  height: 100%;
+  width: 100%;
+}

@@ -357,7 +357,7 @@ export const Gallery = () => {
 
   if (loading) {
     return (
-      <div className="loader-container">
+      <div className="loader-container-gallery">
         <div className="loader"></div>
       </div>
     );

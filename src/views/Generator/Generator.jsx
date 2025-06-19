@@ -1091,11 +1091,12 @@ export const Generator = () => {
           />
         )}
         
-        <div className="main-content">
-          {/* Панель добавления элементов */}
-          <ElementToolbar onAddElement={handleAddElement} />
-        </div>
+        {/* <div className="main-content">
+          Панель добавления элементов
+          
+        </div> */}
         <div className='design-area'>
+          
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
@@ -1108,7 +1109,7 @@ export const Generator = () => {
               onItemClick={handleProductSelect}
             />
           )}
-
+          
           <div 
             ref={captureRef} 
             className="design-container"
@@ -1390,6 +1391,8 @@ export const Generator = () => {
             })()}
           </div>
         </div> 
+        <div>
+        <ElementToolbar onAddElement={handleAddElement} />
         <DraggableElementsList 
           elements={elements}
           moveElement={moveElement}
@@ -1419,7 +1422,8 @@ export const Generator = () => {
           onSizeChange={handleSizeChange}
           onRotationChange={handleRotationChange}
           onProportionalResize={handleProportionalResize}
-        />      
+        /> 
+        </div>     
       </div>  
       <input
         type="file"
