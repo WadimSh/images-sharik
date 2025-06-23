@@ -77,6 +77,19 @@ export const PreviewDesign = ({ elements }) => (
                       ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`
                   }} 
                    className="preview-shape" />;
+        case 'background':
+          return <div key={element.id} 
+                  style={{
+                   ...style, 
+                   border: 'none',
+                   opacity: element.opacity,
+                   background: element.gradient 
+                               ? `linear-gradient(${element.gradient.direction}, 
+                                 ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}  ${element.gradient.start}%, 
+                                 ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+                               : element.color,
+                  }} 
+                className="preview-shape" />;
         default:
           return null;
       }

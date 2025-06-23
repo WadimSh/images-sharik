@@ -6,6 +6,7 @@ import { TemplateModal } from '../../components/TemplateModal';
 import { ProductMetaInfo } from '../../components/ProductMetaInfo';
 import { ProductImagesGrid } from '../../components/ProductImagesGrid';
 import { DraggableElementsList } from '../../components/DraggableElementsList';
+import { BackgroundElement } from '../../components/BackgroundElement';
 import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
@@ -657,6 +658,11 @@ export const Generator = () => {
   // Замените старые функции перемещения на новую
   const moveElement = (fromIndex, toIndex) => {
     if (fromIndex === toIndex) return;
+    
+    const hasBackground = elements[0]?.type === 'background';
+    if (hasBackground && (fromIndex === 0 || toIndex === 0)) return;
+    
+
     const newElements = [...elements];
     const [movedElement] = newElements.splice(fromIndex, 1);
     newElements.splice(toIndex, 0, movedElement);
@@ -1151,6 +1157,15 @@ export const Generator = () => {
             </div>            
             {elements.map((element) => {
               switch (element.type) {
+                case 'background': 
+                  return (
+                    <BackgroundElement 
+                      element={element}
+                      key={element.id}
+                      color={element.color || '#ccc'} // Добавляем цвет
+                      
+                    />
+                  );
                 case 'image':
                   return (
                     <ImageElement
@@ -1389,7 +1404,10 @@ export const Generator = () => {
         </div> 
 
         <div>
-          <ElementToolbar onAddElement={handleAddElement} />
+          <ElementToolbar 
+            onAddElement={handleAddElement} 
+            isBackground={elements[0]?.type === 'background'}
+          />
           <DraggableElementsList 
             elements={elements}
             moveElement={moveElement}

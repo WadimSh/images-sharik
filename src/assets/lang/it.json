@@ -135,10 +135,13 @@
     "addText": "Aggiungi testo",
     "addSquare": "Aggiungi forma",
     "addElement": "Aggiungi elemento",
-    "addProduct": "Aggiungi prodotto"
+    "addProduct": "Aggiungi prodotto",
+    "addBackground": "Aggiungi sfondo",
+    "addedBackground": "Sfondo aggiunto"
   },
   "elements": {
     "title": "Componenti di design",
+    "labelBackground": "Sfondo della diapositiva",
     "labelImage": "Immagine",
     "labelMainProduct": "Prodotto principale",
     "labelElement": "Elemento",

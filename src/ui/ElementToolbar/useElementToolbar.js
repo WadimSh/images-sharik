@@ -6,6 +6,17 @@ export const useElementToolbar = (
 ) => {
   const handleAddElement = (type) => {
     switch (type) {
+      case 'background':
+        const newBackgroundElement = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          type: 'background',
+          position: { x: 0, y: 0 },
+          width: 450,
+          height: 600,
+          color: '#ccddea'
+        };
+        setElements(prev => [newBackgroundElement, ...prev]);
+        break;
       case 'image':
         fileInputRef.current.click();
         break;

@@ -129,17 +129,19 @@ export const ElementsList = ({
         {[...elements].reverse().map((element, index) => {
           const originalIndex = elements.length - 1 - index;
           const isExpanded = expandedElementId === element.id;
+          const isBackground = element.type === 'background';
                  
           return (
             <DraggableElementItem
               key={element.id}
               element={element}
               originalIndex={originalIndex}
-              moveElement={moveElement}
+              moveElement={isBackground ? undefined : moveElement}
               elements={elements}
               isSelected={selectedElementIds.includes(element.id)}
               disabled={isExpanded}
               setExpandedElementId={setExpandedElementId}
+              isBackground={isBackground}
             >
               <div 
                 ref={el => {
@@ -151,6 +153,7 @@ export const ElementsList = ({
                 }}
                 className={`element-item ${element.id === selectedElementId ? 'selected' : ''} ${selectedElementIds.includes(element.id) ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
                 onClick={(e) => {
+                  if (isBackground) return; // Запрещаем выбор фона
                   if (e.shiftKey) {
                     if (selectedElementIds.includes(element.id)) {
                       setSelectedElementIds(prev => prev.filter(id => id !== element.id));
@@ -173,6 +176,7 @@ export const ElementsList = ({
                 >
                   <RxDragHandleDots2 
                     className="drag-handle" 
+                    style={element.type === 'background' ? { color: '#ddd', cursor: 'no-drop' } : {}}
                     onClick={(e) => {
                       e.stopPropagation();
                       setExpandedElementId(null); // Закрываем все меню
@@ -194,7 +198,7 @@ export const ElementsList = ({
                         alt="alt"
                       />
                     )}
-                    {element.type === 'shape' && (
+                    {(element.type === 'shape' || element.type === 'background') && (
                       <div 
                         style={{
                           width: '30px',
@@ -217,6 +221,7 @@ export const ElementsList = ({
                   {element.isProduct && t('elements.labelMainProduct')}
                   {element.type === 'element' && t('elements.labelElement')}
                   {element.type === 'shape' && t('elements.labelShape')}
+                  {element.type === 'background' && t('elements.labelBackground')}
                 </div>
                 <button 
                   className={`expand-button ${isExpanded ? 'expanded' : ''}`}
@@ -350,7 +355,7 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {element.type === 'shape' && (
+                  {(element.type === 'shape' || element.type === 'background' ) && (
                     <div className="element-controls">
                       <span>{t('elements.subtitleColor')}</span>
                       <div className="color-control">
@@ -463,7 +468,7 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {element.type === 'shape' && (
+                  {(element.type === 'shape' || element.type === 'background') && (
                     <div className="element-controls line">
                       <span>{t('elements.subtitleGradient')}</span>
                       <div className="gradient-controls">
@@ -691,7 +696,7 @@ export const ElementsList = ({
                     </div>
                   )}  
                   
-                  <div className="element-controls line">
+                  {element.type !== 'background' && <div className="element-controls line">
                     <span>{t('elements.subtitlePosition')}</span>
                     <div className="font-controls">
                       <label>
@@ -711,7 +716,7 @@ export const ElementsList = ({
                         />
                       </label>
                     </div>
-                  </div>
+                  </div>}
 
                   {element.type === 'shape' && ( 
                     <div className="element-controls line">
@@ -761,8 +766,7 @@ export const ElementsList = ({
                     </div>
                   )}
 
-
-                  <div className="element-controls line">
+                  {element.type !== 'background' && <div className="element-controls line">
                     <span>{t('elements.subtitleRotation')}</span>
                     <div className="font-controls">
                       <label>
@@ -774,7 +778,7 @@ export const ElementsList = ({
                         />
                       </label>
                     </div>
-                  </div>
+                  </div>}
 
                   <div className="element-controls line">
                     <button 

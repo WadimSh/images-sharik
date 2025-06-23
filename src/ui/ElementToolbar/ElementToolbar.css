@@ -25,3 +25,10 @@
   color: white;
   border-color: #007bff;
 }
+
+.element-toolbar button:disabled {
+  background: white;
+  border: 1px solid #ddd;
+  color: #ccc;
+  cursor: no-drop;
+}

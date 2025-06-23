@@ -135,10 +135,13 @@
     "addText": "Text hinzufügen",
     "addSquare": "Form hinzufügen",
     "addElement": "Element hinzufügen",
-    "addProduct": "Produkt hinzufügen"
+    "addProduct": "Produkt hinzufügen",
+    "addBackground": "Hintergrund hinzufügen",
+    "addedBackground": "Hintergrund hinzugefügt"
   },
   "elements": {
     "title": "Design-Komponenten",
+    "labelBackground": "Folienhintergrund",
     "labelImage": "Bild",
     "labelMainProduct": "Hauptprodukt",
     "labelElement": "Element",

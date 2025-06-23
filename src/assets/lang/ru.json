@@ -135,10 +135,13 @@
     "addText": "Добавить текст",
     "addSquare": "Добавить фигуру",
     "addElement": "Добавить элемент",
-    "addProduct": "Добавить товар"
+    "addProduct": "Добавить товар",
+    "addBackground": "Добавить фон",
+    "addedBackground": "Фон добавлен"
   },
   "elements": {
     "title": "Компоненты дизайна",
+    "labelBackground": "Фон слайда",
     "labelImage": "Изображение",
     "labelMainProduct": "Основной товар",
     "labelElement": "Элемент",

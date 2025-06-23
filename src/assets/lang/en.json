@@ -135,10 +135,13 @@
     "addText": "Add text",
     "addSquare": "Add shape",
     "addElement": "Add element",
-    "addProduct": "Add product"
+    "addProduct": "Add product",
+    "addBackground": "Add background",
+    "addedBackground": "Background added"
   },
   "elements": {
     "title": "Design сomponents",
+    "labelBackground": "Slide background",
     "labelImage": "Image",
     "labelMainProduct": "Main product",
     "labelElement": "Element",

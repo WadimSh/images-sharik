@@ -7,6 +7,7 @@ export const DraggableElementItem = ({
   moveElement,
   disabled, 
   setExpandedElementId,
+  isBackground,
   children 
 }) => {
   const [{ isDragging }, drag] = useDrag({
@@ -15,7 +16,7 @@ export const DraggableElementItem = ({
       setExpandedElementId(null); // Закрываем меню при начале перетаскивания
       return { id: element.id, originalIndex };
     },
-    canDrag: () => !disabled, // Блокируем перетаскивание при disabled=true
+    canDrag: () => !disabled && !isBackground, // Блокируем перетаскивание при disabled=true
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -28,7 +29,10 @@ export const DraggableElementItem = ({
 
   const [, drop] = useDrop({
     accept: 'element',
+    canDrop: () => !isBackground, // Запрещаем дроп на background элемент
     hover({ id: draggedId }) {
+      if (!moveElement || isBackground) return;
+
       if (draggedId !== element.id) {
         const draggedIndex = elements.findIndex(el => el.id === draggedId);
         const targetIndex = elements.findIndex(el => el.id === element.id);
@@ -40,7 +44,10 @@ export const DraggableElementItem = ({
   return (
     <div
       ref={(node) => drag(drop(node))}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      style={{ 
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isBackground && 'default'  
+      }}
     >
       {children}
     </div>
