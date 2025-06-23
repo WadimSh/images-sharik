@@ -112,11 +112,11 @@ const SearchHeader = ({
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
-        {/*
+        {
           <button onClick={handleCreateTamplete} className="creat-temp-button">
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
-        */}
+        }
         <LanguageSwitcher />
       </div>
       <div className="header-top">

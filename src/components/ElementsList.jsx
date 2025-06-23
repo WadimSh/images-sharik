@@ -6,6 +6,7 @@ import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icons/gr";
 
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
@@ -549,7 +550,31 @@ export const ElementsList = ({
                     <div className="element-controls line">
                       <span>{t('elements.subtitleTextFont')}</span>
                       <div className="font-controls">
-                        <div className="style-controls">
+                        <div className="style-controls-wrapper">
+                          <div className="toggle-group">
+                            <button
+                              className={`toggle-option ${element.textAlign === 'left' ? 'active' : ''}`}
+                              onClick={() => handleFontChange(element.id, 'textAlign', 'left')}
+                            >
+                              <GrTextAlignLeft />
+                            </button>
+                            <button
+                              className={`toggle-option ${element.textAlign === 'center' ? 'active' : ''}`}
+                              onClick={() => handleFontChange(element.id, 'textAlign', 'center')}
+                            >
+                              <GrTextAlignCenter />
+                            </button>
+                            <button
+                              className={`toggle-option ${element.textAlign === 'right' ? 'active' : ''}`}
+                              onClick={() => handleFontChange(element.id, 'textAlign', 'right')}
+                            >
+                              <GrTextAlignRight />
+                            </button>
+                            <div className="active-indicator" data-active-option={element.textAlign}></div>
+                          </div>
+                        </div>
+
+                        <div className="style-controls" style={{ marginBottom: '20px'}}>
                           <button
                             className={`style-button bold ${element.fontWeight === 'bold' ? 'active' : ''}`}
                             onClick={() => 
@@ -570,6 +595,28 @@ export const ElementsList = ({
                             }
                           >
                             I
+                          </button>
+
+                          <button
+                            className={`style-button underline ${element.textDecoration === 'underline' ? 'active' : ''}`}
+                            onClick={() => 
+                              handleFontChange(element.id, 'textDecoration', 
+                                element.textDecoration === 'underline' ? 'none' : 'underline'
+                              )
+                            }
+                          >
+                            U
+                          </button>
+
+                          <button
+                            className={`style-button line-through ${element.textDecoration === 'line-through' ? 'active' : ''}`}
+                            onClick={() => 
+                              handleFontChange(element.id, 'textDecoration', 
+                                element.textDecoration === 'line-through' ? 'none' : 'line-through'
+                              )
+                            }
+                          >
+                            S
                           </button>
                         </div>
 

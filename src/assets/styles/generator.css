@@ -915,6 +915,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #fff;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -929,6 +930,14 @@
   font-style: italic;
 }
 
+.style-button.underline {
+  text-decoration: underline;
+}
+
+.style-button.line-through {
+  text-decoration: line-through;
+}
+
 .font-controls .style-button.active {
   background: #007bff;
   color: white;
@@ -937,6 +946,61 @@
 
 .font-controls .style-button:hover {
   background: #f0f0f0;
+}
+
+.style-controls-wrapper {
+  margin: 10px 0 20px;
+  width: 100%;
+}
+
+.style-controls-wrapper .toggle-group {
+  display: inline-flex;
+  position: relative;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.style-controls-wrapper .toggle-option {
+  padding: 6px 10px 4px 10px;
+  width: 33.33333333%;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.style-controls-wrapper .toggle-option.active {
+  color: white;
+}
+
+.active-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 33.33333333%;
+  background: #007bff;
+  border-radius: 3px;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 0;
+}
+
+.active-indicator[data-active-option="left"] {
+  transform: translateX(0);
+}
+
+.active-indicator[data-active-option="center"] {
+  transform: translateX(100%);
+}
+
+.active-indicator[data-active-option="right"] {
+  transform: translateX(200%);
 }
 
 .font-controls label {

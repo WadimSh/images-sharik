@@ -91,6 +91,38 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
         >
           I
         </button>
+
+        <button
+          className={`style-button underline ${element.textDecoration === 'underline' ? 'active' : ''}`}
+          onClick={() => { 
+            if (isMulti) {
+              const newState = !checkMultiStyleState('textDecoration', 'underline') ? 'underline' : 'none';
+              onChangeMulti(selectedElementIds, 'textDecoration', newState);
+            } else {
+              onChange(element.id, 'textDecoration', 
+                element.textDecoration === 'underline' ? 'none' : 'underline'
+              );
+            }
+          }}
+        >
+          U
+        </button>
+
+        <button
+          className={`style-button line-through ${element.textDecoration === 'line-through' ? 'active' : ''}`}
+          onClick={() => {
+            if (isMulti) {
+              const newState = !checkMultiStyleState('textDecoration', 'line-through') ? 'line-through' : 'none';
+              onChangeMulti(selectedElementIds, 'textDecoration', newState);
+            } else {
+              onChange(element.id, 'textDecoration', 
+                element.textDecoration === 'line-through' ? 'none' : 'line-through'
+              )
+            }
+          }}
+        >
+          S
+        </button>
       </div>
 
       <label>

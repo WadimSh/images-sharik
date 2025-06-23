@@ -22,7 +22,7 @@ export const TextElement = ({
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
   const textContainerRef = useRef(null);
-
+  
   const textStyle = {
     position: 'relative',
     color: element.color || '#333',
@@ -30,15 +30,17 @@ export const TextElement = ({
     fontFamily: element.fontFamily || 'HeliosCond',
     fontWeight: element.fontWeight || 'normal',
     fontStyle: element.fontStyle || 'normal',
+    textDecoration: element.textDecoration || 'none',
+    textAlign: element.textAlign || 'left',
     lineHeight: 1,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
     overflow: 'hidden',
     width: '100%',
     height: '100%',
-    display: 'flex',
-    alignItems: element.textAlign?.vertical || 'flex-start',
-    justifyContent: element.textAlign?.horizontal || 'left',
+    // display: 'flex',
+    // alignItems: element.textAlign?.vertical || 'flex-start',
+    // justifyContent: element.textAlign?.horizontal || 'left',
   };
 
   const handleResize = (newSize) => {

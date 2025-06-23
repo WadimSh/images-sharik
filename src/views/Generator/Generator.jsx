@@ -1390,7 +1390,6 @@ export const Generator = () => {
 
         <div>
           <ElementToolbar onAddElement={handleAddElement} />
-
           <DraggableElementsList 
             elements={elements}
             moveElement={moveElement}

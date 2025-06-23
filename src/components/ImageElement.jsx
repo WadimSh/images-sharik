@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
-import item from '../assets/item.jpg'
+import item from '../assets/fallback.png';
 
 export const ImageElement = ({ 
   contextMenuRef,
