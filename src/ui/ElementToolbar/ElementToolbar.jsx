@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { FaImage, FaFont, FaSquare, FaElementor, FaPuzzlePiece } from 'react-icons/fa';
 
+import { Tooltip } from '../Tooltip/Tooltip';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import './ElementToolbar.css';
 
@@ -18,13 +19,18 @@ export const ElementToolbar = ({ onAddElement }) => {
   return (
     <div className="element-toolbar">
       {tools.map(tool => (
-        <button 
+        <Tooltip 
           key={tool.type}
-          onClick={() => onAddElement(tool.type)}
-          title={t(tool.title)}
+          content={t(tool.title)}
+          position="bottom"
         >
-          <tool.icon size={20} />
-        </button>
+          <button 
+            key={tool.type}
+            onClick={() => onAddElement(tool.type)}
+          >
+            <tool.icon size={20} />
+          </button>
+        </Tooltip>
       ))}
     </div>
   );
