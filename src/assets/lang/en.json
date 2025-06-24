@@ -137,7 +137,8 @@
     "addElement": "Add element",
     "addProduct": "Add product",
     "addBackground": "Add background",
-    "addedBackground": "Background added"
+    "addedBackground": "Background added",
+    "removeImage": "Remove image"
   },
   "elements": {
     "title": "Design сomponents",

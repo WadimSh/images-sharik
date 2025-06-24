@@ -78,18 +78,47 @@ export const PreviewDesign = ({ elements }) => (
                   }} 
                    className="preview-shape" />;
         case 'background':
-          return <div key={element.id} 
+          return (
+            <div key={element.id} style={style}>
+              {/* Цвет/градиент (верхний слой) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  ...(element.gradient 
+                    ? {
+                        backgroundImage: `linear-gradient(${element.gradient.direction}, 
+                          ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
+                          ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+                      }
+                    : {
+                        backgroundColor: element.color || '#ccddea'
+                      }),
+                  opacity: element.opacity,
+                }}
+              />
+              {/* Фоновое изображение (нижний слой) */}
+              {element.backgroundImage && (
+                <img
+                  src={element.backgroundImage}
+                  alt=""
                   style={{
-                   ...style, 
-                   border: 'none',
-                   opacity: element.opacity,
-                   background: element.gradient 
-                               ? `linear-gradient(${element.gradient.direction}, 
-                                 ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}  ${element.gradient.start}%, 
-                                 ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
-                               : element.color,
-                  }} 
-                className="preview-shape" />;
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                  }}
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              )}
+            </div>
+          );
         default:
           return null;
       }

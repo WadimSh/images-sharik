@@ -1162,8 +1162,6 @@ export const Generator = () => {
                     <BackgroundElement 
                       element={element}
                       key={element.id}
-                      color={element.color || '#ccc'} // Добавляем цвет
-                      
                     />
                   );
                 case 'image':
@@ -1410,6 +1408,7 @@ export const Generator = () => {
           />
           <DraggableElementsList 
             elements={elements}
+            setElements={setElements}
             moveElement={moveElement}
             colorInputRef={colorInputRef}
             handleRemoveElement={handleRemoveElement}

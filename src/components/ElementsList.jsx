@@ -1,9 +1,11 @@
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext, useState } from 'react';
+import imageCompression from 'browser-image-compression';
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
+import { LuImageOff, LuImagePlus } from "react-icons/lu";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icons/gr";
@@ -11,9 +13,14 @@ import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icon
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
 import { LanguageContext } from '../contexts/contextLanguage';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
+import { BRAND_COLORS } from '../constants/brandColors';
+import { BRAND_GRADIENT } from '../constants/brandGradient';
+import { BRAND_IMAGES } from '../constants/brandImages';
 
 export const ElementsList = ({
   elements,
+  setElements,
   colorInputRef,
   handleRemoveElement,
   handleFlipImage,
@@ -48,8 +55,147 @@ export const ElementsList = ({
   const elementRefs = useRef(new Map());
   // Создаем Map для хранения refs меню элементов
   const menuRefs = useRef(new Map());
+  // Ref для input загрузки файла для компонента Фон
+  const fileInputRef = useRef();
+  const [currentBackgroundId, setCurrentBackgroundId] = useState(null);
 
   const { t } = useContext(LanguageContext);
+
+  // Функция для извлечения числового значения из строки направления
+  const parseGradientAngle = (direction) => {
+    if (!direction) return 0;
+
+    // Извлекаем число из строк типа "45deg", "to right", "135deg" и т.д.
+    const angleMatch = direction.match(/(\d+)deg/);
+    if (angleMatch) return parseInt(angleMatch[1]);
+
+    // Преобразуем ключевые слова в градусы
+    switch (direction) {
+      case 'to top': return 0;
+      case 'to right': return 90;
+      case 'to bottom': return 180;
+      case 'to left': return 270;
+      default: return 0;
+    }
+  };
+
+  const handleSelectBackground = async (imagePath) => {
+    try {
+      // 1. Находим background элемент в массиве elements
+      const backgroundElement = elements.find(el => el.type === 'background');
+      if (!backgroundElement) {
+        console.error('Background element not found');
+        return;
+      }
+  
+      // 2. Загружаем изображение для получения размеров
+      const img = new Image();
+      img.src = imagePath;
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+  
+      // 3. Обновляем background элемент
+      setElements(prev => prev.map(el => {
+        if (el.id === backgroundElement.id) {
+          return {
+            ...el,
+            backgroundImage: imagePath,
+            originalImageWidth: img.naturalWidth,
+            originalImageHeight: img.naturalHeight,
+            // Сохраняем цвет/градиент для полупрозрачных изображений
+            color: el.color || '#ccddea',
+            gradient: el.gradient || null
+          };
+        }
+        return el;
+      }));
+  
+    } catch (error) {
+      console.error('Error loading background image:', error);
+      alert('Could not set background image');
+    }
+  };
+
+  const handleBackgroundUpload = async (file, setElements, backgroundElementId) => {
+    if (!file) return;
+  
+    try {
+      // Настройки компрессии (оптимизированы для фонов)
+      const options = {
+        maxSizeMB: 1.5, // Чуть больше для фонов
+        maxWidthOrHeight: 2000, // Большее разрешение для фона
+        useWebWorker: true,
+        fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
+        initialQuality: 0.7 // Лучшее качество для фона
+      };
+  
+      // Сжимаем изображение
+      const compressedFile = await imageCompression(file, options);
+      
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const containerHeight = 600; // Фиксированная высота контейнера
+          
+          // Рассчитываем масштаб только по высоте
+          const scale = containerHeight / img.height;
+          
+          // Новые размеры с сохранением пропорций
+          const newHeight = containerHeight;
+          const newWidth = img.width * scale;
+  
+          setElements(prev => prev.map(el => {
+            if (el.id === backgroundElementId) {
+              return {
+                ...el,
+                backgroundImage: event.target.result,
+                originalImageWidth: img.width,
+                originalImageHeight: img.height,
+                imageScale: scale,
+                width: newWidth, // Обновляем ширину элемента
+                height: newHeight
+              };
+            }
+            return el;
+          }));
+        };
+        img.onerror = () => alert('Background image loading error');
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(compressedFile);
+  
+    } catch (error) {
+      console.error('Error loading background image:', error);
+      alert('Could not set background image');
+    }
+  };
+
+  const handleRemoveBackgroundImage = (elementId, setElements) => {
+    setElements(prev => prev.map(el => {
+      if (el.id === elementId) {
+        // Создаем новый объект без backgroundImage, но сохраняем все остальные свойства
+        const updatedElement = {
+          ...el,
+          backgroundImage: null,
+          originalImageWidth: undefined,
+          originalImageHeight: undefined,
+          imageScale: undefined
+        };
+        
+        // Удаляем ненужные свойства (опционально)
+        delete updatedElement.originalImageWidth;
+        delete updatedElement.originalImageHeight;
+        delete updatedElement.imageScale;
+        
+        return updatedElement;
+      }
+      return el;
+    }));
+  };
 
   // Эффект для прокрутки к выделенному элементу
   useEffect(() => {
@@ -184,9 +330,9 @@ export const ElementsList = ({
                   />
                   <span style={{alignSelf: 'center'}}>
                     {element.type === 'text' && '📝 '}
-                    {(element.type === 'image' || element.type === 'element') && (
+                    {(element.type === 'image' || element.type === 'element' || (element.type === 'background' && element.backgroundImage)) && (
                       <img 
-                        src={element.image}
+                        src={element.image || element.backgroundImage}
                         style={{
                           width: '30px',
                           height: '30px',
@@ -198,7 +344,7 @@ export const ElementsList = ({
                         alt="alt"
                       />
                     )}
-                    {(element.type === 'shape' || element.type === 'background') && (
+                    {(element.type === 'shape' || (element.type === 'background' && !element.backgroundImage)) && (
                       <div 
                         style={{
                           width: '30px',
@@ -355,7 +501,67 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {(element.type === 'shape' || element.type === 'background' ) && (
+                  {element.type === 'background' && (
+                    <div className="element-controls">
+                      <span>{t('elements.subtitleColor')}</span>
+                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
+                        {BRAND_COLORS.map(brand => (
+                          <Tooltip 
+                          key={brand.title}
+                          content={brand.title}
+                          position={brand.position || 'bottom'}
+                        >
+                          <button 
+                            onClick={() => {
+                              setElements(prev => 
+                                prev.map(el => 
+                                  el.id === element.id 
+                                    ? { ...el, color: brand.color, gradient: null } 
+                                    : el
+                                )
+                              );
+                            }}
+                            style={{ 
+                              background: brand.color,
+                              border: element?.color === brand.color && "2px solid #2196F3",
+                            }}
+                            className="color-button"
+                          />
+                          </Tooltip>
+                        ))}
+                      </div>
+
+                      <div className="color-control">
+                        <MdOpacity
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                          }}
+                        />
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={element.opacity || 1}
+                            onChange={(e) => handleoOpacityChange(element.id, e.target.value)}
+                          />
+                          <span>{(element.opacity || 1).toFixed(1)}</span>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleColorButtonClick(element.id);
+                        }}
+                        className="remove-bg-button"
+                      >
+                        <><IoColorPaletteOutline /> {t('views.generatorMenuChangeColor')}</>
+                      </button>
+                    </div>
+                  )}
+
+                  {element.type === 'shape' && (
                     <div className="element-controls">
                       <span>{t('elements.subtitleColor')}</span>
                       <div className="color-control">
@@ -468,7 +674,192 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {(element.type === 'shape' || element.type === 'background') && (
+                  {element.type === 'background' && (
+                    <div className="element-controls line">
+                      <span>{t('elements.subtitleGradient')}</span>
+                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
+                        {BRAND_GRADIENT.map(brand => (
+                          <Tooltip 
+                          key={brand.title}
+                          content={brand.title}
+                          position={brand.position || 'bottom'}
+                        >
+                          <button 
+                            onClick={() => {
+                              setElements(prev => prev.map(el => {
+                                if (el.id === element.id) {
+                                  return {
+                                    ...el,
+                                    // Сбрасываем цвет, если был задан ранее
+                                    color: null,
+                                    // Устанавливаем градиент из выбранного бренда
+                                    gradient: {
+                                      direction: brand.direction || 'to right', // Направление из BRAND_GRADIENT
+                                      colors: brand.color,                      // Цвета из BRAND_GRADIENT
+                                      opacity: [1, 1],                         // Фиксированная прозрачность
+                                      start: 0,
+                                    },
+                                  };
+                                }
+                                return el;
+                              }));
+                              
+                            }}
+                            style={{ 
+                              background: `linear-gradient(${brand.direction}, ${brand.color[0]}, ${brand.color[1]})`,
+                              border: element?.gradient?.colors?.join() === brand.color.join() && "2px solid #2196F3",
+                            }}
+                            className="color-button"
+                          />
+                          </Tooltip>
+                        ))}
+                      </div>
+
+                      <div className="gradient-controls">
+                        {/* Выбор направления */}
+                        <div className="direction-buttons">
+                          <button
+                            onClick={() => handleGradientChange(element.id, 'direction', 'to right')}
+                            className={element.gradient?.direction === 'to right' ? 'active' : ''}
+                          >
+                            →
+                          </button>
+                          <button
+                            onClick={() => handleGradientChange(element.id, 'direction', 'to left')}
+                            className={element.gradient?.direction === 'to left' ? 'active' : ''}
+                          >
+                            ←
+                          </button>
+                          <button
+                            onClick={() => handleGradientChange(element.id, 'direction', 'to bottom')}
+                            className={element.gradient?.direction === 'to bottom' ? 'active' : ''}
+                          >
+                            ↓
+                          </button>
+                          <button
+                            onClick={() => handleGradientChange(element.id, 'direction', 'to top')}
+                            className={element.gradient?.direction === 'to top' ? 'active' : ''}
+                          >
+                            ↑
+                          </button>
+                        </div>
+
+                        <div className="font-controls">
+                          <label>
+                            {t('elements.subtitleRotation')}, deg:
+                            <input
+                              type="number"
+                              min="0"
+                              max="360"
+                              step="1"
+                              value={parseGradientAngle(element.gradient?.direction) || 0}
+                              onChange={(e) => {
+                                const degrees = parseInt(e.target.value);
+                                handleGradientChange(
+                                  element.id, 
+                                  'direction', 
+                                  `${degrees}deg` // Преобразуем в CSS-формат (например "45deg")
+                                );
+                              }}
+                            />
+                          </label>
+                        </div>
+
+                        <div className="opacity-control">
+                          <label>{t('elements.labelPointStart')}</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={element.gradient?.start || 0}
+                            onChange={(e) => handleGradientChange(element.id, 'start', e.target.value)}
+                          />
+                          <span>{(element.gradient?.start || 0)} %</span>
+                        </div>
+                        {/* Выбор цветов */}
+                        <div className="opacity-control">
+                          <label>{t('elements.subtitleColor')} 1:</label>
+                          <input
+                            type="color"
+                            value={element.gradient?.colors?.[0] || '#000000'}
+                            onChange={(e) => handleGradientChange(element.id, 'color1', e.target.value)}
+                          />
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={element.gradient?.opacity?.[0] || 1}
+                            onChange={(e) => handleGradientChange(element.id, 'opacity1', e.target.value)}
+                          />
+                          <span>{(element.gradient?.opacity?.[0] || 1).toFixed(1)}</span>
+                        </div>
+
+                        <div className="opacity-control">
+                          <label>{t('elements.subtitleColor')} 2:</label>
+                          <input
+                            type="color"
+                            value={element.gradient?.colors?.[1] || '#ffffff'}
+                            onChange={(e) => handleGradientChange(element.id, 'color2', e.target.value)}
+                          />
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={element.gradient?.opacity?.[1] || 0}
+                            onChange={(e) => handleGradientChange(element.id, 'opacity2', e.target.value)}
+                          />
+                          <span>{(element.gradient?.opacity?.[1] || 0).toFixed(1)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {element.type === 'background' && (
+                    <div className="element-controls line">
+                      <span>{t('elements.labelImage')}</span>
+                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
+                        {BRAND_IMAGES.map((img, index) => (
+                          <div 
+                            key={index}
+                            className="images-brand"
+                            onClick={() => handleSelectBackground(img)}
+                          >
+                            <img 
+                              src={img} 
+                              alt={`Decoration ${index + 1}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentBackgroundId(element.id);
+                          fileInputRef.current.click();
+                        }}
+                        className="remove-bg-button"
+                      >
+                        <><LuImagePlus /> {t('ui.addImage')}</>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveBackgroundImage(element.id, setElements);
+                        }}
+                        className="remove-button"
+                        disabled={!element.backgroundImage}
+                      >
+                        <><LuImageOff /> {t('ui.removeImage')}</>
+                      </button>
+                    </div>
+                  )}
+
+                  {element.type === 'shape' && (
                     <div className="element-controls line">
                       <span>{t('elements.subtitleGradient')}</span>
                       <div className="gradient-controls">
@@ -500,7 +891,27 @@ export const ElementsList = ({
                           </button>
                         </div>
 
-                        {/* Выбор цветов */}
+                        <div className="font-controls">
+                          <label>
+                            {t('elements.subtitleRotation')}, deg:
+                            <input
+                              type="number"
+                              min="0"
+                              max="360"
+                              step="1"
+                              value={parseGradientAngle(element.gradient?.direction) || 0}
+                              onChange={(e) => {
+                                const degrees = parseInt(e.target.value);
+                                handleGradientChange(
+                                  element.id, 
+                                  'direction', 
+                                  `${degrees}deg` // Преобразуем в CSS-формат (например "45deg")
+                                );
+                              }}
+                            />
+                          </label>
+                        </div>
+
                         <div className="opacity-control">
                           <label>{t('elements.labelPointStart')}</label>
                           <input
@@ -513,6 +924,7 @@ export const ElementsList = ({
                           />
                           <span>{(element.gradient?.start || 0)} %</span>
                         </div>
+                        {/* Выбор цветов */}
                         <div className="opacity-control">
                           <label>{t('elements.subtitleColor')} 1:</label>
                           <input
@@ -530,6 +942,7 @@ export const ElementsList = ({
                           />
                           <span>{(element.gradient?.opacity?.[0] || 1).toFixed(1)}</span>
                         </div>
+
                         <div className="opacity-control">
                           <label>{t('elements.subtitleColor')} 2:</label>
                           <input
@@ -806,6 +1219,17 @@ export const ElementsList = ({
           height: 0,
           width: 0 
         }}
+      />
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        onChange={(e) => handleBackgroundUpload(
+          e.target.files[0], 
+          setElements, 
+          currentBackgroundId
+        )} 
+        accept="image/*"
+        style={{ display: 'none' }}
       />
     </div>
   );

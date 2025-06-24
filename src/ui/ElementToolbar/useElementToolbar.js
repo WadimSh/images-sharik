@@ -11,8 +11,8 @@ export const useElementToolbar = (
           id: Date.now() + Math.floor(Math.random() * 1000),
           type: 'background',
           position: { x: 0, y: 0 },
-          width: 450,
-          height: 600,
+          width: 451,
+          height: 601,
           color: '#ccddea'
         };
         setElements(prev => [newBackgroundElement, ...prev]);

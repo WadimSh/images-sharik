@@ -137,7 +137,8 @@
     "addElement": "Добавить элемент",
     "addProduct": "Добавить товар",
     "addBackground": "Добавить фон",
-    "addedBackground": "Фон добавлен"
+    "addedBackground": "Фон добавлен",
+    "removeImage": "Удалить изображение"
   },
   "elements": {
     "title": "Компоненты дизайна",

@@ -137,7 +137,8 @@
     "addElement": "Element hinzufügen",
     "addProduct": "Produkt hinzufügen",
     "addBackground": "Hintergrund hinzufügen",
-    "addedBackground": "Hintergrund hinzugefügt"
+    "addedBackground": "Hintergrund hinzugefügt",
+    "removeImage": "Bild entfernen"
   },
   "elements": {
     "title": "Design-Komponenten",
