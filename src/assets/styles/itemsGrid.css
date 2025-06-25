@@ -201,6 +201,10 @@
   font-size: calc(12px + 0.5vw - 0.5vh);
   aspect-ratio: 3/4;
   box-sizing: border-box;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .preview-container {
@@ -231,15 +235,6 @@
 .preview-shape {
   border: 1px solid rgba(0,0,0,0.1);
   box-sizing: border-box;
-}
-
-.item-content {
-  aspect-ratio: 3/4;
-  position: relative;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
 }
 
 .new-design-card {

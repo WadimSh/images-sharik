@@ -1,4 +1,5 @@
 import { hexToRgba } from "../utils/hexToRgba";
+import img from "../assets/fallback.png";
 
 export const PreviewDesign = ({ elements }) => (
   <div className="preview-container">
@@ -14,7 +15,7 @@ export const PreviewDesign = ({ elements }) => (
       };
       switch (element.type) {
         case 'image':
-          return <img key={element.id} src={element.image} alt="preview" 
+          return <img key={element.id} src={element.image === "{{ITEM_IMAGE}}" ? img : element.image} alt="preview" 
                    style={{
                     ...style,
                     objectFit: 'cover',
