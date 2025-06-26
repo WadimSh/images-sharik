@@ -1,29 +1,320 @@
-.form-group {
-  margin-bottom: 1rem;
+.template-page {
+  overflow: hidden;
+  height: 100vh;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
+.template-wrapper {
+  padding: 10px;
+  height: calc(100vh - 60px);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.template-instruction {
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  margin: 5% 0 3%;
+  width: 650px;
+}
+
+/* Стили для контейнера с карточками */
+.scroll-container-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: flex-start;
+  overflow-x: auto;
+  width: 100%;
+  padding: 20px 0;
+  box-sizing: border-box;
+  gap: 15px;
+  cursor: grab;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cards-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cards-container::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0 40px;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 3px;
+}
+
+.card-wrapper {
+  flex-shrink: 0;
+  width: 270px;
+  height: 360px;
+  scroll-snap-align: start;
+}
+
+/* Кнопки прокрутки */
+.scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(255,255,255,0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.scroll-button.left {
+  left: 0;
+}
+
+.scroll-button.right {
+  right: 0;
+}
+
+/* Тени */
+.shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.shadow.left {
+  left: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+.shadow.right {
+  right: 0;
+  background: linear-gradient(270deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%);
+}
+
+.shadow:not(.visible) {
+  background: none !important;
+}
+
+/* Стили для пустого состояния */
+.empty-state-image {
+  width: 264px;
+  height: 264px;
+  margin-top: 5%;
+}
+
+.empty-state-message {
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  margin-bottom: 16px;
+  width: 550px;
+}
+
+.modal-content.download-modal-content {
+  width: 500px;
+  max-width: 90vw;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.form-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-select {
+  min-width: 220px;
+}
+
+.required-star {
+  color: red;
+  margin-left: 4px;
 }
 
 .preview-filename {
-  margin: 1rem 0;
-  padding: 0.5rem;
+  margin: 1.5rem 0;
+  padding: 0.75rem;
   background: #f5f5f5;
   border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.preview-filename small {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #666;
+}
+
+.buttons-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .download-btn {
-  background: #4CAF50;
+  background: #007bff;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.download-btn:hover {
+  background: #0056b3;
 }
 
 .download-btn:disabled {
   background: #cccccc;
   cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.status-message {
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.status-message.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-message.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.button-delete {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: rgba(143, 143, 143, 0.4);
+  color: #333;
+  border: 1px solid #333;
+  border-radius: 2px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 2;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item:hover .button-delete {
+  opacity: 1;
+}
+
+.button-delete:hover {
+  color: #fff;
+  border: 1px solid #cc0000;
+  background: #cc0000;
+}
+
+.item-wrapper {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 270px;
+  height: 360px;
+}
+
+.draggable-card {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.draggable-card.dragging {
+  opacity: 0.5;
+  transform: scale(1.05);
+}
+
+.card-item {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 270px;
+  height: 360px;
+  position: relative;
+}
+
+.card-preview-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  font-size: calc(12px + 0.5vw - 0.5vh);
+  aspect-ratio: 3/4;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.card-preview-container[data-dragging="true"] {
+  cursor: grabbing;
 }

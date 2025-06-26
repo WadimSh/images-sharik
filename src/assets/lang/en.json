@@ -17,7 +17,9 @@
     "wbCollage": "WB Collage",
     "ozonCollage": "OZON Collage",
     "mainSlide": "Main slide",
-    "slideNumber": "Slide"
+    "slideNumber": "Slide",
+    "addLayout": "Add layout",
+    "downloadLayout": "Create template"
   },
   "grid": {
     "belbal": "Belbal (3 slides)",
@@ -124,7 +126,10 @@
     "generatorMenuRemoveBackground": "Remove background",
     "generatorMenuChangeColor": "Change color",
     "generatorMenuDelete": "Delete (Del)",
-    "generatorMessageInput": "Drag and drop an image here"
+    "generatorMessageInput": "Drag and drop an image here",
+    "templateMessageCreating": "To create your template, simply rearrange cards, remove unnecessary ones or add new layouts.",
+    "templateMessageStarted": "To create a template, you need to add several layouts. Start by clicking the button.",
+    "templateStartedButton": "Add layouts"
   },
   "ui": {
     "ru": "Russian",
@@ -175,10 +180,22 @@
     "upload": "Upload",
     "delete": "Delete",
     "edit": "Edit",
+    "download": "Download",
     "preview": "Preview",
     "loading": "Loading...",
     "addProduct": "Add product",
-    "titleImageLibrary": "Image library"
+    "titleImageLibrary": "Image library",
+    "titleTemplateDownload": "Download Template",
+    "successMessageDownload": "File successfully created and downloaded!",
+    "errorMessageDownload": "An error occurred while creating the file!",
+    "labelSelectedCategory": "Select Product Category",
+    "labelSelectedBrand": "Select Brand",
+    "labelPreviewFilename": "Generated Filename:",
+    "titleLayoutChoose": "Select required layouts",
+    "warningMessageLimit": "You haven't created any card design layouts yet. Return to the editor and create several variants. This will allow you to use them for template development.",
+    "labelCounter": "Selected layouts:",
+    "addIntoTemplate": "Add to template",
+    "titlePIN": "Enter PIN code"
   },
   "template": {
     "create": "Create template",

@@ -41,23 +41,11 @@ const DraggableCard = ({ item, index, moveCard, handleDelete }) => {
   return (
     <div
       ref={ref}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        transform: isDragging ? 'scale(1.05)' : 'scale(1)',
-        transition: 'transform 0.2s ease',
-        flexShrink: 0,
-      }}
+      className={`draggable-card ${isDragging ? 'dragging' : ''}`}
     >
-      <div 
-        className="item-card" 
-        style={{ 
-          flexDirection: 'column', 
-          width: '270px', 
-          height: '360px',
-        }}
-      >
+      <div className="item card-item">
         <button
-          className="delete-button"
+          className="button-delete"
           onClick={(e) => {
             e.stopPropagation();
             handleDelete(item);
@@ -66,22 +54,7 @@ const DraggableCard = ({ item, index, moveCard, handleDelete }) => {
           ×
         </button>
 
-        <div style={{ 
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
-          fontSize: 'calc(12px + 0.5vw - 0.5vh)',
-          aspectRatio: '3/4',
-          boxSizing: 'border-box',
-          background: 'white',
-          borderRadius: '8px',
-          overflow: 'hidden',
-          cursor: isDragging ? 'grabbing' : 'grab' 
-          }}
-        >
+        <div className="card-preview-container" data-dragging={isDragging}>
           <PreviewDesign elements={item} />
         </div>
       </div>

@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+
+import { LanguageContext } from "../contexts/contextLanguage";
 import { CustomSelect } from "../ui/CustomSelect/CustomSelect";
 
 export const DownloadModal = ({ isOpen, onClose, template }) => {
+  const { t } = useContext(LanguageContext);
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
+  const [status, setStatus] = useState(null); // 'success' | 'error' | null
 
   const brands = {
     agura: "Agura",
@@ -128,94 +133,129 @@ export const DownloadModal = ({ isOpen, onClose, template }) => {
   };
   
   const handleExportTemplate = () => {
-    if (template.length === 0) return;
+    if (template.length === 0 || !selectedCategory) return;
     
-    // Формируем имя файла
-    let fileNameParts = [];
-    
-    if (selectedCategory) {
-      fileNameParts.push(selectedCategory);
-    }
-    
-    if (selectedBrand) {
-      fileNameParts.push(selectedBrand);
-    }
-    
-    fileNameParts.push("template");
-    const fileName = fileNameParts.join("-") + ".json";
-    
-    // Создаем JSON строку
-    const json = JSON.stringify(template, null, 2);
-    
-    // Создаем Blob и ссылку для скачивания
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    
-    // Очистка
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      // Формируем имя файла
+      let fileNameParts = [];
+      
+      if (selectedCategory) {
+        fileNameParts.push(selectedCategory);
+      }
+      
+      if (selectedBrand) {
+        fileNameParts.push(selectedBrand);
+      }
+      
+      fileNameParts.push("template");
+      const fileName = fileNameParts.join("-") + ".json";
+      
+      // Создаем JSON строку
+      const json = JSON.stringify(template, null, 2);
+      
+      // Создаем Blob и ссылку для скачивания
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Очистка
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-    handleClose();
+      setStatus('success');
+      setTimeout(() => {
+        handleClose();
+        setStatus(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Export error:', error);
+      setStatus('error');
+      setTimeout(() => setStatus(null), 2000);
+    }
   };
 
   const handleClose = () => {
     setSelectedCategory("");
     setSelectedBrand("");
+    setStatus(null);
     onClose();
   };
 
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`} onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content download-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Скачать шаблон</h3>
+          <h3 className="no-margin">{t('modals.titleTemplateDownload')}</h3>
           <button onClick={handleClose} className="close-btn">&times;</button>
         </div>
 
         <div className="modal-body">
-          <div className="form-group">
-            <label>Категория продукта (обязательно)</label>
-            <CustomSelect
-              options={productCategories}
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Бренд (необязательно)</label>
-            <CustomSelect
-              options={brands}
-              value={selectedBrand}
-              onChange={setSelectedBrand}
-            />
-          </div>
-          
-          <div className="preview-filename">
-            <small>Имя файла:</small>
-            <div>
-              {selectedCategory || "не выбрано"}
-              {selectedBrand && `-${selectedBrand}`}
-              -template.json
+          {status === 'success' ? (
+            <div className="status-message success">
+              {t('modals.successMessageDownload')}
             </div>
-          </div>
+          ) : status === 'error' ? (
+            <div className="status-message error">
+              {t('modals.errorMessageDownload')}
+            </div>
+          ) : (
+            <>
+              <div className="form-row">
+                <label className="form-label">
+                  {t('modals.labelSelectedCategory')}<span className="required-star">*</span>
+                </label>
+                <CustomSelect
+                  options={productCategories}
+                  value={selectedCategory}
+                  onChange={setSelectedCategory}
+                  className="form-select"
+                />
+              </div>
+              
+              <div className="form-row">
+                <label className="form-label">{t('modals.labelSelectedBrand')}</label>
+                <CustomSelect
+                  options={brands}
+                  value={selectedBrand}
+                  onChange={setSelectedBrand}
+                  className="form-select"
+                />
+              </div>
+              
+              <div className="preview-filename">
+                <small>{t('modals.labelPreviewFilename')}</small>
+                <div>
+                  {selectedCategory || "..."}
+                  {selectedBrand && `-${selectedBrand}`}
+                  -template.json
+                </div>
+              </div>
+            </>
+          )}
         </div>
         
-        <div className="modal-footer">
-          <button 
-            onClick={handleExportTemplate} 
-            disabled={!selectedCategory || template.length === 0}
-            className="download-btn"
-          >
-            Скачать
-          </button>
-        </div>
+        {!status && (
+          <div className="modal-footer buttons-group">
+            <button 
+              onClick={handleClose}
+              className="cancel-btn"
+            >
+              {t('modals.cancel')}
+            </button>
+            <button 
+              onClick={handleExportTemplate} 
+              disabled={!selectedCategory || template.length === 0}
+              className="download-btn"
+            >
+              {t('modals.download')}
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

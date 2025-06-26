@@ -9,11 +9,13 @@ import DraggableCard from '../../components/DraggableCard';
 import { DownloadModal } from '../../components/DownloadModal';
 import { SelectionTemplatesModal } from '../../components/SelectionTemplatesModal';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { useAuth } from '../../contexts/AuthContext';
 import img from '../../assets/illustrations.png';
 
 export const Template = () => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
+  const { logout } = useAuth();
 
   const scrollContainerRef = useRef(null);
   const [showLeftShadow, setShowLeftShadow] = useState(false);
@@ -25,6 +27,7 @@ export const Template = () => {
   const [template, setTemplate] = useState([]);
 
   const handleBack = () => {
+    logout();
     navigate(-1);
   };
 
@@ -113,112 +116,48 @@ export const Template = () => {
   
   return (
     <DndProvider backend={HTML5Backend}>
-    <div style={{ overflow: 'hidden', height: '100vh' }}>
+    <div className="template-page">
       <div className='header-section' style={{ margin: '10px'}}>
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
           <HiOutlineChevronLeft /> {t('header.back')}
         </button>
         <h2 style={{ color: '#333'}}>{t('header.tempSubtitle')}</h2>
-        {template.length !== 0 && <><button onClick={() => setIsModal(true)} className="template-button">
-          <FaClipboardCheck /> Добавить макет
-        </button>
-        <button onClick={() => setIsDownload(true)} className="download-button">
-          <><FaDownload /> Создать шаблон</>
-        </button></>}
+        {template.length !== 0 && <>
+          <button onClick={() => setIsModal(true)} className="template-button">
+            <FaClipboardCheck /> {t('header.addLayout')}
+          </button>
+          <button onClick={() => setIsDownload(true)} className="download-button">
+            <FaDownload /> {t('header.downloadLayout')}
+          </button>
+        </>}
       </div>
 
-      <div 
-        className="content-wrapper" 
-        style={{
-            padding: '10px',
-            height: 'calc(100vh - 60px)', // Учитываем высоту шапки
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            overflow: 'hidden',
-            position: 'relative',
-            boxSizing: 'border-box'
-          }}
-      >
+      <div className="content-wrapper template-wrapper">
         {template.length !== 0 ? (<>
-          <span style={{ fontSize: '18px', lineHeight: '1.2', textAlign: 'center', marginTop: '5%', marginBottom: '3%' }}>
-            Для создания необходимого шаблона, просто меняйте местами карточки,<br/> убирайте ненужные или добавляйте новые макеты.
+          <span className="template-instruction">
+            {t('views.templateMessageCreating')}
           </span>
-          <div style={{ 
-            position: 'relative',
-            width: '100%',
-            padding: '0 40px', // Увеличили отступы для кнопок
-            boxSizing: 'border-box'
-          }}>
+          <div className="scroll-container-wrapper">
             {/* Кнопка прокрутки влево */}
             {isScrollable && showLeftShadow && (
               <button 
                 onClick={() => scrollBy('left')}
-                style={{
-                  position: 'absolute',
-                  left: '0',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  zIndex: 2,
-                  background: 'rgba(255,255,255,0.8)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                  cursor: 'pointer'
-                }}
+                className="scroll-button left"
               >
                 <FaChevronLeft />
               </button>
             )}
 
-
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            style={{ 
-              display: 'flex',
-              justifyContent: 'flex-start',
-              overflowX: 'auto',
-              width: '100%',
-              padding: '20px 0',
-              boxSizing: 'border-box',
-              gap: '15px',
-              cursor: 'grab',
-              scrollBehavior: 'smooth',
-              scrollbarWidth: 'thin',
-              scrollbarColor: '#888 transparent',
-              WebkitOverflowScrolling: 'touch', // Для плавного скролла на iOS
-              msOverflowStyle: 'none',
-              '&::-webkit-scrollbar': {
-                height: '6px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-                margin: '0 40px'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#888',
-                borderRadius: '3px',
-              }
-            }}
+            className="cards-container"
           >
           {template.map((temp, index) => (
             <div 
               key={index} 
-              style={{ 
-                flexShrink: 0,
-                width: '270px',
-                height: '360px',
-                scrollSnapAlign: 'start',
-                marginLeft: index === 0 ? '0px' : '0'
-              }}
+              className="card-wrapper"
+              style={{ marginLeft: index === 0 ? '0px' : '0' }}
             >
               <DraggableCard
                 index={index}
@@ -234,61 +173,23 @@ export const Template = () => {
             {isScrollable && showRightShadow && (
                 <button 
                   onClick={() => scrollBy('right')}
-                  style={{
-                    position: 'absolute',
-                    right: '0',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 2,
-                    background: 'rgba(255,255,255,0.8)',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                    cursor: 'pointer'
-                  }}
+                  className="scroll-button right"
                 >
                   <FaChevronRight />
                 </button>
               )}
 
               {/* Динамические тени */}
-              <div style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: '30px',
-                background: showLeftShadow 
-                  ? 'linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%)' 
-                  : 'none',
-                pointerEvents: 'none',
-                transition: 'background 0.3s ease'
-              }}></div>
-              <div style={{
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: '30px',
-                background: showRightShadow 
-                  ? 'linear-gradient(270deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%)' 
-                  : 'none',
-                pointerEvents: 'none',
-                transition: 'background 0.3s ease'
-              }}></div>
+              <div className={`shadow left ${showLeftShadow ? 'visible' : ''}`}></div>
+              <div className={`shadow right ${showRightShadow ? 'visible' : ''}`}></div>
             </div>
-            </>): (<>
-        <img src={img} style={{ width: '264px', height: '264px', marginTop: '5%' }} />
-        <span style={{ fontSize: '18px', lineHeight: '1.2', textAlign: 'center', marginBottom: '16px' }}>
-          Для создания шаблона нужно добавить несколько макетов.<br/> Начните с нажатия кнопки.
+          </>): (<>
+        <img src={img} className="empty-state-image" />
+        <span className="empty-state-message">
+          {t('views.templateMessageStarted')}
         </span>
         <button onClick={() => setIsModal(true)} className="download-button">
-          Добавить макеты
+          {t('views.templateStartedButton')}
         </button>
         </>)}
       </div>

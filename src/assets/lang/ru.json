@@ -17,7 +17,9 @@
     "wbCollage": "Коллаж для WB",
     "ozonCollage": "Коллаж для OZON",
     "mainSlide": "Основной слайд",
-    "slideNumber": "Слайд"
+    "slideNumber": "Слайд",
+    "addLayout": "Добавить макет",
+    "downloadLayout": "Создать шаблон"
   },
   "grid": {
     "belbal": "Belbal (3 слайда)",
@@ -124,7 +126,10 @@
     "generatorMenuRemoveBackground": "Удалить фон",
     "generatorMenuChangeColor": "Изменить цвет",
     "generatorMenuDelete": "Удалить (Del)",
-    "generatorMessageInput": "Перетащите изображение сюда"
+    "generatorMessageInput": "Перетащите изображение сюда",
+    "templateMessageCreating": "Для создания необходимого шаблона, просто меняйте местами карточки, убирайте ненужные или добавляйте новые макеты.",
+    "templateMessageStarted": "Для создания шаблона нужно добавить несколько макетов. Начните с нажатия кнопки.",
+    "templateStartedButton": "Добавить макеты"
   },
   "ui": {
     "ru": "Русский",
@@ -175,10 +180,22 @@
     "upload": "Загрузить",
     "delete": "Удалить",
     "edit": "Редактировать",
+    "download": "Скачать",
     "preview": "Предпросмотр",
     "loading": "Загрузка...",
     "addProduct": "Добавить товар",
-    "titleImageLibrary": "Библиотека изображений"
+    "titleImageLibrary": "Библиотека изображений",
+    "titleTemplateDownload": "Скачать шаблон",
+    "successMessageDownload": "Файл успешно создан и скачан!",
+    "errorMessageDownload": "Произошла ошибка при создании файла!",
+    "labelSelectedCategory": "Выберите товарную номенклатуру",
+    "labelSelectedBrand": "Выберите бренд",
+    "labelPreviewFilename": "Имя создаваемого файла:",
+    "titleLayoutChoose": "Выберите необходимые макеты",
+    "warningMessageLimit": "Вы пока не создали ни одного макета для дизайна карточки. Вернитесь в редактор и создайте несколько вариантов. Это позволит вам использовать их для разработки шаблонов.",
+    "labelCounter": "Выбрано макетов:",
+    "addIntoTemplate": "Добавить в шаблон",
+    "titlePIN": "Введите PIN-код"
   },
   "template": {
     "create": "Создать макет",

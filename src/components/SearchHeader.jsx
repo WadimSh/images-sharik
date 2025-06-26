@@ -4,7 +4,7 @@ import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 import { MdCreateNewFolder } from "react-icons/md";
 
-
+import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
 import { db, productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
@@ -26,6 +26,8 @@ const SearchHeader = ({
   const headerRightRef = useRef(null);
   const [hasKeys, setHasKeys] = useState(false);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -113,7 +115,7 @@ const SearchHeader = ({
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
         {
-          <button onClick={handleCreateTamplete} className="creat-temp-button">
+          <button onClick={() => setIsPinModalOpen(true)} className="creat-temp-button">
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         }
@@ -192,6 +194,12 @@ const SearchHeader = ({
           <IoFolderOpen /> {t('header.gallery')}
         </button>
       </div>}
+      {isPinModalOpen && (
+        <PinModal 
+        isOpen={isPinModalOpen} 
+        onClose={() => setIsPinModalOpen(false)} 
+      />
+      )}
     </div>
   );
 };

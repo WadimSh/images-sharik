@@ -17,7 +17,9 @@
     "wbCollage": "WB-Collage",
     "ozonCollage": "OZON-Collage",
     "mainSlide": "Hauptfolie",
-    "slideNumber": "Folie"
+    "slideNumber": "Folie",
+    "addLayout": "Layout hinzufügen",
+    "downloadLayout": "Vorlage erstellen"
   },
   "grid": {
     "belbal": "Belbal (3 Folien)",
@@ -124,7 +126,10 @@
     "generatorMenuRemoveBackground": "Hintergrund entfernen",
     "generatorMenuChangeColor": "Farbe ändern",
     "generatorMenuDelete": "Löschen (Entf)",
-    "generatorMessageInput": "Bild hierher ziehen"
+    "generatorMessageInput": "Bild hierher ziehen",
+    "templateMessageCreating": "Um Ihre Vorlage zu erstellen, ordnen Sie einfach Karten neu an, entfernen Sie unnötige oder fügen Sie neue Layouts hinzu.",
+    "templateMessageStarted": "Um eine Vorlage zu erstellen, müssen Sie mehrere Layouts hinzufügen. Beginnen Sie mit einem Klick auf die Schaltfläche.",
+    "templateStartedButton": "Layouts hinzufügen"
   },
   "ui": {
     "ru": "Russisch",
@@ -175,10 +180,22 @@
     "upload": "Hochladen",
     "delete": "Löschen",
     "edit": "Bearbeiten",
+    "download": "Herunterladen",
     "preview": "Vorschau",
     "loading": "Wird geladen...",
     "addProduct": "Produkt hinzufügen",
-    "titleImageLibrary": "Bildbibliothek"
+    "titleImageLibrary": "Bildbibliothek",
+    "titleTemplateDownload": "Vorlage herunterladen",
+    "successMessageDownload": "Datei erfolgreich erstellt und heruntergeladen!",
+    "errorMessageDownload": "Fehler beim Erstellen der Datei!",
+    "labelSelectedCategory": "Produktkategorie wählen",
+    "labelSelectedBrand": "Marke wählen",
+    "labelPreviewFilename": "Generierter Dateiname:",
+    "titleLayoutChoose": "Erforderliche Layouts auswählen",
+    "warningMessageLimit": "Sie haben noch keine Kartenlayouts erstellt. Kehren Sie zum Editor zurück und erstellen Sie mehrere Varianten. So können Sie diese für die Vorlagenentwicklung nutzen.",
+    "labelCounter": "Ausgewählte Layouts:",
+    "addIntoTemplate": "Zu Vorlage hinzufügen",
+    "titlePIN": "PIN-Code eingeben"
   },
   "template": {
     "create": "Vorlage erstellen",

@@ -17,7 +17,9 @@
     "wbCollage": "Collage per WB",
     "ozonCollage": "Collage per OZON",
     "mainSlide": "Slide principale",
-    "slideNumber": "Slide"
+    "slideNumber": "Slide",
+    "addLayout": "Aggiungi layout",
+    "downloadLayout": "Crea modello"
   },
   "grid": {
     "belbal": "Belbal (3 diapo)",
@@ -124,7 +126,10 @@
     "generatorMenuRemoveBackground": "Rimuovi sfondo",
     "generatorMenuChangeColor": "Cambia colore",
     "generatorMenuDelete": "Elimina (Del)",
-    "generatorMessageInput": "Trascina un'immagine qui"
+    "generatorMessageInput": "Trascina un'immagine qui",
+    "templateMessageCreating": "Per creare il tuo modello, riorganizza le carte, rimuovi quelle non necessarie o aggiungi nuovi layout.",
+    "templateMessageStarted": "Per creare un modello, devi aggiungere diversi layout. Inizia cliccando il pulsante.",
+    "templateStartedButton": "Aggiungi layout"
   },
   "ui": {
     "ru": "Russo",
@@ -175,10 +180,22 @@
     "upload": "Carica",
     "delete": "Elimina",
     "edit": "Modifica",
+    "download": "Scarica",
     "preview": "Anteprima",
     "loading": "Caricamento...",
     "addProduct": "Aggiungi prodotto",
-    "titleImageLibrary": "Libreria immagini"
+    "titleImageLibrary": "Libreria immagini",
+    "titleTemplateDownload": "Scarica Modello",
+    "successMessageDownload": "File creato e scaricato con successo!",
+    "errorMessageDownload": "Si è verificato un errore durante la creazione del file!",
+    "labelSelectedCategory": "Seleziona Categoria Prodotto",
+    "labelSelectedBrand": "Seleziona Brand",
+    "labelPreviewFilename": "Nome file generato:",
+    "titleLayoutChoose": "Seleziona i layout necessari",
+    "warningMessageLimit": "Non hai ancora creato alcun layout per il design delle carte. Torna all'editor e crea diverse varianti. Questo ti permetterà di utilizzarli per lo sviluppo dei template.",
+    "labelCounter": "Layout selezionati:",
+    "addIntoTemplate": "Aggiungi al template",
+    "titlePIN": "Inserisci codice PIN"
   },
   "template": {
     "create": "Crea template",
