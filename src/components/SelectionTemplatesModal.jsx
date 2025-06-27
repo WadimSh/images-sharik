@@ -8,7 +8,7 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
   const { t } = useContext(LanguageContext);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [templates, setTemplates] = useState(null);
+  const [templates, setTemplates] = useState({});
   const [isChecked, setIsChecked] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
 
@@ -58,7 +58,7 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
       loadTemplates();
     } else {
       // Сбрасываем состояние при закрытии
-      setTemplates(null);
+      setTemplates({});
       setIsLoading(true);
     }
   }, [isOpen]);
@@ -71,7 +71,7 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
               <button onClick={onClose} className="close-btn" style={{ marginLeft: 'auto' }}>&times;</button>
             </div>
             <div className="spinner"></div>
-          </>) : templates === null ? null : (<>
+          </>) : (<>
             <div className="modal-header">
               <h2>{t('modals.titleLayoutChoose')}</h2>
               <button onClick={onClose} className="close-btn">&times;</button>
