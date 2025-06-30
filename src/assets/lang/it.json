@@ -143,7 +143,10 @@
     "addProduct": "Aggiungi prodotto",
     "addBackground": "Aggiungi sfondo",
     "addedBackground": "Sfondo aggiunto",
-    "removeImage": "Rimuovi immagine"
+    "removeImage": "Rimuovi immagine",
+    "searchPlaceholder": "Cerca...",
+    "selectedMessage": "Seleziona...",
+    "noResults": "Nessun risultato trovato"
   },
   "elements": {
     "title": "Componenti di design",
@@ -189,13 +192,17 @@
     "successMessageDownload": "File creato e scaricato con successo!",
     "errorMessageDownload": "Si è verificato un errore durante la creazione del file!",
     "labelSelectedCategory": "Seleziona Categoria Prodotto",
+    "labelSelectedView": "Seleziona tipo di materiale",
+    "labelSelectedGroup": "Seleziona gruppo di materiale",
     "labelSelectedBrand": "Seleziona Brand",
     "labelPreviewFilename": "Nome file generato:",
     "titleLayoutChoose": "Seleziona i layout necessari",
     "warningMessageLimit": "Non hai ancora creato alcun layout per il design delle carte. Torna all'editor e crea diverse varianti. Questo ti permetterà di utilizzarli per lo sviluppo dei template.",
     "labelCounter": "Layout selezionati:",
     "addIntoTemplate": "Aggiungi al template",
-    "titlePIN": "Inserisci codice PIN"
+    "titlePIN": "Inserisci codice PIN",
+    "searchPlaceholder": "Cerca layout...",
+    "noResultsFound": "Nessun layout trovato"
   },
   "template": {
     "create": "Crea template",

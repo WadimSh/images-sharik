@@ -143,7 +143,10 @@
     "addProduct": "Добавить товар",
     "addBackground": "Добавить фон",
     "addedBackground": "Фон добавлен",
-    "removeImage": "Удалить изображение"
+    "removeImage": "Удалить изображение",
+    "searchPlaceholder": "Поиск...",
+    "selectedMessage": "Выберите...",
+    "noResults": "Ничего не найдено"
   },
   "elements": {
     "title": "Компоненты дизайна",
@@ -189,13 +192,17 @@
     "successMessageDownload": "Файл успешно создан и скачан!",
     "errorMessageDownload": "Произошла ошибка при создании файла!",
     "labelSelectedCategory": "Выберите товарную номенклатуру",
+    "labelSelectedView": "Выберите вид материала",
+    "labelSelectedGroup": "Выберите группу материала",
     "labelSelectedBrand": "Выберите бренд",
     "labelPreviewFilename": "Имя создаваемого файла:",
     "titleLayoutChoose": "Выберите необходимые макеты",
     "warningMessageLimit": "Вы пока не создали ни одного макета для дизайна карточки. Вернитесь в редактор и создайте несколько вариантов. Это позволит вам использовать их для разработки шаблонов.",
     "labelCounter": "Выбрано макетов:",
     "addIntoTemplate": "Добавить в шаблон",
-    "titlePIN": "Введите PIN-код"
+    "titlePIN": "Введите PIN-код",
+    "searchPlaceholder": "Найти макет...",
+    "noResultsFound": "Ничего не найдено"
   },
   "template": {
     "create": "Создать макет",

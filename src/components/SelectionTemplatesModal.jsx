@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
+import { FiSearch, FiX } from "react-icons/fi";
 
 import { PreviewDesign } from "./PreviewDesign";
 import { LanguageContext } from "../contexts/contextLanguage";
@@ -11,6 +12,18 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
   const [templates, setTemplates] = useState({});
   const [isChecked, setIsChecked] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTemplates = useMemo(() => {
+    if (!searchQuery) return templates;
+    
+    return Object.entries(templates).reduce((acc, [key, value]) => {
+      if (key.toLowerCase().includes(searchQuery.toLowerCase())) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+  }, [templates, searchQuery]);
 
   const handleTemplateToggle = (templateKey, templateData) => {
     setIsChecked(prev => {
@@ -33,6 +46,11 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
     setTemplate(prev => [...prev, ...selectedTemplates]);
     onClose();
   };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -60,6 +78,7 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
       // Сбрасываем состояние при закрытии
       setTemplates({});
       setIsLoading(true);
+      setSearchQuery('');
     }
   }, [isOpen]);
   
@@ -77,13 +96,36 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
               <button onClick={onClose} className="close-btn">&times;</button>
             </div>
 
+            <div className="search-container">
+              <div className="search-input-wrapper">
+                <FiSearch className="search-icon" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('modals.searchPlaceholder')}
+                  className="search-input"
+                />
+                {searchQuery && (
+                  <button onClick={clearSearch} className="clear-search-btn">
+                    <FiX />
+                  </button>
+                )}
+              </div>
+            </div>
+
             {Object.keys(templates).length === 0 ? (
               <div className="limit-warning">
                 {t('modals.warningMessageLimit')}
               </div>
             ) : (<>
+              {Object.keys(filteredTemplates).length === 0 ? (
+                  <div className="no-results-message">
+                    {t('modals.noResultsFound')}
+                  </div>
+                ) : (
               <div className="items-grid" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                {Object.entries(templates).map(([templateKey, templateData]) => {
+                {Object.entries(filteredTemplates).map(([templateKey, templateData]) => {
                   const isChecke = isChecked.includes(templateKey);
                 
                   return(
@@ -119,7 +161,7 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
                   </div>
                 )})}
               </div>
-              
+                )}
               <div className="modal-footer">
                 <div className="selection-counter">
                   {`${t('modals.labelCounter')} ${isChecked.length}`}

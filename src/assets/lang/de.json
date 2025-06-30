@@ -143,7 +143,10 @@
     "addProduct": "Produkt hinzufügen",
     "addBackground": "Hintergrund hinzufügen",
     "addedBackground": "Hintergrund hinzugefügt",
-    "removeImage": "Bild entfernen"
+    "removeImage": "Bild entfernen",
+    "searchPlaceholder": "Suche...",
+    "selectedMessage": "Auswählen...",
+    "noResults": "Keine Ergebnisse gefunden"
   },
   "elements": {
     "title": "Design-Komponenten",
@@ -189,13 +192,17 @@
     "successMessageDownload": "Datei erfolgreich erstellt und heruntergeladen!",
     "errorMessageDownload": "Fehler beim Erstellen der Datei!",
     "labelSelectedCategory": "Produktkategorie wählen",
+    "labelSelectedView": "Materialart auswählen",
+    "labelSelectedGroup": "Materialgruppe auswählen",
     "labelSelectedBrand": "Marke wählen",
     "labelPreviewFilename": "Generierter Dateiname:",
     "titleLayoutChoose": "Erforderliche Layouts auswählen",
     "warningMessageLimit": "Sie haben noch keine Kartenlayouts erstellt. Kehren Sie zum Editor zurück und erstellen Sie mehrere Varianten. So können Sie diese für die Vorlagenentwicklung nutzen.",
     "labelCounter": "Ausgewählte Layouts:",
     "addIntoTemplate": "Zu Vorlage hinzufügen",
-    "titlePIN": "PIN-Code eingeben"
+    "titlePIN": "PIN-Code eingeben",
+    "searchPlaceholder": "Layout suchen...",
+    "noResultsFound": "Keine Layouts gefunden"
   },
   "template": {
     "create": "Vorlage erstellen",

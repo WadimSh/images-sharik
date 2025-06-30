@@ -143,7 +143,10 @@
     "addProduct": "Add product",
     "addBackground": "Add background",
     "addedBackground": "Background added",
-    "removeImage": "Remove image"
+    "removeImage": "Remove image",
+    "searchPlaceholder": "Search...",
+    "selectedMessage": "Select...",
+    "noResults": "No results found"
   },
   "elements": {
     "title": "Design сomponents",
@@ -189,13 +192,17 @@
     "successMessageDownload": "File successfully created and downloaded!",
     "errorMessageDownload": "An error occurred while creating the file!",
     "labelSelectedCategory": "Select Product Category",
+    "labelSelectedView": "Select material type",
+    "labelSelectedGroup": "Select material group",
     "labelSelectedBrand": "Select Brand",
     "labelPreviewFilename": "Generated Filename:",
     "titleLayoutChoose": "Select required layouts",
     "warningMessageLimit": "You haven't created any card design layouts yet. Return to the editor and create several variants. This will allow you to use them for template development.",
     "labelCounter": "Selected layouts:",
     "addIntoTemplate": "Add to template",
-    "titlePIN": "Enter PIN code"
+    "titlePIN": "Enter PIN code",
+    "searchPlaceholder": "Find layout...",
+    "noResultsFound": "No layouts found"
   },
   "template": {
     "create": "Create template",
