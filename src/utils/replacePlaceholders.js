@@ -1,4 +1,5 @@
 export const replacePlaceholders = (template, item) => {
+  
   return template.map(element => ({
     ...element,
     image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,

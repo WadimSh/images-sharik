@@ -1,4 +1,431 @@
 export const data = [
+    {
+        "measure_units_properties": [
+            [
+                "Размер",
+                [
+                    "20.0x15.0x0.05 см",
+                    "20.0x15.0x0.25 см",
+                    "20.0x15.0x5.0 см"
+                ]
+            ],
+            [
+                "Вес брутто",
+                [
+                    "3.5 Г",
+                    "17.5 Г(брутто)",
+                    "518.0 Г(брутто)"
+                ]
+            ],
+            [
+                "Объем",
+                [
+                    "0.015 дм3",
+                    "0.075 дм3",
+                    "1.5 дм3"
+                ]
+            ],
+            [
+                "Баз. ед.",
+                [
+                    "1 шт",
+                    "5 шт",
+                    "100 шт"
+                ]
+            ],
+            [
+                "Штрих код. ед.",
+                [
+                    "4640122227051",
+                    "4690390595185",
+                    "4690390595192"
+                ]
+            ]
+        ],
+        "rating": 0,
+        "code": "1206-1622",
+        "units_counts": [
+            [
+                "блк",
+                "5 шт"
+            ],
+            [
+                "кор",
+                "100 шт"
+            ]
+        ],
+        "seo_header": "",
+        "updated_at": "2025-06-30T12:32:07.275121",
+        "rest": 125,
+        "in_favorite": false,
+        "product_files": [],
+        "category_detail": [
+            {
+                "meta_description": "Оптовая продажа мини шаров на палочке в Москве. Покупайте мини шары на палочке оптом с доставкой у проверенного поставщика!",
+                "meta_title": "",
+                "code": "SHARIK_RU_2_5//01",
+                "name": "Мини шары на палочке",
+                "image": "/media/cache/68/c6/68c62689fcbc04a0188610127553b1fd.jpg",
+                "seo_header": "",
+                "slug": "mini-shary-na-palochke",
+                "meta_keywords": "",
+                "seo_caption": "",
+                "seo_text": "Шары мини очень доступные фольгированные шарики, продаются как мороженое эскимо на палочке и не требуют для надувания гелия. Мы предлагаем широкий ассортимент фольгированных мини-фигур всевозможных форм: техника, животные, насекомые, игрушки и т.д. Кроме того, есть фольгированные мини-фигуры персонажей известных мультфильмов. Мини-фигуры надувают воздухом и устанавливают на палочку, используя пластиковую розетку. Основная часть мини-фигур не имеют клапана. Поэтому для работы с ними следует использовать запайщик (приспособление для запаивания шаров из фольги без клапана, надутых воздухом). ",
+                "id": 8681,
+                "extra_info": ""
+            },
+            {
+                "meta_description": "",
+                "meta_title": "",
+                "code": "SHARIK_RU_C1_14_2//01",
+                "name": "23 февраля",
+                "image": null,
+                "seo_header": "",
+                "slug": "23-fevralia",
+                "meta_keywords": "",
+                "seo_caption": "",
+                "seo_text": "",
+                "id": 9571,
+                "extra_info": ""
+            }
+        ],
+        "images": [
+            {
+                "image": "/media/products/108052/29a6a0c1-d6b5-44e8-952a-1fe49eec840a.jpg",
+                "thumb": {
+                    "product_small": "/media/cache/51/46/5146c033d8b4776786def45dc76b07af.jpg",
+                    "zoom_medium": "/media/cache/d6/0a/d60afce5b63797d9f88d3aa05d662e68.jpg",
+                    "zoom_large": "/media/cache/b0/68/b0683d380ca08e899b522fd15f8e1c38.jpg",
+                    "medium": "/media/cache/19/9f/199f6dc1e509d102973c4953878e6407.jpg"
+                },
+                "id": 157518,
+                "is_base": true
+            }
+        ],
+        "document_images": [],
+        "stickers": [],
+        "id": 130185,
+        "extra_info": "",
+        "category": 8681,
+        "slug": "r-m-figura-samolet-istrebitel-1206-1622",
+        "seo_text": "",
+        "meta_keywords": "",
+        "seo_caption": "",
+        "measure_units_names": [
+            "Штука",
+            "Блок",
+            "Коробка"
+        ],
+        "meta_description": "",
+        "meta_title": "",
+        "description": "Сложная, объемная фигура указанной формы. При надувании используется только воздух. Крепятся с помощью розетки на палочку (в комплект не входят). Для запаивания рекомендуется использовать запайщик - 1307-0005. Тонкая миларовая (фольга на полиэтиленовой основе) пленка позволяет шарам не сдуваться от недели до одного месяца.",
+        "measure_unit": {
+            "name": "шт",
+            "weight": 3.5,
+            "height": 0.05,
+            "volume": 0.015,
+            "width": 15,
+            "length": 20,
+            "common": {
+                "name": "шт",
+                "full_name": "Штука"
+            },
+            "full_name": "Штука",
+            "id": 325905
+        },
+        "properties": [
+            {
+                "name": "Индивидуальная упаковка",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Нет",
+                "unimportant": false,
+                "value_id": 50187,
+                "id": 23539473
+            },
+            {
+                "name": "Наличие клапана",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Нет",
+                "unimportant": false,
+                "value_id": 70957,
+                "id": 23539475
+            },
+            {
+                "name": "Вид материала",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Шары фигурные малые",
+                "unimportant": true,
+                "value_id": 28366,
+                "id": 23538245
+            },
+            {
+                "name": "Группа материала",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Минифигура Agura",
+                "unimportant": true,
+                "value_id": 70685,
+                "id": 23538246
+            },
+            {
+                "name": "Дизайн товара",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Техника",
+                "unimportant": true,
+                "value_id": 28753,
+                "id": 23539463
+            },
+            {
+                "name": "Код ТНВЭД",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "9503 00 9909",
+                "unimportant": true,
+                "value_id": 29485,
+                "id": 23538242
+            },
+            {
+                "name": "Коллекция",
+                "image": "/media/property_value/%D0%A2%D0%B5%D1%85%D0%BD%D0%B8%D0%BA%D0%B0.png",
+                "value": "Техника",
+                "unimportant": false,
+                "value_id": 27249,
+                "id": 23539466
+            },
+            {
+                "name": "Наличие рисунка",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Шар с рисунком",
+                "unimportant": false,
+                "value_id": 27796,
+                "id": 23539469
+            },
+            {
+                "name": "Отрасль",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "2Шары фольгированные",
+                "unimportant": true,
+                "value_id": 28414,
+                "id": 23538247
+            },
+            {
+                "name": "Размер фольга",
+                "image": "/media/property_value/12.png",
+                "value": "12\"",
+                "unimportant": false,
+                "value_id": 59391,
+                "id": 23539461
+            },
+            {
+                "name": "Размеры\\Габариты",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "26/31 СМ",
+                "unimportant": false,
+                "value_id": 70697,
+                "id": 23538243
+            },
+            {
+                "name": "Событие",
+                "image": "/media/property_value/%D0%9D%D0%9821_23_%D0%A4%D0%B5%D0%B2%D1%80%D0%B0%D0%BB%D1%8F.png",
+                "value": "23 Февраля",
+                "unimportant": false,
+                "value_id": 28429,
+                "id": 23539464
+            },
+            {
+                "name": "Способ выкладки",
+                "image": "/media/property_value/%D0%BF%D0%BE%D0%BB%D0%BA%D0%B0.png",
+                "value": "Полка",
+                "unimportant": false,
+                "value_id": 64567,
+                "id": 23539474
+            },
+            {
+                "name": "Статус мелкий опт",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Сток",
+                "unimportant": false,
+                "value_id": 70633,
+                "id": 23539470
+            },
+            {
+                "name": "Статус товара",
+                "image": "/media/property_value/%D0%A1%D0%A2%D0%9E%D0%9A.PNG",
+                "value": "Сток",
+                "unimportant": false,
+                "value_id": 63547,
+                "id": 23539465
+            },
+            {
+                "name": "Статус Франшиза",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "Сток",
+                "unimportant": true,
+                "value_id": 70632,
+                "id": 23539471
+            },
+            {
+                "name": "Товарная номенклатура",
+                "image": "/media/property_value/%D0%A8._%D0%B8%D0%B7_%D1%84%D0%BE%D0%BB%D1%8C%D0%B3%D0%B8.png",
+                "value": "Шарики из фольги",
+                "unimportant": false,
+                "value_id": 51733,
+                "id": 23539468
+            },
+            {
+                "name": "Форма фольга",
+                "image": "/media/property_value/%D0%A4%D0%A4_%D0%BC%D0%B8%D0%BD%D0%B8_%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0_60.png",
+                "value": "Мини фигура",
+                "unimportant": false,
+                "value_id": 29142,
+                "id": 23539462
+            }
+        ],
+        "promotions": [],
+        "name": "Р М/ФИГУРА Самолет Истребитель",
+        "rests": [
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "Садовод-Салют, склад-магазин",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "",
+                    "address": "ул. Верхние Поля, 56, стр. 11, Садовод, ТЦ “Салют” Вход №1, 3 этаж, павильон № 20",
+                    "id": 24
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": null,
+                "id": 250250,
+                "rest": 0
+            },
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "Сокол, склад-магазин",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "",
+                    "address": "ул.Дубосековская, д 4 (МАИ ГУП)",
+                    "id": 22
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": 100,
+                "id": 250216,
+                "rest": 80
+            },
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "Комсомольская, склад-магазин",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "55.77647194769816,37.65784693652341",
+                    "address": "Комсомольская площадь, д. 1 А, строение 2, 17 склад",
+                    "id": 23
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": null,
+                "id": 250242,
+                "rest": 30
+            },
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "Нагорный, склад-магазин",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "",
+                    "address": "Нагорный проезд, дом 7, Институт вакуумной техники имени С. А. Векшинского, м.Нагатинская",
+                    "id": 21
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": null,
+                "id": 250273,
+                "rest": 0
+            },
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "РЦ, Зеленоград",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "",
+                    "address": "Зеленоград, ул.Заводская, д.18, стр.9",
+                    "id": 25
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": null,
+                "id": 250189,
+                "rest": 0
+            },
+            {
+                "warehouse": {
+                    "city": 1,
+                    "name": "Фуд Сити, склад-магазин",
+                    "is_visible": true,
+                    "country": 1,
+                    "coordinates": "",
+                    "address": "Москва, п. Сосненское, 22-й км Калужского шоссе, здание №10",
+                    "id": 27
+                },
+                "date_of_new_arrival": null,
+                "new_arrival": null,
+                "id": 250263,
+                "rest": 15
+            }
+        ],
+        "multiplicity": 5,
+        "default_price": null,
+        "popularity": 21,
+        "multiplicity_measure_unit": "шт",
+        "icons_property_value": [
+            {
+                "value__image": "/media/property_value/12.png",
+                "value__property__name": "Размер фольга",
+                "value__name": "12\"",
+                "value__property__value_icon_position": 4
+            },
+            {
+                "value__image": "/media/property_value/%D0%A1%D0%A2%D0%9E%D0%9A.PNG",
+                "value__property__name": "Статус товара",
+                "value__name": "Сток",
+                "value__property__value_icon_position": 5
+            },
+            {
+                "value__image": "/media/property_value/russia_glossy_wave_icon_60.png",
+                "value__property__name": "Страна",
+                "value__name": "Россия",
+                "value__property__value_icon_position": 1
+            }
+        ],
+        "dist_markets": "Товар находится в <span>Каталог Мелкий ОПТ</span>",
+        "origin_properties": [
+            {
+                "name": "Артикул производителя",
+                "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+                "value": "227051",
+                "unimportant": false,
+                "value_id": 70698,
+                "id": 23538244
+            },
+            {
+                "name": "Торговая марка",
+                "image": "/media/property_value/AGURA.png",
+                "value": "Agura",
+                "unimportant": false,
+                "value_id": 49084,
+                "id": 23538248
+            },
+            {
+                "name": "Страна",
+                "image": "/media/property_value/russia_glossy_wave_icon_60.png",
+                "value": "Россия",
+                "unimportant": false,
+                "value_id": 27887,
+                "id": 23539467
+            }
+        ],
+        "measure_prices": []
+    },
   {
       "measure_units_properties": [
           [

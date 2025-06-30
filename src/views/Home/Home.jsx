@@ -152,38 +152,84 @@ export const Home = () => {
         category: getPropertyValue('Тип латексных шаров'),
         brand: getOriginPropertyValue('Торговая марка'),
         properties: getPropertyValue('Товарная номенклатура'),
+        viewMaterial: getPropertyValue('Вид материала'),
+        groupMaterial: getPropertyValue('Группа материала'),
       }));
     });
   };
 
   const generateDesignData = useCallback((item) => {
-    // Универсальная функция для обработки сложных шаблонов (с несколькими слайдами)
-    const processTemplate = (templateArray) => {
+    // Функция для проверки типа шаблона
+    const getTemplateType = (template) => {
+      if (!Array.isArray(template)) return 'single';
+      return template.some(item => Array.isArray(item)) ? 'complex' : 'simple';
+    };
+    
+    // Обработка сложных шаблонов (массив массивов)
+    const processComplexTemplate = (templateArray) => {
       const parts = item.code.split('_');
       const imageIndex = parseInt(parts[parts.length - 1]) - 1;
       const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-      return replacePlaceholders(templateArray[templateIndex], item);
+      const selectedTemplate = templateArray[templateIndex];
+      return replacePlaceholders(selectedTemplate, item);
     };
   
-    // Система шаблонов с иерархией: свойство → бренд → шаблон
+    // Система шаблонов
     const TEMPLATE_SYSTEM = {
-      // Основной шаблон по умолчанию
-      _default: templates.main,
+      _default: templates.main, // Все шаблоны храним как массивы
       
-      // Специальные обработчики для определенных свойств
       properties: {
         'Шарики из латекса': {
-          _default: templates.main, // основной шаблон, если бренд не указан или не найден
+          _default: templates.main,
+          
+          viewMaterials: {
+            'Круглые без рисунка': {
+              _default: templates.main,
+              
+              groupMaterials: {
+                'Шар с рисунком': {
+                  _default: templates.main,
+                  
+                  brands: {
+                    'Gemar': templates.gemar,
+                    'Belbal': templates.belbal
+                  }
+                }
+              },
+              
+              brands: {
+                'Gemar': templates.gemar,
+                'Belbal': templates.belbal
+              }
+            }
+          },
+          
+          groupMaterials: {
+            'Шар с рисунком': {
+              _default: templates.main,
+              
+              brands: {
+                'Gemar': templates.gemar,
+                'Belbal': templates.belbal
+              }
+            }
+          },
           
           brands: {
             'Gemar': templates.gemar,
             'Belbal': templates.belbal
           }
+        },
+        'Шарики из фольги': {
+          _default: templates.main,
+          viewMaterials: {
+            'Шары фигурные малые': {
+              _default: templates.main
+            }
+          }
         }
       },
       
-      // Все остальные свойства будут использовать основной шаблон
-      // пока не будет сосзданы под них шаблоны
       useMainTemplate: [
         'Bubble', 'Баннеры', 'Барные аксессуары', 'Бижутерия', 'Боа',
         'Бумага упаковочная', 'Гавайи', 'Газовое оборудование', 'Галстук',
@@ -200,34 +246,161 @@ export const Home = () => {
         'Серпантин', 'Сеть', 'Скатерти', 'Сладкий стол', 'Спецэффекты', 'Спирали',
         'Спрей', 'Стаканы', 'Столовые приборы', 'Тарелки', 'Тассел, бахрома',
         'Украшения на голову', 'Упаковочный', 'Учебные материалы', 'Фант',
-        'Фигурка на торт', 'Фотобутафория', 'Хлопушка', 'Шарики из фольги', 'Язычки'
+        'Фигурка на торт', 'Фотобутафория', 'Хлопушка', 'Язычки'
       ]
     };
   
-    // 1. Проверяем специальные свойства с особыми шаблонами
-    if (TEMPLATE_SYSTEM.properties[item.properties]) {
-      const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
-      
-      // Если есть бренд и для него есть шаблон
-      if (item.brand && propertyConfig.brands && propertyConfig.brands[item.brand]) {
-        const brandTemplate = propertyConfig.brands[item.brand];
-        return Array.isArray(brandTemplate) 
-          ? processTemplate(brandTemplate)
-          : replacePlaceholders(brandTemplate, item);
-      }
-      
-      // Используем шаблон по умолчанию для этого свойства
-      return replacePlaceholders(propertyConfig._default, item);
-    }
-  
-    // 2. Проверяем свойства, которые используют основной шаблон
+    // Улучшенная функция поиска шаблона
+  const findTemplate = () => {
+    // 1. Проверяем свойства из useMainTemplate
     if (TEMPLATE_SYSTEM.useMainTemplate.includes(item.properties)) {
-      return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
+      return TEMPLATE_SYSTEM._default;
     }
+
+    // 2. Получаем конфигурацию для свойства
+    const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
+    if (!propertyConfig) {
+      return TEMPLATE_SYSTEM._default;
+    }
+
+    // Проверяем полный путь (viewMaterial -> groupMaterial -> brand)
+    if (item.viewMaterial && item.groupMaterial && item.brand) {
+      const viewMat = propertyConfig.viewMaterials?.[item.viewMaterial];
+      const groupMat = viewMat?.groupMaterials?.[item.groupMaterial];
+      const brandTemplate = groupMat?.brands?.[item.brand];
+      if (brandTemplate) return brandTemplate;
+    }
+
+    // Проверяем viewMaterial -> brand
+    if (item.viewMaterial && item.brand) {
+      const brandTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.brands?.[item.brand];
+      if (brandTemplate) return brandTemplate;
+    }
+
+    // Проверяем groupMaterial -> brand
+    if (item.groupMaterial && item.brand) {
+      const brandTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?.brands?.[item.brand];
+      if (brandTemplate) return brandTemplate;
+    }
+
+    // Проверяем только brand
+    if (item.brand) {
+      const brandTemplate = propertyConfig.brands?.[item.brand];
+      if (brandTemplate) return brandTemplate;
+    }
+
+    // Проверяем viewMaterial -> groupMaterial
+    if (item.viewMaterial && item.groupMaterial) {
+      const groupTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.groupMaterials?.[item.groupMaterial]?._default;
+      if (groupTemplate) return groupTemplate;
+    }
+
+    // Проверяем только viewMaterial
+    if (item.viewMaterial) {
+      const viewTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?._default;
+      if (viewTemplate) return viewTemplate;
+    }
+
+    // Проверяем только groupMaterial
+    if (item.groupMaterial) {
+      const groupTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?._default;
+      if (groupTemplate) return groupTemplate;
+    }
+
+    // Возвращаем дефолтный для свойства
+    return propertyConfig._default;
+  };
+
+  // Получаем шаблон
+  const template = findTemplate();
   
-    // 3. Для всех остальных случаев (включая отсутствие свойства) - основной шаблон
-    return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
+  // Определяем тип шаблона
+  const templateType = getTemplateType(template);
+
+  // Обрабатываем в зависимости от типа
+  switch (templateType) {
+    case 'complex':
+      return processComplexTemplate(template);
+    case 'simple':
+      return replacePlaceholders(template, item);
+    default:
+      return replacePlaceholders([template], item);
+  }
   }, [templates]);
+
+  //const generateDesignData = useCallback((item) => {
+  //  // Универсальная функция для обработки сложных шаблонов (с несколькими слайдами)
+  //  const processTemplate = (templateArray) => {
+  //    console.log(templateArray)
+  //    const parts = item.code.split('_');
+  //    const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+  //    const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+  //    return replacePlaceholders(templateArray[templateIndex], item);
+  //  };
+  //
+  //  // Система шаблонов с иерархией: свойство → бренд → шаблон
+  //  const TEMPLATE_SYSTEM = {
+  //    // Основной шаблон по умолчанию
+  //    _default: templates.main,
+  //    
+  //    // Специальные обработчики для определенных свойств
+  //    properties: {
+  //      'Шарики из латекса': {
+  //        _default: templates.main, // основной шаблон, если бренд не указан или не найден
+  //        
+  //        brands: {
+  //          'Gemar': templates.gemar,
+  //          'Belbal': templates.belbal
+  //        }
+  //      }
+  //    },
+  //    
+  //    // Все остальные свойства будут использовать основной шаблон
+  //    // пока не будет сосзданы под них шаблоны
+  //    useMainTemplate: [
+  //      'Bubble', 'Баннеры', 'Барные аксессуары', 'Бижутерия', 'Боа',
+  //      'Бумага упаковочная', 'Гавайи', 'Газовое оборудование', 'Галстук',
+  //      'Гелий, баллоны', 'Гирлянды', 'Гирлянды-буквы', 'Гирлянды вертикальные',
+  //      'Гирлянды-вымпелы', 'Головные уборы', 'Горн', 'Грим', 'Грузики для шаров',
+  //      'Декорации', 'Декорации подвески', 'Держатели', 'Дисплеи', 'Дудочка',
+  //      'Дым цветной', 'Значок', 'Игра', 'Игрушки', 'Карнавальный костюм',
+  //      'Клоунский нос', 'Компрессор для шаров', 'Конфетти', 'Краска для шаров',
+  //      'Лента', 'Лента для шаров', 'Маски', 'Медаль', 'Мишура', 'Мыльные пузыри',
+  //      'Наборы в упаковках', 'Надувная игрушка', 'Наклейки', 'Насос для шаров',
+  //      'Очки', 'Пакет', 'Парик', 'Пиньята', 'Пиротехника', 'Пленка упаковочная',
+  //      'Полимерный гель для шаров', 'Праздничные аксессуары', 'Рекламные шары',
+  //      'Салфетки', 'Светящиеся сувениры', 'Свечи для торта', 'Свечи-цифры',
+  //      'Серпантин', 'Сеть', 'Скатерти', 'Сладкий стол', 'Спецэффекты', 'Спирали',
+  //      'Спрей', 'Стаканы', 'Столовые приборы', 'Тарелки', 'Тассел, бахрома',
+  //      'Украшения на голову', 'Упаковочный', 'Учебные материалы', 'Фант',
+  //      'Фигурка на торт', 'Фотобутафория', 'Хлопушка', 'Шарики из фольги', 'Язычки'
+  //    ]
+  //  };
+  //
+  //  // 1. Проверяем специальные свойства с особыми шаблонами
+  //  if (TEMPLATE_SYSTEM.properties[item.properties]) {
+  //    const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
+  //    
+  //    // Если есть бренд и для него есть шаблон
+  //    if (item.brand && propertyConfig.brands && propertyConfig.brands[item.brand]) {
+  //      const brandTemplate = propertyConfig.brands[item.brand];
+  //      return Array.isArray(brandTemplate) 
+  //        ? processTemplate(brandTemplate)
+  //        : replacePlaceholders(brandTemplate, item);
+  //    }
+  //    
+  //    // Используем шаблон по умолчанию для этого свойства
+  //    return replacePlaceholders(propertyConfig._default, item);
+  //  }
+  //
+  //  // 2. Проверяем свойства, которые используют основной шаблон
+  //  if (TEMPLATE_SYSTEM.useMainTemplate.includes(item.properties)) {
+  //    return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
+  //  }
+  //
+  //  // 3. Для всех остальных случаев (включая отсутствие свойства) - основной шаблон
+  //  return replacePlaceholders(TEMPLATE_SYSTEM._default, item);
+  //}, [templates]);
   
   // В компоненте Home обновляем handleSearch
 const handleSearch = useCallback((normalizedArticles) => {
@@ -240,33 +413,33 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    //setLoading(true);
-    //
-    //const searchQuery = normalizedArticles.join(' ');
-    //const encodedSearch = encodeURIComponent(searchQuery);
-    //
-    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
-    //  .then(response => response.json())
-    //  .then(data => {
-    //    if (data.results.length === 0) {
-    //      const message = t('views.homeMissingCode');
-    //      setInfoMessage(message);
-    //      return Promise.reject(message);
-    //    }
-    //
-    //    const productIds = data.results.map(product => product.id);
-    //    const idsParam = productIds.join(',');
-    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //  })
-    //  .then(response => response?.json())
-    //  .then(detailedData => {
-    //    if (!detailedData) return;
+    setLoading(true);
+    
+    const searchQuery = normalizedArticles.join(' ');
+    const encodedSearch = encodeURIComponent(searchQuery);
+    
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          const message = t('views.homeMissingCode');
+          setInfoMessage(message);
+          return Promise.reject(message);
+        }
+    
+        const productIds = data.results.map(product => product.id);
+        const idsParam = productIds.join(',');
+        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+      })
+      .then(response => response?.json())
+      .then(detailedData => {
+        if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      const processedResults = processProductsData(data);
-      const processedMetaResults = processProductsMeta(data);
-      //const processedResults = processProductsData(detailedData);
-      //const processedMetaResults = processProductsMeta(detailedData);
+      //const processedResults = processProductsData(data);
+      //const processedMetaResults = processProductsMeta(data);
+      const processedResults = processProductsData(detailedData);
+      const processedMetaResults = processProductsMeta(detailedData);
             
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -296,16 +469,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    //})
-    //.catch(error => {
-    //  console.error('Error:', error);
-    //  setError(error.message || "An error occurred");
-    //  setValidArticles([]);
-    //  setIsSearchActive(false);
-    //})
-    //.finally(() => {
-    //  setLoading(false);
-    //});
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setError(error.message || "An error occurred");
+      setValidArticles([]);
+      setIsSearchActive(false);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {
