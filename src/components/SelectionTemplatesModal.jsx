@@ -98,6 +98,12 @@ export const SelectionTemplatesModal = ({ isOpen, onClose, setTemplate }) => {
                     <div className="item-content" style={{ position: 'absolute' }}>
                       <PreviewDesign elements={templateData} />
                     </div>
+
+                    <div className="template-key-container">
+                      <span className="template-key-badge">
+                        {templateKey}
+                      </span>
+                    </div>
                   
                     <label className="checkbox-label">
                       <input

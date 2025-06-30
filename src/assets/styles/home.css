@@ -95,6 +95,7 @@
   left: 8px;
   display: block;
   cursor: pointer;
+  z-index: 3; /* Чтобы чекбокс был поверх градиента */
 }
 
 .checkbox-label input {
