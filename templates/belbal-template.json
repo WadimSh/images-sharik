@@ -2,17 +2,18 @@
   [
     {
       "id": 1744738384460,
-      "type": "element",
+      "type": "background",
       "position": {
-          "x": 0,
-          "y": 0
+        "x": 0,
+        "y": 0
       },
-      "isFlipped": false,
-      "image": "/images/Belbal-background.png",
-      "width": 450,
-      "height": 597.7859778597785,
-      "originalWidth": 1355,
-      "originalHeight": 1800
+      "backgroundImage": "/images/Belbal-background.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1355,
+      "originalImageWidth": 1800
     },
     {
       "id": 1744221252268,
@@ -111,6 +112,7 @@
       "image": "/images/Belbal-round-2.png",
       "width": 96,
       "height": 96,
+      "rotation": -45,
       "originalWidth": 275,
       "originalHeight": 275
     },
@@ -158,11 +160,11 @@
       "id": 1744221657494,
       "type": "text",
       "position": {
-          "x": 355,
-          "y": 244
+          "x": 346,
+          "y": 240
       },
       "text": "{{SIZE}}",
-      "fontSize": 28,
+      "fontSize": 36,
       "color": "#ffffff",
       "fontFamily": "BelbalFontRegul",
       "image": null
@@ -175,6 +177,8 @@
           "y": 63
       },
       "text": "{{CATEGORY}}",
+      "height": 42,
+      "width": 410,
       "fontSize": 36,
       "color": "#00aeef",
       "fontFamily": "BelbalFont",
@@ -188,6 +192,8 @@
           "y": 20
       },
       "text": "{{TITLE}}",
+      "height": 42,
+      "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
       "fontFamily": "BelbalFont",
@@ -195,6 +201,21 @@
     }
   ],
   [
+    {
+      "id": 1744738384476,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/Belbal-background.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1355,
+      "originalImageWidth": 1800
+    },
     {
       "id": 1744221252268,
       "type": "image",
@@ -254,6 +275,34 @@
       "originalHeight": 110
     },
     {
+      "id": 1744221189429,
+      "type": "element",
+      "position": {
+          "x": 333.5,
+          "y": 421.5
+      },
+      "isFlipped": false,
+      "image": "/images/sertif.png",
+      "width": 96,
+      "height": 96,
+      "originalWidth": 263,
+      "originalHeight": 263
+    },
+    {
+      "id": 1744738831264,
+      "type": "element",
+      "position": {
+          "x": 333.5,
+          "y": 318.5
+      },
+      "isFlipped": false,
+      "image": "/images/Belbal-round-3.png",
+      "width": 96,
+      "height": 96,
+      "originalWidth": 275,
+      "originalHeight": 275
+    },
+    {
       "id": 1744221409662,
       "type": "text",
       "position": {
@@ -261,6 +310,8 @@
           "y": 63
       },
       "text": "воздушные шары премиум-класса",
+      "height": 42,
+      "width": 430,
       "fontSize": 32,
       "color": "#00aeef",
       "fontFamily": "BelbalFont",
@@ -274,6 +325,8 @@
           "y": 20
       },
       "text": "{{TITLE}}",
+      "height": 42,
+      "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
       "fontFamily": "BelbalFont",
@@ -282,18 +335,19 @@
   ],
   [
     {
-      "id": 1744738384460,
-      "type": "element",
+      "id": 1744738384463,
+      "type": "background",
       "position": {
-          "x": 0,
-          "y": 0
+        "x": 0,
+        "y": 0
       },
-      "isFlipped": false,
-      "image": "/images/Belbal-background.png",
-      "width": 450,
-      "height": 597.7859778597785,
-      "originalWidth": 1355,
-      "originalHeight": 1800
+      "backgroundImage": "/images/Belbal-background.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1355,
+      "originalImageWidth": 1800
     },
     {
       "id": 1744221252268,
@@ -382,73 +436,6 @@
       "originalHeight": 275
     },
     {
-      "id": 1744738678078,
-      "type": "element",
-      "position": {
-          "x": 333.5,
-          "y": 214.5
-      },
-      "isFlipped": false,
-      "image": "/images/Belbal-round-2.png",
-      "width": 96,
-      "height": 96,
-      "originalWidth": 275,
-      "originalHeight": 275
-    },
-    {
-      "id": 1744738946843,
-      "type": "element",
-      "position": {
-          "x": 333.5,
-          "y": 106.5
-      },
-      "isFlipped": false,
-      "image": "/images/Belbal-round-1.png",
-      "width": 96,
-      "height": 96,
-      "originalWidth": 275,
-      "originalHeight": 275
-    },
-    {
-      "id": 1744221504335,
-      "type": "text",
-      "position": {
-          "x": 357,
-          "y": 112
-      },
-      "text": "{{MULTIPLICITY}}",
-      "fontSize": 56,
-      "color": "#ffffff",
-      "fontFamily": "BelbalFontRegul",
-      "image": null
-    },
-    {
-      "id": 1744734115161,
-      "type": "text",
-      "position": {
-          "x": 366,
-          "y": 159
-      },
-      "text": "шт",
-      "fontSize": 28,
-      "color": "#ffffff",
-      "fontFamily": "BelbalFontRegul",
-      "image": null
-    },
-    {
-      "id": 1744221657494,
-      "type": "text",
-      "position": {
-          "x": 355,
-          "y": 244
-      },
-      "text": "{{SIZE}}",
-      "fontSize": 28,
-      "color": "#ffffff",
-      "fontFamily": "BelbalFontRegul",
-      "image": null
-    },
-    {
       "id": 1744221409662,
       "type": "text",
       "position": {
@@ -456,6 +443,8 @@
           "y": 63
       },
       "text": "упаковка премиум-класса",
+      "height": 42,
+      "width": 410,
       "fontSize": 36,
       "color": "#00aeef",
       "fontFamily": "BelbalFont",
@@ -469,6 +458,8 @@
           "y": 20
       },
       "text": "{{TITLE}}",
+      "height": 42,
+      "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
       "fontFamily": "BelbalFont",
