@@ -106,6 +106,13 @@
     "linkNo": "prodotto non disponibile sui marketplace",
     "placeholder": "Crea nuovo slider"
   },
+  "styles": {
+    "default": "Stile Classico",
+    "red": "Vibrazioni Coralline",
+    "green": "Freschezza Lime",
+    "yellow": "Luminosità Miele",
+    "crimson": "Cremisi Profondo"
+  },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",
     "galleryMessageTitle": "Non ci sono design salvati",

@@ -143,6 +143,78 @@
   background-position: center;
 }
 
+.style-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.style-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: white;
+  color: #66717d;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Эффект гладкого перехода цвета */
+.style-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.style-button:hover::before {
+  opacity: 1;
+}
+
+/* Активное состояние - элегантное выделение */
+.style-button.active {
+  transform: scale(1);
+  z-index: 1;
+}
+
+/* Индикатор выбранного стиля */
+.style-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: #333;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+/* Минималистичный эффект при наведении */
+.style-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Стиль для иконок */
+.style-button svg {
+  transition: transform 0.2s ease;
+}
+
+/* Активная иконка */
+.style-button.active svg {
+  transform: scale(1.15);
+}
+
 .template-selector-controls {
   display: flex;
   align-items: center;

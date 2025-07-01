@@ -106,6 +106,13 @@
     "linkNo": "product not available on marketplaces",
     "placeholder": "Create new slider"
   },
+  "styles": {
+    "default": "Classic Style",
+    "red": "Coral Vibes",
+    "green": "Lime Fresh",
+    "yellow": "Honey Glow",
+    "crimson": "Deep Crimson"
+  },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",
     "galleryMessageTitle": "No saved designs",

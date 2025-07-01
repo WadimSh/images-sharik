@@ -1,6 +1,20 @@
-export const replacePlaceholders = (template, item) => {
+const applyTemplateStyles = (template, styleVariant = 'default') => {
+  return template.map(element => {
+    if (!element.styles) return element;
+    
+    const style = element.styles[styleVariant] || element.styles.default;
+    
+    return {
+      ...element,
+      ...style
+    };
+  });
+};
+
+export const replacePlaceholders = (template, item, styleVariant = 'default') => {
+  const styledTemplate = applyTemplateStyles(template, styleVariant);
   
-  return template.map(element => ({
+  return styledTemplate.map(element => ({
     ...element,
     image: element.image === "{{ITEM_IMAGE}}" ? item.image : element.image,
     text: element.text

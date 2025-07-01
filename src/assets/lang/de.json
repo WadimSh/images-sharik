@@ -106,6 +106,13 @@
     "linkNo": "Produkt nicht auf Marktplätzen verfügbar",
     "placeholder": "Neuen Slider erstellen"
   },
+  "styles": {
+    "default": "Klassischer Stil",
+    "red": "Korallen-Energie",
+    "green": "Limonen-Frische",
+    "yellow": "Honig-Glanz",
+    "crimson": "Tiefes Karmesin"
+  },
   "views": {
     "homeMissingCode": "Ändern Sie die Suchparameter oder verwenden Sie andere Schlüsselwörter.",
     "galleryMessageTitle": "Keine gespeicherten Designs",

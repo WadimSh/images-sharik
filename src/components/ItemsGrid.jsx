@@ -8,6 +8,9 @@ import { useGetCode } from '../hooks/useGetCode';
 import { PreviewDesign } from './PreviewDesign';
 import { CustomSelect } from '../ui/CustomSelect/CustomSelect';
 import { productsDB, slidesDB } from '../utils/handleDB';
+import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
+import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
+import { Tooltip } from '../ui/Tooltip/Tooltip';
 
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
@@ -17,6 +20,31 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
+  
+
+  // Функция для применения стилей к элементам
+  const applyElementStyle = (element, styleVariant) => {
+    if (!element?.styles) return element;
+    return {
+      ...element,
+      ...(element.styles[styleVariant] || element.styles.default || {})
+    };
+  };
+
+  // Функция для применения стилей ко всему шаблону
+  const applyTemplateStyles = (template, styleVariant = 'default') => {
+    if (!template) return [];
+    
+    // Для вложенных шаблонов (как в gemar/belbal)
+    if (Array.isArray(template[0])) {
+      return template.map(subTemplate => 
+        subTemplate.map(element => applyElementStyle(element, styleVariant))
+      );
+    }
+    
+    // Для обычных шаблонов
+    return template.map(element => applyElementStyle(element, styleVariant));
+  };
 
   // Загрузка метаданных продуктов
   useEffect(() => {
@@ -27,10 +55,17 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       await Promise.all(uniqueBaseCodes.map(async (baseCode) => {
         try {
           const product = await productsDB.get(`product-${baseCode}`);
-          metas[baseCode] = product?.data || { templateType: 'default' };
+          metas[baseCode] = { 
+            ...(product?.data || {}),
+            templateType: product?.data?.templateType || 'default',
+            styleVariant: product?.data?.styleVariant || 'default' // Добавляем стиль в метаданные
+          };
         } catch (error) {
           console.error(`Error loading product meta for ${baseCode}:`, error);
-          metas[baseCode] = { templateType: 'default' };
+          metas[baseCode] = { 
+            templateType: 'default',
+            styleVariant: 'default'
+          };
         }
       }));
 
@@ -42,7 +77,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   }, [items]);
 
-  // Загрузка данных дизайнов
+  // Загрузка данных дизайнов с применением стилей
   useEffect(() => {
     const loadDesignsData = async () => {
       const designs = {};
@@ -50,7 +85,15 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       await Promise.all(items.map(async (item) => {
         try {
           const slide = await slidesDB.get(`design-${item}`);
-          designs[item] = slide?.data || null;
+          const baseCode = item.split('_').slice(0, -1).join('_');
+          const productMeta = productMetas[baseCode] || { 
+            templateType: 'default',
+            styleVariant: 'default'
+          };
+          
+          // Применяем текущий стиль при загрузке
+          const styledDesign = applyTemplateStyles(slide?.data, productMeta.styleVariant);
+          designs[item] = styledDesign || null;
         } catch (error) {
           console.error(`Error loading design for ${item}:`, error);
           designs[item] = null;
@@ -60,18 +103,17 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       setDesignsData(designs);
     };
 
-    if (items.length > 0) {
+    if (items.length > 0 && Object.keys(productMetas).length > 0) {
       loadDesignsData();
     }
-  }, [items]);
-  
-  // Инициализируем порядок при первом рендере
+  }, [items, productMetas]);
+
+  // Инициализация и обновление порядка базовых кодов
   useEffect(() => {
     const initialOrder = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
     setBaseCodesOrder(initialOrder);
   }, [items]);
 
-  // Обновляем порядок при изменениях
   useEffect(() => {
     const newCodes = items.map(item => item.split('_').slice(0, -1).join('_'));
     const uniqueNewCodes = [...new Set(newCodes)];
@@ -83,7 +125,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     });
   }, [items]);
 
-  // Функция для создания нового дизайна
+  // Функция для создания нового дизайна с применением стиля
   const handleCreateNewDesign = async (baseCode) => {
     try {
       const existingNumbers = items
@@ -97,11 +139,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       const product = await productsDB.get(`product-${baseCode}`);
       const productMeta = product?.data || {};
     
-      // Определяем текущий шаблон группы
       const templateKey = productMeta.templateType || 'default';
       let selectedTemplate = templates.default;
     
-      // Выбираем подходящий шаблон
       if (templateKey === 'belbal' || templateKey === 'gemar') {
         const templateArray = templates[templateKey] || [];
         const imageIndex = newNumber - 1;
@@ -111,11 +151,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
         selectedTemplate = templates[templateKey];
       }
     
-      // Выбираем изображение
       const imageIndex = newNumber - 1;
       const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
     
-      // Формируем данные для шаблона
       const templateData = {
         code: newDesignKey,
         image: image,
@@ -127,20 +165,166 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
         imageIndex: imageIndex
       };
     
-      // Генерируем и сохраняем дизайн
+      // Применяем стиль перед сохранением
       const newDesign = replacePlaceholders(selectedTemplate, templateData);
+      
       await slidesDB.add({
         code: `design-${newDesignKey}`,
         data: newDesign
       });
     
-      // Обновляем состояние
       onItemsUpdate([...items, newDesignKey]);
     } catch (error) {
       console.error('Error creating new design:', error);
     }
   };
+
+  // Обработчик изменения шаблона с сохранением стиля
+  const handleTemplateChange = async (baseCode, templateKey) => {
+    try {
+      const product = await productsDB.get(`product-${baseCode}`);
+      const updatedMeta = {
+        ...(product?.data || {}),
+        templateType: templateKey
+      };
+      
+      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
+
+      const updatePromises = items.map(async (item) => {
+        if (item.startsWith(`${baseCode}_`)) {
+          const slide = await slidesDB.get(`design-${item}`);
+          const currentDesign = slide?.data || [];
+
+          const validImages = currentDesign.filter(el => 
+            el.type === 'image' && el.image?.startsWith('https://')
+          );
+
+          const currentImage = validImages.length > 0 
+            ? validImages[validImages.length - 1].image 
+            : updatedMeta.images?.[0];
+
+          const parts = item.split('_');
+          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+
+          const itemData = {
+            ...updatedMeta,
+            code: item,
+            image: currentImage,
+            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
+            title: getPropertyValue(updatedMeta, 'Событие'),
+            multiplicity: updatedMeta.multiplicity,
+            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
+            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
+            imageIndex: imageIndex
+          };
+
+          let template;
+          if ((templateKey === 'gemar' || templateKey === 'belbal') && Array.isArray(templates[templateKey])) {
+            const templateArray = templates[templateKey];
+            const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+            template = templateArray[templateIndex];
+          } else {
+            template = templates[templateKey] || templates['main'];
+          }
+          
+          // Применяем текущий стиль
+          const newDesign = replacePlaceholders(template, itemData);
+          await slidesDB.update(`design-${item}`, { data: newDesign });
+        }
+      });
+
+      await Promise.all(updatePromises);
+      onItemsUpdate([...items]);
+    } catch (error) {
+      console.error('Error updating template:', error);
+    }
+  };
+
+  // Применение стиля ко всей группе элементов
+  const applyStyleToGroup = async (baseCode, styleVariant) => {
+    try {
+      const product = await productsDB.get(`product-${baseCode}`);
+      const updatedMeta = {
+        ...(product?.data || {}),
+        styleVariant: styleVariant
+      };
   
+      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
+  
+      setProductMetas(prev => ({
+        ...prev,
+        [baseCode]: {
+          ...prev[baseCode],
+          styleVariant: styleVariant
+        }
+      }));
+  
+      // Обновляем все связанные дизайны
+      const updatePromises = items.map(async (item) => {
+        if (item.startsWith(`${baseCode}_`)) {
+          const slide = await slidesDB.get(`design-${item}`);
+          const currentDesign = slide?.data || [];
+  
+          const validImages = currentDesign.filter(el =>
+            el.type === 'image' && el.image?.startsWith('https://')
+          );
+  
+          const currentImage = validImages.length > 0
+            ? validImages[validImages.length - 1].image
+            : updatedMeta.images?.[0];
+  
+          const parts = item.split('_');
+          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+  
+          const itemData = {
+            ...updatedMeta,
+            code: item,
+            image: currentImage,
+            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
+            title: getPropertyValue(updatedMeta, 'Событие'),
+            multiplicity: updatedMeta.multiplicity,
+            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
+            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
+            imageIndex: imageIndex
+          };
+  
+          const templateKey = updatedMeta.templateType || 'default';
+          let template = templates[templateKey];
+  
+          if ((templateKey === 'gemar' || templateKey === 'belbal') && Array.isArray(template)) {
+            const templateIndex = Math.min(imageIndex, template.length - 1);
+            template = template[templateIndex];
+          }
+  
+          const newDesign = replacePlaceholders(template, itemData, styleVariant);
+  
+          await slidesDB.update(`design-${item}`, { data: newDesign });
+  
+          return { [item]: newDesign };
+        }
+        return null;
+      });
+  
+      const updatedDesignsArray = await Promise.all(updatePromises);
+  
+      // Собираем обновленные дизайны в объект
+      const updatedDesigns = updatedDesignsArray.reduce((acc, val) => {
+        if (val) Object.assign(acc, val);
+        return acc;
+      }, {});
+  
+      // Обновляем локальное состояние дизайнов
+      setDesignsData(prev => ({
+        ...prev,
+        ...updatedDesigns
+      }));
+  
+    } catch (error) {
+      console.error('Error applying style to group:', error);
+    }
+  };
+  
+
   const getUniqueBaseCodes = () => {
     return baseCodesOrder.filter(baseCode => 
       items.some(item => item.startsWith(`${baseCode}_`))
@@ -195,81 +379,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const getOriginPropertyValue = (productMeta, propName) => 
     productMeta.originProperties?.find(p => p.name === propName)?.value || '';
 
-  
-  // Обработчик изменения шаблона
-  const handleTemplateChange = async (baseCode, templateKey) => {
-    try {
-      // Получаем и обновляем метаданные товара
-      const product = await productsDB.get(`product-${baseCode}`);
-      const updatedMeta = {
-        ...(product?.data || {}),
-        templateType: templateKey
-      };
-      
-      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
-
-      // Обновляем все связанные слайды
-      const updatePromises = items.map(async (item) => {
-        if (item.startsWith(`${baseCode}_`)) {
-          // Получаем текущий дизайн
-          const slide = await slidesDB.get(`design-${item}`);
-          const currentDesign = slide?.data || [];
-
-          // Находим все изображения с реальными URL
-          const validImages = currentDesign.filter(el => 
-            el.type === 'image' && 
-            el.image?.startsWith('https://')
-          );
-
-          // Берем последнее добавленное изображение или из метаданных
-          const currentImage = validImages.length > 0 
-            ? validImages[validImages.length - 1].image 
-            : updatedMeta.images?.[0];
-
-          // Извлекаем индекс изображения из кода
-          const parts = item.split('_');
-          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
-
-          const itemData = {
-            ...updatedMeta,
-            code: item,
-            image: currentImage,
-            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
-            title: getPropertyValue(updatedMeta, 'Событие'),
-            multiplicity: updatedMeta.multiplicity,
-            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
-            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
-            imageIndex: imageIndex
-          };
-
-          // Выбираем подходящий шаблон
-          let template;
-          if (
-            (templateKey === 'gemar' || templateKey === 'belbal') && 
-            Array.isArray(templates[templateKey])
-          ) {
-            const templateArray = templates[templateKey];
-            const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-            template = templateArray[templateIndex];
-          } else if (templateKey === 'main' || templateKey === 'default') {
-            template = templates[templateKey];
-          } else {
-            template = templates['main'];
-          }
-          
-          const newDesign = replacePlaceholders(template, itemData);
-          await slidesDB.update(`design-${item}`, { data: newDesign });
-        }
-        return item;
-      });
-
-      await Promise.all(updatePromises);
-      onItemsUpdate([...items]);
-    } catch (error) {
-      console.error('Error updating template:', error);
-    }
-  };
-  
+    
   // Объект перевода названий шаблонов
   const templateOptions = {
     belbal: t('grid.belbal'),
@@ -353,19 +463,47 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     foilBalls: t('grid.foilBalls'),
     blowouts: t('grid.blowouts'),
   };
-
+  
   // Вспомогательная функция для рендеринга контролов выбора шаблона
   const renderTemplateControls = (baseCode, currentTemplate) => {
     const wbCode = getCode(baseCode, "WB");
     const ozCode = getCode(baseCode, "OZ");
+
+    const template = templates[currentTemplate] || [];
+    const availableStyles = getAvailableStyleVariants(template);
+    const currentStyle = productMetas[baseCode]?.styleVariant || 'default';
+    
     return (
       <div className={`template-selector ${marketplace}`} >
-        <CustomSelect 
-          options={templateOptions}
-          value={currentTemplate}
-          onChange={(value) => handleTemplateChange(baseCode, value)}
-          dropdownMaxHeight="300px"
-        />
+        <div className="template-selector-controls">
+          <CustomSelect 
+            options={templateOptions}
+            value={currentTemplate}
+            onChange={(value) => handleTemplateChange(baseCode, value)}
+            dropdownMaxHeight="300px"
+          />
+
+          {availableStyles.length > 1 && (
+            <div className="style-buttons">
+              {availableStyles.map(styleId => (
+                  <Tooltip 
+                    key={styleId}
+                    content={t(getStyleDisplayName(styleId))}
+                    position="bottom"
+                  >
+                    <button
+                      className={`style-button ${currentStyle === styleId ? 'active' : ''}`}
+                      onClick={() => applyStyleToGroup(baseCode, styleId)}
+                    >
+                      {getStyleIcon(styleId)}
+                    </button>
+                  </Tooltip>
+                )
+              )}
+            </div>
+          )}
+        </div>
+        
         <div className="template-selector-controls">
           {(wbCode !== t('product.notWB') || ozCode !== t('product.notOZ')) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
           {wbCode !== t('product.notWB') && <a 
@@ -417,7 +555,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   return (
     <div className="items-grid-container">
       {uniqueBaseCodes.map((baseCode) => {
-        const productMeta = productMetas[baseCode] || { templateType: 'default' };
+        const productMeta = productMetas[baseCode] || { 
+          templateType: 'default'
+        };
         const currentTemplate = productMeta.templateType || 'default';
         const relatedItems = items.filter(item => item.startsWith(baseCode + '_'));
         

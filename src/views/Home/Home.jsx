@@ -251,81 +251,81 @@ export const Home = () => {
     };
   
     // Улучшенная функция поиска шаблона
-  const findTemplate = () => {
-    // 1. Проверяем свойства из useMainTemplate
-    if (TEMPLATE_SYSTEM.useMainTemplate.includes(item.properties)) {
-      return TEMPLATE_SYSTEM._default;
-    }
-
-    // 2. Получаем конфигурацию для свойства
-    const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
-    if (!propertyConfig) {
-      return TEMPLATE_SYSTEM._default;
-    }
-
-    // Проверяем полный путь (viewMaterial -> groupMaterial -> brand)
-    if (item.viewMaterial && item.groupMaterial && item.brand) {
-      const viewMat = propertyConfig.viewMaterials?.[item.viewMaterial];
-      const groupMat = viewMat?.groupMaterials?.[item.groupMaterial];
-      const brandTemplate = groupMat?.brands?.[item.brand];
-      if (brandTemplate) return brandTemplate;
-    }
-
-    // Проверяем viewMaterial -> brand
-    if (item.viewMaterial && item.brand) {
-      const brandTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.brands?.[item.brand];
-      if (brandTemplate) return brandTemplate;
-    }
-
-    // Проверяем groupMaterial -> brand
-    if (item.groupMaterial && item.brand) {
-      const brandTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?.brands?.[item.brand];
-      if (brandTemplate) return brandTemplate;
-    }
-
-    // Проверяем только brand
-    if (item.brand) {
-      const brandTemplate = propertyConfig.brands?.[item.brand];
-      if (brandTemplate) return brandTemplate;
-    }
-
-    // Проверяем viewMaterial -> groupMaterial
-    if (item.viewMaterial && item.groupMaterial) {
-      const groupTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.groupMaterials?.[item.groupMaterial]?._default;
-      if (groupTemplate) return groupTemplate;
-    }
-
-    // Проверяем только viewMaterial
-    if (item.viewMaterial) {
-      const viewTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?._default;
-      if (viewTemplate) return viewTemplate;
-    }
-
-    // Проверяем только groupMaterial
-    if (item.groupMaterial) {
-      const groupTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?._default;
-      if (groupTemplate) return groupTemplate;
-    }
-
-    // Возвращаем дефолтный для свойства
-    return propertyConfig._default;
-  };
-
-  // Получаем шаблон
-  const template = findTemplate();
+    const findTemplate = () => {
+      // 1. Проверяем свойства из useMainTemplate
+      if (TEMPLATE_SYSTEM.useMainTemplate.includes(item.properties)) {
+        return TEMPLATE_SYSTEM._default;
+      }
+    
+      // 2. Получаем конфигурацию для свойства
+      const propertyConfig = TEMPLATE_SYSTEM.properties[item.properties];
+      if (!propertyConfig) {
+        return TEMPLATE_SYSTEM._default;
+      }
+    
+      // Проверяем полный путь (viewMaterial -> groupMaterial -> brand)
+      if (item.viewMaterial && item.groupMaterial && item.brand) {
+        const viewMat = propertyConfig.viewMaterials?.[item.viewMaterial];
+        const groupMat = viewMat?.groupMaterials?.[item.groupMaterial];
+        const brandTemplate = groupMat?.brands?.[item.brand];
+        if (brandTemplate) return brandTemplate;
+      }
+    
+      // Проверяем viewMaterial -> brand
+      if (item.viewMaterial && item.brand) {
+        const brandTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.brands?.[item.brand];
+        if (brandTemplate) return brandTemplate;
+      }
+    
+      // Проверяем groupMaterial -> brand
+      if (item.groupMaterial && item.brand) {
+        const brandTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?.brands?.[item.brand];
+        if (brandTemplate) return brandTemplate;
+      }
+    
+      // Проверяем только brand
+      if (item.brand) {
+        const brandTemplate = propertyConfig.brands?.[item.brand];
+        if (brandTemplate) return brandTemplate;
+      }
+    
+      // Проверяем viewMaterial -> groupMaterial
+      if (item.viewMaterial && item.groupMaterial) {
+        const groupTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?.groupMaterials?.[item.groupMaterial]?._default;
+        if (groupTemplate) return groupTemplate;
+      }
+    
+      // Проверяем только viewMaterial
+      if (item.viewMaterial) {
+        const viewTemplate = propertyConfig.viewMaterials?.[item.viewMaterial]?._default;
+        if (viewTemplate) return viewTemplate;
+      }
+    
+      // Проверяем только groupMaterial
+      if (item.groupMaterial) {
+        const groupTemplate = propertyConfig.groupMaterials?.[item.groupMaterial]?._default;
+        if (groupTemplate) return groupTemplate;
+      }
+    
+      // Возвращаем дефолтный для свойства
+      return propertyConfig._default;
+    };
   
-  // Определяем тип шаблона
-  const templateType = getTemplateType(template);
-
-  // Обрабатываем в зависимости от типа
-  switch (templateType) {
-    case 'complex':
-      return processComplexTemplate(template);
-    case 'simple':
-      return replacePlaceholders(template, item);
-    default:
-      return replacePlaceholders([template], item);
-  }
+    // Получаем шаблон
+    const template = findTemplate();
+    
+    // Определяем тип шаблона
+    const templateType = getTemplateType(template);
+  
+    // Обрабатываем в зависимости от типа
+    switch (templateType) {
+      case 'complex':
+        return processComplexTemplate(template);
+      case 'simple':
+        return replacePlaceholders(template, item);
+      default:
+        return replacePlaceholders([template], item);
+    }
   }, [templates]);
 
   //const generateDesignData = useCallback((item) => {
@@ -413,33 +413,33 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    //setLoading(true);
-    //
-    //const searchQuery = normalizedArticles.join(' ');
-    //const encodedSearch = encodeURIComponent(searchQuery);
-    //
-    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
-    //  .then(response => response.json())
-    //  .then(data => {
-    //    if (data.results.length === 0) {
-    //      const message = t('views.homeMissingCode');
-    //      setInfoMessage(message);
-    //      return Promise.reject(message);
-    //    }
-    //
-    //    const productIds = data.results.map(product => product.id);
-    //    const idsParam = productIds.join(',');
-    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //  })
-    //  .then(response => response?.json())
-    //  .then(detailedData => {
-    //    if (!detailedData) return;
+    setLoading(true);
+    
+    const searchQuery = normalizedArticles.join(' ');
+    const encodedSearch = encodeURIComponent(searchQuery);
+    
+    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length === 0) {
+          const message = t('views.homeMissingCode');
+          setInfoMessage(message);
+          return Promise.reject(message);
+        }
+    
+        const productIds = data.results.map(product => product.id);
+        const idsParam = productIds.join(',');
+        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+      })
+      .then(response => response?.json())
+      .then(detailedData => {
+        if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      const processedResults = processProductsData(data);
-      const processedMetaResults = processProductsMeta(data);
-      //const processedResults = processProductsData(detailedData);
-      //const processedMetaResults = processProductsMeta(detailedData);
+      //const processedResults = processProductsData(data);
+      //const processedMetaResults = processProductsMeta(data);
+      const processedResults = processProductsData(detailedData);
+      const processedMetaResults = processProductsMeta(detailedData);
             
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -469,16 +469,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    //})
-    //.catch(error => {
-    //  console.error('Error:', error);
-    //  setError(error.message || "An error occurred");
-    //  setValidArticles([]);
-    //  setIsSearchActive(false);
-    //})
-    //.finally(() => {
-    //  setLoading(false);
-    //});
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setError(error.message || "An error occurred");
+      setValidArticles([]);
+      setIsSearchActive(false);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

@@ -25,6 +25,7 @@ export const TextElement = ({
   
   const textStyle = {
     position: 'relative',
+    paddingLeft: '2px',
     color: element.color || '#333',
     fontSize: `${element.fontSize || 32}px`,
     fontFamily: element.fontFamily || 'HeliosCond',

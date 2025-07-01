@@ -1,18 +1,26 @@
 [
   [
     {
-      "id": 1744221023619,
-      "type": "element",
+      "id": 1751369985641,
+      "type": "background",
       "position": {
-          "x": 0,
-          "y": 0
+        "x": 0,
+        "y": 0
       },
-      "isFlipped": false,
-      "image": "/images/fon-01-01.png",
-      "width": 450,
-      "height": 600,
-      "originalWidth": 900,
-      "originalHeight": 1200
+      "backgroundImage": "/images/fon-01-02.png",
+      "color": "#ccddea",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900,
+      "styles": {
+        "default": { "backgroundImage": "/images/fon-01-01.png" },
+        "red": { "backgroundImage": "/images/fon-01-02.png" },
+        "green": { "backgroundImage": "/images/fon-01-03.png" },
+        "yellow": { "backgroundImage": "/images/fon-01-04.png" },
+        "crimson": { "backgroundImage": "/images/fon-01-05.png" }
+      }
     },
     {
       "id": 1744221038696,
@@ -47,13 +55,13 @@
       "id": 1744221189410,
       "type": "element",
       "position": {
-          "x": 320.5,
-          "y": 415.5
+          "x": 316,
+          "y": 398
       },
       "isFlipped": false,
       "image": "/images/sertif.png",
-      "width": 104,
-      "height": 104,
+      "width": 114,
+      "height": 114,
       "originalWidth": 263,
       "originalHeight": 263
     },
@@ -69,7 +77,14 @@
       "width": 114,
       "height": 114,
       "originalWidth": 250,
-      "originalHeight": 250
+      "originalHeight": 250,
+      "styles": {
+        "default": { "image": "/images/round-01.png" },
+        "red": { "image": "/images/round-02.png" },
+        "green": { "image": "/images/round-05.png" },
+        "yellow": { "image": "/images/round-04.png" },
+        "crimson": { "image": "/images/round-02.png" }
+      }
     },
     {
       "id": 1744221137175,
@@ -83,7 +98,14 @@
       "width": 114,
       "height": 114,
       "originalWidth": 250,
-      "originalHeight": 250
+      "originalHeight": 250,
+      "styles": {
+        "default": { "image": "/images/round-08.png" },
+        "red": { "image": "/images/round-10.png" },
+        "green": { "image": "/images/round-07.png" },
+        "yellow": { "image": "/images/round-10.png" },
+        "crimson": { "image": "/images/round-08.png" }
+      }
     },
     {
       "id": 1744221504335,
@@ -132,6 +154,8 @@
           "y": 67
       },
       "text": "{{CATEGORY}}",
+      "width": 410,
+      "height": 42,
       "fontSize": 32,
       "color": "#ffffff",
       "fontFamily": "GemarFont",
@@ -152,6 +176,21 @@
     }  
   ],
   [
+    {
+      "id": 1751377556552,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/fon-02-01.png",
+      "color": "#ccddea",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900
+    },
     {
         "id": 1744221252268,
         "type": "image",
@@ -199,18 +238,57 @@
         "id": 1744731970068,
         "type": "element",
         "position": {
-            "x": 25,
-            "y": 28.125
+            "x": 22,
+            "y": 25.156
         },
+        "rotation": 0,
         "isFlipped": false,
-        "image": "/images/message-01.png",
-        "width": 185,
-        "height": 74.7,
-        "originalWidth": 525,
-        "originalHeight": 212
+        "image": "/images/bubbles-14.png",
+        "width": 194,
+        "height": 84,
+        "originalWidth": 540,
+        "originalHeight": 230,
+        "styles": {
+          "default": { "image": "/images/bubbles-14.png" },
+          "red": { "image": "/images/bubbles-15.png" },
+          "green": { "image": "/images/bubbles-17.png" },
+          "yellow": { "image": "/images/bubbles-16.png" },
+          "crimson": { "image": "/images/bubbles-13.png" }
+        }
+    },
+    {
+      "id": 1751377667470,
+      "type": "text",
+      "color": "#ffffff",
+      "fontFamily": "GemarFont",
+      "fontSize": 22,
+      "height": 54,
+      "position": {
+        "x": 48, 
+        "y": 41
+      },
+      "rotation": -5.825,
+      "text": "Удобная упаковка",
+      "textAlign": "center",
+      "width": 145.188
     }
   ],
   [
+    {
+      "id": 1751378702298,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/fon-02-01.png",
+      "color": "#ccddea",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900
+    },
     {
         "id": 1744221252268,
         "type": "image",
@@ -255,18 +333,42 @@
         "originalHeight": 263
     },
     {
-        "id": 1744732957739,
-        "type": "element",
-        "position": {
-            "x": 35,
-            "y": 36
-        },
-        "isFlipped": false,
-        "image": "/images/message-02.png",
-        "width": 165,
-        "height": 135.5,
-        "originalWidth": 358,
-        "originalHeight": 294
+      "id": 1751378876040,
+      "type": "element",
+      "position": {
+          "x": 31,
+          "y": 15
+      },
+      "rotation": 0,
+      "isFlipped": false,
+      "image": "/images/bubbles-25.png",
+      "width": 169,
+      "height": 169,
+      "originalWidth": 450,
+      "originalHeight": 450,
+      "styles": {
+        "default": { "image": "/images/bubbles-25.png" },
+        "red": { "image": "/images/bubbles-26.png" },
+        "green": { "image": "/images/bubbles-27.png" },
+        "yellow": { "image": "/images/bubbles-29.png" },
+        "crimson": { "image": "/images/bubbles-28.png" }
+      }
+    },
+    {
+      "id": 1751378939725,
+      "type": "text",
+      "color": "#ffffff",
+      "fontFamily": "GemarFont",
+      "fontSize": 34,
+      "height": 67,
+      "position": {
+        "x": 49, 
+        "y": 57
+      },
+      "rotation": -7,
+      "text": "Яркий дизайн",
+      "textAlign": "center",
+      "width": 124.281
     }
   ]
 ]
