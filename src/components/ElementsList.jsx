@@ -706,7 +706,7 @@ export const ElementsList = ({
                               
                             }}
                             style={{ 
-                              background: `linear-gradient(${brand.direction}, ${brand.color[0]}, ${brand.color[1]})`,
+                              background: `linear-gradient(${brand.direction}, ${brand.color[0]}, ${brand.color[1]}${brand.color[2] ? `, ${brand.color[2]}` : ''})`,
                               border: element?.gradient?.colors?.join() === brand.color.join() && "2px solid #2196F3",
                             }}
                             className="color-button"
@@ -813,6 +813,24 @@ export const ElementsList = ({
                           />
                           <span>{(element.gradient?.opacity?.[1] || 0).toFixed(1)}</span>
                         </div>
+
+                        {element.gradient?.colors?.[2] && <div className="opacity-control">
+                          <label>{t('elements.subtitleColor')} 3:</label>
+                          <input
+                            type="color"
+                            value={element.gradient?.colors?.[2] || '#ffffff'}
+                            onChange={(e) => handleGradientChange(element.id, 'color3', e.target.value)}
+                          />
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={element.gradient?.opacity?.[2] || 1}
+                            onChange={(e) => handleGradientChange(element.id, 'opacity3', e.target.value)}
+                          />
+                          <span>{(element.gradient?.opacity?.[2] || 1).toFixed(1)}</span>
+                        </div>}
                       </div>
                     </div>
                   )}

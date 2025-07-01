@@ -392,13 +392,25 @@ export const Generator = () => {
             ...gradient,
             ...(type === 'direction' && { direction: value }),
             ...(type === 'start' && { start: value }),
-            ...(type === 'color1' && { colors: [value, gradient.colors[1]] }),
-            ...(type === 'color2' && { colors: [gradient.colors[0], value] }),
+            // Обновление цветов с сохранением всех существующих значений
+            ...(type === 'color1' && { 
+              colors: [value, gradient.colors[1], gradient.colors[2]].filter(Boolean) 
+            }),
+            ...(type === 'color2' && { 
+              colors: [gradient.colors[0], value, gradient.colors[2]].filter(Boolean) 
+            }),
+            ...(type === 'color3' && { 
+              colors: [gradient.colors[0], gradient.colors[1], value].filter(Boolean) 
+            }),
+            // Обновление прозрачности с сохранением всех существующих значений
             ...(type === 'opacity1' && { 
-              opacity: [parseFloat(value), gradient.opacity[1]] 
+              opacity: [parseFloat(value), gradient.opacity[1], gradient.opacity[2]].filter(n => !isNaN(n)) 
             }),
             ...(type === 'opacity2' && { 
-              opacity: [gradient.opacity[0], parseFloat(value)] 
+              opacity: [gradient.opacity[0], parseFloat(value), gradient.opacity[2]].filter(n => !isNaN(n)) 
+            }),
+            ...(type === 'opacity3' && { 
+              opacity: [gradient.opacity[0], gradient.opacity[1], parseFloat(value)].filter(n => !isNaN(n)) 
             }),
           }
         };

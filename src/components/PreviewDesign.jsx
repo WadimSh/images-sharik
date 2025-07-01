@@ -93,7 +93,11 @@ export const PreviewDesign = ({ elements }) => (
                     ? {
                         backgroundImage: `linear-gradient(${element.gradient.direction}, 
                           ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}, 
-                          ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
+                          ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])}${
+                            element.gradient.colors[2] 
+                              ? `, ${hexToRgba(element.gradient.colors[2], element.gradient.opacity[2])}` 
+                              : ''
+                          })`
                       }
                     : {
                         backgroundColor: element.color || '#ccddea'
