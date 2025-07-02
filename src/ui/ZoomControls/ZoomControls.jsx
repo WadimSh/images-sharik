@@ -1,4 +1,4 @@
-import { FiZoomIn, FiZoomOut, FiRefreshCw } from 'react-icons/fi';
+import { FiZoomIn, FiZoomOut, FiMaximize } from 'react-icons/fi';
 
 import './ZoomControls.css';
 
@@ -42,7 +42,7 @@ export const ZoomControls = ({
         disabled={zoomLevel === 1}
         className="zoom-button zoom-reset"
       >
-        <FiRefreshCw size={16} />
+        <FiMaximize size={16} />
       </button>
     </div>
   );

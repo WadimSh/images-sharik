@@ -219,7 +219,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           };
 
           let template;
-          if ((templateKey === 'gemar' || templateKey === 'belbal') && Array.isArray(templates[templateKey])) {
+          if (Array.isArray(templates[templateKey])) {
             const templateArray = templates[templateKey];
             const templateIndex = Math.min(imageIndex, templateArray.length - 1);
             template = templateArray[templateIndex];
@@ -291,7 +291,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           const templateKey = updatedMeta.templateType || 'default';
           let template = templates[templateKey];
   
-          if ((templateKey === 'gemar' || templateKey === 'belbal') && Array.isArray(template)) {
+          if (Array.isArray(template)) {
             const templateIndex = Math.min(imageIndex, template.length - 1);
             template = template[templateIndex];
           }
