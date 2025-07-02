@@ -12,6 +12,7 @@ import { LanguageContext } from '../contexts/contextLanguage';
 
 export const HeaderSection = ({
   captureRef,
+  setZoom,
   slideNumber,
   templates,
   setTemplates,
@@ -32,7 +33,7 @@ export const HeaderSection = ({
   const { marketplace } = useMarketplace();
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+    
   const handleBack = () => {
     if (!slideNumber) {
       localStorage.removeItem('design-collage');
@@ -131,8 +132,10 @@ export const HeaderSection = ({
   const handleDownload = async () => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
 
+      setZoom(prev => ({ ...prev, level: 1 }));
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       let baseCode, slideType;
       let slideNumberPart = slideNumber;
       
@@ -223,6 +226,8 @@ export const HeaderSection = ({
     } catch (error) {
       console.error('Generation error:', error);
       alert('Error during image generation!');
+    } finally {
+      setLoading(false);
     }
   };
 

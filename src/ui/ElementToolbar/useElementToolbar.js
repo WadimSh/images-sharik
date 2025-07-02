@@ -28,7 +28,9 @@ export const useElementToolbar = (
           position: { x: 100, y: 100 },
           fontSize: 32,
           color: '#333333',
-          fontFamily: 'HeliosCond'
+          fontFamily: 'HeliosCond',
+          width: 164,
+          height: 36
         };
         setElements(prev => [...prev, newTextElement]);
         break;

@@ -195,6 +195,11 @@
 
 
 /* --- */
+.zoom-wrapper {
+  display: inline-block; /* Или другой подходящий display */
+  transform-origin: top center;
+}
+
 .design-container {
   position: relative;
   width: 450px;
@@ -238,7 +243,7 @@
 .dragging-overlay {
   position: fixed;
   pointer-events: none;
-  z-index: 999;
+  z-index: 9999;
   border: 1px solid #007bff;
   box-sizing: border-box;
   opacity: 0;

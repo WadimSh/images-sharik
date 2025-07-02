@@ -111,13 +111,16 @@
       "id": 1744221504335,
       "type": "text",
       "position": {
-          "x": 343,
+          "x": 324,
           "y": 159
       },
       "text": "{{MULTIPLICITY}}",
       "fontSize": 48,
       "color": "#ffffff",
       "fontFamily": "GemarFont",
+      "textAlign": "center",
+      "width": 95,
+      "height": 43,
       "image": null
     },
     {
@@ -131,19 +134,24 @@
       "fontSize": 24,
       "color": "#ffffff",
       "fontFamily": "GemarFont",
+      "width": 38,
+      "height": 25,
       "image": null
     },
     {
       "id": 1744221657494,
       "type": "text",
       "position": {
-          "x": 337,
-          "y": 307
+          "x": 327,
+          "y": 309
       },
       "text": "{{SIZE}}",
       "fontSize": 29,
       "color": "#ffffff",
       "fontFamily": "GemarFont",
+      "textAlign": "center",
+      "width": 92,
+      "height": 28,
       "image": null
     },
     {
@@ -155,7 +163,7 @@
       },
       "text": "{{CATEGORY}}",
       "width": 410,
-      "height": 42,
+      "height": 38,
       "fontSize": 32,
       "color": "#ffffff",
       "fontFamily": "GemarFont",
@@ -169,6 +177,8 @@
           "y": 24
       },
       "text": "{{TITLE}}",
+      "width": 410,
+      "height": 42,
       "fontSize": 42,
       "color": "#ffffff",
       "fontFamily": "GemarFont",

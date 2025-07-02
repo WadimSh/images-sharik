@@ -20,7 +20,9 @@ export const ShapeElement = ({
   element,
   selectedElementId,
   selectedElementIds,
-  onDeselect
+  onDeselect,
+  zoom,
+  captureRef
 }) => {
   const containerRef = useRef(null);
   
@@ -52,6 +54,8 @@ export const ShapeElement = ({
       selectedElementId={selectedElementId}
       selectedElementIds={selectedElementIds}
       onDeselect={onDeselect}
+      zoom={zoom}
+      captureRef={captureRef}
     >
       <div 
         ref={containerRef}

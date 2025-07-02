@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 const DraggableElement = ({ 
   contextMenuRef,
@@ -17,7 +18,9 @@ const DraggableElement = ({
   onContextMenu,
   onClick,
   onDeselect,
-  hideOverlay = false
+  hideOverlay = false,
+  zoom = 1,
+  captureRef = null
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -35,20 +38,24 @@ const DraggableElement = ({
     setCurrentRotation(rotation);
   }, [rotation]);
 
-  const updateOverlayPosition = () => {
-    if (!elementRef.current || !overlayRef.current) return;
-    
-    const element = elementRef.current;
-    const overlay = overlayRef.current;
-    
-    // Синхронизируем размеры с текущими значениями из DOM
-    overlay.style.width = `${element.offsetWidth}px`;
-    overlay.style.height = `${element.offsetHeight}px`;
-    
-    // Обновляем позицию после изменения размеров
-    const rect = element.getBoundingClientRect();
-    overlay.style.left = `${rect.left}px`;
-    overlay.style.top = `${rect.top}px`;
+  // Новая функция для вычисления абсолютных координат overlay
+  const getOverlayStyle = () => {
+    if (!captureRef?.current) return { display: 'none' };
+    const containerRect = captureRef.current.getBoundingClientRect();
+    const left = containerRect.left + position.x * zoom;
+    const top = containerRect.top + position.y * zoom;
+    const width = (dimensions ? dimensions.width : 0) * zoom;
+    const height = (dimensions ? dimensions.height : 0) * zoom;
+    return {
+      position: 'fixed',
+      left,
+      top,
+      width,
+      height,
+      pointerEvents: 'none',
+      zIndex: 9999,
+      transform: `rotate(${currentRotation}deg)`
+    };
   };
 
   useEffect(() => {
@@ -59,7 +66,6 @@ const DraggableElement = ({
 
     if (selectedElementId === id || selectedElementIds.includes(id)) {
       setIsOverlayVisible(true);
-      updateOverlayPosition();
     } else {
       setIsOverlayVisible(false);
     }
@@ -116,7 +122,6 @@ const DraggableElement = ({
       const newRotation = (currentRotation + angle * (180/Math.PI)) % 360;
       setCurrentRotation(newRotation);
       onRotate?.(newRotation);
-      updateOverlayPosition();
     };
 
     const handleMouseUpR = () => {
@@ -179,7 +184,6 @@ const DraggableElement = ({
     });
     setIsDragging(true);
     setIsOverlayVisible(true);
-    updateOverlayPosition();
   };
 
   const handleMouseMove = (e) => {
@@ -244,9 +248,6 @@ const DraggableElement = ({
           y: newY
         });
       }
-  
-      updateOverlayPosition();
-      return;
     }
   
     if (isDragging && elementRef.current) {
@@ -263,8 +264,6 @@ const DraggableElement = ({
         // Для одиночного элемента используем абсолютные координаты
         onDrag({ x: newX, y: newY });
       }
-      
-      updateOverlayPosition();
     }
   };
 
@@ -305,7 +304,6 @@ const DraggableElement = ({
         cursor: isDragging ? 'grabbing' : 'grab',
         transform: `rotate(${currentRotation}deg)`,
         transformOrigin: 'center center'
-        
       }}
       onMouseDown={handleMouseDown}
       onContextMenu={onContextMenu}
@@ -313,56 +311,49 @@ const DraggableElement = ({
       >
         {children}
       </div>
+    </div>
+    {/* Overlay через Portal */}
+    {isOverlayVisible && captureRef?.current && ReactDOM.createPortal(
       <div 
         ref={overlayRef}
-        className={`dragging-overlay ${isOverlayVisible ? 'visible' : ''}`}
-        style={{
-          transform: `rotate(${currentRotation}deg)`,
-          width: dimensions ? `${dimensions.width}px` : 'auto',
-          height: dimensions ? `${dimensions.height}px` : 'auto',
-        }}
+        className={`dragging-overlay visible`}
+        style={getOverlayStyle()}
       >
         {/* Ручка поворота */}
-        {isOverlayVisible && (
-          <div
-            ref={rotateHandleRef}
-            className='rotate-handle'
-            onMouseDown={handleRotateStart}
-            style={{
-              
-            }}
-          />
-        )}
-      
+        <div
+          ref={rotateHandleRef}
+          className='rotate-handle'
+          onMouseDown={handleRotateStart}
+        />
         {/* Кнопка изменения размера */}
-        {splitResizable && isOverlayVisible && (
+        {splitResizable && (
           <>
-            <div className={`resize-handle left ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle left visible`}
               onMouseDown={(e) => handleDirectionalResize(e, 'left')} />
-            <div className={`resize-handle right ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle right visible`}
               onMouseDown={(e) => handleDirectionalResize(e, 'right')} />
-            <div className={`resize-handle top ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle top visible`}
               onMouseDown={(e) => handleDirectionalResize(e, 'top')} />
-            <div className={`resize-handle bottom ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle bottom visible`}
               onMouseDown={(e) => handleDirectionalResize(e, 'bottom')} />
           </>
         )}
         {/* Кнопка пропорционального изменения размера */}
-        {resizeable && isOverlayVisible && (
+        {resizeable && (
           <>
-            <div className={`resize-handle top-left ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle top-left visible`}
               onMouseDown={(e) => handleProportionalResize(e, 'top-left')} />
-            <div className={`resize-handle top-right ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle top-right visible`}
               onMouseDown={(e) => handleProportionalResize(e, 'top-right')} />
-            <div className={`resize-handle bottom-left ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle bottom-left visible`}
               onMouseDown={(e) => handleProportionalResize(e, 'bottom-left')} />
-            <div className={`resize-handle bottom-right ${isOverlayVisible ? 'visible' : ''}`}
+            <div className={`resize-handle bottom-right visible`}
               onMouseDown={(e) => handleProportionalResize(e, 'bottom-right')} />
           </>
         )}
-      </div>
-    </div>
-    
+      </div>,
+      document.body
+    )}
   </>);
 };
 

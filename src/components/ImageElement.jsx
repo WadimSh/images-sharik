@@ -20,7 +20,9 @@ export const ImageElement = ({
   onClick,
   selectedElementId,
   selectedElementIds, 
-  onDeselect
+  onDeselect,
+  zoom,
+  captureRef
 }) => {
   const [imageSrc, setImageSrc] = useState('');
   
@@ -78,6 +80,8 @@ export const ImageElement = ({
       selectedElementId={selectedElementId}
       selectedElementIds={selectedElementIds}
       onDeselect={onDeselect}
+      zoom={zoom}
+      captureRef={captureRef}
     >
       {imageSrc && <img // Добавляем проверку на наличие src
         src={imageSrc}

@@ -1,0 +1,96 @@
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 6px;
+  border: none;
+  gap: 4px;
+}
+
+.zoom-controls.vertical {
+  flex-direction: column;
+}
+
+.zoom-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  color: #4a5568;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.zoom-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.zoom-button:active {
+  background: #f1f5f9;
+  transform: scale(0.95);
+}
+
+.zoom-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8fafc;
+  border-color: #f1f5f9;
+}
+
+.zoom-button:disabled:hover {
+  background: #f8fafc;
+  border-color: #f1f5f9;
+}
+
+.zoom-percentage {
+  min-width: 52px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  margin: 0 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.zoom-controls.vertical .zoom-percentage {
+  writing-mode: vertical-rl;
+  transform: rotate(-90deg);
+  min-width: unset;
+  min-height: 24px;
+  max-height: 24px;
+}
+
+/* Стили для иконок */
+.zoom-button svg {
+  pointer-events: none;
+  stroke-width: 2px;
+}
+
+.zoom-in, .zoom-out {
+  color: #3b82f6; /* Синий для кнопки увеличения и уменьшения */
+}
+
+.zoom-reset {
+  color: #64748b; /* Серый для кнопки сброса */
+}
+
+.zoom-in:hover,
+.zoom-out:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.zoom-reset:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #475569;
+}

@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import ReactDOM from 'react-dom';
 
 import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
@@ -19,6 +20,7 @@ import { CollageTempleModal } from '../../components/CollageTempleModal';
 import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
+import { ZoomControls } from '../../ui/ZoomControls/ZoomControls';
 
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
@@ -115,6 +117,64 @@ export const Generator = () => {
     offsetX: 20,
     offsetY: 20,
   });
+  // Состояния для зума и функции управления им
+  const [zoom, setZoom] = useState({
+    level: 1,
+    min: 0.1,
+    max: 3,
+    step: 0.01
+  });
+  
+  const handleZoomIn = () => {
+    setZoom(prev => ({
+      ...prev,
+      level: Math.min(prev.level + prev.step, prev.max)
+    }));
+  };
+  
+  const handleZoomOut = () => {
+    setZoom(prev => ({
+      ...prev,
+      level: Math.max(prev.level - prev.step, prev.min)
+    }));
+  };
+  
+  const handleResetZoom = () => {
+    setZoom(prev => ({ ...prev, level: 1 }));
+  };
+
+  // Обработка горячих клавиш зума
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Проверяем, что нажат Ctrl
+      if (e.ctrlKey || e.metaKey) { // metaKey для Mac (Cmd)
+        switch (e.key) {
+          case '+':
+          case '=': // + обычно находится на той же клавише, что и =
+            handleZoomIn();
+            e.preventDefault();
+            break;
+          case '-':
+          case '_': // - обычно находится на той же клавише, что и _
+            handleZoomOut();
+            e.preventDefault();
+            break;
+          case '0':
+            handleResetZoom();
+            e.preventDefault();
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [zoom.step, zoom.min, zoom.max]);
 
   const [initialCollage] = useState(processedElements);
   
@@ -921,11 +981,23 @@ export const Generator = () => {
   const handleContextMenu = (e, elementId) => {
     e.preventDefault();
     setSelectedElementId(elementId);
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY
-    });
+    if (captureRef.current) {
+      const containerRect = captureRef.current.getBoundingClientRect();
+      // Сохраняем координаты относительно контейнера (без деления на zoom)
+      const x = e.clientX - containerRect.left;
+      const y = e.clientY - containerRect.top;
+      setContextMenu({
+        visible: true,
+        x,
+        y
+      });
+    } else {
+      setContextMenu({
+        visible: true,
+        x: 0,
+        y: 0
+      });
+    }
   };
 
   // Закрытие меню
@@ -1088,6 +1160,7 @@ export const Generator = () => {
     <div className="generator-container">
       <HeaderSection 
         captureRef={captureRef}
+        setZoom={setZoom}
         slideNumber={slideNumber}
         templates={templates}
         setTemplates={setTemplates}
@@ -1123,6 +1196,7 @@ export const Generator = () => {
             />
           )}
           
+          <div className="zoom-wrapper" style={{ transform: `scale(${zoom.level})`, transformOrigin: 'top center',zIndex: '999' }}>
           <div 
             ref={captureRef} 
             className="design-container"
@@ -1209,6 +1283,8 @@ export const Generator = () => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
                       }}
+                      zoom={zoom.level}
+                      captureRef={captureRef}
                     />
                   );
                 case 'element':
@@ -1244,6 +1320,8 @@ export const Generator = () => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
                       }}
+                      zoom={zoom.level}
+                      captureRef={captureRef}
                     />
                   );
                 case 'shape':
@@ -1277,6 +1355,8 @@ export const Generator = () => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
                       }}
+                      zoom={zoom.level}
+                      captureRef={captureRef}
                     />
                   );
                 case 'text':
@@ -1314,6 +1394,8 @@ export const Generator = () => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
                       }}
+                      zoom={zoom.level}
+                      captureRef={captureRef}
                     />
                   );
                 default:
@@ -1322,17 +1404,20 @@ export const Generator = () => {
             })}
 
             {/* Контекстное меню */}
-            {contextMenu.visible && (() => {
+            {contextMenu.visible && captureRef.current && (() => {
               const element = elements.find(el => el.id === selectedElementId);
-              return (
+              const containerRect = captureRef.current.getBoundingClientRect();
+              const left = containerRect.left + contextMenu.x * zoom.level;
+              const top = containerRect.top + contextMenu.y * zoom.level;
+              return ReactDOM.createPortal(
                 <div 
                   ref={contextMenuRef}
                   className="context-menu"
                   style={{
                     position: 'fixed',
-                    left: contextMenu.x,
-                    top: contextMenu.y,
-                    zIndex: 1000
+                    left,
+                    top,
+                    zIndex: 1000000000
                   }}
                 >
                   <button onClick={handleCopy}>
@@ -1407,12 +1492,25 @@ export const Generator = () => {
                   >
                     {t('views.generatorMenuDelete')}
                   </button>
-                </div>
+                </div>,
+                document.body
               );
             })()}
           </div>
+          </div>
         </div> 
-
+          <div style={{ marginTop: 'auto' }}>
+            <ZoomControls 
+              zoomLevel={zoom.level}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onReset={handleResetZoom}
+              minZoom={zoom.min}
+              maxZoom={zoom.max}
+              layout = 'vertical'
+              //showPercentage={false}
+            />
+          </div>
         <div>
           <ElementToolbar 
             onAddElement={handleAddElement} 

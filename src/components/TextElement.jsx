@@ -17,7 +17,9 @@ export const TextElement = ({
   onClick,
   selectedElementId,
   selectedElementIds,
-  onDeselect
+  onDeselect,
+  zoom,
+  captureRef
 }) => {
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
@@ -94,6 +96,8 @@ export const TextElement = ({
       onDeselect={onDeselect}
       splitResizable
       hideOverlay={isEditing}
+      zoom={zoom}
+      captureRef={captureRef}
     >
       <div 
         className="text-content-wrapper" 
