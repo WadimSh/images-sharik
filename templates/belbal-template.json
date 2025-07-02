@@ -134,39 +134,47 @@
       "id": 1744221504335,
       "type": "text",
       "position": {
-          "x": 357,
+          "x": 338,
           "y": 112
       },
       "text": "{{MULTIPLICITY}}",
       "fontSize": 56,
       "color": "#ffffff",
       "fontFamily": "BelbalFontRegul",
+      "textAlign": "center",
+      "width": 87,
+      "height": 54,
       "image": null
     },
     {
       "id": 1744734115161,
       "type": "text",
       "position": {
-          "x": 366,
-          "y": 159
+          "x": 365,
+          "y": 161
       },
       "text": "шт",
       "fontSize": 28,
       "color": "#ffffff",
       "fontFamily": "BelbalFontRegul",
+      "width": 40,
+      "height": 28,
       "image": null
     },
     {
       "id": 1744221657494,
       "type": "text",
       "position": {
-          "x": 346,
-          "y": 240
+          "x": 339,
+          "y": 241
       },
       "text": "{{SIZE}}",
       "fontSize": 36,
       "color": "#ffffff",
       "fontFamily": "BelbalFontRegul",
+      "textAlign": "center",
+      "width": 86,
+      "height": 35,
       "image": null
     },
     {
