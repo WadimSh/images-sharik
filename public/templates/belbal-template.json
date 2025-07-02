@@ -200,7 +200,7 @@
           "y": 20
       },
       "text": "{{TITLE}}",
-      "height": 42,
+      "height": 57,
       "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
@@ -333,7 +333,7 @@
           "y": 20
       },
       "text": "{{TITLE}}",
-      "height": 42,
+      "height": 57,
       "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
@@ -466,7 +466,7 @@
           "y": 20
       },
       "text": "{{TITLE}}",
-      "height": 42,
+      "height": 57,
       "width": 410,
       "fontSize": 48,
       "color": "#0033a0",
