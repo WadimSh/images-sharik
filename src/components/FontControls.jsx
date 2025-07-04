@@ -189,6 +189,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
           <option value="FreeSetRegular">FreeSetRegular</option>
           <option value="FreeSetBold">FreeSetBold</option>
           <option value="MyriadPro">MyriadPro</option>
+          <option value="RF_Krabuler">RF Krabuler</option>
           <option value="Bosk">Bosk</option>
           <option value="Troubleside">Troubleside</option>
           <option value="Badaboom">Badaboom</option>

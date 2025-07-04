@@ -68,6 +68,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'RF_Krabuler';
+  src: url('./assets/fonts/rfkrabuler_regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
