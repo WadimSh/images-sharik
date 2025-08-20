@@ -75,6 +75,27 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'FuturaRound';
+  src: url('./assets/fonts/a_FuturaRound.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FuturaRoundDemi';
+  src: url('./assets/fonts/a_FuturaRoundDemi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoslinGothic_DG';
+  src: url('./assets/fonts/roslyngothicmedium-dg-medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
