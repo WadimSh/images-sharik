@@ -142,7 +142,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       const templateKey = productMeta.templateType || 'default';
       let selectedTemplate = templates.default;
     
-      if (templateKey === 'belbal' || templateKey === 'gemar') {
+      if (templateKey === 'belbal' || templateKey === 'gemar' || templateKey === 'petard') {
         const templateArray = templates[templateKey] || [];
         const imageIndex = newNumber - 1;
         const templateIndex = Math.min(imageIndex, templateArray.length - 1);
@@ -383,6 +383,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const templateOptions = {
     belbal: t('grid.belbal'),
     gemar: t('grid.gemar'),
+    petard: t('grid.petard'),
     main: t('grid.main'),
     default: t('grid.default'),
     // bubble: t('grid.bubble'),
@@ -457,7 +458,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     // fant: t('grid.fant'),
     // cakeFigurine: t('grid.cakeFigurine'),
     // photoProps: t('grid.photoProps'),
-    // partyPopper: t('grid.partyPopper'),
     // latexBalls: t('grid.latexBalls'),
     // foilBalls: t('grid.foilBalls'),
     // blowouts: t('grid.blowouts'),

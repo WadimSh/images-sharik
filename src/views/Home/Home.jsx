@@ -21,6 +21,7 @@ export const Home = () => {
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   
   const [templates, setTemplates] = useState({
+    petard: [],
     belbal: [],
     gemar: [],
     main: [],
@@ -65,13 +66,14 @@ export const Home = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate] = await Promise.all([
+        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate, petardTemplate] = await Promise.all([
           fetch('/templates/main-template.json').then(r => r.json()),
           fetch('/templates/default-template.json').then(r => r.json()),
           fetch('/templates/gemar-template.json').then(r => r.json()),
           fetch('/templates/belbal-template.json').then(r => r.json()),
+          fetch('/templates/petard-template.json').then(r => r.json())
         ]);
-        setTemplates({ belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
+        setTemplates({ petard: petardTemplate, belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
       } catch (error) {
         console.error('Error loading templates:', error);
       }
@@ -106,7 +108,11 @@ export const Home = () => {
       // Добавляем определение типа шаблона
       const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
       const brand = brandProperty ? brandProperty.value : '';
-      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : 'main';
+      
+      const properProperty = propertiesList.find(p => p.name === 'Товарная номенклатура');
+      const proper = properProperty ? properProperty.value : '';
+
+      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : proper.toLowerCase() === 'хлопушка' ? 'petard' : 'main';
   
       return {
         code: item.code,
@@ -227,6 +233,9 @@ export const Home = () => {
               _default: templates.main
             }
           }
+        },
+        'Хлопушка': {
+           _default: templates.petard
         }
       },
       
@@ -246,7 +255,7 @@ export const Home = () => {
         'Серпантин', 'Сеть', 'Скатерти', 'Сладкий стол', 'Спецэффекты', 'Спирали',
         'Спрей', 'Стаканы', 'Столовые приборы', 'Тарелки', 'Тассел, бахрома',
         'Украшения на голову', 'Упаковочный', 'Учебные материалы', 'Фант',
-        'Фигурка на торт', 'Фотобутафория', 'Хлопушка', 'Язычки'
+        'Фигурка на торт', 'Фотобутафория', 'Язычки'
       ]
     };
   

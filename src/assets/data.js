@@ -1,5 +1,498 @@
 export const data = [
     {
+    "measure_units_properties": [
+        [
+            "Размер",
+            [
+                "38.0x5.0x5.0 см",
+                "39.0x20.5x15.5 см",
+                "62.5x33.0x41.0 см"
+            ]
+        ],
+        [
+            "Вес брутто",
+            [
+                "201.0 Г",
+                "2550.0 Г(брутто)",
+                "16150.0 Г(брутто)"
+            ]
+        ],
+        [
+            "Объем",
+            [
+                "1.174 дм3",
+                "14.088 дм3",
+                "84.562 дм3"
+            ]
+        ],
+        [
+            "Баз. ед.",
+            [
+                "1 шт",
+                "12 шт",
+                "72 шт"
+            ]
+        ],
+        [
+            "Штрих код. ед.",
+            [
+                "4690390004397",
+                "4690390011821",
+                "4690390011838"
+            ]
+        ]
+    ],
+    "rating": 0,
+    "code": "1501-1143",
+    "units_counts": [
+        [
+            "блк",
+            "12 шт"
+        ],
+        [
+            "кор",
+            "72 шт"
+        ]
+    ],
+    "seo_header": "",
+    "updated_at": "2025-08-20T04:09:53.168746",
+    "rest": 5685,
+    "in_favorite": false,
+    "product_files": [],
+    "category_detail": [
+        {
+            "meta_description": "",
+            "meta_title": "",
+            "code": "SHARIK_RU_4_7_1//01",
+            "name": "Хлопушки",
+            "image": null,
+            "seo_header": "",
+            "slug": "khlopushki",
+            "meta_keywords": "",
+            "seo_caption": "",
+            "seo_text": "",
+            "id": 9650,
+            "extra_info": ""
+        }
+    ],
+    "images": [
+        {
+            "image": "/media/products/65738/c81bf38a-00a4-4df6-844d-6f37a5c6dcb4.jpg",
+            "thumb": {
+                "product_small": "/media/cache/4d/3b/4d3b3c5fba9ba668e33a2c66c3d9f37f.jpg",
+                "zoom_medium": "/media/cache/25/4a/254a6c5fd37c65330172c6a7e3d3c049.jpg",
+                "zoom_large": "/media/cache/9a/e8/9ae86e86ce74fbb5e9e137f7cf046d7c.jpg",
+                "medium": "/media/cache/b9/da/b9da5746c7a28dc2d3e7aefd4e9d9542.jpg"
+            },
+            "id": 171330,
+            "is_base": true
+        },
+        {
+            "image": "/media/products/65738/3148141b-bf11-4f28-93a6-1e0c95d86538.jpg",
+            "thumb": {
+                "product_small": "/media/cache/80/42/80429ec3580057bb698a93d4285201f8.jpg",
+                "zoom_medium": "/media/cache/64/70/64706a69805bb9b027ac79a24a908af4.jpg",
+                "zoom_large": "/media/cache/a6/19/a619b2f87af54144c742a8a5848c823d.jpg",
+                "medium": "/media/cache/7f/d6/7fd63680dc5240ac8c19bd40f24b51df.jpg"
+            },
+            "id": 171236,
+            "is_base": false
+        },
+        {
+            "image": "/media/products/65738/f125aacb-2703-454c-9945-be32daa4f5aa.jpg",
+            "thumb": {
+                "product_small": "/media/cache/5f/d1/5fd167bf02cd12986f56b5798baafdfe.jpg",
+                "zoom_medium": "/media/cache/b8/08/b808ce151f77f798f4e28b21c9952b6c.jpg",
+                "zoom_large": "/media/cache/08/20/0820086bbb08207fd6fd8bfc883ded37.jpg",
+                "medium": "/media/cache/b1/83/b1839330fcc0023ff43a6d497a632bd6.jpg"
+            },
+            "id": 171290,
+            "is_base": false
+        },
+        {
+            "image": "/media/products/65738/cb07643c-295b-4f96-9126-e7d4c016f5e8.jpg",
+            "thumb": {
+                "product_small": "/media/cache/ef/43/ef433002cce4f20cfc6c308286a39a04.jpg",
+                "zoom_medium": "/media/cache/97/c0/97c03bf31811e13856a15a22f36dc6c4.jpg",
+                "zoom_large": "/media/cache/62/8a/628a2b759a08489485b1a06f6d813e95.jpg",
+                "medium": "/media/cache/3e/6f/3e6fbb8d1c376ef1fc026e0d4d0a08de.jpg"
+            },
+            "id": 171301,
+            "is_base": false
+        },
+        {
+            "image": "/media/products/65738/3abf1db5-0eb9-459c-ab44-89e97f7f3720.jpg",
+            "thumb": {
+                "product_small": "/media/cache/c4/0a/c40ac20a97f97a6dcb6cb233b662f89b.jpg",
+                "zoom_medium": "/media/cache/c6/37/c637f144614d4956f2fce9f0f6284cde.jpg",
+                "zoom_large": "/media/cache/39/6e/396e6a8db24e03ed9267c517f1bc8a5b.jpg",
+                "medium": "/media/cache/a1/cf/a1cf95615bd3536d2d4a9557272ec1ea.jpg"
+            },
+            "id": 171188,
+            "is_base": false
+        }
+    ],
+    "document_images": [],
+    "stickers": [],
+    "id": 86992,
+    "extra_info": "",
+    "category": 9650,
+    "slug": "khlopushka-bumfeti-40sm-denezhnyidozhd-evro-1501-1",
+    "seo_text": "",
+    "meta_keywords": "",
+    "seo_caption": "",
+    "measure_units_names": [
+        "Штука",
+        "Блок",
+        "Коробка"
+    ],
+    "meta_description": "",
+    "meta_title": "",
+    "description": "Пневматическое устройство, аналог хлопушки, абсолютно безопасное, предназначено для использования в помещении и на улице, дальность выстрела 8-10 м. Корпус хлопушки состоит из двух частей: пневматического баллона со сжатым воздухом и картонного цилиндра с наполнителем. Баллон изготовлен из металла, надежен и безопасен при хранении и в использовании, обладает высокой прочностью, чтобы выдержать давление воздуха. Хлопушка с наполнением в виде бумажных купюр номиналом 500 евро.",
+    "measure_unit": {
+        "name": "шт",
+        "weight": 201,
+        "height": 5,
+        "volume": 1.174,
+        "width": 5,
+        "length": 38,
+        "common": {
+            "name": "шт",
+            "full_name": "Штука"
+        },
+        "full_name": "Штука",
+        "id": 233516
+    },
+    "properties": [
+        {
+            "name": "Индивидуальная упаковка",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Нет",
+            "unimportant": false,
+            "value_id": 50187,
+            "id": 22900533
+        },
+        {
+            "name": "Вид материала",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Карнавал аксессуары",
+            "unimportant": true,
+            "value_id": 28392,
+            "id": 22532561
+        },
+        {
+            "name": "Группа материала",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Хлопушки",
+            "unimportant": true,
+            "value_id": 28103,
+            "id": 22532562
+        },
+        {
+            "name": "Код ТНВЭД",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "9505 90 0000",
+            "unimportant": true,
+            "value_id": 33730,
+            "id": 22532559
+        },
+        {
+            "name": "Коллекция",
+            "image": "/media/property_value/%D0%BA%D0%B0%D0%B7%D0%B8%D0%BD%D0%BE.png",
+            "value": "Казино",
+            "unimportant": false,
+            "value_id": 27180,
+            "id": 22900527
+        },
+        {
+            "name": "Отрасль",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "5Карнавально праздничная прод.",
+            "unimportant": true,
+            "value_id": 28417,
+            "id": 22532563
+        },
+        {
+            "name": "Событие",
+            "image": "/media/property_value/%D0%9D%D0%9821_23_%D0%A4%D0%B5%D0%B2%D1%80%D0%B0%D0%BB%D1%8F.png",
+            "value": "23 Февраля",
+            "unimportant": false,
+            "value_id": 28429,
+            "id": 22900523
+        },
+        {
+            "name": "Способ выкладки",
+            "image": "/media/property_value/%D1%88%D0%BE%D1%83%D0%B1%D0%BE%D0%BA%D1%81.png",
+            "value": "Шоубокс",
+            "unimportant": false,
+            "value_id": 64568,
+            "id": 22900534
+        },
+        {
+            "name": "Статус мелкий опт",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Базовый ассортимент",
+            "unimportant": false,
+            "value_id": 27733,
+            "id": 22900530
+        },
+        {
+            "name": "Статус товара",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Базовый ассортимент",
+            "unimportant": false,
+            "value_id": 28422,
+            "id": 22900524
+        },
+        {
+            "name": "Статус Франшиза",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Базовый ассортимент",
+            "unimportant": true,
+            "value_id": 27724,
+            "id": 22900531
+        },
+        {
+            "name": "Тип карнавал",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "Пластмассовый",
+            "unimportant": true,
+            "value_id": 29091,
+            "id": 22900522
+        },
+        {
+            "name": "Товарная номенклатура",
+            "image": "/media/property_value/%D0%A5%D0%BB%D0%BE%D0%BF%D1%83%D1%88%D0%BA%D0%B0.png",
+            "value": "Хлопушка",
+            "unimportant": false,
+            "value_id": 49879,
+            "id": 22900529
+        }
+    ],
+    "promotions": [],
+    "name": "Хлопушка Бумфети 40см ДенежныйДождь Евро",
+    "rests": [
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "Сокол, склад-магазин",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "",
+                "address": "ул.Дубосековская, д 4 (МАИ ГУП)",
+                "id": 22
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": 72,
+            "id": 97740,
+            "rest": 70
+        },
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "Нагорный, склад-магазин",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "",
+                "address": "Нагорный проезд, дом 7, Институт вакуумной техники имени С. А. Векшинского, м.Нагатинская",
+                "id": 21
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": null,
+            "id": 91862,
+            "rest": 21
+        },
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "Садовод-Салют, склад-магазин",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "",
+                "address": "ул. Верхние Поля, 56, стр. 11, Садовод, ТЦ “Салют” Вход №1, 3 этаж, павильон № 20",
+                "id": 24
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": null,
+            "id": 109496,
+            "rest": 12
+        },
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "Комсомольская, склад-магазин",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "55.77647194769816,37.65784693652341",
+                "address": "Комсомольская площадь, д. 1 А, строение 2, 17 склад",
+                "id": 23
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": null,
+            "id": 103618,
+            "rest": 26
+        },
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "Фуд Сити, склад-магазин",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "",
+                "address": "Москва, п. Сосненское, 22-й км Калужского шоссе, здание №10",
+                "id": 27
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": null,
+            "id": 184686,
+            "rest": 12
+        },
+        {
+            "warehouse": {
+                "city": 1,
+                "name": "РЦ, Зеленоград",
+                "is_visible": true,
+                "country": 1,
+                "coordinates": "",
+                "address": "Зеленоград, ул.Заводская, д.18, стр.9",
+                "id": 25
+            },
+            "date_of_new_arrival": null,
+            "new_arrival": 6048,
+            "id": 115374,
+            "rest": 5544
+        }
+    ],
+    "multiplicity": 12,
+    "default_price": {
+        "is_rrc": false,
+        "is_visible": false,
+        "price_type": "PR00//ALL//1000",
+        "currency_price": 208,
+        "is_default": false,
+        "currency": "RUB",
+        "original_currency_price": 208,
+        "position": 1
+    },
+    "popularity": 694,
+    "multiplicity_measure_unit": "шт",
+    "icons_property_value": [
+        {
+            "value__image": "/media/property_value/china_glossy_wave_icon_60.png",
+            "value__property__name": "Страна",
+            "value__name": "Китай",
+            "value__property__value_icon_position": 1
+        }
+    ],
+    "dist_markets": "",
+    "origin_properties": [
+        {
+            "name": "Артикул производителя",
+            "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+            "value": "D8340 EURO",
+            "unimportant": false,
+            "value_id": 37939,
+            "id": 22532560
+        },
+        {
+            "name": "Торговая марка",
+            "image": "/media/property_value/%D0%92%D0%B5%D1%81%D1%91%D0%BB%D0%B0%D1%8F_%D0%B7%D0%B0%D1%82%D0%B5%D1%8F.png",
+            "value": "Весёлая Затея",
+            "unimportant": false,
+            "value_id": 27914,
+            "id": 22532564
+        },
+        {
+            "name": "Страна",
+            "image": "/media/property_value/china_glossy_wave_icon_60.png",
+            "value": "Китай",
+            "unimportant": false,
+            "value_id": 27865,
+            "id": 22900528
+        }
+    ],
+    "measure_prices": [
+        {
+            "measure_unit": {
+                "name": "шт",
+                "weight": 201,
+                "height": 5,
+                "volume": 1.174,
+                "width": 5,
+                "length": 38,
+                "common": {
+                    "name": "шт",
+                    "full_name": "Штука"
+                },
+                "full_name": "Штука",
+                "id": 233516
+            },
+            "price": {
+                "is_rrc": false,
+                "is_visible": false,
+                "price_type": "PR00//ALL//1000",
+                "currency_price": 208,
+                "is_default": false,
+                "currency": "RUB",
+                "original_currency_price": 208,
+                "position": 1
+            }
+        },
+        {
+            "measure_unit": {
+                "name": "блк",
+                "weight": 2550,
+                "height": 15.5,
+                "volume": 14.088,
+                "width": 20.5,
+                "length": 39,
+                "common": {
+                    "name": "блк",
+                    "full_name": "Блок"
+                },
+                "full_name": "Блок",
+                "id": 233517
+            },
+            "price": {
+                "is_rrc": false,
+                "is_visible": false,
+                "price_type": "PR00//ALL//1000",
+                "currency_price": 2496,
+                "is_default": false,
+                "currency": "RUB",
+                "original_currency_price": 2496,
+                "position": 1
+            }
+        },
+        {
+            "measure_unit": {
+                "name": "кор",
+                "weight": 16150,
+                "height": 41,
+                "volume": 84.562,
+                "width": 33,
+                "length": 62.5,
+                "common": {
+                    "name": "кор",
+                    "full_name": "Коробка"
+                },
+                "full_name": "Коробка",
+                "id": 233518
+            },
+            "price": {
+                "is_rrc": false,
+                "is_visible": false,
+                "price_type": "PR00//ALL//1000",
+                "currency_price": 14976,
+                "is_default": false,
+                "currency": "RUB",
+                "original_currency_price": 14976,
+                "position": 1
+            }
+        }
+    ]
+},
+    {
         "measure_units_properties": [
             [
                 "Размер",

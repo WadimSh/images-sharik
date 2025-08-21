@@ -1,5 +1,5 @@
 export const getAvailableStyleVariants = (template) => {
-  const variants = new Set(['default']);
+  const variants = new Set([]);
   
   if (!template) return Array.from(variants);
   

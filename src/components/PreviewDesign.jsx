@@ -2,6 +2,7 @@ import { hexToRgba } from "../utils/hexToRgba";
 import img from "../assets/fallback.png";
 
 export const PreviewDesign = ({ elements }) => (
+  
   <div className="preview-container">
     {elements.map((element) => {
       const style = {
@@ -15,13 +16,13 @@ export const PreviewDesign = ({ elements }) => (
       };
       switch (element.type) {
         case 'image':
-          return <img key={element.id} src={element.image === "{{ITEM_IMAGE}}" ? img : element.image} alt="preview" 
+          return <img key={element.id} src={element.image === "{{ITEM_IMAGE}}" ? img : element.image} 
                    style={{
                     ...style,
                     objectFit: 'cover',
                   }} className="preview-element" />;
         case 'element':
-          return <img key={element.id} src={element.image} alt="preview" 
+          return <img key={element.id} src={element.image} 
                    style={{
                     ...style,
                     objectFit: 'cover',
