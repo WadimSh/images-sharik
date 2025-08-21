@@ -15,7 +15,7 @@
     "originalImageHeight": 1201,
     "gradient": null,
     "styles": {
-      "type": {
+      "default": {
         "backgroundImage": "/images/fon-03-03.png"
       },
       "brutal": {
@@ -149,7 +149,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_001.png",
         "width": 200,
         "height": 74,
@@ -210,7 +210,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_003.png",
         "width": 167,
         "height": 62,
@@ -271,7 +271,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_005.png",
         "width": 122,
         "height": 196,
@@ -332,7 +332,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_004.png",
         "width": 217,
         "height": 74,
@@ -395,7 +395,7 @@
     "originalImageHeight": 1201,
     "gradient": null,
     "styles": {
-      "type": {
+      "default": {
         "backgroundImage": "/images/fon-03-03.png"
       },
       "brutal": {
@@ -560,7 +560,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/arrow-01.png",
         "width": 105,
         "height": 48,
@@ -621,7 +621,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_002.png",
         "width": 199,
         "height": 106,
@@ -682,7 +682,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_007.png",
         "width": 201,
         "height": 117,
@@ -743,7 +743,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_006.png",
         "width": 134,
         "height": 216,
@@ -804,7 +804,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_008.png",
         "width": 113,
         "height": 120,
@@ -867,7 +867,7 @@
     "originalImageHeight": 1201,
     "gradient": null,
     "styles": {
-      "type": {
+      "default": {
         "backgroundImage": "/images/fon-03-03.png"
       },
       "brutal": {
@@ -971,7 +971,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_009.png",
         "width": 151,
         "height": 138,
@@ -1032,7 +1032,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_010.png",
         "width": 227,
         "height": 114,
@@ -1093,7 +1093,7 @@
     "isFlipped": false,
     "rotation": 0,
     "styles": {
-      "type": {
+      "default": {
         "image": "/images/bubbles_05+text_011.png",
         "width": 309,
         "height": 92,
@@ -1116,26 +1116,10 @@
         }
       },
       "amur1": {
-        "image": "/images/bubbles_06+text_010.png",
-        "width": 205,
-        "height": 140,
-        "originalWidth": 314,
-        "originalHeight": 215,
-        "position": {
-          "x": 219,
-          "y": 376.5
-        }
+        "visibility": false
       },
       "amur2": {
-        "image": "/images/bubbles_03+text_021.png",
-        "width": 236,
-        "height": 132,
-        "originalWidth": 329,
-        "originalHeight": 184,
-        "position": {
-          "x": 204.5,
-          "y": 405
-        }
+        "visibility": false
       }
     }
   }

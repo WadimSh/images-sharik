@@ -20,31 +20,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
-  
-
-  // Функция для применения стилей к элементам
-  const applyElementStyle = (element, styleVariant) => {
-    if (!element?.styles) return element;
-    return {
-      ...element,
-      ...(element.styles[styleVariant] || element.styles.default || {})
-    };
-  };
-
-  // Функция для применения стилей ко всему шаблону
-  const applyTemplateStyles = (template, styleVariant = 'default') => {
-    if (!template) return [];
-    
-    // Для вложенных шаблонов (как в gemar/belbal)
-    if (Array.isArray(template[0])) {
-      return template.map(subTemplate => 
-        subTemplate.map(element => applyElementStyle(element, styleVariant))
-      );
-    }
-    
-    // Для обычных шаблонов
-    return template.map(element => applyElementStyle(element, styleVariant));
-  };
 
   // Загрузка метаданных продуктов
   useEffect(() => {
@@ -85,15 +60,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       await Promise.all(items.map(async (item) => {
         try {
           const slide = await slidesDB.get(`design-${item}`);
-          const baseCode = item.split('_').slice(0, -1).join('_');
-          const productMeta = productMetas[baseCode] || { 
-            templateType: 'default',
-            styleVariant: 'default'
-          };
-          
-          // Применяем текущий стиль при загрузке
-          const styledDesign = applyTemplateStyles(slide?.data, productMeta.styleVariant);
-          designs[item] = styledDesign || null;
+          designs[item] = slide?.data || null;
         } catch (error) {
           console.error(`Error loading design for ${item}:`, error);
           designs[item] = null;
@@ -240,88 +207,135 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   };
 
   // Применение стиля ко всей группе элементов
-  const applyStyleToGroup = async (baseCode, styleVariant) => {
-    try {
-      const product = await productsDB.get(`product-${baseCode}`);
-      const updatedMeta = {
-        ...(product?.data || {}),
+const applyStyleToGroup = async (baseCode, styleVariant) => {
+  try {
+    const product = await productsDB.get(`product-${baseCode}`);
+    const updatedMeta = {
+      ...(product?.data || {}),
+      styleVariant: styleVariant
+    };
+
+    await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
+
+    setProductMetas(prev => ({
+      ...prev,
+      [baseCode]: {
+        ...prev[baseCode],
         styleVariant: styleVariant
-      };
-  
-      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
-  
-      setProductMetas(prev => ({
-        ...prev,
-        [baseCode]: {
-          ...prev[baseCode],
-          styleVariant: styleVariant
+      }
+    }));
+
+    // Обновляем все связанные дизайны
+    const updatePromises = items.map(async (item) => {
+      if (item.startsWith(`${baseCode}_`)) {
+        const slide = await slidesDB.get(`design-${item}`);
+        const currentDesign = slide?.data || [];
+
+        const validImages = currentDesign.filter(el =>
+          el.type === 'image' && el.image?.startsWith('https://')
+        );
+
+        const currentImage = validImages.length > 0
+          ? validImages[validImages.length - 1].image
+          : updatedMeta.images?.[0];
+
+        const parts = item.split('_');
+        const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+
+        const itemData = {
+          ...updatedMeta,
+          code: item,
+          image: currentImage,
+          category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
+          title: getPropertyValue(updatedMeta, 'Событие'),
+          multiplicity: updatedMeta.multiplicity,
+          size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
+          brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
+          imageIndex: imageIndex
+        };
+
+        const templateKey = updatedMeta.templateType || 'default';
+        let template = templates[templateKey];
+        
+        if (Array.isArray(templates[templateKey]) && templates[templateKey].every(item => Array.isArray(item))) {
+          const templateIndex = Math.min(imageIndex, template.length - 1);
+          template = template[templateIndex];
         }
-      }));
-  
-      // Обновляем все связанные дизайны
-      const updatePromises = items.map(async (item) => {
-        if (item.startsWith(`${baseCode}_`)) {
-          const slide = await slidesDB.get(`design-${item}`);
-          const currentDesign = slide?.data || [];
-  
-          const validImages = currentDesign.filter(el =>
-            el.type === 'image' && el.image?.startsWith('https://')
-          );
-  
-          const currentImage = validImages.length > 0
-            ? validImages[validImages.length - 1].image
-            : updatedMeta.images?.[0];
-  
-          const parts = item.split('_');
-          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
-  
-          const itemData = {
-            ...updatedMeta,
-            code: item,
-            image: currentImage,
-            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
-            title: getPropertyValue(updatedMeta, 'Событие'),
-            multiplicity: updatedMeta.multiplicity,
-            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
-            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
-            imageIndex: imageIndex
-          };
-  
-          const templateKey = updatedMeta.templateType || 'default';
-          let template = templates[templateKey];
+
+        // Функция для фильтрации элементов по видимости в стиле
+        const filterElementsByVisibility = (elements, variant) => {
+          return elements.filter(element => {
+            // Проверяем настройки видимости для элемента
+            if (element.styles && element.styles[variant]) {
+              const styleConfig = element.styles[variant];
+              
+              // Если явно указано visibility: false - скрываем элемент
+              if (styleConfig.visibility === false) {
+                return false;
+              }
+              
+              // Если указано visibility: true или не указано - оставляем элемент
+              return true;
+            }
+            
+            // Если для этого стиля нет настроек - оставляем элемент
+            return true;
+          });
+        };
+
+        // Функция для применения стилей к элементам (только изображение)
+        const applyElementStyle = (element, variant) => {
+          if (!element?.styles) return element;
           
-          if (Array.isArray(templates[templateKey]) && templates[templateKey].every(item => Array.isArray(item))) {
-            const templateIndex = Math.min(imageIndex, template.length - 1);
-            template = template[templateIndex];
+          const styleData = element.styles[variant];
+          if (!styleData) return element;
+          
+          // Создаем копию элемента и применяем ТОЛЬКО нужные свойства
+          const result = { ...element };
+          
+          // Применяем только image из стиля, остальные свойства игнорируем
+          if (styleData.image !== undefined) {
+            result.image = styleData.image;
           }
-  
-          const newDesign = replacePlaceholders(template, itemData, styleVariant);
-  
-          await slidesDB.update(`design-${item}`, { data: newDesign });
-  
-          return { [item]: newDesign };
-        }
-        return null;
-      });
-  
-      const updatedDesignsArray = await Promise.all(updatePromises);
-  
-      // Собираем обновленные дизайны в объект
-      const updatedDesigns = updatedDesignsArray.reduce((acc, val) => {
-        if (val) Object.assign(acc, val);
-        return acc;
-      }, {});
-  
-      // Обновляем локальное состояние дизайнов
-      setDesignsData(prev => ({
-        ...prev,
-        ...updatedDesigns
-      }));
-  
-    } catch (error) {
-      console.error('Error applying style to group:', error);
-    }
-  };
+          
+          return result;
+        };
+
+        // Сначала фильтруем элементы по видимости
+        let filteredTemplate = filterElementsByVisibility(template, styleVariant);
+        
+        // Затем применяем стили к оставшимся элементам
+        filteredTemplate = filteredTemplate.map(element => 
+          applyElementStyle(element, styleVariant)
+        );
+
+        const newDesign = replacePlaceholders(filteredTemplate, itemData, styleVariant);
+
+        await slidesDB.update(`design-${item}`, { data: newDesign });
+
+        return { [item]: newDesign };
+      }
+      return null;
+    });
+
+    const updatedDesignsArray = await Promise.all(updatePromises);
+
+    // Собираем обновленные дизайны в объект
+    const updatedDesigns = updatedDesignsArray.reduce((acc, val) => {
+      if (val) Object.assign(acc, val);
+      return acc;
+    }, {});
+
+    // Обновляем локальное состояние дизайнов
+    setDesignsData(prev => ({
+      ...prev,
+      ...updatedDesigns
+    }));
+
+  } catch (error) {
+    console.error('Error applying style to group:', error);
+  }
+};
   
 
   const getUniqueBaseCodes = () => {
@@ -470,8 +484,8 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
     const template = templates[currentTemplate] || [];
     const availableStyles = getAvailableStyleVariants(template);
-    const currentStyle = productMetas[baseCode]?.styleVariant || 'default';
-    
+    const currentStyle = productMetas[baseCode]?.styleVariant;
+        
     return (
       <div className={`template-selector ${marketplace}`} >
         <div className="template-selector-controls">
