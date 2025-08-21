@@ -484,8 +484,24 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
     const template = templates[currentTemplate] || [];
     const availableStyles = getAvailableStyleVariants(template);
-    const currentStyle = productMetas[baseCode]?.styleVariant;
-        
+    const currentStyle = productMetas[baseCode]?.styleVariant || 'default';
+
+    // Определяем, какой стиль должен быть активным
+    const getActiveStyleId = () => {
+      // Если текущий стиль есть в доступных стилях - используем его
+      if (availableStyles.includes(currentStyle)) {
+        return currentStyle;
+      }
+      // Если текущего стиля нет в доступных - используем default
+      if (availableStyles.includes('default')) {
+        return 'default';
+      }
+      // Если default тоже нет - используем первый доступный стиль
+      return availableStyles.length > 0 ? availableStyles[0] : 'default';
+    };
+    
+    const activeStyleId = getActiveStyleId();
+      
     return (
       <div className={`template-selector ${marketplace}`} >
         <div className="template-selector-controls">
@@ -505,7 +521,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
                     position="bottom"
                   >
                     <button
-                      className={`style-button ${currentStyle === styleId ? 'active' : ''}`}
+                      className={`style-button ${activeStyleId === styleId ? 'active' : ''}`}
                       onClick={() => applyStyleToGroup(baseCode, styleId)}
                     >
                       {getStyleIcon(styleId)}
