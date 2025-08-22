@@ -98,7 +98,7 @@
     "fant": "Fant",
     "cakeFigurine": "Cake figurine",
     "photoProps": "Photo props",
-    "petard": "Party popper",
+    "petard": "Party popper (3 slides)",
     "latexBalls": "Latex balloons",
     "foilBalls": "Foil balloons",
     "blowouts": "Blowouts",
@@ -111,7 +111,10 @@
     "red": "Coral Vibes",
     "green": "Lime Fresh",
     "yellow": "Honey Glow",
-    "crimson": "Deep Crimson"
+    "crimson": "Deep Crimson",
+    "brutal": "Linear Style",
+    "amur1": "Amorous Style",
+    "amur2": "Romantic Style"
   },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",

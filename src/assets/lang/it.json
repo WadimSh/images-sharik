@@ -98,7 +98,7 @@
     "fant": "Fant",
     "cakeFigurine": "Figurina per torta",
     "photoProps": "Accessori per foto",
-    "petard": "Stelle filanti",
+    "petard": "Stelle filanti (3 diapo)",
     "latexBalls": "Palloncini in lattice",
     "foilBalls": "Palloncini in foglio",
     "blowouts": "Soffietti",
@@ -111,7 +111,10 @@
     "red": "Vibrazioni Coralline",
     "green": "Freschezza Lime",
     "yellow": "Luminosità Miele",
-    "crimson": "Cremisi Profondo"
+    "crimson": "Cremisi Profondo",
+    "brutal": "Stile Lineare",
+    "amur1": "Stile Amoroso",
+    "amur2": "Stile Romantico"
   },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",

@@ -31,17 +31,17 @@ export const STYLE_VARIANTS = {
   },
   brutal: {
     id: 'brutal',
-    name: '',
+    name: 'styles.brutal',
     icon: <IoMapSharp size={16} color="#f6aa06" />
   },
   amur1: {
     id: 'amur1',
-    name: '',
+    name: 'styles.amur1',
     icon: <IoMdHeart size={16} color='#e34e46' />
   },
   amur2: {
     id: 'amur2',
-    name: '',
+    name: 'styles.amur2',
     icon: <IoMdHeart size={16} color='#ec028c' />
   }
 };
