@@ -72,7 +72,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": -31.6
+    "rotation": -31.6,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": -31.6,
+        "position": {
+          "x": 38.5,
+          "y": 356
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": -31.6,
+        "position": {
+          "x": 38.5,
+          "y": 356
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227495949,
@@ -87,7 +119,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 73
+    "rotation": 73,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 73,
+         "position": {
+          "x": 0.5,
+          "y": 434
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 73,
+         "position": {
+          "x": 0.5,
+          "y": 434
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227578688,
@@ -102,7 +166,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 31
+    "rotation": 31,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 31,
+        "position": {
+          "x": 151.5,
+          "y": 553.5
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 31,
+        "position": {
+          "x": 151.5,
+          "y": 553.5
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227666341,
@@ -117,7 +213,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 210.5
+    "rotation": 210.5,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210.5,
+        "position": {
+          "x": 357.5,
+          "y": 167
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210.5,
+        "position": {
+          "x": 357.5,
+          "y": 167
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752233319211,
@@ -132,7 +260,374 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 191
+    "rotation": 191,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 191,
+        "position": {
+          "x": 13.5,
+          "y": 144
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 191,
+        "position": {
+          "x": 13.5,
+          "y": 144
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755853002788,
+    "type": "element",
+    "position": {
+      "x": 52.5,
+      "y": 147
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 52.5,
+          "y": 147
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755853041251,
+    "type": "element",
+    "position": {
+      "x": 101.5,
+      "y": 284
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 101.5,
+          "y": 284
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755853048610,
+    "type": "element",
+    "position": {
+      "x": 383.5,
+      "y": 463
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 383.5,
+          "y": 463
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755853054753,
+    "type": "element",
+    "position": {
+      "x": 158.5,
+      "y": 543
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 158.5,
+          "y": 543
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755853156276,
+    "type": "element",
+    "position": {
+      "x": 238.5,
+      "y": 462
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 238.5,
+          "y": 462
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755856669741,
+    "type": "element",
+    "position": {
+      "x": 10.5,
+      "y": 387
+    },
+    "image": "/images/element-fon_009.png",
+    "width": 47,
+    "height": 49,
+    "originalWidth": 79,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_009.png",
+        "width": 47,
+        "height": 48,
+        "originalWidth": 79,
+        "originalHeight": 82,
+        "position": {
+          "x": 10.5,
+          "y": 387
+        }
+      }
+    }
+  },
+  {
+    "id": 1755856721846,
+    "type": "element",
+    "position": {
+      "x": 222,
+      "y": 460
+    },
+    "image": "/images/element-fon_010.png",
+    "width": 42,
+    "height": 43.5,
+    "originalWidth": 80,
+    "originalHeight": 83,
+    "isFlipped": false,
+    "rotation": 31,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_010.png",
+        "width": 42,
+        "height": 43.5,
+        "originalWidth": 80,
+        "originalHeight": 83,
+        "rotation": 31,
+        "position": {
+          "x": 222,
+          "y": 460
+        }
+      }
+    }
+  },
+  {
+    "id": 1755856756007,
+    "type": "element",
+    "position": {
+      "x": 33,
+      "y": 244
+    },
+    "image": "/images/element-fon_011.png",
+    "width": 42,
+    "height": 43,
+    "originalWidth": 80,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": 33,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_011.png",
+        "width": 42,
+        "height": 43,
+        "originalWidth": 80,
+        "originalHeight": 82,
+        "rotation": 33,
+        "position": {
+          "x": 33,
+          "y": 244
+        }
+      }
+    }
+  },
+  {
+    "id": 1755856848593,
+    "type": "element",
+    "position": {
+      "x": 132.5,
+      "y": 520
+    },
+    "image": "/images/element-fon_012.png",
+    "width": 63,
+    "height": 65,
+    "originalWidth": 79,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_012.png",
+        "width": 63,
+        "height": 65,
+        "originalWidth": 79,
+        "originalHeight": 82,
+        "position": {
+          "x": 132.5,
+          "y": 520
+        }
+      }
+    }
   },
   {
     "id": 1752233119103,
@@ -452,7 +947,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": -49
+    "rotation": -49,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": -49,
+        "position": {
+          "x": 32.5,
+          "y": 321
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": -49,
+        "position": {
+          "x": 32.5,
+          "y": 321
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227495949,
@@ -467,7 +994,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 144
+    "rotation": 144,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 144,
+        "position": {
+          "x": 37.5,
+          "y": 540
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 144,
+        "position": {
+          "x": 37.5,
+          "y": 540
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227578688,
@@ -482,7 +1041,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": true,
-    "rotation": 226
+    "rotation": 226,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 226,
+        "position": {
+          "x": 103.5,
+          "y": 500.5
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 226,
+        "position": {
+          "x": 103.5,
+          "y": 500.5
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227666341,
@@ -497,7 +1088,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 210.5
+    "rotation": 210.5,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210.5,
+        "position": {
+          "x": 369.5,
+          "y": 151
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210.5,
+        "position": {
+          "x": 369.5,
+          "y": 151
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752233319211,
@@ -512,9 +1135,40 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 197.5
-  }
-  ,
+    "rotation": 197.5,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 197.5,
+        "position": {
+          "x": 81.5,
+          "y": 171
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 64,
+        "height": 24.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 197.5,
+        "position": {
+          "x": 81.5,
+          "y": 171
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
   {
     "id": 1752233826803,
     "type": "element",
@@ -528,7 +1182,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": true,
-    "rotation": 228
+    "rotation": 228,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 228,
+        "position": {
+          "x": 374.5,
+          "y": 513
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 228,
+        "position": {
+          "x": 374.5,
+          "y": 513
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752233847674,
@@ -543,7 +1229,375 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": true,
-    "rotation": 134
+    "rotation": 134,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 134,
+        "position": {
+          "x": 300.5,
+          "y": 546
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 134,
+        "position": {
+          "x": 300.5,
+          "y": 546
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755854522108,
+    "type": "element",
+    "position": {
+      "x": 94.5,
+      "y": 161
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 26,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 26,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 94.5,
+          "y": 161
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755854549360,
+    "type": "element",
+    "position": {
+      "x": 305.5,
+      "y": 544
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 26,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 26,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 305.5,
+          "y": 544
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755854665880,
+    "type": "element",
+    "position": {
+      "x": 50,
+      "y": 324.5
+    },
+    "image": "/images/element-fon_014.png",
+    "width": 42,
+    "height": 32.5,
+    "originalWidth": 48,
+    "originalHeight": 37,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_014.png",
+        "width": 42,
+        "height": 32.5,
+        "originalWidth": 48,
+        "originalHeight": 37,
+        "position": {
+          "x": 50,
+          "y": 324.5
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755854697138,
+    "type": "element",
+    "position": {
+      "x": 68.5,
+      "y": 515
+    },
+    "image": "/images/element-fon_013.png",
+    "width": 43,
+    "height": 38,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_013.png",
+        "width": 43,
+        "height": 38,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 68.5,
+          "y": 515
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755854713348,
+    "type": "element",
+    "position": {
+      "x": 370.5,
+      "y": 500
+    },
+    "image": "/images/element-fon_013.png",
+    "width": 36,
+    "height": 32,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_013.png",
+        "width": 36,
+        "height": 32,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 370.5,
+          "y": 500
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755857550232,
+    "type": "element",
+    "position": {
+      "x": 25.5,
+      "y": 143
+    },
+    "image": "/images/element-fon_009.png",
+    "width": 50,
+    "height": 52,
+    "originalWidth": 79,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_009.png",
+        "width": 50,
+        "height": 52,
+        "originalWidth": 79,
+        "originalHeight": 82,
+        "position": {
+          "x": 25.5,
+          "y": 143
+        }
+      }
+    }
+  },
+  {
+    "id": 1755857575420,
+    "type": "element",
+    "position": {
+      "x": 50,
+      "y": 499.5
+    },
+    "image": "/images/element-fon_010.png",
+    "width": 80,
+    "height": 83,
+    "originalWidth": 80,
+    "originalHeight": 83,
+    "isFlipped": false,
+    "rotation": 37,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_010.png",
+        "width": 80,
+        "height": 83,
+        "originalWidth": 80,
+        "originalHeight": 83,
+        "rotation": 37,
+        "position": {
+          "x": 50,
+          "y": 499.5
+        }
+      }
+    }
+  },
+  {
+    "id": 1755857599312,
+    "type": "element",
+    "position": {
+      "x": 301,
+      "y": 515
+    },
+    "image": "/images/element-fon_011.png",
+    "width": 51,
+    "height": 52,
+    "originalWidth": 80,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": -39,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_011.png",
+        "width": 51,
+        "height": 52,
+        "originalWidth": 80,
+        "originalHeight": 82,
+        "rotation": -39,
+        "position": {
+          "x": 301,
+          "y": 515
+        }
+      }
+    }
+  },
+  {
+    "id": 1755857641091,
+    "type": "element",
+    "position": {
+      "x": 379.5,
+      "y": 535.5
+    },
+    "image": "/images/element-fon_012.png",
+    "width": 40,
+    "height": 41.5,
+    "originalWidth": 79,
+    "originalHeight": 82,
+    "isFlipped": false,
+    "rotation": 34,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "image": "/images/element-fon_012.png",
+        "width": 40,
+        "height": 41.5,
+        "originalWidth": 79,
+        "originalHeight": 82,
+        "rotation": 34,
+        "position": {
+          "x": 379.5,
+          "y": 535.5
+        }
+      }
+    }
   },
   {
     "id": 1752233632951,
@@ -924,7 +1978,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": false,
-    "rotation": 176
+    "rotation": 176,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 176,
+        "position": {
+          "x": 32.5,
+          "y": 562
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 61,
+        "height": 23.5,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 176,
+        "position": {
+          "x": 32.5,
+          "y": 562
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752227578688,
@@ -939,7 +2025,39 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": true,
-    "rotation": 210
+    "rotation": 210,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210,
+        "position": {
+          "x": 117.5,
+          "y": 545.5
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 60,
+        "height": 23,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 210,
+        "position": {
+          "x": 117.5,
+          "y": 545.5
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752233826803,
@@ -954,7 +2072,224 @@
     "originalWidth": 133,
     "originalHeight": 51,
     "isFlipped": true,
-    "rotation": 228
+    "rotation": 228,
+    "styles": {
+      "default": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 228,
+        "position": {
+          "x": 373.5,
+          "y": 472
+        }
+      },
+      "brutal": {
+        "image": "/images/bubbles_04_011.png",
+        "width": 68,
+        "height": 26,
+        "originalWidth": 133,
+        "originalHeight": 51,
+        "rotation": 228,
+        "position": {
+          "x": 373.5,
+          "y": 472
+        }
+      },
+      "amur1": {
+        "visibility": false
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755855893828,
+    "type": "element",
+    "position": {
+      "x": 51.5,
+      "y": 132
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+         "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 51.5,
+          "y": 132
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755855918909,
+    "type": "element",
+    "position": {
+      "x": 366.5,
+      "y": 544
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+         "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 366.5,
+          "y": 544
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755856024262,
+    "type": "element",
+    "position": {
+      "x": 190.5,
+      "y": 498
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+         "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 190.5,
+          "y": 498
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755856030207,
+    "type": "element",
+    "position": {
+      "x": 97.5,
+      "y": 548
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 97.5,
+          "y": 548
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
+  },
+  {
+    "id": 1755856042347,
+    "type": "element",
+    "position": {
+      "x": 363.5,
+      "y": 310
+    },
+    "image": "/images/element-fon_015.png",
+    "width": 31,
+    "height": 28,
+    "originalWidth": 45,
+    "originalHeight": 40,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": {
+        "visibility": false
+      },
+      "brutal": {
+        "visibility": false
+      },
+      "amur1": {
+        "image": "/images/element-fon_015.png",
+        "width": 31,
+        "height": 28,
+        "originalWidth": 45,
+        "originalHeight": 40,
+        "position": {
+          "x": 363.5,
+          "y": 310
+        }
+      },
+      "amur2": {
+        "visibility": false
+      }
+    }
   },
   {
     "id": 1752234099242,
@@ -1066,14 +2401,14 @@
         }
       },
       "amur2": {
-        "image": "/images/bubbles_03+text_021.png",
-        "width": 236,
-        "height": 132,
-        "originalWidth": 329,
-        "originalHeight": 184,
+        "image": "/images/bubbles_03+text_020.png",
+        "width": 176,
+        "height": 105,
+        "originalWidth": 324,
+        "originalHeight": 193,
         "position": {
-          "x": 204.5,
-          "y": 405
+          "x": 248,
+          "y": 343.5
         }
       }
     }
@@ -1119,7 +2454,15 @@
         "visibility": false
       },
       "amur2": {
-        "visibility": false
+        "image": "/images/bubbles_03+text_021.png",
+        "width": 178,
+        "height": 100,
+        "originalWidth": 329,
+        "originalHeight": 184,
+        "position": {
+          "x": 205.5,
+          "y": 477
+        }
       }
     }
   }
