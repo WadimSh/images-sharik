@@ -12,6 +12,28 @@ import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
 import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
 import { Tooltip } from '../ui/Tooltip/Tooltip';
 
+// Добавляем вспомогательную функцию для фильтрации элементов по стилю
+const filterElementsByStyle = (elements, styleVariant) => {
+  if (!elements || !Array.isArray(elements)) return [];
+  
+  return elements.filter(element => {
+    // Если у элемента нет настроек стилей - показываем его
+    if (!element.styles) return true;
+    
+    // Проверяем настройки видимости для выбранного стиля
+    const styleConfig = element.styles[styleVariant];
+    
+    // Если для этого стиля явно указано visibility: false - скрываем элемент
+    if (styleConfig && styleConfig.visibility === false) {
+      return false;
+    }
+    
+    // Если стиля нет в настройках или visibility не false - оставляем элемент
+    return true;
+  });
+};
+
+
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
@@ -74,6 +96,16 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       loadDesignsData();
     }
   }, [items, productMetas]);
+
+  // Функция для получения отфильтрованных элементов для превью
+  const getFilteredDesignForPreview = (designData, baseCode) => {
+    if (!designData || !Array.isArray(designData)) return [];
+    
+    const productMeta = productMetas[baseCode] || {};
+    const currentStyle = productMeta.styleVariant || 'default';
+    
+    return filterElementsByStyle(designData, currentStyle);
+  };
 
   // Инициализация и обновление порядка базовых кодов
   useEffect(() => {
@@ -146,65 +178,151 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   };
 
-  // Обработчик изменения шаблона с сохранением стиля
-  const handleTemplateChange = async (baseCode, templateKey) => {
-    try {
-      const product = await productsDB.get(`product-${baseCode}`);
-      const updatedMeta = {
-        ...(product?.data || {}),
-        templateType: templateKey
-      };
-      
-      await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
-
-      const updatePromises = items.map(async (item) => {
-        if (item.startsWith(`${baseCode}_`)) {
-          const slide = await slidesDB.get(`design-${item}`);
-          const currentDesign = slide?.data || [];
-
-          const validImages = currentDesign.filter(el => 
-            el.type === 'image' && el.image?.startsWith('https://')
-          );
-
-          const currentImage = validImages.length > 0 
-            ? validImages[validImages.length - 1].image 
-            : updatedMeta.images?.[0];
-
-          const parts = item.split('_');
-          const imageIndex = parseInt(parts[parts.length - 1]) - 1;
-
-          const itemData = {
-            ...updatedMeta,
-            code: item,
-            image: currentImage,
-            category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
-            title: getPropertyValue(updatedMeta, 'Событие'),
-            multiplicity: updatedMeta.multiplicity,
-            size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
-            brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
-            imageIndex: imageIndex
-          };
-
-          let template;
-          if (Array.isArray(templates[templateKey]) && templates[templateKey].every(item => Array.isArray(item))) {
-            const templateArray = templates[templateKey];
-            const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-            template = templateArray[templateIndex];
-          } else {
-            template = templates[templateKey] || templates['main'];
-          }
-          // Применяем текущий стиль
-          const newDesign = replacePlaceholders(template, itemData);
-          await slidesDB.update(`design-${item}`, { data: newDesign });
-        }
-      });
-
-      await Promise.all(updatePromises);
-      onItemsUpdate([...items]);
-    } catch (error) {
-      console.error('Error updating template:', error);
+  // Обработчик изменения шаблона с валидацией и сбросом стиля
+const handleTemplateChange = async (baseCode, templateKey) => {
+  try {
+    const product = await productsDB.get(`product-${baseCode}`);
+    const currentMeta = product?.data || {};
+    
+    // Получаем доступные стили для нового шаблона
+    const newTemplate = templates[templateKey] || [];
+    const availableStyles = getAvailableStyleVariants(newTemplate);
+    
+    // Проверяем, поддерживается ли текущий стиль в новом шаблоне
+    const currentStyle = currentMeta.styleVariant || 'default';
+    const isStyleSupported = availableStyles.includes(currentStyle);
+    
+    // Если текущий стиль не поддерживается, сбрасываем на дефолтный или первый доступный
+    let newStyleVariant = currentStyle;
+    if (!isStyleSupported) {
+      if (availableStyles.includes('default')) {
+        newStyleVariant = 'default';
+      } else if (availableStyles.length > 0) {
+        newStyleVariant = availableStyles[0];
+      } else {
+        newStyleVariant = 'default';
+      }
     }
-  };
+    
+    const updatedMeta = {
+      ...currentMeta,
+      templateType: templateKey,
+      styleVariant: newStyleVariant // Обновляем стиль если нужно
+    };
+    
+    await productsDB.update(`product-${baseCode}`, { data: updatedMeta });
+
+    // Обновляем локальное состояние метаданных
+    setProductMetas(prev => ({
+      ...prev,
+      [baseCode]: {
+        ...prev[baseCode],
+        templateType: templateKey,
+        styleVariant: newStyleVariant
+      }
+    }));
+
+    const updatePromises = items.map(async (item) => {
+      if (item.startsWith(`${baseCode}_`)) {
+        const slide = await slidesDB.get(`design-${item}`);
+        const currentDesign = slide?.data || [];
+
+        const validImages = currentDesign.filter(el => 
+          el.type === 'image' && el.image?.startsWith('https://')
+        );
+
+        const currentImage = validImages.length > 0 
+          ? validImages[validImages.length - 1].image 
+          : updatedMeta.images?.[0];
+
+        const parts = item.split('_');
+        const imageIndex = parseInt(parts[parts.length - 1]) - 1;
+
+        const itemData = {
+          ...updatedMeta,
+          code: item,
+          image: currentImage,
+          category: getPropertyValue(updatedMeta, 'Тип латексных шаров'),
+          title: getPropertyValue(updatedMeta, 'Событие'),
+          multiplicity: updatedMeta.multiplicity,
+          size: getPropertyValue(updatedMeta, 'Размер').split("/")[0]?.trim() || '',
+          brand: getOriginPropertyValue(updatedMeta, 'Торговая марка'),
+          imageIndex: imageIndex
+        };
+
+        let template;
+        if (Array.isArray(templates[templateKey]) && templates[templateKey].every(item => Array.isArray(item))) {
+          const templateArray = templates[templateKey];
+          const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+          template = templateArray[templateIndex];
+        } else {
+          template = templates[templateKey] || templates['main'];
+        }
+
+        // Функция для фильтрации элементов по видимости в стиле
+        const filterElementsByVisibility = (elements, variant) => {
+          return elements.filter(element => {
+            if (element.styles && element.styles[variant]) {
+              const styleConfig = element.styles[variant];
+              if (styleConfig.visibility === false) {
+                return false;
+              }
+              return true;
+            }
+            return true;
+          });
+        };
+
+        // Функция для применения стилей к элементам (только изображение)
+        const applyElementStyle = (element, variant) => {
+          if (!element?.styles) return element;
+          
+          const styleData = element.styles[variant];
+          if (!styleData) return element;
+          
+          const result = { ...element };
+          
+          if (styleData.image !== undefined) {
+            result.image = styleData.image;
+          }
+          
+          return result;
+        };
+
+        // Фильтруем элементы по видимости для нового стиля
+        let filteredTemplate = filterElementsByVisibility(template, newStyleVariant);
+        
+        // Применяем стили к оставшимся элементам
+        filteredTemplate = filteredTemplate.map(element => 
+          applyElementStyle(element, newStyleVariant)
+        );
+
+        const newDesign = replacePlaceholders(filteredTemplate, itemData, newStyleVariant);
+
+        await slidesDB.update(`design-${item}`, { data: newDesign });
+
+        return { [item]: newDesign };
+      }
+      return null;
+    });
+
+    const updatedDesignsArray = await Promise.all(updatePromises);
+
+    // Обновляем локальное состояние дизайнов
+    const updatedDesigns = updatedDesignsArray.reduce((acc, val) => {
+      if (val) Object.assign(acc, val);
+      return acc;
+    }, {});
+
+    setDesignsData(prev => ({
+      ...prev,
+      ...updatedDesigns
+    }));
+
+  } catch (error) {
+    console.error('Error updating template:', error);
+  }
+};
 
   // Применение стиля ко всей группе элементов
 const applyStyleToGroup = async (baseCode, styleVariant) => {
@@ -264,21 +382,15 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
         // Функция для фильтрации элементов по видимости в стиле
         const filterElementsByVisibility = (elements, variant) => {
+          if (!elements || !Array.isArray(elements)) return [];
+
           return elements.filter(element => {
-            // Проверяем настройки видимости для элемента
-            if (element.styles && element.styles[variant]) {
-              const styleConfig = element.styles[variant];
-              
-              // Если явно указано visibility: false - скрываем элемент
-              if (styleConfig.visibility === false) {
-                return false;
-              }
-              
-              // Если указано visibility: true или не указано - оставляем элемент
-              return true;
+            if (!element.styles) return true;
+
+            const styleConfig = element.styles[variant];
+            if (styleConfig && styleConfig.visibility === false) {
+              return false;
             }
-            
-            // Если для этого стиля нет настроек - оставляем элемент
             return true;
           });
         };
@@ -488,19 +600,18 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
     // Определяем, какой стиль должен быть активным
     const getActiveStyleId = () => {
-      // Если текущий стиль есть в доступных стилях - используем его
-      if (availableStyles.includes(currentStyle)) {
-        return currentStyle;
-      }
-      // Если текущего стиля нет в доступных - используем default
-      if (availableStyles.includes('default')) {
-        return 'default';
-      }
-      // Если default тоже нет - используем первый доступный стиль
-      return availableStyles.length > 0 ? availableStyles[0] : 'default';
-    };
+    if (availableStyles.includes(currentStyle)) {
+      return currentStyle;
+    }
+    if (availableStyles.includes('default')) {
+      return 'default';
+    }
+    return availableStyles.length > 0 ? availableStyles[0] : 'default';
+  };
     
     const activeStyleId = getActiveStyleId();
+
+    
       
     return (
       <div className={`template-selector ${marketplace}`} >
@@ -598,36 +709,43 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
             </h2>
             {renderTemplateControls(baseCode, currentTemplate)}
             <div className="items-grid">
-              {relatedItems.map((item) => (
-                <div 
-                  key={item} 
-                  className="item-card"
-                  style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
-                  onClick={() => handleItemClick(item)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <button
-                    className="delete-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteItem(item);
-                    }}
+              {relatedItems.map((item) => {
+                const designData = designsData[item];
+                const filteredDesign = getFilteredDesignForPreview(designData, baseCode);
+                
+                return (
+                  <div 
+                    key={item} 
+                    className="item-card"
+                    style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
+                    onClick={() => handleItemClick(item)}
+                    role="button"
+                    tabIndex={0}
                   >
-                    ×
-                  </button>
-                  
-                  <div className="item-content">
-                    {designsData[item] ? (
-                      <PreviewDesign elements={designsData[item]} />
-                    ) : (
-                      <div className="loader-container">
-                        <div className="loader"></div>
-                      </div>
-                    )}
+                    <button
+                      className="delete-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteItem(item);
+                      }}
+                    >
+                      ×
+                    </button>
+                    
+                    <div className="item-content">
+                      {filteredDesign && filteredDesign.length > 0 ? (
+                        <PreviewDesign elements={filteredDesign} />
+                      ) : designData ? (
+                        <PreviewDesign elements={designData} />
+                      ) : (
+                        <div className="loader-container">
+                          <div className="loader"></div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <div
                 className="item-card new-design-card"

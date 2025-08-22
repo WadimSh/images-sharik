@@ -122,6 +122,7 @@ export const Home = () => {
         images: images, // Массив ссылок на все изображения товара
         properties: propertiesList,
         originProperties: originPropertiesList,
+        styleVariant: 'default',
         templateType: templateType, // Добавлено новое поле
       };
     }); // Фильтруем некорректные элементы
