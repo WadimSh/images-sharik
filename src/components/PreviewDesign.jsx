@@ -68,7 +68,10 @@ export const PreviewDesign = ({ elements }) => (
           return <div key={element.id} 
                    style={{
                     ...style, 
-                    border: 'none',
+                    boxSizing: 'border-box',
+                    border: element.borderWidth && element.borderColor 
+                      ? `${element.borderWidth - .5}px solid ${element.borderColor}`
+                      : 'none',
                     opacity: element.opacity,
                     background: element.gradient 
                                 ? `linear-gradient(${element.gradient.direction}, 

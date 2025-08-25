@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { FaImage, FaFont, FaSquare, FaElementor, FaPuzzlePiece } from 'react-icons/fa';
 import { MdOutlineLensBlur } from "react-icons/md";
 import { SlFrame } from "react-icons/sl";
 import { IoImagesOutline } from "react-icons/io5";

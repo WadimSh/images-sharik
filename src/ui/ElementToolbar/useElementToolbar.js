@@ -41,7 +41,9 @@ export const useElementToolbar = (
           position: { x: 100, y: 100 },
           width: 100,
           height: 100,
-          color: '#cccccc'
+          color: '#cccccc',
+          borderWidth: 0,        
+          borderColor: '#000000'
         };
         setElements(prev => [...prev, newShapeElement]);
         break;

@@ -6,6 +6,8 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
 import { LuImageOff, LuImagePlus } from "react-icons/lu";
+import { BsBorderWidth } from "react-icons/bs";
+import { RxBorderWidth } from "react-icons/rx";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icons/gr";
@@ -22,6 +24,7 @@ export const ElementsList = ({
   elements,
   setElements,
   colorInputRef,
+  borderColorInputRef,
   handleRemoveElement,
   handleFlipImage,
   handleColorButtonClick,
@@ -31,6 +34,9 @@ export const ElementsList = ({
   handleBorderRadiusChange,
   handleGradientChange,
   handleoOpacityChange,
+  handleBorderChange,
+  handleBorderColorChange,
+  handleBorderColorButtonClick,
   processingIds,
   processingShedowIds,
   shadowSetting,
@@ -674,6 +680,73 @@ export const ElementsList = ({
                     </div>
                   )}
 
+                  {element.type === 'shape' && (
+                    <div className="element-controls line">
+                      <span>{t('elements.labelBorder')}</span>
+                      {element.borderWidth === 0 && <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBorderChange(element.id, 'width', 1);
+                          handleBorderChange(element.id, 'color', '#000000')
+                        }}
+                        className="remove-bg-button"
+                      >
+                        <><BsBorderWidth /> {t('elements.buttonAddBorder')}</>
+                      </button>}
+
+                      {element.borderWidth !== 0 && <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBorderChange(element.id, 'width', 0)
+                        }}
+                        className="remove-button"
+                      >
+                        <><RxBorderWidth /> {t('elements.buttonRemoveBorder')}</>
+                      </button>}
+                      {element.borderWidth > 0 && <div className="color-control">
+                        <div 
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            background: element.borderColor || '#000',
+                            marginRight: '4px',
+                            borderRadius: '2px',
+                            marginLeft: '10px'
+                          }}
+                        />
+                        <span className="color-hex" style={{ userSelect: 'text' }}>{element.borderColor || '#000000'}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBorderColorButtonClick(element.id);
+                          }}
+                          className="change-color-button"
+                        >
+                          <IoColorPaletteOutline 
+                            style={{
+                            width: '24px',
+                            height: '24px',
+                            marginRight: '10px'
+                          }}
+                          />
+                        </button>
+                      </div>}
+                      {element.borderWidth > 0 && <div className="font-controls">
+                        <label>
+                          {t('elements.borderWidth')}, px:
+                          <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={element.borderWidth || 0}
+                            onChange={(e) => handleBorderChange(element.id, 'width', parseInt(e.target.value) || 0)}
+                          />
+                        </label>
+                      </div>}
+
+                    </div>
+                  )}
+
                   {element.type === 'background' && (
                     <div className="element-controls line">
                       <span>{t('elements.subtitleGradient')}</span>
@@ -1240,6 +1313,18 @@ export const ElementsList = ({
           opacity: 0,
           height: 0,
           width: 0 
+        }}
+      />
+      <input
+        type="color"
+        ref={borderColorInputRef}
+        onChange={handleBorderColorChange} // ← Отдельный обработчик
+        style={{ 
+          position: 'absolute',
+          left: '-220px',
+          opacity: 0,
+          height: 0,
+          width: 0
         }}
       />
       <input 

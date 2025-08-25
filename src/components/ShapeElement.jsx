@@ -63,13 +63,16 @@ export const ShapeElement = ({
           position: 'relative',
           width: `${width}px`,
           height: `${height}px`,
+          boxSizing: 'border-box',
           background: element.gradient 
             ? `linear-gradient(${element.gradient.direction}, 
                 ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])} ${element.gradient.start}%, 
                 ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])} 100%)`
             : color,
           backgroundBlendMode: element.gradient ? 'normal' : 'unset',
-          border: 'none',
+          border: element.borderWidth && element.borderColor 
+            ? `${element.borderWidth}px solid ${element.borderColor}`
+            : 'none',
           opacity: element.opacity,
           borderRadius: `${element.borderRadius?.topLeft || 0}px ${element.borderRadius?.topRight || 0}px 
                  ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`,

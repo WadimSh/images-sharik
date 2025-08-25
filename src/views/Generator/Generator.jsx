@@ -75,7 +75,9 @@ export const Generator = () => {
   const contextMenuRef = useRef(null);
   const colorInputRef = useRef(null);
   const fileInputRef = useRef(null);
+  const borderColorInputRef = useRef(null);
 
+  const [currentBorderElementId, setCurrentBorderElementId] = useState(null);
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const [selectedElementId, setSelectedElementId] = useState(null);
   const [selectedElementIds, setSelectedElementIds] = useState([]);
@@ -142,6 +144,12 @@ export const Generator = () => {
   const handleResetZoom = () => {
     setZoom(prev => ({ ...prev, level: 1 }));
   };
+
+  useEffect(() => {
+    return () => {
+      setCurrentBorderElementId(null);
+    };
+  }, []);
 
   // Обработка горячих клавиш зума
   useEffect(() => {
@@ -509,6 +517,41 @@ export const Generator = () => {
     }));
   };
 
+  // Обработчик изменения цвета обводки
+  const handleBorderColorChange = (e) => {
+    const newColor = e.target.value;
+    if (currentBorderElementId) {
+      setElements(prev => 
+        prev.map(el => 
+          el.id === currentBorderElementId ? {...el, borderColor: newColor} : el
+        )
+      );
+    }
+  };
+
+  // Обработчик клика по кнопке выбора цвета обводки
+  const handleBorderColorButtonClick = (elementId) => {
+    const element = elements.find(el => el.id === elementId);
+    if (element && borderColorInputRef.current) {
+      borderColorInputRef.current.value = element.borderColor || '#000000';
+      setCurrentBorderElementId(elementId);
+      borderColorInputRef.current.click();
+    }
+  };
+
+  const handleBorderChange = (elementId, property, value) => {
+  setElements(prev => prev.map(el => {
+    if (el.id === elementId) {
+      return {
+        ...el,
+        borderWidth: property === 'width' ? value : el.borderWidth,
+        borderColor: property === 'color' ? value : el.borderColor
+      };
+    }
+    return el;
+  }));
+};
+
   // Обработчик переключения редактирования
   const handleTextEditToggle = (elementId, isEditing) => {
     setEditingTextId(isEditing ? elementId : null);
@@ -727,7 +770,7 @@ export const Generator = () => {
     setIsCollageTempleModalOpen(true);
   }
 
-  // Замените старые функции перемещения на новую
+  // функции перемещения
   const moveElement = (fromIndex, toIndex) => {
     if (fromIndex === toIndex) return;
     
@@ -1521,6 +1564,7 @@ export const Generator = () => {
             setElements={setElements}
             moveElement={moveElement}
             colorInputRef={colorInputRef}
+            borderColorInputRef={borderColorInputRef}
             handleRemoveElement={handleRemoveElement}
             handleFlipImage={handleFlipImage}
             handleColorButtonClick={handleColorButtonClick}
@@ -1530,6 +1574,9 @@ export const Generator = () => {
             handleBorderRadiusChange={handleBorderRadiusChange}
             handleGradientChange={handleGradientChange}
             handleoOpacityChange={handleoOpacityChange}
+            handleBorderColorChange={handleBorderColorChange}
+            handleBorderColorButtonClick={handleBorderColorButtonClick}
+            handleBorderChange={handleBorderChange}
             processingIds={processingIds}
             processingShedowIds={processingShedowIds}
             shadowSetting={shadowSetting}
