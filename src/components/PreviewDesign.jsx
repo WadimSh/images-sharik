@@ -8,8 +8,8 @@ export const PreviewDesign = ({ elements }) => (
       const style = {
         left: `${(element.position.x / 450) * 100}%`,
         top: `${(element.position.y / 600) * 100}%`,
-        width: `${(element.width / 450) * 100}%`,
-        height: `${(element.height / 600) * 100}%`,
+        width: `${(element.width / 440) * 100}%`,
+        height: `${(element.height / 590) * 100}%`,
         transform: `rotate(${element.rotation || 0}deg) scaleX(${element.isFlipped ? -1 : 1})`,
         transformOrigin: 'center',
         position: 'absolute'
@@ -78,8 +78,8 @@ export const PreviewDesign = ({ elements }) => (
                                   ${hexToRgba(element.gradient.colors[0], element.gradient.opacity[0])}  ${element.gradient.start}%, 
                                   ${hexToRgba(element.gradient.colors[1], element.gradient.opacity[1])})`
                                 : element.color,
-                    borderRadius: `${element.borderRadius?.topLeft || 0}px ${element.borderRadius?.topRight || 0}px 
-                      ${element.borderRadius?.bottomRight || 0}px ${element.borderRadius?.bottomLeft || 0}px`
+                    borderRadius: `${(element.borderRadius?.topLeft / 1.5) || 0}px ${(element.borderRadius?.topRight / 1.5) || 0}px 
+                      ${(element.borderRadius?.bottomRight / 1.5) || 0}px ${(element.borderRadius?.bottomLeft / 1.5) || 0}px`
                   }} 
                    className="preview-shape" />;
         case 'background':
