@@ -1062,40 +1062,40 @@ export const ElementsList = ({
                             value={element.fontFamily || 'Arial'}
                             onChange={(e) => handleFontChange(element.id, 'fontFamily', e.target.value)}
                           >
-                            <option value="HeliosCond">HeliosCond</option>
-                            <option value="GemarFont">GemarFont</option>
-                            <option value="BelbalFont">BelbalFont</option>
-                            <option value="BelbalFontRegul">BelbalFontRegul</option>
-                            <option value="FreeSetRegular">FreeSetRegular</option>
-                            <option value="FreeSetBold">FreeSetBold</option>
-                            <option value="MyriadPro">MyriadPro</option>
-                            <option value="RF_Krabuler">RF Krabuler</option>
-                            <option value="Bosk">Bosk</option>
-                            <option value="Troubleside">Troubleside</option>
-                            <option value="Badaboom">Badaboom</option>
-                            <option value="FuturaRound">FuturaRound</option>
-                            <option value="FuturaRoundDemi">FuturaRoundDemi</option>
-                            <option value="RoslinGothic_DG">RoslinGothic</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Times New Roman">Times New Roman</option>
-                            <option value="Verdana">Verdana</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Courier New">Courier New</option>
-                            <option value="Calibri">Calibri</option>
-                            <option value="Tahoma">Tahoma</option>
-                            <option value="Impact">Impact</option>
-                            <option value="Comic Sans MS">Comic Sans MS</option>
-                            <option value="Lucida Sans">Lucida Sans</option>
-                            <option value="Segoe UI">Segoe UI</option>
-                            <option value="Cambria">Cambria</option>
-                            <option value="Garamond">Garamond</option>
-                            <option value="Franklin Gothic">Franklin Gothic</option>
-                            <option value="Consolas">Consolas</option>
-                            <option value="Palatino Linotype">Palatino Linotype</option>
-                            <option value="Trebuchet MS">Trebuchet MS</option>
-                            <option value="Book Antiqua">Book Antiqua</option>
-                            <option value="Century Gothic">Century Gothic</option>
-                            <option value="Candara">Candara</option>
+                            <option value="GemarFont" style={{ fontFamily: 'GemarFont', fontSize: '15px' }}>GemarFont</option>
+                            <option value="HeliosCond" style={{ fontFamily: 'HeliosCond', fontSize: '18px' }}>HeliosCond</option>
+                            <option value="BelbalFont" style={{ fontFamily: 'BelbalFont', fontSize: '18px' }}>BelbalFont</option>
+                            <option value="BelbalFontRegul" style={{ fontFamily: 'BelbalFontRegul', fontSize: '18px' }}>BelbalFontRegul</option>
+                            <option value="FreeSetRegular" style={{ fontFamily: 'FreeSetRegular', fontSize: '18px' }}>FreeSetRegular</option>
+                            <option value="FreeSetBold" style={{ fontFamily: 'FreeSetBold', fontSize: '18px' }}>FreeSetBold</option>
+                            <option value="MyriadPro" style={{ fontFamily: 'MyriadPro', fontSize: '18px' }}>MyriadPro</option>
+                            <option value="RF_Krabuler" style={{ fontFamily: 'RF_Krabuler', fontSize: '18px' }}>RF Krabuler</option>
+                            <option value="Bosk" style={{ fontFamily: 'Bosk', fontSize: '18px' }}>Bosk</option>
+                            <option value="Troubleside" style={{ fontFamily: 'Troubleside', fontSize: '18px' }}>Troubleside</option>
+                            <option value="Badaboom" style={{ fontFamily: 'Badaboom', fontSize: '18px' }}>Badaboom</option>
+                            <option value="FuturaRound" style={{ fontFamily: 'FuturaRound', fontSize: '18px' }}>FuturaRound</option>
+                            <option value="FuturaRoundDemi" style={{ fontFamily: 'FuturaRoundDemi', fontSize: '18px' }}>FuturaRoundDemi</option>
+                            <option value="RoslinGothic_DG" style={{ fontFamily: 'RoslinGothic_DG', fontSize: '18px' }}>RoslinGothic</option>
+                            <option value="Arial" style={{ fontFamily: 'Arial', fontSize: '18px' }}>Arial</option>
+                            <option value="Times New Roman" style={{ fontFamily: 'Times New Roman', fontSize: '18px' }}>Times New Roman</option>
+                            <option value="Verdana" style={{ fontFamily: 'Verdana', fontSize: '18px' }}>Verdana</option>
+                            <option value="Georgia" style={{ fontFamily: 'Georgia', fontSize: '18px' }}>Georgia</option>
+                            <option value="Courier New" style={{ fontFamily: 'Courier New', fontSize: '18px' }}>Courier New</option>
+                            <option value="Calibri" style={{ fontFamily: 'Calibri', fontSize: '18px' }}>Calibri</option>
+                            <option value="Tahoma" style={{ fontFamily: 'Tahoma', fontSize: '18px' }}>Tahoma</option>
+                            <option value="Impact" style={{ fontFamily: 'Impact', fontSize: '18px' }}>Impact</option>
+                            <option value="Comic Sans MS" style={{ fontFamily: 'Comic Sans MS', fontSize: '18px' }}>Comic Sans MS</option>
+                            <option value="Lucida Sans" style={{ fontFamily: 'Lucida Sans', fontSize: '18px' }}>Lucida Sans</option>
+                            <option value="Segoe UI" style={{ fontFamily: 'Segoe UI', fontSize: '18px' }}>Segoe UI</option>
+                            <option value="Cambria" style={{ fontFamily: 'Cambria', fontSize: '18px' }}>Cambria</option>
+                            <option value="Garamond" style={{ fontFamily: 'Garamond', fontSize: '18px' }}>Garamond</option>
+                            <option value="Franklin Gothic" style={{ fontFamily: 'Franklin Gothic', fontSize: '18px' }}>Franklin Gothic</option>
+                            <option value="Consolas" style={{ fontFamily: 'Consolas', fontSize: '18px' }}>Consolas</option>
+                            <option value="Palatino Linotype" style={{ fontFamily: 'Palatino Linotype', fontSize: '18px' }}>Palatino Linotype</option>
+                            <option value="Trebuchet MS" style={{ fontFamily: 'Trebuchet MS', fontSize: '18px' }}>Trebuchet MS</option>
+                            <option value="Book Antiqua" style={{ fontFamily: 'Book Antiqua', fontSize: '18px' }}>Book Antiqua</option>
+                            <option value="Century Gothic" style={{ fontFamily: 'Century Gothic', fontSize: '18px' }}>Century Gothic</option>
+                            <option value="Candara" style={{ fontFamily: 'Candara', fontSize: '18px' }}>Candara</option>
                           </select>
                         </label>
 

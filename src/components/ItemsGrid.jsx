@@ -125,58 +125,110 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   }, [items]);
 
   // Функция для создания нового дизайна с применением стиля
-  const handleCreateNewDesign = async (baseCode) => {
-    try {
-      const existingNumbers = items
-        .filter(item => item.startsWith(`${baseCode}_`))
-        .map(item => parseInt(item.split('_')[1]))
-        .filter(num => !isNaN(num));
-      
-      const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-      const newDesignKey = `${baseCode}_${newNumber}`;
-      
-      const product = await productsDB.get(`product-${baseCode}`);
-      const productMeta = product?.data || {};
+  // Функция для создания нового дизайна с применением стиля
+const handleCreateNewDesign = async (baseCode) => {
+  try {
+    const existingNumbers = items
+      .filter(item => item.startsWith(`${baseCode}_`))
+      .map(item => parseInt(item.split('_')[1]))
+      .filter(num => !isNaN(num));
     
-      const templateKey = productMeta.templateType || 'default';
-      let selectedTemplate = templates.default;
+    const newNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    const newDesignKey = `${baseCode}_${newNumber}`;
     
-      if (templateKey === 'belbal' || templateKey === 'gemar' || templateKey === 'petard') {
-        const templateArray = templates[templateKey] || [];
-        const imageIndex = newNumber - 1;
-        const templateIndex = Math.min(imageIndex, templateArray.length - 1);
-        selectedTemplate = templateArray[templateIndex] || [];
-      } else if (templates[templateKey]) {
-        selectedTemplate = templates[templateKey];
-      }
+    const product = await productsDB.get(`product-${baseCode}`);
+    const productMeta = product?.data || {};
     
+    // Получаем текущий стиль продукта
+    const currentStyle = productMeta.styleVariant || 'default';
+  
+    const templateKey = productMeta.templateType || 'default';
+    let selectedTemplate = templates.default;
+  
+    if (templateKey === 'belbal' || templateKey === 'gemar' || templateKey === 'petard') {
+      const templateArray = templates[templateKey] || [];
       const imageIndex = newNumber - 1;
-      const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
-    
-      const templateData = {
-        code: newDesignKey,
-        image: image,
-        category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
-        title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
-        multiplicity: productMeta.multiplicity,
-        size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
-        brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || '',
-        imageIndex: imageIndex
-      };
-    
-      // Применяем стиль перед сохранением
-      const newDesign = replacePlaceholders(selectedTemplate, templateData);
-      
-      await slidesDB.add({
-        code: `design-${newDesignKey}`,
-        data: newDesign
-      });
-    
-      onItemsUpdate([...items, newDesignKey]);
-    } catch (error) {
-      console.error('Error creating new design:', error);
+      const templateIndex = Math.min(imageIndex, templateArray.length - 1);
+      selectedTemplate = templateArray[templateIndex] || [];
+    } else if (templates[templateKey]) {
+      selectedTemplate = templates[templateKey];
     }
-  };
+  
+    const imageIndex = newNumber - 1;
+    const image = productMeta.images?.[imageIndex] || productMeta.images?.[0] || '';
+  
+    const templateData = {
+      code: newDesignKey,
+      image: image,
+      category: productMeta.properties?.find(p => p.name === 'Тип латексных шаров')?.value || '',
+      title: productMeta.properties?.find(p => p.name === 'Событие')?.value || '',
+      multiplicity: productMeta.multiplicity,
+      size: productMeta.properties?.find(p => p.name === 'Размер')?.value?.split("/")[0]?.trim() || '',
+      brand: productMeta.originProperties?.find(p => p.name === 'Торговая марка')?.value || '',
+      imageIndex: imageIndex
+    };
+  
+    // Функция для фильтрации элементов по видимости в стиле
+    const filterElementsByVisibility = (elements, variant) => {
+      if (!elements || !Array.isArray(elements)) return [];
+      
+      return elements.filter(element => {
+        if (!element.styles) return true;
+        
+        const styleConfig = element.styles[variant];
+        if (styleConfig && styleConfig.visibility === false) {
+          return false;
+        }
+        return true;
+      });
+    };
+
+    // Функция для применения стилей к элементам (только изображение)
+    const applyElementStyle = (element, variant) => {
+      if (!element?.styles) return element;
+      
+      const styleData = element.styles[variant];
+      if (!styleData) return element;
+      
+      // Создаем копию элемента и применяем ТОЛЬКО нужные свойства
+      const result = { ...element };
+      
+      // Применяем только image из стиля, остальные свойства игнорируем
+      if (styleData.image !== undefined) {
+        result.image = styleData.image;
+      }
+      
+      return result;
+    };
+
+    // Сначала фильтруем элементы по видимости для текущего стиля
+    let filteredTemplate = filterElementsByVisibility(selectedTemplate, currentStyle);
+    
+    // Затем применяем стили к оставшимся элементам
+    filteredTemplate = filteredTemplate.map(element => 
+      applyElementStyle(element, currentStyle)
+    );
+
+    // Применяем стиль перед сохранением
+    const newDesign = replacePlaceholders(filteredTemplate, templateData, currentStyle);
+    
+    await slidesDB.add({
+      code: `design-${newDesignKey}`,
+      data: newDesign
+    });
+  
+    onItemsUpdate([...items, newDesignKey]);
+    
+    // Обновляем локальное состояние дизайнов
+    setDesignsData(prev => ({
+      ...prev,
+      [newDesignKey]: newDesign
+    }));
+    
+  } catch (error) {
+    console.error('Error creating new design:', error);
+  }
+};
 
   // Обработчик изменения шаблона с валидацией и сбросом стиля
 const handleTemplateChange = async (baseCode, templateKey) => {
@@ -611,8 +663,6 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     
     const activeStyleId = getActiveStyleId();
 
-    
-      
     return (
       <div className={`template-selector ${marketplace}`} >
         <div className="template-selector-controls">

@@ -165,7 +165,46 @@ export const Home = () => {
     });
   };
 
-  const generateDesignData = useCallback((item) => {
+  // Функция для фильтрации элементов по видимости в стиле
+  const filterElementsByVisibility = (elements, variant) => {
+    if (!elements || !Array.isArray(elements)) return [];
+    
+    return elements.filter(element => {
+      if (!element.styles) return true;
+      
+      const styleConfig = element.styles[variant];
+      if (styleConfig && styleConfig.visibility === false) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  // Функция для применения стилей к элементам
+  const applyElementStyle = (element, variant) => {
+    if (!element?.styles) return element;
+    
+    const styleData = element.styles[variant];
+    if (!styleData) return element;
+    
+    const result = { ...element };
+    
+    if (styleData.image !== undefined) {
+      result.image = styleData.image;
+    }
+    
+    // Добавьте другие свойства стиля, если нужно
+    if (styleData.width !== undefined) result.width = styleData.width;
+    if (styleData.height !== undefined) result.height = styleData.height;
+    if (styleData.originalWidth !== undefined) result.originalWidth = styleData.originalWidth;
+    if (styleData.originalHeight !== undefined) result.originalHeight = styleData.originalHeight;
+    if (styleData.position !== undefined) result.position = styleData.position;
+    if (styleData.rotation !== undefined) result.rotation = styleData.rotation;
+    
+    return result;
+  };
+
+  const generateDesignData = useCallback((item, styleVariant = 'default') => {
     // Функция для проверки типа шаблона
     const getTemplateType = (template) => {
       if (!Array.isArray(template)) return 'single';
@@ -178,7 +217,14 @@ export const Home = () => {
       const imageIndex = parseInt(parts[parts.length - 1]) - 1;
       const templateIndex = Math.min(imageIndex, templateArray.length - 1);
       const selectedTemplate = templateArray[templateIndex];
-      return replacePlaceholders(selectedTemplate, item);
+
+      // Фильтруем и применяем стиль
+      let filteredTemplate = filterElementsByVisibility(selectedTemplate, styleVariant);
+      filteredTemplate = filteredTemplate.map(element => 
+        applyElementStyle(element, styleVariant)
+      );
+
+      return replacePlaceholders(filteredTemplate, item);
     };
   
     // Система шаблонов
@@ -423,33 +469,33 @@ const handleSearch = useCallback((normalizedArticles) => {
     return
   };
 
-    setLoading(true);
-    
-    const searchQuery = normalizedArticles.join(' ');
-    const encodedSearch = encodeURIComponent(searchQuery);
-    
-    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.results.length === 0) {
-          const message = t('views.homeMissingCode');
-          setInfoMessage(message);
-          return Promise.reject(message);
-        }
-    
-        const productIds = data.results.map(product => product.id);
-        const idsParam = productIds.join(',');
-        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-      })
-      .then(response => response?.json())
-      .then(detailedData => {
-        if (!detailedData) return;
+    //setLoading(true);
+    //
+    //const searchQuery = normalizedArticles.join(' ');
+    //const encodedSearch = encodeURIComponent(searchQuery);
+    //
+    //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
+    //  .then(response => response.json())
+    //  .then(data => {
+    //    if (data.results.length === 0) {
+    //      const message = t('views.homeMissingCode');
+    //      setInfoMessage(message);
+    //      return Promise.reject(message);
+    //    }
+    //
+    //    const productIds = data.results.map(product => product.id);
+    //    const idsParam = productIds.join(',');
+    //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+    //  })
+    //  .then(response => response?.json())
+    //  .then(detailedData => {
+    //    if (!detailedData) return;
 
       // Обрабатываем полученные данные API
-      //const processedResults = processProductsData(data);
-      //const processedMetaResults = processProductsMeta(data);
-      const processedResults = processProductsData(detailedData);
-      const processedMetaResults = processProductsMeta(detailedData);
+      const processedResults = processProductsData(data);
+      const processedMetaResults = processProductsMeta(data);
+      //const processedResults = processProductsData(detailedData);
+      //const processedMetaResults = processProductsMeta(detailedData);
             
       // Сохраняем в sessionStorage
       processedResults.forEach(item => {
@@ -479,16 +525,16 @@ const handleSearch = useCallback((normalizedArticles) => {
       }));
 
       return processedResults;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setError(error.message || "An error occurred");
-      setValidArticles([]);
-      setIsSearchActive(false);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
+    //})
+    //.catch(error => {
+    //  console.error('Error:', error);
+    //  setError(error.message || "An error occurred");
+    //  setValidArticles([]);
+    //  setIsSearchActive(false);
+    //})
+    //.finally(() => {
+    //  setLoading(false);
+    //});
 }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

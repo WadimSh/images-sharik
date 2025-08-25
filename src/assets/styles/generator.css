@@ -1316,7 +1316,7 @@
   transition: transform 0.3s ease;
 }
 
-/* Добавим стили для подписей (если нужно) */
+/* Добавим стили для подписей */
 .images-item::after {
   content: attr(data-filename);
   position: absolute;

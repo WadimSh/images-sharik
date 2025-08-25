@@ -1557,28 +1557,35 @@ export const Generator = () => {
         className="hidden-input"
       />
       {/* Панель настроек шрифта вне цикла элементов */}
-      {selectedTextEdit && (
-        <div 
-          className="font-controls-wrapper"
-          style={{
-            position: 'fixed',
-            left: contextMenu.x,
-            top: contextMenu.y,
-            zIndex: 1000
-          }}
-          onClick={(e) => e.stopPropagation()} // Предотвращаем всплытие события
-        >
-          <FontControls
-            element={elements.find(el => el.id === selectedTextEdit.elementId)}
-            isMulti={selectedTextEdit.isMulti}
-            selectedElementIds={selectedTextEdit.selectedIds}
-            onClose={() => setSelectedTextEdit(null)}
-            onChange={handleFontChange}
-            onChangeMulti={handleFontChangeMulti}
-            elements={elements}
-          />
-        </div>
-      )}  
+      {selectedTextEdit && captureRef.current && (() => {
+        const containerRect = captureRef.current.getBoundingClientRect();
+        const left = containerRect.left + contextMenu.x;
+        const top = containerRect.top + contextMenu.y + 20;
+
+        return ReactDOM.createPortal(
+          <div 
+            className="font-controls-wrapper"
+            style={{
+              position: 'fixed',
+              left,
+              top,
+              zIndex: 1000
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FontControls
+              element={elements.find(el => el.id === selectedTextEdit.elementId)}
+              isMulti={selectedTextEdit.isMulti}
+              selectedElementIds={selectedTextEdit.selectedIds}
+              onClose={() => setSelectedTextEdit(null)}
+              onChange={handleFontChange}
+              onChangeMulti={handleFontChangeMulti}
+              elements={elements}
+            />
+          </div>,
+          document.body
+        );
+      })()}
       {isCollageTempleModalOpen && <CollageTempleModal 
         setIsCollageTempleModalOpen={setIsCollageTempleModalOpen}
         setCollageTemples={setCollageTemples}
