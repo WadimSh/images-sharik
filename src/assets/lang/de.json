@@ -21,7 +21,17 @@
     "addLayout": "Layout hinzufügen",
     "downloadLayout": "Vorlage erstellen"
   },
+  "category": {
+    "all": "Alle",
+    "others": "Andere",
+    "belbal": "Belbal",
+    "gemar": "Gemar",
+    "main": "Grundvorlage",
+    "petard": "Knallbonbon"
+  },
   "grid": {
+    "all": "Alle",
+    "others": "Andere",
     "belbal": "Belbal (3 Folien)",
     "gemar": "Gemar (3 Folien)",
     "main": "Grundvorlage",
@@ -216,7 +226,11 @@
     "addIntoTemplate": "Zu Vorlage hinzufügen",
     "titlePIN": "PIN-Code eingeben",
     "searchPlaceholder": "Layout suchen...",
-    "noResultsFound": "Keine Layouts gefunden"
+    "noResultsFound": "Keine Layouts gefunden",
+    "searchPlaceholders": "Bilder suchen...",
+    "noImagesFound": "Keine Bilder gefunden",
+    "imagesFound": "Bilder gefunden",
+    "subcategories": "Unterkategorien"
   },
   "template": {
     "create": "Vorlage erstellen",

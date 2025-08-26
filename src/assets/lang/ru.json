@@ -21,7 +21,17 @@
     "addLayout": "Добавить макет",
     "downloadLayout": "Создать шаблон"
   },
+  "category": {
+    "all": "Все",
+    "others": "Другие",
+    "belbal": "Belbal",
+    "gemar": "Gemar",
+    "main": "Базовый шаблон",
+    "petard": "Хлопушка"
+  },
   "grid": {
+    "all": "Все",
+    "others": "Другие",
     "belbal": "Belbal (3 слайда)",
     "gemar": "Gemar (3 слайда)",
     "main": "Базовый шаблон",
@@ -216,7 +226,11 @@
     "addIntoTemplate": "Добавить в шаблон",
     "titlePIN": "Введите PIN-код",
     "searchPlaceholder": "Найти макет...",
-    "noResultsFound": "Ничего не найдено"
+    "noResultsFound": "Ничего не найдено",
+    "searchPlaceholders": "Поиск изображений...",
+    "noImagesFound": "Изображения не найдены",
+    "imagesFound": "изображений найдено",
+    "subcategories": "Подкатегории"
   },
   "template": {
     "create": "Создать макет",

@@ -21,7 +21,17 @@
     "addLayout": "Aggiungi layout",
     "downloadLayout": "Crea modello"
   },
+  "category": {
+    "all": "Tutto",
+    "others": "Altri",
+    "belbal": "Belbal",
+    "gemar": "Gemar",
+    "main": "Modello base",
+    "petard": "Stelle filanti"
+  },
   "grid": {
+    "all": "Tutto",
+    "others": "Altri",
     "belbal": "Belbal (3 diapo)",
     "gemar": "Gemar (3 diapo)",
     "main": "Modello base",
@@ -216,7 +226,11 @@
     "addIntoTemplate": "Aggiungi al template",
     "titlePIN": "Inserisci codice PIN",
     "searchPlaceholder": "Cerca layout...",
-    "noResultsFound": "Nessun layout trovato"
+    "noResultsFound": "Nessun layout trovato",
+    "searchPlaceholders": "Cerca immagini...",
+    "noImagesFound": "Nessuna immagine trovata",
+    "imagesFound": "immagini trovate",
+    "subcategories": "Sottocategorie"
   },
   "template": {
     "create": "Crea template",

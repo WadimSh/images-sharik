@@ -21,7 +21,17 @@
     "addLayout": "Add layout",
     "downloadLayout": "Create template"
   },
+  "category": {
+    "all": "All",
+    "others": "Others",
+    "belbal": "Belbal",
+    "gemar": "Gemar",
+    "main": "Basic template",
+    "petard": "Party popper"
+  },
   "grid": {
+    "all": "All",
+    "others": "Others",
     "belbal": "Belbal (3 slides)",
     "gemar": "Gemar (3 slides)",
     "main": "Basic template",
@@ -216,7 +226,11 @@
     "addIntoTemplate": "Add to template",
     "titlePIN": "Enter PIN code",
     "searchPlaceholder": "Find layout...",
-    "noResultsFound": "No layouts found"
+    "noResultsFound": "No layouts found",
+    "searchPlaceholders": "Search images...",
+    "noImagesFound": "No images found",
+    "imagesFound": "images found",
+    "subcategories": "Subcategories"
   },
   "template": {
     "create": "Create template",
