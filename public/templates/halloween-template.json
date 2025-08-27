@@ -1,0 +1,669 @@
+[
+  {
+    "id": 1744738384460,
+    "type": "background",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "backgroundImage": "/images/fon-04-01.png",
+    "color": "#ffffff",
+    "gradient": null,
+    "height": 601,
+    "width": 451,
+    "originalImageHeight": 1200,
+    "originalImageWidth": 900,
+    "styles": {
+      "default": { "backgroundImage": "/images/fon-04-01.png" },
+      "bat": { "backgroundImage": "/images/fon-04-02.png" },
+      "pumpkin": { "backgroundImage": "/images/fon-04-03.png" },
+      "blood": { "backgroundImage": "/images/fon-04-04.png" },
+      "carved": { "backgroundImage": "/images/fon-04-05.png" },
+      "monsters": { "backgroundImage": "/images/fon-04-06.png" }
+    }
+  },
+  {
+    "id": 1744221252268,
+    "type": "image",
+    "position": {
+      "x": -30,
+      "y": 116
+    },
+    "isFlipped": false,
+    "image": "{{ITEM_IMAGE}}",
+    "isProduct": true,
+    "width": 462,
+    "height": 462,
+    "originalWidth": 400,
+    "originalHeight": 400
+  },
+  {
+    "id": 1756280698868,
+    "type": "element",
+    "position": {
+      "x": 14,
+      "y": 13
+    },
+    "image": "/images/title_07.png",
+    "width": 424,
+    "height": 105,
+    "originalWidth": 864,
+    "originalHeight": 214,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 14,
+          "y": 13
+        },
+        "image": "/images/title_07.png",
+        "width": 424,
+        "height": 105,
+        "originalWidth": 864,
+        "originalHeight": 214
+      },
+      "bat": { 
+        "position": {
+          "x": 23,
+          "y": 12
+        },
+        "image": "/images/title_08.png",
+        "width": 394,
+        "height": 112,
+        "originalWidth": 768,
+        "originalHeight": 219
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 14,
+          "y": 13
+        },
+        "image": "/images/title_09.png",
+        "width": 424,
+        "height": 105,
+        "originalWidth": 864,
+        "originalHeight": 214
+      },
+      "blood": { 
+        "position": {
+          "x": 21,
+          "y": 21
+        },
+        "image": "/images/title_10.png",
+        "width": 410,
+        "height": 89.5,
+        "originalWidth": 836,
+        "originalHeight": 183
+      },
+      "carved": { 
+        "position": {
+          "x": 23,
+          "y": 10.5
+        },
+        "image": "/images/title_11.png",
+        "width": 393,
+        "height": 114,
+        "originalWidth": 825,
+        "originalHeight": 240
+      },
+      "monsters": { 
+        "position": {
+          "x": 19,
+          "y": 24
+        },
+        "image": "/images/title_12.png",
+        "width": 407,
+        "height": 94.5,
+        "originalWidth": 832,
+        "originalHeight": 193
+      }
+    }
+  },
+  {
+    "id": 1756280824543,
+    "type": "element",
+    "position": {
+      "x": 317.5,
+      "y": 320
+    },
+    "image": "/images/bubbles_09+text_002.png",
+    "width": 118,
+    "height": 112,
+    "originalWidth": 225,
+    "originalHeight": 214,
+    "isFlipped": false,
+    "rotation": 0,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 317.5,
+          "y": 320
+        },
+        "image": "/images/bubbles_09+text_002.png",
+        "width": 118,
+        "height": 112,
+        "originalWidth": 225,
+        "originalHeight": 214
+      },
+      "bat": { 
+        "position": {
+          "x": 85.5,
+          "y": 508
+        },
+        "image": "/images/bubbles_09+text_006.png",
+        "width": 141,
+        "height": 75,
+        "originalWidth": 333,
+        "originalHeight": 178
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 310.5,
+          "y": 329
+        },
+        "image": "/images/bubbles_09+text_008.png",
+        "width": 125,
+        "height": 107,
+        "originalWidth": 247,
+        "originalHeight": 211
+      },
+      "blood": { 
+        "position": {
+          "x": 85,
+          "y": 508
+        },
+        "image": "/images/bubbles_09+text_012.png",
+        "width": 141,
+        "height": 76,
+        "originalWidth": 332,
+        "originalHeight": 179
+      },
+      "carved": { 
+        "position": {
+          "x": 317.5,
+          "y": 320
+        },
+        "image": "/images/bubbles_09+text_002.png",
+        "width": 118,
+        "height": 112,
+        "originalWidth": 225,
+        "originalHeight": 214
+      },
+      "monsters": { 
+        "position": {
+          "x": 226.5,
+          "y": 483.5
+        },
+        "image": "/images/bubbles_09+text_015.png",
+        "width": 145,
+        "height": 108,
+        "originalWidth": 283,
+        "originalHeight": 211
+      }
+    }
+  },
+  {
+    "id": 1756281051634,
+    "type": "element",
+    "position": {
+      "x": 321.5,
+      "y": 125
+    },
+    "image": "/images/bubbles_09_001.png",
+    "width": 117,
+    "height": 110,
+    "originalWidth": 225,
+    "originalHeight": 212,
+    "isFlipped": false,
+    "rotation": 16,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 321.5,
+          "y": 125
+        },
+        "image": "/images/bubbles_09_001.png",
+        "width": 117,
+        "height": 110,
+        "originalWidth": 225,
+        "originalHeight": 212,
+        "rotation": 16
+      },
+      "bat": { 
+        "position": {
+          "x": 302.5,
+          "y": 152
+        },
+        "image": "/images/bubbles_09_002.png",
+        "width": 141,
+        "height": 86,
+        "originalWidth": 269,
+        "originalHeight": 164,
+        "rotation": -16
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 308,
+          "y": 129.5
+        },
+        "image": "/images/bubbles_09_003.png",
+        "width": 125,
+        "height": 108,
+        "originalWidth": 246,
+        "originalHeight": 213,
+        "rotation": -16
+      },
+      "blood": { 
+        "position": {
+          "x": 299,
+          "y": 151
+        },
+        "image": "/images/bubbles_09_004.png",
+        "width": 141,
+        "height": 87,
+        "originalWidth": 268,
+        "originalHeight": 164,
+        "rotation": -16
+      },
+      "carved": { 
+        "position": {
+          "x": 321.5,
+          "y": 125
+        },
+        "image": "/images/bubbles_09_001.png",
+        "width": 117,
+        "height": 110,
+        "originalWidth": 225,
+        "originalHeight": 212,
+        "rotation": 16
+      },
+      "monsters": { 
+        "position": {
+          "x": 316.5,
+          "y": 116.5
+        },
+        "image": "/images/bubbles_09_005.png",
+        "width": 127,
+        "height": 125,
+        "originalWidth": 219,
+        "originalHeight": 215,
+        "rotation": 0
+      }
+    }
+  },
+  {
+    "id": 1744734115161,
+    "type": "text",
+    "position": {
+      "x": 360,
+      "y": 197
+    },
+    "text": "шт",
+    "fontSize": 24,
+    "color": "#000000",
+    "fontFamily": "Swampy",
+    "width": 34,
+    "height": 22,
+    "image": null,
+    "rotation": 16,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 360,
+          "y": 197
+        },
+        "fontSize": 24,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "width": 34,
+        "height": 22,
+        "rotation": 16
+      },
+      "bat": { 
+        "position": {
+          "x": 366,
+          "y": 196
+        },
+        "fontSize": 26,
+        "color": "#ffffff",
+        "fontFamily": "Jolly Lodger",
+        "width": 34,
+        "height": 26,
+        "rotation": -16
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 367,
+          "y": 195
+        },
+        "fontSize": 32,
+        "color": "#000000",
+        "fontFamily": "Jolly Lodger",
+        "width": 34,
+        "height": 32,
+        "rotation": -16
+      },
+      "blood": { 
+        "position": {
+          "x": 364,
+          "y": 196
+        },
+        "fontSize": 24,
+        "color": "#ffffff",
+        "fontFamily": "Jolly Lodger",
+        "width": 34,
+        "height": 24,
+        "rotation": -16
+      },
+      "carved": { 
+        "position": {
+          "x": 360,
+          "y": 197
+        },
+        "fontSize": 24,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "width": 34,
+        "height": 22,
+        "rotation": 16
+      },
+      "monsters": { 
+        "position": {
+          "x": 354,
+          "y": 206
+        },
+        "fontSize": 24,
+        "color": "#cc99ff",
+        "fontFamily": "Alterna Nr",
+        "width": 34,
+        "height": 22,
+        "rotation": 0
+      }
+    }
+  },
+  {
+    "id": 1744221504335,
+    "type": "text",
+    "position": {
+      "x": 343,
+      "y": 160
+    },
+    "text": "{{MULTIPLICITY}}",
+    "fontSize": 46,
+    "color": "#000000",
+    "fontFamily": "Swampy",
+    "textAlign": "center",
+    "width": 82,
+    "height": 45,
+    "image": null,
+    "rotation": 16,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 343,
+          "y": 160
+        },
+        "fontSize": 46,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "textAlign": "center",
+        "width": 82,
+        "height": 45,
+        "rotation": 16
+      },
+      "bat": { 
+        "position": {
+          "x": 329,
+          "y": 168
+        },
+        "fontSize": 42,
+        "color": "#ffffff",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 82,
+        "height": 38,
+        "rotation": -16
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 330,
+          "y": 160
+        },
+        "fontSize": 52,
+        "color": "#000000",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 82,
+        "height": 51,
+        "rotation": -16
+      },
+      "blood": { 
+        "position": {
+          "x": 324,
+          "y": 168
+        },
+        "fontSize": 42,
+        "color": "#ffffff",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 82,
+        "height": 45,
+        "rotation": -16
+      },
+      "carved": { 
+        "position": {
+          "x": 343,
+          "y": 160
+        },
+        "fontSize": 46,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "textAlign": "center",
+        "width": 82,
+        "height": 45,
+        "rotation": 16
+      },
+      "monsters": { 
+        "position": {
+          "x": 324,
+          "y": 166
+        },
+        "fontSize": 46,
+        "color": "#cc99ff",
+        "fontFamily": "Alterna Nr",
+        "textAlign": "center",
+        "width": 82,
+        "height": 43,
+        "rotation": 0
+      }
+    }
+  },
+  {
+    "id": 1756281520084,
+    "type": "element",
+    "position": {
+      "x": 17.5,
+      "y": 339
+    },
+    "image": "/images/bubbles_09_001.png",
+    "width": 117,
+    "height": 110,
+    "originalWidth": 225,
+    "originalHeight": 212,
+    "isFlipped": false,
+    "rotation": 16,
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 17.5,
+          "y": 339
+        },
+        "image": "/images/bubbles_09_001.png",
+        "width": 117,
+        "height": 110,
+        "originalWidth": 225,
+        "originalHeight": 212,
+        "rotation": 16
+      },
+      "bat": { 
+        "position": {
+          "x": 6.5,
+          "y": 296
+        },
+        "image": "/images/bubbles_09_002.png",
+        "width": 141,
+        "height": 86,
+        "originalWidth": 269,
+        "originalHeight": 164,
+        "rotation": 16
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 4,
+          "y": 342.5
+        },
+        "image": "/images/bubbles_09_003.png",
+        "width": 125,
+        "height": 108,
+        "originalWidth": 246,
+        "originalHeight": 213,
+        "rotation": -16
+      },
+      "blood": { 
+        "position": {
+          "x": 7,
+          "y": 296
+        },
+        "image": "/images/bubbles_09_004.png",
+        "width": 141,
+        "height": 87,
+        "originalWidth": 268,
+        "originalHeight": 164,
+        "rotation": 16
+      },
+      "carved": { 
+        "position": {
+          "x": 17.5,
+          "y": 339
+        },
+        "image": "/images/bubbles_09_001.png",
+        "width": 117,
+        "height": 110,
+        "originalWidth": 225,
+        "originalHeight": 212,
+        "rotation": 16
+      },
+      "monsters": { 
+        "position": {
+          "x": 15.5,
+          "y": 285
+        },
+        "image": "/images/bubbles_09_006.png",
+        "width": 145,
+        "height": 120,
+        "originalWidth": 287,
+        "originalHeight": 238,
+        "rotation": 16
+      }
+    }
+  },
+  {
+    "id": 1744221657494,
+    "type": "text",
+    "position": {
+      "x": 32,
+      "y": 388
+    },
+    "text": "{{SIZE}}",
+    "fontSize": 36,
+    "color": "#000000",
+    "fontFamily": "Swampy",
+    "textAlign": "center",
+    "width": 86,
+    "height": 35,
+    "image": null,
+    "rotation": 16,
+    "fontWeight": "normal",
+    "styles": {
+      "default": { 
+        "position": {
+          "x": 32,
+          "y": 388
+        },
+        "fontSize": 36,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "textAlign": "center",
+        "width": 86,
+        "height": 35,
+        "rotation": 16
+      },
+      "bat": { 
+        "position": {
+          "x": 34,
+          "y": 315
+        },
+        "fontSize": 38,
+        "color": "#FFFFFF",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 86,
+        "height": 36,
+        "rotation": 16
+      },
+      "pumpkin": { 
+        "position": {
+          "x": 25,
+          "y": 382
+        },
+        "fontSize": 46,
+        "color": "#000000",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 86,
+        "height": 51,
+        "rotation": -16
+      },
+      "blood": { 
+        "position": {
+          "x": 36,
+          "y": 314
+        },
+        "fontSize": 38,
+        "color": "#ffffff",
+        "fontFamily": "Jolly Lodger",
+        "textAlign": "center",
+        "width": 86,
+        "height": 38,
+        "rotation": 16
+      },
+      "carved": { 
+        "position": {
+          "x": 32,
+          "y": 388
+        },
+        "fontSize": 36,
+        "color": "#000000",
+        "fontFamily": "Swampy",
+        "textAlign": "center",
+        "width": 86,
+        "height": 35,
+        "rotation": 16
+      },
+      "monsters": { 
+        "position": {
+          "x": 21,
+          "y": 343
+        },
+        "fontSize": 36,
+        "color": "#cc99ff",
+        "fontFamily": "Alterna Nr",
+        "textAlign": "center",
+        "width": 86,
+        "height": 35,
+        "rotation": 18
+      }
+    }
+  }
+]

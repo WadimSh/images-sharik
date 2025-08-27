@@ -562,6 +562,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     belbal: t('grid.belbal'),
     gemar: t('grid.gemar'),
     petard: t('grid.petard'),
+    halloween: t('category.halloween'),
     main: t('grid.main'),
     default: t('grid.default'),
     // bubble: t('grid.bubble'),

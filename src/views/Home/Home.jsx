@@ -21,6 +21,7 @@ export const Home = () => {
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
   
   const [templates, setTemplates] = useState({
+    halloween: [],
     petard: [],
     belbal: [],
     gemar: [],
@@ -66,14 +67,15 @@ export const Home = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate, petardTemplate] = await Promise.all([
+        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate, petardTemplate, halloweenTemplate] = await Promise.all([
           fetch('/templates/main-template.json').then(r => r.json()),
           fetch('/templates/default-template.json').then(r => r.json()),
           fetch('/templates/gemar-template.json').then(r => r.json()),
           fetch('/templates/belbal-template.json').then(r => r.json()),
-          fetch('/templates/petard-template.json').then(r => r.json())
+          fetch('/templates/petard-template.json').then(r => r.json()),
+          fetch('/templates/halloween-template.json').then(r => r.json())
         ]);
-        setTemplates({ petard: petardTemplate, belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
+        setTemplates({ halloween: halloweenTemplate, petard: petardTemplate, belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
       } catch (error) {
         console.error('Error loading templates:', error);
       }
