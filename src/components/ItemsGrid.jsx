@@ -11,6 +11,7 @@ import { productsDB, slidesDB } from '../utils/handleDB';
 import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
 import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
 import { Tooltip } from '../ui/Tooltip/Tooltip';
+import { ImageSliderModal } from './ImageSliderModal';
 
 // Добавляем вспомогательную функцию для фильтрации элементов по стилю
 const filterElementsByStyle = (elements, styleVariant) => {
@@ -33,7 +34,6 @@ const filterElementsByStyle = (elements, styleVariant) => {
   });
 };
 
-
 const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
@@ -42,6 +42,42 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
+  const [productImages, setProductImages] = useState({});
+  const [modalData, setModalData] = useState({
+    isOpen: false,
+    images: [],
+    currentIndex: 0,
+    baseCode: ''
+  });
+
+  // Функции для управления модальным окном
+  const openImageModal = (baseCode, initialIndex = 0) => {
+    const images = productImages[baseCode] || [];
+    if (images.length > 0) {
+      setModalData({
+        isOpen: true,
+        images,
+        currentIndex: initialIndex,
+        baseCode
+      });
+    }
+  };
+
+  const closeImageModal = () => {
+    setModalData({
+      isOpen: false,
+      images: [],
+      currentIndex: 0,
+      baseCode: ''
+    });
+  };
+
+  const handleImageIndexChange = (newIndex) => {
+    setModalData(prev => ({
+      ...prev,
+      currentIndex: newIndex
+    }));
+  };
 
   // Загрузка метаданных продуктов
   useEffect(() => {
@@ -97,6 +133,85 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     }
   }, [items, productMetas]);
 
+  // Функция для получения изображений товара
+  const creatLinkImages = async (baseCode) => {
+    const wbCode = getCode(baseCode, "WB");
+    if (wbCode !== t('product.notWB')) {
+      const volLength = wbCode.length === 8 ? 3 : 4;
+      const partLength = wbCode.length === 8 ? 5 : 6;
+    
+      const volPart = wbCode.substring(0, volLength);
+      const partPart = wbCode.substring(0, partLength);
+    
+      // Функция для проверки доступности изображения
+      const checkImageExists = async (url) => {
+        try {
+          const response = await fetch(url, { method: 'HEAD' });
+          return response.status === 200;
+        } catch (error) {
+          return false;
+        }
+      };
+    
+      // Сначала находим рабочий номер basket
+      let workingBasket = null;
+      
+      for (let basketNumber = 1; basketNumber <= 30; basketNumber++) {
+        const testLink = `https://basket-${basketNumber}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/1.webp`;
+      
+        try {
+          const exists = await checkImageExists(testLink);
+          if (exists) {
+            workingBasket = basketNumber;
+            break;
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+    
+      if (!workingBasket) {
+        setProductImages(prev => ({ ...prev, [baseCode]: [] }));
+        return;
+      }
+    
+      // Параллельная проверка всех изображений
+      const imageCheckPromises = [];
+      
+      for (let imageNumber = 1; imageNumber <= 10; imageNumber++) {
+        const imageLink = `https://basket-${workingBasket}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/${imageNumber}.webp`;
+        
+        imageCheckPromises.push(
+          checkImageExists(imageLink)
+            .then(exists => exists ? imageLink : null)
+            .catch(() => null)
+        );
+      }
+    
+      // Ждем результаты всех проверок
+      const imageResults = await Promise.all(imageCheckPromises);
+      const workingImages = imageResults.filter(link => link !== null);
+    
+      // Сохраняем изображения в состояние
+      setProductImages(prev => ({ ...prev, [baseCode]: workingImages }));
+    }
+  };
+
+  // Загрузка изображений при изменении baseCodes
+  useEffect(() => {
+    const loadImagesForProducts = async () => {
+      const uniqueBaseCodes = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+      
+      for (const baseCode of uniqueBaseCodes) {
+        await creatLinkImages(baseCode);
+      }
+    };
+
+    if (items.length > 0) {
+      loadImagesForProducts();
+    }
+  }, [items]);
+
   // Функция для получения отфильтрованных элементов для превью
   const getFilteredDesignForPreview = (designData, baseCode) => {
     if (!designData || !Array.isArray(designData)) return [];
@@ -124,7 +239,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     });
   }, [items]);
 
-  // Функция для создания нового дизайна с применением стиля
   // Функция для создания нового дизайна с применением стиля
 const handleCreateNewDesign = async (baseCode) => {
   try {
@@ -641,7 +755,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     // foilBalls: t('grid.foilBalls'),
     // blowouts: t('grid.blowouts'),
   };
-  
+
   // Вспомогательная функция для рендеринга контролов выбора шаблона
   const renderTemplateControls = (baseCode, currentTemplate) => {
     const wbCode = getCode(baseCode, "WB");
@@ -743,8 +857,47 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     );
   };
 
+  // Функция для рендеринга превью изображений
+  const renderImagePreviews = (baseCode) => {
+    const images = productImages[baseCode] || [];
+    
+    if (images.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="product-images-preview">
+        {images.map((imageUrl, index) => (
+          <div 
+            key={index} 
+            className="product-image-item"
+            onClick={() => openImageModal(baseCode, index)}
+          >
+            <img 
+              src={imageUrl} 
+              alt={`Товар ${baseCode} - ${index + 1}`}
+              loading="lazy"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="items-grid-container">
+      {modalData.isOpen && (
+        <ImageSliderModal
+          baseCode={modalData.baseCode}
+          images={modalData.images}
+          currentIndex={modalData.currentIndex}
+          onClose={closeImageModal}
+          onIndexChange={handleImageIndexChange}
+        />
+      )}
       {uniqueBaseCodes.map((baseCode) => {
         const productMeta = productMetas[baseCode] || { 
           templateType: 'default'
@@ -754,11 +907,16 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
         
         return (
           <div key={baseCode}>
-            <h2 className="item-title">
-              {baseCode}
-              {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
-            </h2>
+            <div className="product-header">
+              <h2 className="item-title">
+                {baseCode}
+                {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
+              </h2>
+              {marketplace === 'WB' && renderImagePreviews(baseCode)}
+            </div>
+
             {renderTemplateControls(baseCode, currentTemplate)}
+
             <div className="items-grid">
               {relatedItems.map((item) => {
                 const designData = designsData[item];
