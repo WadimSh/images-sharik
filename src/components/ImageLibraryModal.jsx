@@ -180,7 +180,7 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
                 className={`subcategory-btn ${selectedSubcategory === 'all' ? 'active' : ''}`}
                 onClick={() => handleSubcategorySelect('all')}
               >
-                {t('category.all')} {t(getCurrentCategory().name)}
+                {t('category.all_from')} {t(getCurrentCategory().name)}
               </button>
               {getCurrentCategory().subcategories.map(subcategory => (
                 <button

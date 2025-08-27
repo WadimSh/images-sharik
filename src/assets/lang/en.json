@@ -23,11 +23,13 @@
   },
   "category": {
     "all": "All",
+    "all_from": "All from",
     "others": "Others",
     "belbal": "Belbal",
     "gemar": "Gemar",
     "main": "Basic template",
-    "petard": "Party popper"
+    "petard": "Party popper",
+    "halloween": "Halloween"
   },
   "grid": {
     "all": "All",
@@ -124,7 +126,12 @@
     "crimson": "Deep Crimson",
     "brutal": "Linear Style",
     "amur1": "Amorous Style",
-    "amur2": "Romantic Style"
+    "amur2": "Romantic Style",
+    "pumpkin": "Pumpkin style",
+    "bat": "Night style",
+    "blood": "Bloody style",
+    "carved": "Carved style",
+    "monsters": "Monster style"
   },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",

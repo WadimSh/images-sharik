@@ -23,11 +23,13 @@
   },
   "category": {
     "all": "Alle",
+    "all_from": "Alle aus",
     "others": "Andere",
     "belbal": "Belbal",
     "gemar": "Gemar",
     "main": "Grundvorlage",
-    "petard": "Knallbonbon"
+    "petard": "Knallbonbon",
+    "halloween": "Halloween"
   },
   "grid": {
     "all": "Alle",
@@ -124,7 +126,12 @@
     "crimson": "Tiefes Karmesin",
     "brutal": "Linearer Stil",
     "amur1": "Verliebter Stil",
-    "amur2": "Romantischer Stil"
+    "amur2": "Romantischer Stil",
+    "pumpkin": "Kürbis-Stil",
+    "bat": "Nacht-Stil",
+    "blood": "Blutiger Stil",
+    "carved": "Schnitz-Stil", 
+    "monsters": "Monster-Stil"
   },
   "views": {
     "homeMissingCode": "Ändern Sie die Suchparameter oder verwenden Sie andere Schlüsselwörter.",

@@ -23,11 +23,13 @@
   },
   "category": {
     "all": "Tutto",
+    "all_from": "Tutti da",
     "others": "Altri",
     "belbal": "Belbal",
     "gemar": "Gemar",
     "main": "Modello base",
-    "petard": "Stelle filanti"
+    "petard": "Stelle filanti",
+    "halloween": "Halloween"
   },
   "grid": {
     "all": "Tutto",
@@ -124,7 +126,12 @@
     "crimson": "Cremisi Profondo",
     "brutal": "Stile Lineare",
     "amur1": "Stile Amoroso",
-    "amur2": "Stile Romantico"
+    "amur2": "Stile Romantico",
+    "pumpkin": "Stile zucca",
+    "bat": "Stile notte",
+    "blood": "Stile sanguinante",
+    "carved": "Stile intagliato",
+    "monsters": "Stile mostro"
   },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",

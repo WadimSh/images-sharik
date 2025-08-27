@@ -10,6 +10,18 @@
       "subcategories": []
     },
     {
+      "id": "halloween",
+      "name": "category.halloween",
+      "subcategories": [
+        { "id": "default-halloween", "name": "styles.default", "tags": ["default-halloween"] },
+        { "id": "pumpkin", "name": "styles.pumpkin", "tags": ["pumpkin"] },
+        { "id": "bat", "name": "styles.bat", "tags": ["bat"] },
+        { "id": "blood", "name": "styles.blood", "tags": ["blood"] },
+        { "id": "carved", "name": "styles.carved", "tags": ["carved"] },
+        { "id": "monsters", "name": "styles.monsters", "tags": ["monsters"] }
+      ]
+    },
+    {
       "id": "belbal",
       "name": "category.belbal",
       "subcategories": []
@@ -38,9 +50,7 @@
     {
       "id": "others",
       "name": "category.others",
-      "subcategories": [
-        
-      ]
+      "subcategories": []
     }
   ],
   "images": [
@@ -927,6 +937,118 @@
   {
     "filename": "title_06.png",
     "tags": ["others"]
+  },
+  {
+    "filename": "title_07.png",
+    "tags": ["halloween", "default-halloween"]
+  },
+  {
+    "filename": "title_08.png",
+    "tags": ["halloween", "bat"]
+  },
+  {
+    "filename": "title_09.png",
+    "tags": ["halloween", "pumpkin"]
+  },
+  {
+    "filename": "title_10.png",
+    "tags": ["halloween", "blood"]
+  },
+  {
+    "filename": "title_11.png",
+    "tags": ["halloween", "carved"]
+  },
+  {
+    "filename": "title_12.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09_001.png",
+    "tags": ["halloween", "default-halloween", "carved"]
+  },
+  {
+    "filename": "bubbles_09_002.png",
+    "tags": ["halloween", "bat"]
+  },
+  {
+    "filename": "bubbles_09_003.png",
+    "tags": ["halloween", "pumpkin"]
+  },
+  {
+    "filename": "bubbles_09_004.png",
+    "tags": ["halloween", "blood"]
+  },
+  {
+    "filename": "bubbles_09_005.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09_006.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09_007.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09+text_001.png",
+    "tags": ["halloween", "default-halloween", "carved"]
+  },
+  {
+    "filename": "bubbles_09+text_002.png",
+    "tags": ["halloween", "default-halloween", "carved"]
+  },
+  {
+    "filename": "bubbles_09+text_003.png",
+    "tags": ["halloween", "default-halloween", "carved"]
+  },
+  {
+    "filename": "bubbles_09+text_004.png",
+    "tags": ["halloween", "bat"]
+  },
+  {
+    "filename": "bubbles_09+text_005.png",
+    "tags": ["halloween", "bat"]
+  },
+  {
+    "filename": "bubbles_09+text_006.png",
+    "tags": ["halloween", "bat"]
+  },
+  {
+    "filename": "bubbles_09+text_007.png",
+    "tags": ["halloween", "pumpkin"]
+  },
+  {
+    "filename": "bubbles_09+text_008.png",
+    "tags": ["halloween", "pumpkin"]
+  },
+  {
+    "filename": "bubbles_09+text_009.png",
+    "tags": ["halloween", "pumpkin"]
+  },
+  {
+    "filename": "bubbles_09+text_010.png",
+    "tags": ["halloween", "blood"]
+  },
+  {
+    "filename": "bubbles_09+text_011.png",
+    "tags": ["halloween", "blood"]
+  },
+  {
+    "filename": "bubbles_09+text_012.png",
+    "tags": ["halloween", "blood"]
+  },
+  {
+    "filename": "bubbles_09+text_013.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09+text_014.png",
+    "tags": ["halloween", "monsters"]
+  },
+  {
+    "filename": "bubbles_09+text_015.png",
+    "tags": ["halloween", "monsters"]
   }
   ]
 }
