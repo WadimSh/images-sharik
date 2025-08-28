@@ -39,6 +39,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const getCode = useGetCode();
+  
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
@@ -153,7 +154,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
         }
       };
     
-      // Сначала находим рабочий номер basket
+      // Находим рабочий номер basket
       let workingBasket = null;
       
       for (let basketNumber = 1; basketNumber <= 30; basketNumber++) {
@@ -175,22 +176,25 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
         return;
       }
     
-      // Параллельная проверка всех изображений
-      const imageCheckPromises = [];
+      // Проверяем изображения последовательно, останавливаемся при первой нерабочей ссылке
+      const workingImages = [];
       
       for (let imageNumber = 1; imageNumber <= 10; imageNumber++) {
         const imageLink = `https://basket-${workingBasket}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/${imageNumber}.webp`;
         
-        imageCheckPromises.push(
-          checkImageExists(imageLink)
-            .then(exists => exists ? imageLink : null)
-            .catch(() => null)
-        );
+        try {
+          const exists = await checkImageExists(imageLink);
+          if (exists) {
+            workingImages.push(imageLink);
+          } else {
+            // Прекращаем проверку при первой нерабочей ссылке
+            break;
+          }
+        } catch (error) {
+          // Прекращаем проверку при ошибке
+          break;
+        }
       }
-    
-      // Ждем результаты всех проверок
-      const imageResults = await Promise.all(imageCheckPromises);
-      const workingImages = imageResults.filter(link => link !== null);
     
       // Сохраняем изображения в состояние
       setProductImages(prev => ({ ...prev, [baseCode]: workingImages }));
@@ -912,7 +916,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
                 {baseCode}
                 {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
               </h2>
-              {marketplace === 'WB' && renderImagePreviews(baseCode)}
+              {marketplace === 'WB' && (renderImagePreviews(baseCode))}
             </div>
 
             {renderTemplateControls(baseCode, currentTemplate)}

@@ -423,7 +423,7 @@
 .product-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 20px;
 }
 
@@ -431,7 +431,7 @@
   flex-shrink: 0;
   margin-left: auto;
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .product-image-item {
@@ -494,7 +494,6 @@
   align-items: center;
   justify-content: center;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
 }
 
 .slider-image {
