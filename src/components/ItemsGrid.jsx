@@ -43,13 +43,26 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
-  const [productImages, setProductImages] = useState({});
+  const [productImages, setProductImages] = useState(() => {
+    // Восстанавливаем из localStorage при инициализации
+    const saved = localStorage.getItem('productImagesCache');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [modalData, setModalData] = useState({
     isOpen: false,
     images: [],
     currentIndex: 0,
     baseCode: ''
   });
+
+  const updateProductImages = (newImages) => {
+    setProductImages(prev => {
+      const updated = { ...prev, ...newImages };
+      // Сохраняем в localStorage
+      localStorage.setItem('productImagesCache', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   // Функции для управления модальным окном
   const openImageModal = (baseCode, initialIndex = 0) => {
@@ -136,6 +149,9 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   // Функция для получения изображений товара
   const creatLinkImages = async (baseCode) => {
+    if (productImages[baseCode]) {
+      return;
+    }
     const wbCode = getCode(baseCode, "WB");
     if (wbCode !== t('product.notWB')) {
       const volLength = wbCode.length === 8 ? 3 : 4;
@@ -156,7 +172,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     
       // Находим рабочий номер basket
       let workingBasket = null;
-      
+
       for (let basketNumber = 1; basketNumber <= 30; basketNumber++) {
         const testLink = `https://basket-${basketNumber}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/1.webp`;
       
@@ -172,16 +188,16 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       }
     
       if (!workingBasket) {
-        setProductImages(prev => ({ ...prev, [baseCode]: [] }));
+        updateProductImages({ [baseCode]: [] });
         return;
       }
     
       // Проверяем изображения последовательно, останавливаемся при первой нерабочей ссылке
       const workingImages = [];
-      
+
       for (let imageNumber = 1; imageNumber <= 10; imageNumber++) {
         const imageLink = `https://basket-${workingBasket}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/${imageNumber}.webp`;
-        
+
         try {
           const exists = await checkImageExists(imageLink);
           if (exists) {
@@ -197,7 +213,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       }
     
       // Сохраняем изображения в состояние
-      setProductImages(prev => ({ ...prev, [baseCode]: workingImages }));
+      updateProductImages({ [baseCode]: workingImages });
     }
   };
 
@@ -213,6 +229,22 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
     if (items.length > 0) {
       loadImagesForProducts();
+    }
+  }, [items]);
+
+  // Очистка устаревших изображений при изменении items
+  useEffect(() => {
+    const currentBaseCodes = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+    
+    // Находим baseCodes, которые больше не нужны
+    const codesToRemove = Object.keys(productImages).filter(
+      code => !currentBaseCodes.includes(code)
+    );
+    
+    if (codesToRemove.length > 0) {
+      const updatedImages = { ...productImages };
+      codesToRemove.forEach(code => delete updatedImages[code]);
+      updateProductImages(updatedImages);
     }
   }, [items]);
 
