@@ -441,6 +441,13 @@
   border-radius: 2px;
   overflow: hidden;
   border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.product-image-item:hover {
+  transform: scale(1.05);
+  border-color: #007bff;
 }
 
 .product-image-item img {
