@@ -237,7 +237,10 @@
     "searchPlaceholders": "Bilder suchen...",
     "noImagesFound": "Keine Bilder gefunden",
     "imagesFound": "Bilder gefunden",
-    "subcategories": "Unterkategorien"
+    "subcategories": "Unterkategorien",
+    "recentSelected": "Zuletzt Ausgewählt",
+    "noRecentImages": "Keine kürzlich ausgewählten Bilder",
+    "inRecent": "in den letzten"
   },
   "template": {
     "create": "Vorlage erstellen",

@@ -174,12 +174,14 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       let workingBasket = null;
 
       for (let basketNumber = 1; basketNumber <= 30; basketNumber++) {
-        const testLink = `https://basket-${basketNumber}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/1.webp`;
+        // Форматируем номер корзины с ведущим нулем
+        const formattedBasket = basketNumber.toString().padStart(2, '0');
+        const testLink = `https://basket-${formattedBasket}.wbbasket.ru/vol${volPart}/part${partPart}/${wbCode}/images/big/1.webp`;
       
         try {
           const exists = await checkImageExists(testLink);
           if (exists) {
-            workingBasket = basketNumber;
+            workingBasket = formattedBasket;
             break;
           }
         } catch (error) {

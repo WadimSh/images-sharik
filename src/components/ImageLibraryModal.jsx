@@ -1,8 +1,11 @@
 import { useEffect, useState, useContext, useCallback } from 'react';
 import { LanguageContext } from '../contexts/contextLanguage';
+import { useRecentImages } from '../contexts/contextRecentImages';
 
 export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   const { t } = useContext(LanguageContext);
+  const { recentImages, addRecentImage } = useRecentImages();
+
   const [categories, setCategories] = useState([]);
   const [images, setImages] = useState([]);
   const [filteredImages, setFilteredImages] = useState([]);
@@ -44,8 +47,12 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   const filterImages = useCallback((categoryId = selectedCategory, subcategoryId = selectedSubcategory, search = searchTerm) => {
     let filtered = images;
 
-    // Фильтрация по категории (только если выбрана не "Все")
-    if (categoryId !== 'all') {
+    // Если выбрана категория "recent" - показываем недавние изображения
+    if (categoryId === 'recent') {
+      filtered = recentImages;
+    } 
+    // Обычная фильтрация для других категорий
+    else if (categoryId !== 'all') {
       const category = categories.find(cat => cat.id === categoryId);
       if (category) {
         // Если у категории есть подкатегории
@@ -75,8 +82,8 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
       }
     }
 
-    // Поиск (применяется всегда, даже для категории "Все")
-    if (search) {
+    // Поиск (не применяется для категории "recent")
+    if (search && categoryId !== 'recent') {
       filtered = filtered.filter(img =>
         img.filename.toLowerCase().includes(search.toLowerCase()) ||
         img.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
@@ -84,11 +91,12 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
     }
 
     setFilteredImages(filtered);
-  }, [categories, images, selectedCategory, selectedSubcategory, searchTerm]);
+  }, [categories, images, selectedCategory, selectedSubcategory, searchTerm, recentImages]);
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory('all');
+    // setSearchTerm(''); // Очищаем поиск при смене категории
     filterImages(categoryId, 'all', searchTerm);
   };
 
@@ -100,25 +108,37 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    filterImages(selectedCategory, selectedSubcategory, value);
+    // Не применяем поиск для категории "recent"
+    if (selectedCategory !== 'recent') {
+      filterImages(selectedCategory, selectedSubcategory, value);
+    }
   };
 
   const handleImageSelect = (image) => {
+    addRecentImage(image);
     onSelectImage(image.filename);
   };
 
   const clearSearch = () => {
     setSearchTerm('');
-    filterImages(selectedCategory, selectedSubcategory, '');
+    if (selectedCategory !== 'recent') {
+      filterImages(selectedCategory, selectedSubcategory, '');
+    }
   };
 
   const getCurrentCategory = () => {
+    if (selectedCategory === 'recent') {
+      return { id: 'recent', name: 'modals.recentSelected' };
+    }
     return categories.find(cat => cat.id === selectedCategory);
   };
 
   const hasSubcategories = (category) => {
-    return category.subcategories && category.subcategories.length > 0;
+    return category.subcategories && category.subcategories.length > 0 && category.id !== 'recent';
   };
+
+  // Отключаем поиск и подкатегории для раздела "Последнее выбранное"
+  const isRecentCategory = selectedCategory === 'recent';
 
   if (!isOpen) return null;
 
@@ -130,32 +150,35 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
           <button onClick={onClose} className="close-btn">&times;</button>
         </div>
 
-        {/* Поиск */}
-        <div className="modals-search">
-          <div className="search-box">
-            <div className="search-input-wrapper">
-              <input
-                type="text"
-                placeholder={t('modals.searchPlaceholders') || "Поиск изображений..."}
-                value={searchTerm}
-                onChange={handleSearch}
-                className="search-inputs"
-              />
-              {searchTerm && (
-                <button 
-                  className="search-clear-btn"
-                  onClick={clearSearch}
-                  type="button"
-                >
-                  &times;
-                </button>
-              )}
+        {/* Поиск (скрываем для раздела "Последнее выбранное") */}
+        {!isRecentCategory && (
+          <div className="modals-search">
+            <div className="search-box">
+              <div className="search-input-wrapper">
+                <input
+                  type="text"
+                  placeholder={t('modals.searchPlaceholders') || "Поиск изображений..."}
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="search-inputs"
+                />
+                {searchTerm && (
+                  <button 
+                    className="search-clear-btn"
+                    onClick={clearSearch}
+                    type="button"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Основные категории */}
+        {/* Основные категории + кнопка "Последнее выбранное" */}
         <div className="main-categories">
+          {/* Основные категории из JSON */}
           {categories.map(category => (
             <button
               key={category.id}
@@ -165,10 +188,20 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
               <span className="category-name">{t(category.name)}</span>
             </button>
           ))}
+
+          {/* Кнопка "Последнее выбранное" (только если есть недавние изображения) */}
+          {recentImages.length > 0 && (
+            <button
+              className={`main-category-btn ${selectedCategory === 'recent' ? 'active' : ''}`}
+              onClick={() => handleCategorySelect('recent')}
+            >
+              <span className="category-name">{t('modals.recentSelected') || "Последнее выбранное"}</span>
+            </button>
+          )}
         </div>
 
-        {/* Подкатегории (только если выбрана не основная категория "Все" и у нее есть подкатегории) */}
-        {selectedCategory !== 'all' && 
+        {/* Подкатегории (скрываем для раздела "Последнее выбранное") */}
+        {!isRecentCategory && selectedCategory !== 'all' && 
          getCurrentCategory() && 
          hasSubcategories(getCurrentCategory()) && (
           <div className="subcategories">
@@ -207,7 +240,12 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
             <>
               {filteredImages.length === 0 ? (
                 <div className="empty-state">
-                  <p>{t('modals.noImagesFound') || "Изображения не найдены"}</p>
+                  <p>
+                    {isRecentCategory 
+                      ? (t('modals.noRecentImages') || "Нет недавно выбранных изображений")
+                      : (t('modals.noImagesFound') || "Изображения не найдены")
+                    }
+                  </p>
                 </div>
               ) : (
                 <div className="images-grids">
@@ -240,8 +278,9 @@ export const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
             {!isLoading && (
               <span>
                 {filteredImages.length} {t('modals.imagesFound') || "изображений найдено"}
-                {selectedCategory !== 'all' && ` в "${t(getCurrentCategory()?.name)}"`}
-                {selectedSubcategory !== 'all' && ` → "${t(getCurrentCategory()?.subcategories?.find(sub => sub.id === selectedSubcategory)?.name)}"`}
+                {!isRecentCategory && selectedCategory !== 'all' && ` в "${t(getCurrentCategory()?.name)}"`}
+                {!isRecentCategory && selectedSubcategory !== 'all' && ` → "${t(getCurrentCategory()?.subcategories?.find(sub => sub.id === selectedSubcategory)?.name)}"`}
+                {isRecentCategory && ` ${t('modals.inRecent') || "в недавних"}`}
               </span>
             )}
           </div>

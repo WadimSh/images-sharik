@@ -237,7 +237,10 @@
     "searchPlaceholders": "Cerca immagini...",
     "noImagesFound": "Nessuna immagine trovata",
     "imagesFound": "immagini trovate",
-    "subcategories": "Sottocategorie"
+    "subcategories": "Sottocategorie",
+    "recentSelected": "Selezionati di Recente",
+    "noRecentImages": "Nessuna immagine selezionata di recente",
+    "inRecent": "nei recenti"
   },
   "template": {
     "create": "Crea template",

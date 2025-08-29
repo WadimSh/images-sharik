@@ -237,7 +237,10 @@
     "searchPlaceholders": "Поиск изображений...",
     "noImagesFound": "Изображения не найдены",
     "imagesFound": "изображений найдено",
-    "subcategories": "Подкатегории"
+    "subcategories": "Подкатегории",
+    "recentSelected": "Последнее выбранное",
+    "noRecentImages": "Нет недавно выбранных изображений",
+    "inRecent": "в недавних"
   },
   "template": {
     "create": "Создать макет",

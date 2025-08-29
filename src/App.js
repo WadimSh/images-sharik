@@ -2,6 +2,7 @@ import Views from "./views/Views";
 import { MarketplaceProvider } from "./contexts/contextMarketplace";
 import { LanguageProvider } from "./contexts/contextLanguage";
 import { AuthProvider } from "./contexts/AuthContext";
+import { RecentImagesProvider } from "./contexts/contextRecentImages";
 
 function App() {
   
@@ -9,7 +10,9 @@ function App() {
     <LanguageProvider>
       <MarketplaceProvider>
         <AuthProvider>
-          <Views />
+          <RecentImagesProvider>
+            <Views />
+          </RecentImagesProvider>
         </AuthProvider>
       </MarketplaceProvider>
     </LanguageProvider>
