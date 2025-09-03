@@ -4,7 +4,7 @@ import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
 import Template from "../views/Template";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AllRoutes = () => {
   
