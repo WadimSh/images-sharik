@@ -1,4 +1,5 @@
 import Dexie from 'dexie';
+import { verifyPassword } from './hashPassword';
 
 export const db = new Dexie('SharikDatabase');
 
@@ -7,7 +8,8 @@ db.version(1).stores({
   collage: 'code', // Данные макетов коллажей
   history: 'code', // Данные о созданных слайдах
   products: 'code', // Данные о товарах
-  slides: 'code' // Данные слайдов
+  slides: 'code', // Данные слайдов
+  users: '++id, login, email, passwordHash, createdAt, lastLogin, isActive' // Добавляем данные пользователя
 });
 
 // Общий метод для очистки таблицы
@@ -18,6 +20,94 @@ const clearTable = async (table) => {
   } catch (error) {
     console.error(`Error when clearing the table ${table.name}:`, error);
     throw error;
+  }
+};
+
+// Методы для работы с таблицей users
+export const usersDB = {
+  async add(user) {
+    try {
+      return await db.users.add(user);
+    } catch (error) {
+      console.error('Error when adding user:', error);
+      throw error;
+    }
+  },
+
+  async getByLogin(login) {
+    try {
+      return await db.users.where('login').equals(login).first();
+    } catch (error) {
+      console.error('Error getting user by login:', error);
+      throw error;
+    }
+  },
+
+  async getByEmail(email) {
+    try {
+      return await db.users.where('email').equals(email).first();
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      throw error;
+    }
+  },
+
+  async verifyCredentials(login, password) {
+    try {
+      const user = await db.users.where('login').equals(login).first();
+      if (!user) return false;
+      
+      const isValid = await verifyPassword(password, user.passwordHash);
+      return isValid ? user : false;
+    } catch (error) {
+      console.error('Error verifying credentials:', error);
+      throw error;
+    }
+  },
+
+  async getAll() {
+    try {
+      return await db.users.toArray();
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      throw error;
+    }
+  },
+
+  async update(id, changes) {
+    try {
+      return await db.users.update(id, changes);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  },
+
+  async delete(id) {
+    try {
+      return await db.users.delete(id);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  },
+
+  async updateLastLogin(userId) {
+    try {
+      return await db.users.update(userId, { lastLogin: new Date() });
+    } catch (error) {
+      console.error('Error updating last login:', error);
+      throw error;
+    }
+  },
+
+  async deactivateUser(userId) {
+    try {
+      return await db.users.update(userId, { isActive: false });
+    } catch (error) {
+      console.error('Error deactivating user:', error);
+      throw error;
+    }
   }
 };
 
