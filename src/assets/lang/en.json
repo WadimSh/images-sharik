@@ -131,7 +131,8 @@
     "bat": "Night style",
     "blood": "Bloody style",
     "carved": "Carved style",
-    "monsters": "Monster style"
+    "monsters": "Monster style",
+    "comics": "Comics style"
   },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",

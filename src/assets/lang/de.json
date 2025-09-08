@@ -131,7 +131,8 @@
     "bat": "Nacht-Stil",
     "blood": "Blutiger Stil",
     "carved": "Schnitz-Stil", 
-    "monsters": "Monster-Stil"
+    "monsters": "Monster-Stil",
+    "comics": "Comic-Stil"
   },
   "views": {
     "homeMissingCode": "Ändern Sie die Suchparameter oder verwenden Sie andere Schlüsselwörter.",

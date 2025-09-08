@@ -131,7 +131,8 @@
     "bat": "Stile notte",
     "blood": "Stile sanguinante",
     "carved": "Stile intagliato",
-    "monsters": "Stile mostro"
+    "monsters": "Stile mostro",
+    "comics": "Stile fumetto"
   },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",
