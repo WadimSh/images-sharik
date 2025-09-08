@@ -49,6 +49,11 @@
       ]
     },
     {
+      "id": "kittens",
+      "name": "category.kittens",
+      "subcategories": []
+    },
+    {
       "id": "others",
       "name": "category.others",
       "subcategories": []
@@ -844,6 +849,46 @@
     "tags": ["halloween", "comics"]
   },
   {
+    "filename": "element-fon_034.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_035.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_036.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_037.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_038.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_039.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_040.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_041.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_042.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_043.png",
+    "tags": ["kittens"]
+  },
+  {
     "filename": "logo-gemar.png",
     "tags": ["gemar","default", "red", "green", "yellow", "crimson"]
   },
@@ -1262,6 +1307,98 @@
   {
     "filename": "bubbles_09+text_030.png",
     "tags": ["halloween", "comics"]
-  }
+  },
+  {
+    "filename": "bubbles_10_001.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_002.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_003.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_004.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_005.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_006.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_007.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_008.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_009.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_010.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_011.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_001.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_002.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_003.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_004.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_005.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_006.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_007.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_008.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_009.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_010.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_011.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_012.png",
+    "tags": ["kittens"]
+  }  
   ]
 }
