@@ -18,7 +18,8 @@
         { "id": "bat", "name": "styles.bat", "tags": ["bat"] },
         { "id": "blood", "name": "styles.blood", "tags": ["blood"] },
         { "id": "carved", "name": "styles.carved", "tags": ["carved"] },
-        { "id": "monsters", "name": "styles.monsters", "tags": ["monsters"] }
+        { "id": "monsters", "name": "styles.monsters", "tags": ["monsters"] },
+        { "id": "comics", "name": "styles.comics", "tags": ["comics"]}
       ]
     },
     {
@@ -46,6 +47,11 @@
         { "id": "amur1", "name": "styles.amur1", "tags": ["amur1"] },
         { "id": "amur2", "name": "styles.amur2", "tags": ["amur2"] }
       ]
+    },
+    {
+      "id": "kittens",
+      "name": "category.kittens",
+      "subcategories": []
     },
     {
       "id": "others",
@@ -771,6 +777,118 @@
     "tags": ["petard", "amur1"]
   },
   {
+    "filename": "element-fon_016.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_017.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_018.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_019.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_020.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_021.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_022.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_023.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_024.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_025.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_026.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_027.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_028.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_029.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_030.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_031.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_032.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_033.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "element-fon_034.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_035.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_036.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_037.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_038.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_039.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_040.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_041.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_042.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "element-fon_043.png",
+    "tags": ["kittens"]
+  },
+  {
     "filename": "logo-gemar.png",
     "tags": ["gemar","default", "red", "green", "yellow", "crimson"]
   },
@@ -991,6 +1109,86 @@
     "tags": ["halloween", "monsters"]
   },
   {
+    "filename": "bubbles_09_008.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_009.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_010.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_011.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_012.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_013.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_014.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_015.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_016.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_017.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_018.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_019.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_020.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_021.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_022.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_023.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_024.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_025.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_026.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09_027.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
     "filename": "bubbles_09+text_001.png",
     "tags": ["halloween", "default-halloween", "carved"]
   },
@@ -1049,6 +1247,158 @@
   {
     "filename": "bubbles_09+text_015.png",
     "tags": ["halloween", "monsters"]
-  }
+  },
+  {
+    "filename": "bubbles_09+text_016.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_017.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_018.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_019.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_020.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_021.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_022.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_023.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_024.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_025.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_026.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_027.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_028.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_029.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_09+text_030.png",
+    "tags": ["halloween", "comics"]
+  },
+  {
+    "filename": "bubbles_10_001.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_002.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_003.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_004.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_005.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_006.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_007.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_008.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_009.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_010.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10_011.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_001.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_002.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_003.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_004.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_005.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_006.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_007.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_008.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_009.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_010.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_011.png",
+    "tags": ["kittens"]
+  },
+  {
+    "filename": "bubbles_10+text_012.png",
+    "tags": ["kittens"]
+  }  
   ]
 }
