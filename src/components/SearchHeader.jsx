@@ -6,9 +6,10 @@ import { MdCreateNewFolder } from "react-icons/md";
 
 import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
-import { db, productsDB, slidesDB } from "../utils/handleDB";
+import { db, productsDB, slidesDB, usersDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
+import { isToday } from "../utils/isToday";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -25,9 +26,48 @@ const SearchHeader = ({
   const { t } = useContext(LanguageContext);
   const headerRightRef = useRef(null);
   const [hasKeys, setHasKeys] = useState(false);
+  const [hasUsers, setHasUsers] = useState(false); 
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+
+  // Функция для проверки наличия пользователей
+  const checkUsers = async () => {
+    try {
+      const users = await usersDB.getAll();
+      setHasUsers(users.length > 0);
+    } catch (error) {
+      console.error('Error checking users:', error);
+      setHasUsers(false);
+    }
+  };
+
+  // Функция для проверки аутентификации пользователя
+  const checkUserAuthentication = async () => {
+    try {
+      const users = await usersDB.getAll();
+      
+      // Если нет пользователей - перенаправляем на регистрацию
+      if (users.length === 0) {
+        navigate('/sign-up');
+        return false;
+      }
+      
+      // Если есть пользователи, проверяем lastLogin
+      const currentUser = users[0];
+      
+      // Проверяем, что lastLogin не сегодня
+      if (!isToday(currentUser.lastLogin)) {
+        navigate('/sign-in');
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error checking user authentication:', error);
+      navigate('/sign-up');
+      return false;
+    }
+  };
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -56,13 +96,26 @@ const SearchHeader = ({
     }
   };
   
-  const handleGalleryClick = () => {
-    navigate('/gallery');
+  const handleGalleryClick = async () => {
+    const isAuthenticated = await checkUserAuthentication();
+    if (isAuthenticated) {
+      navigate('/gallery');
+    }
   };
 
-  const handleCreateTamplete = () => {
-    navigate('/create');
+  const handleCreateTamplete = async () => {
+    const isAuthenticated = await checkUserAuthentication();
+    if (isAuthenticated) {
+      setIsPinModalOpen(true)
+    }
   }
+
+  const handleToggleCollage = async () => {
+    const isAuthenticated = await checkUserAuthentication();
+    if (isAuthenticated) {
+      setIsToggled(!isToggled);
+    }
+  };
 
   const handleClear = () => {
     setSearchQuery('');
@@ -111,14 +164,19 @@ const SearchHeader = ({
     checkHistory();
   }, []);
 
+  // Проверяем наличие пользователей при загрузке компонента
+  useEffect(() => {
+    checkUsers();
+  }, []);
+
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
-        {
-          <button onClick={() => setIsPinModalOpen(true)} className="creat-temp-button">
+        {hasUsers && (
+          <button onClick={handleCreateTamplete} className="creat-temp-button">
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
-        }
+        )}
         <LanguageSwitcher />
       </div>
       <div className="header-top">
@@ -182,7 +240,7 @@ const SearchHeader = ({
       </div>}
       {isSearchActive && <div className="template-button-container">
         <MarketplaceSwitcher />
-        <button onClick={() => setIsToggled(!isToggled)} className="template-button" style={{ background: 'transparent' }}>
+        <button onClick={handleToggleCollage} className="template-button" style={{ background: 'transparent' }}>
           <RiCollageFill /> {t('header.createCollage')}
         </button>
         <button 

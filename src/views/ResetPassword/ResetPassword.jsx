@@ -81,6 +81,7 @@ export const ResetPassword = () => {
       // В реальном приложении здесь бы отправлялось письмо
       setIsError(false);
       setEmailSent(true);
+      setMessage('');
 
     } catch (error) {
       console.error('Ошибка при отправке email:', error);
@@ -99,7 +100,7 @@ export const ResetPassword = () => {
       setIsLoading(false);
       return;
     }
-
+    
     try {
       // Находим пользователя по email
       const user = await usersDB.getByEmail(formData.email);
@@ -153,7 +154,7 @@ export const ResetPassword = () => {
       <h2 style={{ 
         textAlign: 'center', 
         color: '#333', 
-        marginBottom: '30px',
+        marginBottom: '10px',
         fontSize: '24px'
       }}>
         {emailSent ? 'Смена пароля' : 'Восстановление пароля'}
@@ -167,7 +168,7 @@ export const ResetPassword = () => {
             marginBottom: '20px',
             fontSize: '14px'
           }}>
-            Введите ваш email для получения инструкций по восстановлению пароля
+            Введите ваш email для верификации и восстановления пароля
           </p>
           
           <form onSubmit={handleSendEmail} style={{ padding: '0' }}>
@@ -179,7 +180,7 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Email *
+                Email
               </label>
               <input
                 type="email"
@@ -225,7 +226,7 @@ export const ResetPassword = () => {
               onMouseDown={(e) => !isLoading && (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => !isLoading && (e.target.style.transform = 'scale(1)')}
             >
-              {isLoading ? 'Отправка...' : 'Отправить инструкции'}
+              {isLoading ? 'Отправка...' : 'Верефицировать'}
             </button>
           </form>
         </>
@@ -249,7 +250,7 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Новый пароль *
+                Новый пароль 
               </label>
               <PasswordInput
                 id="newPassword"
@@ -271,7 +272,7 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Подтверждение пароля *
+                Подтверждение пароля <span style={{ color: '#c62828' }}>*</span>
               </label>
               <PasswordInput
                 id="confirmPassword"

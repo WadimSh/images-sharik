@@ -7,11 +7,12 @@ import { LanguageContext } from '../contexts/contextLanguage';
 import { useGetCode } from '../hooks/useGetCode';
 import { PreviewDesign } from './PreviewDesign';
 import { CustomSelect } from '../ui/CustomSelect/CustomSelect';
-import { productsDB, slidesDB } from '../utils/handleDB';
+import { productsDB, slidesDB, usersDB } from '../utils/handleDB';
 import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
 import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
 import { Tooltip } from '../ui/Tooltip/Tooltip';
 import { ImageSliderModal } from './ImageSliderModal';
+import { isToday } from '../utils/isToday';
 
 // Добавляем вспомогательную функцию для фильтрации элементов по стилю
 const filterElementsByStyle = (elements, styleVariant) => {
@@ -663,20 +664,46 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
   const uniqueBaseCodes = getUniqueBaseCodes();
   
   const handleItemClick = async (itemId) => {
-    const baseCode = itemId.split('_').slice(0, -1).join('_');
+    try {
+      // Проверяем наличие пользователей
+      const users = await usersDB.getAll();
+      
+      // Если нет пользователей - перенаправляем на регистрацию
+      if (users.length === 0) {
+        navigate('/sign-up');
+        return;
+      }
+      
+      // Если есть пользователи, проверяем lastLogin
+      const currentUser = users[0]; // Берем первого пользователя (предполагаем одного пользователя)
+      
+      // Проверяем, что lastLogin не сегодня
+      if (!isToday(currentUser.lastLogin)) {
+        navigate('/sign-in');
+        return;
+      }
+      
+      // Если проверки пройдены - продолжаем исходную логику
+      const baseCode = itemId.split('_').slice(0, -1).join('_');
 
-    const designData = await slidesDB.get(`design-${itemId}`);
-    const productData = await productsDB.get(`product-${baseCode}`);
+      const designData = await slidesDB.get(`design-${itemId}`);
+      const productData = await productsDB.get(`product-${baseCode}`);
 
-    if (designData?.data) {
-      sessionStorage.setItem(`design-${itemId}`, JSON.stringify(designData.data));
+      if (designData?.data) {
+        sessionStorage.setItem(`design-${itemId}`, JSON.stringify(designData.data));
+      }
+      
+      if (productData?.data) {
+        sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(productData.data));
+      }
+
+      navigate(`/template/${itemId}`);
+      
+    } catch (error) {
+      console.error('Error checking user authentication:', error);
+      // В случае ошибки тоже перенаправляем на регистрацию для безопасности
+      navigate('/sign-up');
     }
-    
-    if (productData?.data) {
-      sessionStorage.setItem(`product-${baseCode}`, JSON.stringify(productData.data));
-    }
-
-    navigate(`/template/${itemId}`);
   };
 
   // Функция удаления элемента

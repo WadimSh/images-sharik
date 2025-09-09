@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usersDB } from '../../utils/handleDB';
 import { hashPassword } from '../../utils/hashPassword';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
 
 export const SignUp = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     login: '',
     email: '',
@@ -13,6 +15,21 @@ export const SignUp = () => {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const checkUsers = async () => {
+      try {
+        const users = await usersDB.getAll();
+        if (users.length > 0) {
+          navigate('/'); // Перенаправляем на главную, если есть пользователи
+        }
+      } catch (error) {
+        console.error('Ошибка при проверке пользователей:', error);
+      } 
+    };
+
+    checkUsers();
+  }, [navigate])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,12 +109,16 @@ export const SignUp = () => {
         email: formData.email.trim().toLowerCase(),
         passwordHash: passwordHash,
         createdAt: new Date(),
-        lastLogin: null,
+        lastLogin: new Date(),
         isActive: true
       });
 
       setMessage('Регистрация прошла успешно! Теперь вы можете войти в систему.');
       setIsError(false);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 500);
       
       // Очищаем форму
       setFormData({
@@ -129,12 +150,18 @@ export const SignUp = () => {
       <h2 style={{ 
         textAlign: 'center', 
         color: '#333', 
-        marginBottom: '30px',
         fontSize: '24px'
       }}>
-        Регистрация
+        Давайте познакомимся
       </h2>
-      
+      <p style={{ 
+        textAlign: 'center', 
+        color: '#555', 
+        marginBottom: '30px',
+        fontSize: '16px'
+      }}>
+        Заполните несколько полей, чтобы получить свой&nbsp;аккаунт.
+      </p>
       <form onSubmit={handleSubmit} style={{ padding: '0' }}>
         <div style={{ marginBottom: '20px' }}>
           <label htmlFor="login" style={{ 
@@ -144,7 +171,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Логин *
+            Логин <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="text"
@@ -179,7 +206,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Email *
+            Email <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="email"
@@ -213,7 +240,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Пароль * (мин. 6 символов)
+            Пароль <span style={{ color: '#c62828' }}>*</span> (мин. 6 символов)
           </label>
           <PasswordInput
             id="password"
@@ -235,7 +262,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Подтверждение пароля *
+            Подтверждение пароля <span style={{ color: '#c62828' }}>*</span>
           </label>
           <PasswordInput
             id="confirmPassword"
@@ -272,20 +299,6 @@ export const SignUp = () => {
           {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
         </button>
       </form>
-
-      <div style={{
-        marginTop: '20px',
-        textAlign: 'center',
-        fontSize: '14px',
-        color: '#666'
-      }}>
-        <a href="#sign-in" style={{
-          color: '#007bff',
-          textDecoration: 'none'
-        }}>
-          Вернуться к входу
-        </a>
-      </div>
 
       {message && (
         <div style={{

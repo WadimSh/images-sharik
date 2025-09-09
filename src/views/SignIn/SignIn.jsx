@@ -121,7 +121,7 @@ export const SignIn = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Логин *
+            Логин <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="text"
@@ -156,7 +156,7 @@ export const SignIn = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Пароль *
+            Пароль <span style={{ color: '#c62828' }}>*</span>
           </label>
           <PasswordInput
             id="password"
@@ -200,14 +200,6 @@ export const SignIn = () => {
         fontSize: '14px',
         color: '#666'
       }}>
-        <a href="#sign-up" style={{
-          color: '#007bff',
-          textDecoration: 'none',
-          marginRight: '8px'
-        }}>
-          Зарегистрироваться? 
-        </a>
-
         <a href="#reset-password" style={{
           color: '#007bff',
           textDecoration: 'none'
