@@ -93,6 +93,11 @@ export const SignIn = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    sessionStorage.setItem('fromSignIn', 'true');
+    navigate('/reset-password');
+  };
+
   return (
     <div style={{ 
       maxWidth: '400px', 
@@ -200,7 +205,10 @@ export const SignIn = () => {
         fontSize: '14px',
         color: '#666'
       }}>
-        <a href="#reset-password" style={{
+        <a 
+          href="#reset-password" 
+          onClick={handleForgotPassword}
+          style={{
           color: '#007bff',
           textDecoration: 'none'
         }}>

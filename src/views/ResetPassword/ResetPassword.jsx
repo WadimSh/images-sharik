@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { usersDB } from '../../utils/handleDB';
 import { hashPassword } from '../../utils/hashPassword';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
 
 export const ResetPassword = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     newPassword: '',
@@ -13,6 +16,19 @@ export const ResetPassword = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  // Проверяем, пришли ли мы напрямую или через страницу входа
+  useEffect(() => {
+    // Проверяем, есть ли в sessionStorage флаг, что мы пришли со страницы входа
+    const fromSignIn = sessionStorage.getItem('fromSignIn');
+    
+    if (!fromSignIn) {
+      navigate(-1);
+    } else {
+      // Очищаем флаг после использования
+      sessionStorage.removeItem('fromSignIn');
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

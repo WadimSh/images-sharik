@@ -27,6 +27,7 @@ const SearchHeader = ({
   const headerRightRef = useRef(null);
   const [hasKeys, setHasKeys] = useState(false);
   const [hasUsers, setHasUsers] = useState(false); 
+  const [userLogin, setUserLogin] = useState(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
@@ -66,6 +67,21 @@ const SearchHeader = ({
       console.error('Error checking user authentication:', error);
       navigate('/sign-up');
       return false;
+    }
+  };
+
+  const getUserLogin = async () => {
+    try {
+      const users = await usersDB.getAll();
+      if (users.length === 0) {
+        return null; 
+      }
+
+      return users[0].login || null;
+
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
     }
   };
 
@@ -165,9 +181,19 @@ const SearchHeader = ({
   }, []);
 
   // Проверяем наличие пользователей при загрузке компонента
-  useEffect(() => {
-    checkUsers();
-  }, []);
+   useEffect(() => {
+    const initializeUserData = async () => {
+      await checkUsers();
+      
+      // Если есть пользователи, получаем логин
+      if (hasUsers) {
+        const login = await getUserLogin();
+        setUserLogin(login);
+      }
+    };
+
+    initializeUserData();
+  }, [hasUsers]);
 
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
@@ -180,20 +206,37 @@ const SearchHeader = ({
         <LanguageSwitcher />
       </div>
       <div className="header-top">
-        <h2 style={{
-          paddingBottom: '12px',
-          margin: 0
-        }}>
-          {t('header.title')}
-        </h2>
-        <p style={{
-          fontSize: '20px',
-          color: 'rgba(0,0,0,0.8)',
-          margin: '0px',
-          paddingBottom: '18px'
-        }}>
-          {t('header.description')}
-        </p>
+        {!hasUsers ? (<>
+          <h2 style={{
+            paddingBottom: '12px',
+            margin: 0
+          }}>
+            {t('header.title')}
+          </h2>
+          <p style={{
+            fontSize: '20px',
+            color: 'rgba(0,0,0,0.8)',
+            margin: '0px',
+            paddingBottom: '18px'
+          }}>
+            {t('header.description')}
+          </p>
+        </>) : (<>
+          <h2 style={{
+            paddingBottom: '12px',
+            margin: 0
+          }}>
+            {`Рады снова вас видеть, ${userLogin  || 'Создатель'}!`}
+          </h2>
+          <p style={{
+            fontSize: '20px',
+            color: 'rgba(0,0,0,0.8)',
+            margin: '0px',
+            paddingBottom: '18px'
+          }}>
+            {'Продолжайте превращать обычные товары в магнит для покупателей.'}
+          </p>
+        </>)}
       </div>
       <div className="search-wrapper">
         <div className="input-container">
