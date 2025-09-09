@@ -226,7 +226,7 @@ const SearchHeader = ({
             paddingBottom: '12px',
             margin: 0
           }}>
-            {`Рады снова вас видеть, ${userLogin  || 'Создатель'}!`}
+            {userLogin ? `${t('header.titleNext')}, ${userLogin}!` : t('header.titleNext')}
           </h2>
           <p style={{
             fontSize: '20px',
@@ -234,7 +234,7 @@ const SearchHeader = ({
             margin: '0px',
             paddingBottom: '18px'
           }}>
-            {'Продолжайте превращать обычные товары в магнит для покупателей.'}
+            {t('header.descriptionNext')}
           </p>
         </>)}
       </div>

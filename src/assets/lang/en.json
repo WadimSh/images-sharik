@@ -2,6 +2,8 @@
   "header": {
     "title": "Marketplace Image Generator",
     "description": "With this generator, you can easily create attractive images for your products.",
+    "titleNext": "Welcome back",
+    "descriptionNext": "Keep transforming ordinary products into customer magnets.",
     "subtitle": "Created designs",
     "tempSubtitle": "Template Builder",
     "searchPlaceholder": "Enter SKU numbers, names, or keywords to search",
