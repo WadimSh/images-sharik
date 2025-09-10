@@ -274,7 +274,7 @@
   aspect-ratio: 3/4;
   box-sizing: border-box;
   background: white;
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
 }

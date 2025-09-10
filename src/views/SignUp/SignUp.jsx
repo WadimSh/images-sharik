@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { usersDB } from '../../utils/handleDB';
 import { hashPassword } from '../../utils/hashPassword';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
+import { LanguageContext } from "../../contexts/contextLanguage";
+import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   const [formData, setFormData] = useState({
     login: '',
     email: '',
@@ -24,7 +28,7 @@ export const SignUp = () => {
           navigate('/'); // Перенаправляем на главную, если есть пользователи
         }
       } catch (error) {
-        console.error('Ошибка при проверке пользователей:', error);
+        console.error('Error checking users:', error);
       } 
     };
 
@@ -45,26 +49,26 @@ export const SignUp = () => {
     setIsError(false);
 
     if (formData.login.length < 3) {
-      setMessage('Логин должен содержать минимум 3 символа');
+      setMessage('auth.loginLength');
       setIsError(true);
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage('Введите корректный email адрес');
+      setMessage('auth.emailInvalid');
       setIsError(true);
       return false;
     }
 
     if (formData.password.length < 6) {
-      setMessage('Пароль должен содержать минимум 6 символов');
+      setMessage('auth.passwordLength');
       setIsError(true);
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setMessage('Пароли не совпадают');
+      setMessage('auth.passwordsNotMatch');
       setIsError(true);
       return false;
     }
@@ -87,14 +91,14 @@ export const SignUp = () => {
       const existingByEmail = await usersDB.getByEmail(formData.email);
 
       if (existingByLogin) {
-        setMessage('Пользователь с таким логином уже существует');
+        setMessage('auth.loginExists');
         setIsError(true);
         setIsLoading(false);
         return;
       }
 
       if (existingByEmail) {
-        setMessage('Пользователь с таким email уже существует');
+        setMessage('auth.emailExists');
         setIsError(true);
         setIsLoading(false);
         return;
@@ -113,7 +117,7 @@ export const SignUp = () => {
         isActive: true
       });
 
-      setMessage('Регистрация прошла успешно! Теперь вы можете войти в систему.');
+      setMessage('auth.registrationSuccess');
       setIsError(false);
 
       setTimeout(() => {
@@ -129,8 +133,8 @@ export const SignUp = () => {
       });
 
     } catch (error) {
-      console.error('Ошибка при регистрации:', error);
-      setMessage('Произошла ошибка при регистрации. Попробуйте позже.');
+      console.error('Registration error:', error);
+      setMessage('auth.registrationFailed');
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -147,12 +151,24 @@ export const SignUp = () => {
       borderRadius: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
     }}>
+      <div style={{
+        position: 'fixed',
+        top: '15px',
+        right: '25px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '8px',
+        paddingTop: '8px'
+      }}>
+        <LanguageSwitcher />
+      </div>
       <h2 style={{ 
         textAlign: 'center', 
         color: '#333', 
         fontSize: '24px'
       }}>
-        Давайте познакомимся
+        {t('auth.title')}
       </h2>
       <p style={{ 
         textAlign: 'center', 
@@ -160,7 +176,7 @@ export const SignUp = () => {
         marginBottom: '30px',
         fontSize: '16px'
       }}>
-        Заполните несколько полей, чтобы получить свой&nbsp;аккаунт.
+        {t('auth.subtitle')}
       </p>
       <form onSubmit={handleSubmit} style={{ padding: '0' }}>
         <div style={{ marginBottom: '20px' }}>
@@ -171,7 +187,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Логин <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.loginLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="text"
@@ -182,7 +198,7 @@ export const SignUp = () => {
             required
             minLength={3}
             disabled={isLoading}
-            placeholder="Введите ваш логин"
+            placeholder={t('auth.loginPlaceholder')}
             style={{ 
               width: '100%', 
               padding: '12px', 
@@ -206,7 +222,7 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Email <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.emailLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="email"
@@ -216,7 +232,7 @@ export const SignUp = () => {
             onChange={handleInputChange}
             required
             disabled={isLoading}
-            placeholder="Введите ваш email"
+            placeholder={t('auth.emailPlaceholder')}
             style={{ 
               width: '100%', 
               padding: '12px', 
@@ -240,14 +256,14 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Пароль <span style={{ color: '#c62828' }}>*</span> (мин. 6 символов)
+            {t('auth.passwordLabel')} <span style={{ color: '#c62828' }}>*</span> {t('auth.passwordHint')}
           </label>
           <PasswordInput
             id="password"
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            placeholder="Введите пароль"
+            placeholder={t('auth.passwordPlaceholder')}
             disabled={isLoading}
             required={true}
             minLength={6}
@@ -262,14 +278,14 @@ export const SignUp = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Подтверждение пароля <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.confirmPasswordLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            placeholder="Повторите пароль"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             disabled={isLoading}
             required={true}
             minLength={6}
@@ -296,7 +312,7 @@ export const SignUp = () => {
           onMouseDown={(e) => !isLoading && (e.target.style.transform = 'scale(0.98)')}
           onMouseUp={(e) => !isLoading && (e.target.style.transform = 'scale(1)')}
         >
-          {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
+          {isLoading ? t('auth.registering') : t('auth.registerButton')}
         </button>
       </form>
 
@@ -311,7 +327,7 @@ export const SignUp = () => {
           textAlign: 'center',
           fontSize: '14px'
         }}>
-          {message}
+          {t(message)}
         </div>
       )}
     </div>

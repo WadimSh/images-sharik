@@ -1,12 +1,15 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersDB } from '../../utils/handleDB';
 import { hashPassword } from '../../utils/hashPassword';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
+import { LanguageContext } from "../../contexts/contextLanguage";
+import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 
 export const ResetPassword = () => {
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   const [formData, setFormData] = useState({
     email: '',
     newPassword: '',
@@ -44,19 +47,19 @@ export const ResetPassword = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage('Введите корректный email адрес');
+      setMessage('auth.emailInvalid');
       setIsError(true);
       return false;
     }
 
     if (formData.newPassword && formData.newPassword.length < 6) {
-      setMessage('Новый пароль должен содержать минимум 6 символов');
+      setMessage('auth.passwordLength');
       setIsError(true);
       return false;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      setMessage('Пароли не совпадают');
+      setMessage('auth.passwordsNotMatch');
       setIsError(true);
       return false;
     }
@@ -69,7 +72,7 @@ export const ResetPassword = () => {
     setIsLoading(true);
 
     if (!formData.email) {
-      setMessage('Введите email адрес');
+      setMessage('auth.emailRequired');
       setIsError(true);
       setIsLoading(false);
       return;
@@ -77,7 +80,7 @@ export const ResetPassword = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage('Введите корректный email адрес');
+      setMessage('auth.emailInvalid');
       setIsError(true);
       setIsLoading(false);
       return;
@@ -88,7 +91,7 @@ export const ResetPassword = () => {
       const user = await usersDB.getByEmail(formData.email);
 
       if (!user) {
-        setMessage('Пользователь с таким email не найден');
+        setMessage('auth.userNotFound');
         setIsError(true);
         setIsLoading(false);
         return;
@@ -100,8 +103,8 @@ export const ResetPassword = () => {
       setMessage('');
 
     } catch (error) {
-      console.error('Ошибка при отправке email:', error);
-      setMessage('Произошла ошибка. Попробуйте позже.');
+      console.error('Error when logging in:', error);
+      setMessage('auth.resetError');
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -122,7 +125,7 @@ export const ResetPassword = () => {
       const user = await usersDB.getByEmail(formData.email);
 
       if (!user) {
-        setMessage('Пользователь с таким email не найден');
+        setMessage('auth.userNotFound');
         setIsError(true);
         setIsLoading(false);
         return;
@@ -137,7 +140,7 @@ export const ResetPassword = () => {
         lastLogin: null // Сбрасываем сессию
       });
 
-      setMessage('Пароль успешно изменен! Теперь вы можете войти с новым паролем.');
+      setMessage('auth.passwordResetSuccess');
       setIsError(false);
       
       // Очищаем форму
@@ -149,8 +152,8 @@ export const ResetPassword = () => {
       setEmailSent(false);
 
     } catch (error) {
-      console.error('Ошибка при сбросе пароля:', error);
-      setMessage('Произошла ошибка при изменении пароля. Попробуйте позже.');
+      console.error('Error when logging in:', error);
+      setMessage('auth.resetError');
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -167,13 +170,25 @@ export const ResetPassword = () => {
       borderRadius: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
     }}>
+      <div style={{
+        position: 'fixed',
+        top: '15px',
+        right: '25px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '8px',
+        paddingTop: '8px'
+      }}>
+        <LanguageSwitcher />
+      </div>
       <h2 style={{ 
         textAlign: 'center', 
         color: '#333', 
         marginBottom: '10px',
         fontSize: '24px'
       }}>
-        {emailSent ? 'Смена пароля' : 'Восстановление пароля'}
+        {emailSent ? t('auth.changeTitle') : t('auth.resetTitle')}
       </h2>
 
       {!emailSent ? (
@@ -184,7 +199,7 @@ export const ResetPassword = () => {
             marginBottom: '20px',
             fontSize: '14px'
           }}>
-            Введите ваш email для верификации и восстановления пароля
+            {t('auth.resetSubtitle')}
           </p>
           
           <form onSubmit={handleSendEmail} style={{ padding: '0' }}>
@@ -196,7 +211,7 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Email
+                {t('auth.emailLabel')}
               </label>
               <input
                 type="email"
@@ -206,7 +221,7 @@ export const ResetPassword = () => {
                 onChange={handleInputChange}
                 required
                 disabled={isLoading}
-                placeholder="Введите ваш email"
+                placeholder={t('auth.emailPlaceholder')}
                 style={{ 
                   width: '100%', 
                   padding: '12px', 
@@ -242,7 +257,7 @@ export const ResetPassword = () => {
               onMouseDown={(e) => !isLoading && (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => !isLoading && (e.target.style.transform = 'scale(1)')}
             >
-              {isLoading ? 'Отправка...' : 'Верефицировать'}
+              {isLoading ? t('auth.verifying') : t('auth.verifyButton')}
             </button>
           </form>
         </>
@@ -254,7 +269,7 @@ export const ResetPassword = () => {
             marginBottom: '20px',
             fontSize: '14px'
           }}>
-            Введите новый пароль для вашего аккаунта
+            {t('auth.changeSubtitle')}
           </p>
           
           <form onSubmit={handleResetPassword} style={{ padding: '0' }}>
@@ -266,14 +281,14 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Новый пароль 
+                {t('auth.newPasswordLabel')}
               </label>
               <PasswordInput
                 id="newPassword"
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleInputChange}
-                placeholder="Введите новый пароль"
+                placeholder={t('auth.newPasswordPlaceholder')}
                 disabled={isLoading}
                 required={true}
                 minLength={6}
@@ -288,14 +303,14 @@ export const ResetPassword = () => {
                 color: '#555',
                 fontSize: '14px'
               }}>
-                Подтверждение пароля <span style={{ color: '#c62828' }}>*</span>
+                {t('auth.confirmPasswordLabel')} <span style={{ color: '#c62828' }}>*</span>
               </label>
               <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                placeholder="Повторите новый пароль"
+                placeholder={t('auth.confirmPasswordPlaceholder')}
                 disabled={isLoading}
                 required={true}
                 minLength={6}
@@ -322,7 +337,7 @@ export const ResetPassword = () => {
               onMouseDown={(e) => !isLoading && (e.target.style.transform = 'scale(0.98)')}
               onMouseUp={(e) => !isLoading && (e.target.style.transform = 'scale(1)')}
             >
-              {isLoading ? 'Смена пароля...' : 'Сменить пароль'}
+              {isLoading ? t('auth.changingPassword') : t('auth.changePasswordButton')}
             </button>
           </form>
         </>
@@ -339,7 +354,7 @@ export const ResetPassword = () => {
           textAlign: 'center',
           fontSize: '14px'
         }}>
-          {message}
+          {t(message)}
         </div>
       )}
 
@@ -353,7 +368,7 @@ export const ResetPassword = () => {
           color: '#007bff',
           textDecoration: 'none'
         }}>
-          Вернуться к входу
+          {t('auth.backToSignIn')}
         </a>
       </div>
     </div>

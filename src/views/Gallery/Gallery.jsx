@@ -12,6 +12,9 @@ export const Gallery = () => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingItemKey, setLoadingItemKey] = useState(null);
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
 
@@ -60,10 +63,72 @@ export const Gallery = () => {
   const handleDelete = async (key) => {
     await historyDB.delete(key);
     setDesigns(prev => prev.filter(item => item.key !== key));
+    // Удаляем из выбранных, если был выбран
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(key);
+      return newSet;
+    });
+  };
+
+  // Функция для массового удаления выбранных дизайнов
+  const handleBulkDelete = async () => {
+    try {
+      const keysToDelete = Array.from(selectedItems);
+      
+      // Удаляем из базы данных
+      for (const key of keysToDelete) {
+        await historyDB.delete(key);
+      }
+      
+      // Обновляем состояние
+      setDesigns(prev => prev.filter(item => !selectedItems.has(item.key)));
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
+            
+    } catch (error) {
+      console.error('Error during bulk deletion:', error);
+    }
+  };
+
+  // Функция для отмены выбора
+  const handleCancelSelection = () => {
+    setSelectedItems(new Set());
+    setIsSelectionMode(false);
+  };
+
+  // Функция переключения выбора элемента
+  const toggleItemSelection = (key, e) => {
+    e.stopPropagation();
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      
+      // Если есть выбранные элементы, включаем режим выбора
+      if (newSet.size > 0 && !isSelectionMode) {
+        setIsSelectionMode(true);
+      }
+      // Если все элементы отменены, выключаем режим выбора
+      else if (newSet.size === 0 && isSelectionMode) {
+        setIsSelectionMode(false);
+      }
+      
+      return newSet;
+    });
   };
 
   // Функция извлечения данных для построения структуры данных для страницы генерации
   const handleItemClick = async (key) => {
+    // Если включен режим выбора, обрабатываем клик как выбор элемента
+    if (isSelectionMode) {
+      toggleItemSelection(key, { stopPropagation: () => {} });
+      return;
+    }
+
     setLoadingItemKey(key); // Устанавливаем ключ загружаемой карточки
     
     // Проверяем, является ли дизайн коллажем
@@ -372,6 +437,31 @@ export const Gallery = () => {
         </button>
         <h2 style={{ color: '#333'}}>{t('header.subtitle')}</h2>
       </div>
+
+      {/* Панель массового удаления */}
+      
+        <div className={`bulk-action-bar ${isSelectionMode ? 'visible' : ''}`}>
+          <div className="bulk-action-info">
+            {t('selection.counter')} {selectedItems.size}
+          </div>
+          <div className="bulk-action-buttons">
+            <button 
+              className="bulk-cancel-button"
+              onClick={handleCancelSelection}
+            >
+              {t('modals.cancel')}
+            </button>
+            <button 
+              className="bulk-delete-button"
+              onClick={handleBulkDelete}
+              disabled={selectedItems.size === 0}
+            >
+              {t('modals.delete')} ({selectedItems.size})
+            </button>
+          </div>
+        </div>
+      
+
       <div className="items-grid-container">
         {designs.length === 0 ? (
           <div 
@@ -383,19 +473,31 @@ export const Gallery = () => {
         <div className="items-grid">
           {designs.map((design) => {
             const info = parseDesignTitle(design.title);
+            const isSelected = selectedItems.has(design.key);
+            const isHovered = hoveredItem === design.key;
+
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div 
                 key={design.key} 
-                className="item-card" 
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                onMouseEnter={() => setHoveredItem(design.key)}
+                onMouseLeave={() => setHoveredItem(null)}
+              >
+              <div 
+                className={`item-card ${isSelected ? 'item-card-selected' : ''}`}
                 style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
                 onClick={(e) => {
-                  e.stopPropagation();
-                  marketplace !== info.marketplace && toggleMarketplace();
-                  handleItemClick(design.key);
+                  if (isSelectionMode) {
+                    toggleItemSelection(design.key, e);
+                  } else {
+                    marketplace !== info.marketplace && toggleMarketplace();
+                    handleItemClick(design.key);
+                  }
                 }}
                 role="button"
                 tabIndex={0}
+                onMouseEnter={() => setHoveredItem(design.key)}
+                onMouseLeave={() => setHoveredItem(null)}
               >
                 <button
                   className="delete-button"
@@ -406,6 +508,24 @@ export const Gallery = () => {
                 >
                   ×
                 </button>
+
+                {/* Чекбокс выбора */}
+                {(isHovered) && (
+                  <div 
+                    className="selection-checkbox-container"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleItemSelection(design.key, e);
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      className="selection-checkbox"
+                      checked={isSelected}
+                      readOnly
+                    />
+                  </div>
+                )}
 
                 <div className="item-content">
                   <PreviewDesign elements={design.data} />

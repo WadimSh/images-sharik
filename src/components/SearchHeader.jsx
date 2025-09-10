@@ -35,7 +35,19 @@ const SearchHeader = ({
   const checkUsers = async () => {
     try {
       const users = await usersDB.getAll();
-      setHasUsers(users.length > 0);
+
+      if (users.length === 0) {
+        setHasUsers(false);
+        return;
+      }
+
+      // Проверяем всех пользователей на наличие сегодняшнего логина
+      const hasUserLoggedInToday = users.some(user => 
+        user.lastLogin && isToday(user.lastLogin)
+      );
+
+      setHasUsers(hasUserLoggedInToday);
+
     } catch (error) {
       console.error('Error checking users:', error);
       setHasUsers(false);

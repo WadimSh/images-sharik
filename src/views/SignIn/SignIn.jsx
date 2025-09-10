@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { usersDB } from '../../utils/handleDB';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
+import { LanguageContext } from "../../contexts/contextLanguage";
+import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 
 export const SignIn = () => {
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   const [formData, setFormData] = useState({
     login: '',
     password: ''
@@ -26,13 +30,13 @@ export const SignIn = () => {
     setIsError(false);
 
     if (formData.login.length < 3) {
-      setMessage('Логин должен содержать минимум 3 символа');
+      setMessage('auth.loginLength');
       setIsError(true);
       return false;
     }
 
     if (formData.password.length < 6) {
-      setMessage('Пароль должен содержать минимум 6 символов');
+      setMessage('auth.passwordLength');
       setIsError(true);
       return false;
     }
@@ -54,7 +58,7 @@ export const SignIn = () => {
       const user = await usersDB.verifyCredentials(formData.login, formData.password);
 
       if (!user) {
-        setMessage('Неверный логин или пароль');
+        setMessage('auth.invalidCredentials');
         setIsError(true);
         setIsLoading(false);
         return;
@@ -63,7 +67,7 @@ export const SignIn = () => {
       // Обновляем время последнего входа
       await usersDB.update(user.id, { lastLogin: new Date() });
 
-      setMessage('Вход выполнен успешно!');
+      setMessage('auth.signInSuccess');
       setIsError(false);
 
       // Сохраняем информацию о пользователе в localStorage/sessionStorage
@@ -85,8 +89,8 @@ export const SignIn = () => {
       }, 1500);
 
     } catch (error) {
-      console.error('Ошибка при входе:', error);
-      setMessage('Произошла ошибка при входе. Попробуйте позже.');
+      console.error('Error when logging in:', error);
+      setMessage('auth.signInError');
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -108,13 +112,26 @@ export const SignIn = () => {
       borderRadius: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
     }}>
+      <div style={{
+        position: 'fixed',
+        top: '15px',
+        right: '25px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '8px',
+        paddingTop: '8px'
+      }}>
+        <LanguageSwitcher />
+      </div>
+      
       <h2 style={{ 
         textAlign: 'center', 
         color: '#333', 
         marginBottom: '30px',
         fontSize: '24px'
       }}>
-        Вход в систему
+        {t('auth.signInTitle')}
       </h2>
       
       <form onSubmit={handleSubmit} style={{ padding: '0' }}>
@@ -126,7 +143,7 @@ export const SignIn = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Логин <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.loginLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             type="text"
@@ -137,7 +154,7 @@ export const SignIn = () => {
             required
             minLength={3}
             disabled={isLoading}
-            placeholder="Введите ваш логин"
+            placeholder={t('auth.loginPlaceholder')}
             style={{ 
               width: '100%', 
               padding: '12px', 
@@ -161,14 +178,14 @@ export const SignIn = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            Пароль <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.passwordLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <PasswordInput
             id="password"
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            placeholder="Введите ваш пароль"
+            placeholder={t('auth.passwordPlaceholder')}
             disabled={isLoading}
             required={true}
             minLength={6}
@@ -195,7 +212,7 @@ export const SignIn = () => {
           onMouseDown={(e) => !isLoading && (e.target.style.transform = 'scale(0.98)')}
           onMouseUp={(e) => !isLoading && (e.target.style.transform = 'scale(1)')}
         >
-          {isLoading ? 'Вход...' : 'Войти'}
+          {isLoading ? t('auth.signingIn') : t('auth.signInButton')}
         </button>
       </form>
 
@@ -212,7 +229,7 @@ export const SignIn = () => {
           color: '#007bff',
           textDecoration: 'none'
         }}>
-          Забыли пароль?
+          {t('auth.forgotPassword')}
         </a>
       </div>
 
@@ -227,7 +244,7 @@ export const SignIn = () => {
           textAlign: 'center',
           fontSize: '14px'
         }}>
-          {message}
+          {t(message)}
         </div>
       )}
     </div>
