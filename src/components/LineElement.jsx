@@ -57,7 +57,7 @@ export const LineElement = ({
             left: `-${arrowSize}px`,
             borderWidth: `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`,
             borderColor: `transparent ${color} transparent transparent`,
-            marginLeft: `${arrowSize - 2}px`
+            marginLeft: `${arrowSize - thickness}px`
           }}
         />
       );
@@ -69,7 +69,7 @@ export const LineElement = ({
             right: `-${arrowSize}px`,
             borderWidth: `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`,
             borderColor: `transparent transparent transparent ${color}`,
-            marginRight: `${arrowSize - 2}px`
+            marginRight: `${arrowSize - thickness}px`
           }}
         />
       );
@@ -108,7 +108,8 @@ export const LineElement = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxSizing: 'content-box'
+          boxSizing: 'content-box',
+          opacity: element.opacity || 1,
         }}
         onContextMenu={onContextMenu}
       >
@@ -119,7 +120,6 @@ export const LineElement = ({
             width: '100%',
             height: `${element.lineThickness || 2}px`,
             backgroundColor: color,
-            opacity: element.opacity || 1,
             borderRadius: `${element.lineStyle === 'dashed' ? '2px' : '0px'}`
           }}
         />

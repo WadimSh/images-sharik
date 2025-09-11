@@ -210,7 +210,10 @@
     "subtitleSize": "Größe",
     "labelWidth": "Breite",
     "labelHeight": "Höhe",
-    "subtitleRotation": "Rotation"
+    "subtitleRotation": "Rotation",
+    "subtitleLine": "Linienstilistik",
+    "labelLineThickness": "Liniendicke",
+    "labelLineArrows": "Pfeile hinzufügen:"
   },
   "modals": {
     "close": "Schließen",

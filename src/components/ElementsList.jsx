@@ -584,7 +584,7 @@ export const ElementsList = ({
 
                   {element.type === 'line' && (
                     <div className="element-controls">
-                      <span>{'Стилистика линии'}</span>
+                      <span>{t('elements.subtitleLine')}</span>
                       <div className="color-control">
                         <div 
                           style={{
@@ -611,9 +611,26 @@ export const ElementsList = ({
                           />
                         </button>
                       </div>
+                      <div className="color-control">
+                        <MdOpacity
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                          }}
+                        />
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={element.opacity || 1}
+                            onChange={(e) => handleoOpacityChange(element.id, e.target.value)}
+                          />
+                          <span>{(element.opacity || 1).toFixed(1)}</span>
+                      </div>
                       <div className="font-controls">
                         <label>
-                          {'Толщина линии, px:'}
+                          {`${t('elements.labelLineThickness')}, px:`}
                           <input
                             type="number"
                             min="1"
@@ -623,13 +640,10 @@ export const ElementsList = ({
                           />
                         </label>
                       </div>
-                      
                       <div className="font-controls">
-                        <label>{'Добавить стрелку:'}</label>
-                        <div className="arrow-buttons-group">
-                          <div className="arrow-section">
-                            <span className="arrow-label">Начало:</span>
-                            <div className="arrow-buttons">
+                        <label>
+                          {t('elements.labelLineArrows')}
+                          <div className="arrow-buttons">
                               <button
                                 className={`arrow-btn ${element.lineEnds?.start === 'arrow' ? 'active' : ''}`}
                                 onClick={() => handleLineEndsChange(
@@ -641,12 +655,6 @@ export const ElementsList = ({
                               >
                                 ←
                               </button>
-                            </div>
-                          </div>
-                              
-                          <div className="arrow-section">
-                            <span className="arrow-label">Конец:</span>
-                            <div className="arrow-buttons">
                               <button
                                 className={`arrow-btn ${element.lineEnds?.end === 'arrow' ? 'active' : ''}`}
                                 onClick={() => handleLineEndsChange(
@@ -659,20 +667,11 @@ export const ElementsList = ({
                                 →
                               </button>
                             </div>
-                          </div>
-                        </div>
+                        </label>
                       </div>
                     </div>
                   )}
-
                   
-
-                  {element.type === 'line' && (
-                    <div className="element-controls line">
-                      handleLineEndsChange
-                    </div>
-                  )}
-
                   {element.type === 'shape' && (
                     <div className="element-controls">
                       <span>{t('elements.subtitleColor')}</span>

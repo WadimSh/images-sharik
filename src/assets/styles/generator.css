@@ -1929,32 +1929,13 @@
   }
 }
 
-.arrow-buttons-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.arrow-section {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.arrow-label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
-}
-
 .arrow-buttons {
   display: flex;
   gap: 4px;
 }
 
 .arrow-btn {
-  width: 28px;
+  width: 68px;
   height: 28px;
   border: 1px solid #ddd;
   background: white;

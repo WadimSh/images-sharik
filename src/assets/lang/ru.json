@@ -210,7 +210,10 @@
     "subtitleSize": "Размеры",
     "labelWidth": "Ширина",
     "labelHeight": "Высота",
-    "subtitleRotation": "Поворот"
+    "subtitleRotation": "Поворот",
+    "subtitleLine": "Стилистика линии",
+    "labelLineThickness": "Толщина линии",
+    "labelLineArrows": "Добавить стрелки:"
   },
   "modals": {
     "close": "Закрыть",

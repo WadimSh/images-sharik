@@ -5,6 +5,47 @@ export const PreviewDesign = ({ elements }) => (
   
   <div className="preview-container">
     {elements.map((element) => {
+      const renderArrow = (type) => {
+        if (!element.lineEnds || element.lineEnds[type] !== 'arrow') return null;
+          
+        const arrowStyle = {
+          position: 'absolute',
+          width: '0',
+          height: '0',
+          borderStyle: 'solid',
+          top: '50%',
+          transform: 'translateY(-50%)'
+        };
+      
+        const thickness = (element.lineThickness || 2);
+        const arrowSize = Math.max(7, thickness); // Размер стрелки зависит от толщины линии
+      
+        if (type === 'start') {
+          return (
+            <div
+              style={{
+                ...arrowStyle,
+                left: `-${arrowSize}px`,
+                borderWidth: `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`,
+                borderColor: `transparent ${element.color} transparent transparent`,
+                marginLeft: `${arrowSize - (thickness / 2)}px`
+              }}
+            />
+          );
+        } else {
+          return (
+            <div
+              style={{
+                ...arrowStyle,
+                right: `-${arrowSize}px`,
+                borderWidth: `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`,
+                borderColor: `transparent transparent transparent ${element.color}`,
+                marginRight: `${arrowSize - (thickness / 2)}px`
+              }}
+            />
+          );
+        }
+      };
       const style = {
         left: `${(element.position.x / 450) * 100}%`,
         top: `${(element.position.y / 600) * 100}%`,
@@ -94,7 +135,13 @@ export const PreviewDesign = ({ elements }) => (
                     opacity: element.opacity || 1,
                     borderRadius: `${element.lineStyle === 'dashed' ? '2px' : '0px'}`
                    }}
-            />
+            >
+            {/* Стрелка в начале линии */}
+            {renderArrow('start')}
+        
+            {/* Стрелка в конце линии */}
+            {renderArrow('end')}
+            </div>
           )        
         case 'background':
           return (
