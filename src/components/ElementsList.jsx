@@ -37,6 +37,8 @@ export const ElementsList = ({
   handleBorderChange,
   handleBorderColorChange,
   handleBorderColorButtonClick,
+  handleLineThicknessChange,
+  handleLineEndsChange,
   processingIds,
   processingShedowIds,
   shadowSetting,
@@ -365,6 +367,18 @@ export const ElementsList = ({
                         }}
                       />
                     )}
+                    {element.type === 'line' && (
+                      <div 
+                        style={{
+                          width: '30px',
+                          height: '2px',
+                          background: element.color,
+                          transform: `rotate(-45deg)`,
+                          marginRight: '4px',
+                          borderRadius: '2px'
+                        }}
+                      />
+                    )}
                   </span>
                   {element.type === 'text' && <span className="quoted-truncate">
                     "<span className="truncated-text">{element.text}</span>"
@@ -373,6 +387,7 @@ export const ElementsList = ({
                   {element.isProduct && t('elements.labelMainProduct')}
                   {element.type === 'element' && t('elements.labelElement')}
                   {element.type === 'shape' && t('elements.labelShape')}
+                  {element.type === 'line' && t('elements.labelLine')}
                   {element.type === 'background' && t('elements.labelBackground')}
                 </div>
                 <button 
@@ -564,6 +579,97 @@ export const ElementsList = ({
                       >
                         <><IoColorPaletteOutline /> {t('views.generatorMenuChangeColor')}</>
                       </button>
+                    </div>
+                  )}
+
+                  {element.type === 'line' && (
+                    <div className="element-controls">
+                      <span>{'Стилистика линии'}</span>
+                      <div className="color-control">
+                        <div 
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            background: element.color,
+                            marginRight: '4px',
+                            borderRadius: '2px'
+                          }}
+                        />
+                        <span className="color-hex" style={{ userSelect: 'text' }}>{element.color}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleColorButtonClick(element.id);
+                          }}
+                          className="change-color-button"
+                        >
+                          <IoColorPaletteOutline 
+                            style={{
+                            width: '24px',
+                            height: '24px',
+                          }}
+                          />
+                        </button>
+                      </div>
+                      <div className="font-controls">
+                        <label>
+                          {'Толщина линии, px:'}
+                          <input
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={element.lineThickness || 2}
+                            onChange={(e) => handleLineThicknessChange(element.id, e.target.value)}
+                          />
+                        </label>
+                      </div>
+                      
+                      <div className="font-controls">
+                        <label>{'Добавить стрелку:'}</label>
+                        <div className="arrow-buttons-group">
+                          <div className="arrow-section">
+                            <span className="arrow-label">Начало:</span>
+                            <div className="arrow-buttons">
+                              <button
+                                className={`arrow-btn ${element.lineEnds?.start === 'arrow' ? 'active' : ''}`}
+                                onClick={() => handleLineEndsChange(
+                                  element.id, 
+                                  'start', 
+                                  element.lineEnds?.start === 'arrow' ? 'none' : 'arrow'
+                                )}
+                                title={element.lineEnds?.start === 'arrow' ? 'Убрать стрелку' : 'Добавить стрелку'}
+                              >
+                                ←
+                              </button>
+                            </div>
+                          </div>
+                              
+                          <div className="arrow-section">
+                            <span className="arrow-label">Конец:</span>
+                            <div className="arrow-buttons">
+                              <button
+                                className={`arrow-btn ${element.lineEnds?.end === 'arrow' ? 'active' : ''}`}
+                                onClick={() => handleLineEndsChange(
+                                  element.id, 
+                                  'end', 
+                                  element.lineEnds?.end === 'arrow' ? 'none' : 'arrow'
+                                )}
+                                title={element.lineEnds?.end === 'arrow' ? 'Убрать стрелку' : 'Добавить стрелку'}
+                              >
+                                →
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  
+
+                  {element.type === 'line' && (
+                    <div className="element-controls line">
+                      handleLineEndsChange
                     </div>
                   )}
 

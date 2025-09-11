@@ -1928,3 +1928,52 @@
     padding-bottom: 8px;
   }
 }
+
+.arrow-buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.arrow-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.arrow-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.arrow-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.arrow-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.arrow-btn:hover {
+  border-color: #2196F3;
+  background: #f0f8ff;
+}
+
+.arrow-btn.active {
+  border-color: #2196F3;
+  background: #2196F3;
+  color: white;
+}

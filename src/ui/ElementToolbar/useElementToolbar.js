@@ -47,6 +47,18 @@ export const useElementToolbar = (
         };
         setElements(prev => [...prev, newShapeElement]);
         break;
+      case 'line':
+        const newLineElement = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          type: 'line',
+          position: { x: 170, y: 290 },
+          width: 100,
+          height: 20,
+          color: '#000',
+          borderWidth: 0
+        };
+        setElements(prev => [...prev, newLineElement]);
+        break;  
       case 'element':
         setIsImageLibraryOpen(true);
         break;

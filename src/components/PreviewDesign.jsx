@@ -82,6 +82,20 @@ export const PreviewDesign = ({ elements }) => (
                       ${(element.borderRadius?.bottomRight / 1.5) || 0}px ${(element.borderRadius?.bottomLeft / 1.5) || 0}px`
                   }} 
                    className="preview-shape" />;
+        case 'line': 
+          return (
+            <div
+              key={element.id} 
+                   style={{
+                    ...style, 
+                    top: `${((element.position.y + ((element.height) / 2)) / 600) * 100}%`,
+                    height: `${(element.lineThickness || 2) / 2}px`,
+                    backgroundColor: element.color,
+                    opacity: element.opacity || 1,
+                    borderRadius: `${element.lineStyle === 'dashed' ? '2px' : '0px'}`
+                   }}
+            />
+          )        
         case 'background':
           return (
             <div key={element.id} style={style}>

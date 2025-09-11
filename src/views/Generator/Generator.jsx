@@ -12,6 +12,7 @@ import { ImageElement } from '../../components/ImageElement';
 import { ShapeElement } from '../../components/ShapeElement';
 import { TextElement } from '../../components/TextElement';
 import { ElementsElement } from '../../components/ElementsElement';
+import { LineElement } from '../../components/LineElement';
 import { ImageLibraryModal } from '../../components/ImageLibraryModal';
 import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
@@ -336,9 +337,48 @@ export const Generator = () => {
       : [selectedColorElementId];
 
     setElements(prev => 
+      prev.map(el => {
+        if (ids.includes(el.id)) {
+          if (el.type === 'shape') {
+            return { ...el, color: newColor, gradient: null };
+          } else if (el.type === 'line') {
+            return { ...el, color: newColor };
+          }
+        }
+        return el;
+      })
+    );
+  };
+
+  // Обработчик изменения толщины линии
+  const handleLineThicknessChange = (elementId, thickness) => {
+    setElements(prev => 
       prev.map(el => 
-        ids.includes(el.id) ? {...el, color: newColor, gradient: null} : el
+        el.id === elementId ? { ...el, lineThickness: parseInt(thickness) || 2 } : el
       )
+    );
+  };
+
+  // Обработчик изменения концов линии
+  const handleLineEndsChange = (elementId, endType, arrowType) => {
+    setElements(prev => 
+      prev.map(el => {
+        if (el.id === elementId) {
+          const currentValue = el.lineEnds?.[endType];
+
+          // Если передано 'none' или текущее значение равно переданному - убираем стрелку
+          const newValue = arrowType === 'none' || currentValue === arrowType ? 'none' : arrowType;
+
+          return {
+            ...el,
+            lineEnds: {
+              ...el.lineEnds,
+              [endType]: newValue
+            }
+          };
+        }
+        return el;
+      })
     );
   };
 
@@ -1402,6 +1442,41 @@ export const Generator = () => {
                       captureRef={captureRef}
                     />
                   );
+                case 'line':
+                  return (
+                    <LineElement 
+                      contextMenuRef={contextMenuRef}
+                      element={element}
+                      key={element.id}
+                      position={element.position}
+                      width={element.width}
+                      height={element.height}
+                      color={element.color || '#000'} // Добавляем цвет
+                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                      rotation={element.rotation} // Передаем поворот
+                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                      containerWidth={110}
+                      containerHeight={10}
+                      onContextMenu={(e) => handleContextMenu(e, element.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (e.shiftKey) {
+                          setSelectedElementIds(prev => [...prev, element.id]);
+                        } else {
+                          setSelectedElementId(element.id);
+                        }
+                      }}
+                      selectedElementId={selectedElementId}
+                      selectedElementIds={selectedElementIds}
+                      onDeselect={() => {
+                        setSelectedElementId(null);
+                        setSelectedElementIds([]);
+                      }}
+                      zoom={zoom.level}
+                      captureRef={captureRef}
+                    />
+                  );
                 case 'text':
                   return (
                     <TextElement
@@ -1577,6 +1652,8 @@ export const Generator = () => {
             handleBorderColorChange={handleBorderColorChange}
             handleBorderColorButtonClick={handleBorderColorButtonClick}
             handleBorderChange={handleBorderChange}
+            handleLineThicknessChange={handleLineThicknessChange}
+            handleLineEndsChange={handleLineEndsChange}
             processingIds={processingIds}
             processingShedowIds={processingShedowIds}
             shadowSetting={shadowSetting}

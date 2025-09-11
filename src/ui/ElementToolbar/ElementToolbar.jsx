@@ -4,6 +4,7 @@ import { SlFrame } from "react-icons/sl";
 import { IoImagesOutline } from "react-icons/io5";
 import { PiTextAa, PiShapes } from "react-icons/pi";
 import { AiOutlineProduct } from "react-icons/ai";
+import { TfiLayoutLineSolid } from "react-icons/tfi";
 
 import { Tooltip } from '../Tooltip/Tooltip';
 import { LanguageContext } from '../../contexts/contextLanguage';
@@ -17,6 +18,7 @@ export const ElementToolbar = ({ onAddElement, isBackground }) => {
     { type: 'image', icon: IoImagesOutline, title: 'ui.addImage' },
     { type: 'text', icon: PiTextAa, title: 'ui.addText' },
     { type: 'shape', icon: PiShapes, title: 'ui.addSquare' },
+    { type: 'line', icon: TfiLayoutLineSolid, title: 'ui.addLine' },
     { type: 'element', icon: MdOutlineLensBlur, title: 'ui.addElement' },
     { type: 'product', icon: AiOutlineProduct, title: 'ui.addProduct' }    
   ];
