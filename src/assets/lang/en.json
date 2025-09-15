@@ -21,7 +21,9 @@
     "mainSlide": "Main slide",
     "slideNumber": "Slide",
     "addLayout": "Add layout",
-    "downloadLayout": "Create template"
+    "downloadLayout": "Create template",
+    "showBlindZones": "Show blind zones",
+    "hideBlindZones": "Hide blind zones"
   },
   "category": {
     "all": "All",

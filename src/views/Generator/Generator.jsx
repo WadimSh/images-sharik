@@ -18,6 +18,7 @@ import { ProductModal } from '../../components/ProductModal';
 import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 import { CollageTempleModal } from '../../components/CollageTempleModal';
+import { BlindZones } from '../../components/BlindZones';
 import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
@@ -127,6 +128,8 @@ export const Generator = () => {
     max: 3,
     step: 0.01
   });
+  // Состояние для отображения слепых зон
+  const [showBlindZones, setShowBlindZones] = useState(false);
   
   const handleZoomIn = () => {
     setZoom(prev => ({
@@ -1257,6 +1260,8 @@ export const Generator = () => {
         loadCollageTemplate={loadCollageTemplate}
         handleCreateTemplate={handleCreateTemplate}
         handleCreateCollageTemple={handleCreateCollageTemple}
+        showBlindZones={showBlindZones}
+        setShowBlindZones={setShowBlindZones}
       />
       <div className="content-wrapper">
         {(!isCollageMode && initialMetaDateElement !== null) && (
@@ -1316,6 +1321,17 @@ export const Generator = () => {
               }
             }}
           >
+
+            <BlindZones 
+              show={showBlindZones}
+              zones={[
+                { id: 'zone1', x: 4, y: 4, width: 92, height: 92 },
+                { id: 'zone2', x: 353, y: 4, width: 94, height: 94 },
+                { id: 'zone3', x: 4, y: 510, width: 248, height: 88 },
+                { id: 'zone4', x: 314, y: 532, width: 132, height: 64 }
+              ]}
+            />
+
             {/* Стилизованная область для визуальной обратной связи */}
             <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
               {isDragging && (

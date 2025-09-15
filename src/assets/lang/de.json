@@ -21,7 +21,9 @@
     "mainSlide": "Hauptfolie",
     "slideNumber": "Folie",
     "addLayout": "Layout hinzufügen",
-    "downloadLayout": "Vorlage erstellen"
+    "downloadLayout": "Vorlage erstellen",
+    "showBlindZones": "Tote Winkel anzeigen",
+    "hideBlindZones": "Tote Winkel ausblenden"
   },
   "category": {
     "all": "Alle",

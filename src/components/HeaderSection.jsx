@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
 
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
+import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
 import { designsDB, collageDB, historyDB } from '../utils/handleDB';
 import { LanguageContext } from '../contexts/contextLanguage';
@@ -25,7 +26,9 @@ export const HeaderSection = ({
   loadTemplate,
   loadCollageTemplate,
   handleCreateTemplate,
-  handleCreateCollageTemple
+  handleCreateCollageTemple,
+  showBlindZones,
+  setShowBlindZones
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -132,7 +135,7 @@ export const HeaderSection = ({
   const handleDownload = async () => {
     try {
       setLoading(true);
-
+      setShowBlindZones(false);
       setZoom(prev => ({ ...prev, level: 1 }));
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -342,13 +345,25 @@ export const HeaderSection = ({
   
     loadTemplates();
   }, []);
-
+  console.log(marketplace)
   return (
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
         <HiOutlineChevronLeft /> {t('header.back')}
       </button>
       <h2>{getHeaderTitle()}</h2>
+
+      {marketplace === 'WB' && <div>
+        <ToggleSwitch
+          checked={showBlindZones}
+          onChange={setShowBlindZones}
+          size="medium"
+          onColor="#2196F3"
+          offColor="#cccccc"
+          label={showBlindZones ? t('header.hideBlindZones') : t('header.showBlindZones')}
+        />
+      </div>}
+      
       <TemplateSelector {...templateProps} />
       <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
         <FaClipboardCheck /> {`${t('header.createLayout')}`}

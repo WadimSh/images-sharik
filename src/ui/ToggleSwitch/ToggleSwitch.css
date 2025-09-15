@@ -1,44 +1,54 @@
-.toggle-switch {
-  --width: 50px;
-  --height: 26px;
-  --on-color: #2196f3;
-  --off-color: #cccccc;
-  position: relative;
-  display: inline-flex;
+.toggle-switch-container {
+  display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
+  user-select: none;
+  min-width: fit-content; /* Фиксируем минимальную ширину */
 }
 
-.toggle-switch.disabled {
+.toggle-switch-container.disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: var(--width);
+  height: var(--height);
+  flex-shrink: 0; /* Запрещаем сжатие */
+}
+
 .toggle-input {
+  position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
+  pointer-events: none;
 }
 
 .toggle-slider {
-  position: relative;
-  width: var(--width);
-  height: var(--height);
+  position: absolute;
+  cursor: inherit;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: var(--off-color);
-  transition: 0.2s;
-  border-radius: calc(var(--height) / 2);
+  transition: background-color 0.3s ease;
+  border-radius: var(--height);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-slider:before {
-  content: "";
   position: absolute;
-  height: calc(var(--height) - 4px);
-  width: calc(var(--height) - 4px);
-  left: 2px;
-  bottom: 2px;
+  content: "";
+  height: calc(var(--height) - 6px);
+  width: calc(var(--height) - 6px);
+  left: 4px;
+  bottom: 3px;
   background-color: white;
-  transition: 0.2s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Плавная easing-функция */
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -51,13 +61,22 @@
   transform: translateX(calc(var(--width) - var(--height)));
 }
 
-.toggle-input:focus-visible + .toggle-slider {
-  outline: 2px solid var(--on-color);
-  outline-offset: 2px;
-}
-
 .toggle-label {
   font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #333;
+  font-size: 16px;
+  color: #fff;
+  cursor: inherit;
+  min-width: 170px; /* Фиксированная ширина для текста */
+  text-align: left; /* Выравнивание по левому краю */
+  white-space: nowrap; /* Запрещаем перенос строк */
+  flex-shrink: 0; /* Запрещаем сжатие */
+}
+
+/* Анимация для плавного перехода */
+.toggle-slider:before {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider {
+  transition: all 0.3s ease;
 }

@@ -13,17 +13,23 @@ export const ToggleSwitch = ({
 }) => {
   const [isChecked, setIsChecked] = useState(checked);
   const [isAnimating, setIsAnimating] = useState(false);
-
+  
   useEffect(() => {
     setIsChecked(checked);
   }, [checked]);
 
-  const handleToggle = () => {
-    if (!disabled) {
+  const handleToggle = (e) => {
+    e.stopPropagation(); // Останавливаем всплытие события
+    e.preventDefault(); // Предотвращаем стандартное поведение
+    
+    console.log('Toggle area clicked, disabled:', disabled, 'current:', isChecked);
+    
+    if (!disabled && !isAnimating) {
       const newState = !isChecked;
+      console.log('New state:', newState);
       setIsAnimating(true);
       setIsChecked(newState);
-
+      
       // Задержка соответствует времени анимации в CSS (0.25s)
       setTimeout(() => {
         setIsAnimating(false);
@@ -39,26 +45,43 @@ export const ToggleSwitch = ({
   };
 
   return (
-    <label
-      className={`toggle-switch ${className} ${disabled ? 'disabled' : ''}`}
+    <div
+      className={`toggle-switch-container ${className} ${disabled ? 'disabled' : ''}`}
+      onClick={handleToggle}
       style={{
-        '--width': `${sizes[size].width}px`,
-        '--height': `${sizes[size].height}px`,
-        '--on-color': onColor,
-        '--off-color': offColor,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.6 : 1,
       }}
     >
-      <input
-        type="checkbox"
-        checked={isChecked}
-        onChange={handleToggle}
-        disabled={disabled || isAnimating}
-        aria-checked={isChecked}
-        role="switch"
-        className="toggle-input"
-      />
-      <span className="toggle-slider" />
-      {label && <span className="toggle-label">{label}</span>}
-    </label>
+      <div
+        className="toggle-switch"
+        style={{
+          '--width': `${sizes[size].width}px`,
+          '--height': `${sizes[size].height}px`,
+          '--on-color': onColor,
+          '--off-color': offColor,
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={isChecked}
+          readOnly // Делаем только для чтения, управляем через клик по контейнеру
+          disabled={disabled || isAnimating}
+          aria-checked={isChecked}
+          role="switch"
+          className="toggle-input"
+        />
+        <span className="toggle-slider" />
+      </div>
+      
+      {label && (
+        <span 
+          className="toggle-label"
+          onClick={handleToggle} // Дублируем обработчик на лейбл
+        >
+          {label}
+        </span>
+      )}
+    </div>
   );
 };

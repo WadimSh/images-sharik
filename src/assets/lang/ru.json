@@ -21,7 +21,9 @@
     "mainSlide": "Основной слайд",
     "slideNumber": "Слайд",
     "addLayout": "Добавить макет",
-    "downloadLayout": "Создать шаблон"
+    "downloadLayout": "Создать шаблон",
+    "showBlindZones": "Показать слепые зоны",
+    "hideBlindZones": "Скрыть слепые зоны"
   },
   "category": {
     "all": "Все",

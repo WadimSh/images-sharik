@@ -21,7 +21,9 @@
     "mainSlide": "Slide principale",
     "slideNumber": "Slide",
     "addLayout": "Aggiungi layout",
-    "downloadLayout": "Crea modello"
+    "downloadLayout": "Crea modello",
+    "showBlindZones": "Mostra zone cieche",
+    "hideBlindZones": "Nascondi zone cieche"
   },
   "category": {
     "all": "Tutto",

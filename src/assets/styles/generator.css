@@ -16,7 +16,7 @@
   align-items: center;
   gap: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  z-index: 1000;
+  
 }
 
 .header-section h2 {
@@ -1957,4 +1957,12 @@
   border-color: #2196F3;
   background: #2196F3;
   color: white;
+}
+
+.blind-zones-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 20px;
+  z-index: 100;
 }
