@@ -1241,6 +1241,21 @@ export const Generator = () => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleCopy, handlePaste, handleDelete, selectedElementId, selectedElementIds, copiedElement, editingTextId]);
+
+  const Zone = {
+    'WB': [
+      { id: 'zone1', x: 4, y: 4, width: 92, height: 92 },
+      { id: 'zone2', x: 353, y: 4, width: 94, height: 94 },
+      { id: 'zone3', x: 4, y: 510, width: 248, height: 88 },
+      { id: 'zone4', x: 314, y: 532, width: 132, height: 64 }
+    ],
+    'OZ': [
+      { id: 'zone1', x: 312, y: 4, width: 132, height: 72 },
+      { id: 'zone2', x: 4, y: 542, width: 206, height: 54 },
+      { id: 'zone3', x: 4, y: 4, width: 56, height: 56 },
+      { id: 'zone4', x: 260, y: 452, width: 180, height: 38 }
+    ]
+  }
   
   return (
     <div className="generator-container">
@@ -1324,12 +1339,7 @@ export const Generator = () => {
 
             <BlindZones 
               show={showBlindZones}
-              zones={[
-                { id: 'zone1', x: 4, y: 4, width: 92, height: 92 },
-                { id: 'zone2', x: 353, y: 4, width: 94, height: 94 },
-                { id: 'zone3', x: 4, y: 510, width: 248, height: 88 },
-                { id: 'zone4', x: 314, y: 532, width: 132, height: 64 }
-              ]}
+              zones={Zone[marketplace]}
             />
 
             {/* Стилизованная область для визуальной обратной связи */}

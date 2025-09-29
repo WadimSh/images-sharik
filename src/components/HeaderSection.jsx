@@ -345,7 +345,7 @@ export const HeaderSection = ({
   
     loadTemplates();
   }, []);
-  console.log(marketplace)
+  
   return (
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
@@ -353,7 +353,7 @@ export const HeaderSection = ({
       </button>
       <h2>{getHeaderTitle()}</h2>
 
-      {marketplace === 'WB' && <div>
+      <div>
         <ToggleSwitch
           checked={showBlindZones}
           onChange={setShowBlindZones}
@@ -362,7 +362,7 @@ export const HeaderSection = ({
           offColor="#cccccc"
           label={showBlindZones ? t('header.hideBlindZones') : t('header.showBlindZones')}
         />
-      </div>}
+      </div>
       
       <TemplateSelector {...templateProps} />
       <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
