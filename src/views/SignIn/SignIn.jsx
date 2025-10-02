@@ -70,13 +70,6 @@ export const SignIn = () => {
       setMessage('auth.signInSuccess');
       setIsError(false);
 
-      // Сохраняем информацию о пользователе в localStorage/sessionStorage
-      //localStorage.setItem('currentUser', JSON.stringify({
-      //  id: user.id,
-      //  login: user.login,
-      //  email: user.email
-      //}));
-      
       // Очищаем форму
       setFormData({
         login: '',
