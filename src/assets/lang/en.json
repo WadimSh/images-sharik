@@ -34,7 +34,25 @@
     "main": "Basic template",
     "petard": "Party popper",
     "halloween": "Halloween",
-    "kittens": "Kittens"
+    "kittens": "Kittens",
+    "winter_holidays": "New Year & Christmas"
+  },
+  "styles": {
+    "default": "Classic Style",
+    "red": "Coral Vibes",
+    "green": "Lime Fresh",
+    "yellow": "Honey Glow",
+    "crimson": "Deep Crimson",
+    "brutal": "Linear Style",
+    "amur1": "Amorous Style",
+    "amur2": "Romantic Style",
+    "pumpkin": "Pumpkin style",
+    "bat": "Night style",
+    "blood": "Bloody style",
+    "carved": "Carved style",
+    "monsters": "Monster style",
+    "comics": "Comics style",
+    "popArt": "Pop Art Style"
   },
   "grid": {
     "all": "All",
@@ -122,22 +140,6 @@
     "linkTo": "product links on:",
     "linkNo": "product not available on marketplaces",
     "placeholder": "Create new slider"
-  },
-  "styles": {
-    "default": "Classic Style",
-    "red": "Coral Vibes",
-    "green": "Lime Fresh",
-    "yellow": "Honey Glow",
-    "crimson": "Deep Crimson",
-    "brutal": "Linear Style",
-    "amur1": "Amorous Style",
-    "amur2": "Romantic Style",
-    "pumpkin": "Pumpkin style",
-    "bat": "Night style",
-    "blood": "Bloody style",
-    "carved": "Carved style",
-    "monsters": "Monster style",
-    "comics": "Comics style"
   },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",

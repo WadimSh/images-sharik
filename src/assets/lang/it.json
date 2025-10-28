@@ -34,7 +34,25 @@
     "main": "Modello base",
     "petard": "Stelle filanti",
     "halloween": "Halloween",
-    "kittens": "Gattini"
+    "kittens": "Gattini",
+    "winter_holidays": "Capodanno & Natale"
+  },
+  "styles": {
+    "default": "Stile Classico",
+    "red": "Vibrazioni Coralline",
+    "green": "Freschezza Lime",
+    "yellow": "Luminosità Miele",
+    "crimson": "Cremisi Profondo",
+    "brutal": "Stile Lineare",
+    "amur1": "Stile Amoroso",
+    "amur2": "Stile Romantico",
+    "pumpkin": "Stile zucca",
+    "bat": "Stile notte",
+    "blood": "Stile sanguinante",
+    "carved": "Stile intagliato",
+    "monsters": "Stile mostro",
+    "comics": "Stile fumetto",
+    "popArt": "Stile Pop Art"
   },
   "grid": {
     "all": "Tutto",
@@ -122,22 +140,6 @@
     "linkTo": "collegamenti al prodotto su:",
     "linkNo": "prodotto non disponibile sui marketplace",
     "placeholder": "Crea nuovo slider"
-  },
-  "styles": {
-    "default": "Stile Classico",
-    "red": "Vibrazioni Coralline",
-    "green": "Freschezza Lime",
-    "yellow": "Luminosità Miele",
-    "crimson": "Cremisi Profondo",
-    "brutal": "Stile Lineare",
-    "amur1": "Stile Amoroso",
-    "amur2": "Stile Romantico",
-    "pumpkin": "Stile zucca",
-    "bat": "Stile notte",
-    "blood": "Stile sanguinante",
-    "carved": "Stile intagliato",
-    "monsters": "Stile mostro",
-    "comics": "Stile fumetto"
   },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",

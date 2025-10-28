@@ -34,7 +34,25 @@
     "main": "Grundvorlage",
     "petard": "Knallbonbon",
     "halloween": "Halloween",
-    "kittens": "Kätzchen"
+    "kittens": "Kätzchen",
+    "winter_holidays": "Neujahr & Weihnachten"
+  },
+  "styles": {
+    "default": "Klassischer Stil",
+    "red": "Korallen-Energie",
+    "green": "Limonen-Frische",
+    "yellow": "Honig-Glanz",
+    "crimson": "Tiefes Karmesin",
+    "brutal": "Linearer Stil",
+    "amur1": "Verliebter Stil",
+    "amur2": "Romantischer Stil",
+    "pumpkin": "Kürbis-Stil",
+    "bat": "Nacht-Stil",
+    "blood": "Blutiger Stil",
+    "carved": "Schnitz-Stil", 
+    "monsters": "Monster-Stil",
+    "comics": "Comic-Stil",
+    "popArt": "Pop-Art-Stil"
   },
   "grid": {
     "all": "Alle",
@@ -122,22 +140,6 @@
     "linkTo": "Produktlinks auf:",
     "linkNo": "Produkt nicht auf Marktplätzen verfügbar",
     "placeholder": "Neuen Slider erstellen"
-  },
-  "styles": {
-    "default": "Klassischer Stil",
-    "red": "Korallen-Energie",
-    "green": "Limonen-Frische",
-    "yellow": "Honig-Glanz",
-    "crimson": "Tiefes Karmesin",
-    "brutal": "Linearer Stil",
-    "amur1": "Verliebter Stil",
-    "amur2": "Romantischer Stil",
-    "pumpkin": "Kürbis-Stil",
-    "bat": "Nacht-Stil",
-    "blood": "Blutiger Stil",
-    "carved": "Schnitz-Stil", 
-    "monsters": "Monster-Stil",
-    "comics": "Comic-Stil"
   },
   "views": {
     "homeMissingCode": "Ändern Sie die Suchparameter oder verwenden Sie andere Schlüsselwörter.",
