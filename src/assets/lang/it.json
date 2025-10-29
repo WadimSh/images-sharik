@@ -52,7 +52,9 @@
     "carved": "Stile intagliato",
     "monsters": "Stile mostro",
     "comics": "Stile fumetto",
-    "popArt": "Stile Pop Art"
+    "cartoon": "Stile cartone animato",
+    "popArt": "Stile Pop Art",
+    "cake": "Stile pan di zenzero"
   },
   "grid": {
     "all": "Tutto",

@@ -52,7 +52,9 @@
     "carved": "Carved style",
     "monsters": "Monster style",
     "comics": "Comics style",
-    "popArt": "Pop Art Style"
+    "cartoon": "Cartoon style",
+    "popArt": "Pop Art Style",
+    "cake": "Gingerbread style"
   },
   "grid": {
     "all": "All",

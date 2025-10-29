@@ -53,7 +53,9 @@
       "name": "category.winter_holidays",
       "subcategories": [
         { "id": "default-winter", "name": "styles.default", "tags": ["default-winter"] },
-        { "id": "popArt", "name": "styles.popArt", "tags": ["popArt"] }
+        { "id": "cartoon", "name": "styles.cartoon", "tags": ["cartoon"]},
+        { "id": "popArt", "name": "styles.popArt", "tags": ["popArt"] },
+        { "id": "cake", "name": "styles.cake", "tags": ["cake"] }
       ]
     },
     {
@@ -898,71 +900,71 @@
     },
     {
       "filename": "element-fon_044.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_045.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_046.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_047.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_048.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_049.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_050.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_051.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_052.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_053.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_054.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_055.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_056.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_057.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_058.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_059.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_060.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "element-fon_061.png",
@@ -1011,6 +1013,90 @@
     {
       "filename": "element-fon_072.png",
       "tags": ["winter_holidays", "popArt"]
+    },
+    {
+      "filename": "element-fon_073.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_074.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_075.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_076.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_077.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_078.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_079.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_080.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_081.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_082.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_083.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_084.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "element-fon_085.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_086.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_087.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_088.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_089.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_090.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_091.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_092.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "element-fon_093.png",
+      "tags": ["winter_holidays", "default-winter"]
     },
     {
       "filename": "logo-gemar.png",
@@ -1203,6 +1289,54 @@
     {
       "filename": "title_12.png",
       "tags": ["halloween", "monsters"]
+    },
+    {
+      "filename": "title_13.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_14.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_15.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_16.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_17.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_18.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_19.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_20.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_21.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_22.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_23.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_24.png",
+      "tags": ["winter_holidays", "default-winter"]
     },
     {
       "filename": "bubbles_09_001.png",
@@ -1526,27 +1660,27 @@
     },
     {
       "filename": "bubbles_11_001.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_002.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_003.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_004.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_005.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_006.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11_007.png",
@@ -1589,52 +1723,124 @@
       "tags": ["winter_holidays", "popArt"]
     },
     {
-      "filename": "bubbles_11+text_001.png",
+      "filename": "bubbles_11_017.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_018.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_019.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_020.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_021.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_022.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_023.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_024.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_025.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_026.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_027.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11_028.png",
       "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_029.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_030.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_031.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_032.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_033.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11_034.png",
+      "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "bubbles_11+text_001.png",
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_002.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_003.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_004.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_005.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_006.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_007.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_008.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_009.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_010.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_011.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_012.png",
-      "tags": ["winter_holidays", "default-winter"]
+      "tags": ["winter_holidays", "cartoon"]
     },
     {
       "filename": "bubbles_11+text_013.png",
@@ -1679,6 +1885,82 @@
     {
       "filename": "bubbles_11+text_023.png",
       "tags": ["winter_holidays", "popArt"]
+    },
+    {
+      "filename": "bubbles_11+text_024.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_025.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_026.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_027.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_028.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_029.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_030.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_031.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_032.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_033.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_034.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_035.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_036.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_037.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_038.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_039.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_040.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_041.png",
+      "tags": ["winter_holidays", "cake"]
+    },
+    {
+      "filename": "bubbles_11+text_042.png",
+      "tags": ["winter_holidays", "cake"]
     }
   ]
 } 

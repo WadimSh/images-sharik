@@ -52,7 +52,9 @@
     "carved": "Schnitz-Stil", 
     "monsters": "Monster-Stil",
     "comics": "Comic-Stil",
-    "popArt": "Pop-Art-Stil"
+    "cartoon": "Zeichentrickstil",
+    "popArt": "Pop-Art-Stil",
+    "cake": "Lebkuchen-Stil"
   },
   "grid": {
     "all": "Alle",
