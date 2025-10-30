@@ -11,6 +11,7 @@ import { RxBorderWidth } from "react-icons/rx";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icons/gr";
+import { BsSnow2 } from "react-icons/bs";
 
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';
@@ -1253,14 +1254,14 @@ export const ElementsList = ({
                             <option value="Badaboom" style={{ fontFamily: 'Badaboom', fontSize: '18px' }}>Badaboom</option>
                             <option value="FuturaRound" style={{ fontFamily: 'FuturaRound', fontSize: '18px' }}>FuturaRound</option>
                             <option value="FuturaRoundDemi" style={{ fontFamily: 'FuturaRoundDemi', fontSize: '18px' }}>FuturaRoundDemi</option>
-                            <option value="RoslinGothic_DG" style={{ fontFamily: 'RoslinGothic_DG', fontSize: '18px' }}>RoslinGothic</option>
-                            <option value="Alterna Nr" style={{ fontFamily: 'Alterna Nr', fontSize: '18px' }}>Alterna Nr</option>
-                            <option value="Jolly Lodger" style={{ fontFamily: 'Jolly Lodger', fontSize: '18px' }}>Jolly Lodger</option>
-                            <option value="Swampy" style={{ fontFamily: 'Swampy', fontSize: '18px' }}>Swampy</option>
-                            <option value="Cartonsix NC" style={{ fontFamily: 'Cartonsix NC', fontSize: '18px' }}>Cartonsix NC</option>
-                            <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas</option>
-                            <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans</option>
-                            <option value="Zametka" style={{ fontFamily: 'Zametka', fontSize: '18px' }}>Zametka</option>
+                            <option value="RoslinGothic_DG" style={{ fontFamily: 'RoslinGothic_DG', fontSize: '18px' }}>RoslinGothic 👻</option>
+                            <option value="Alterna Nr" style={{ fontFamily: 'Alterna Nr', fontSize: '18px' }}>Alterna Nr 👻</option>
+                            <option value="Jolly Lodger" style={{ fontFamily: 'Jolly Lodger', fontSize: '18px' }}>Jolly Lodger 👻</option>
+                            <option value="Swampy" style={{ fontFamily: 'Swampy', fontSize: '18px' }}>Swampy 👻</option>
+                            <option value="Cartonsix NC" style={{ fontFamily: 'Cartonsix NC', fontSize: '18px' }}>Cartonsix NC 🎄</option>
+                            <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas 🎄</option>
+                            <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans 🎄</option>
+                            <option value="Zametka" style={{ fontFamily: 'Zametka', fontSize: '18px' }}>Zametka 🎄</option>
                             <option value="Arial" style={{ fontFamily: 'Arial', fontSize: '18px' }}>Arial</option>
                             <option value="Times New Roman" style={{ fontFamily: 'Times New Roman', fontSize: '18px' }}>Times New Roman</option>
                             <option value="Verdana" style={{ fontFamily: 'Verdana', fontSize: '18px' }}>Verdana</option>
