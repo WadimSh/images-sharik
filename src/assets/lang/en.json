@@ -54,7 +54,9 @@
     "comics": "Comics style",
     "cartoon": "Cartoon style",
     "popArt": "Pop Art Style",
-    "cake": "Gingerbread style"
+    "cake": "Gingerbread style",
+    "kawaii": "Kawaii Style",
+    "minimalistic": "Minimalistic Style"
   },
   "grid": {
     "all": "All",

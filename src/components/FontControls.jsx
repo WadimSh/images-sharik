@@ -200,6 +200,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
           <option value="Jolly Lodger" style={{ fontFamily: 'Jolly Lodger', fontSize: '18px' }}>Jolly Lodger 👻</option>
           <option value="Swampy" style={{ fontFamily: 'Swampy', fontSize: '18px' }}>Swampy 👻</option>
           <option value="Cartonsix NC" style={{ fontFamily: 'Cartonsix NC', fontSize: '18px' }}>Cartonsix NC 🎄</option>
+          <option value="Comic CAT" style={{ fontFamily: 'Comic CAT', fontSize: '18px' }}>Comic 🎄</option>
           <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas 🎄</option>
           <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans 🎄</option>
           <option value="Zametka" style={{ fontFamily: 'Zametka', fontSize: '18px' }}>Zametka 🎄</option>

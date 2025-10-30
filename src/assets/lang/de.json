@@ -54,7 +54,9 @@
     "comics": "Comic-Stil",
     "cartoon": "Zeichentrickstil",
     "popArt": "Pop-Art-Stil",
-    "cake": "Lebkuchen-Stil"
+    "cake": "Lebkuchen-Stil",
+    "kawaii": "Kawaii-Stil",
+    "minimalistic": "Minimalistischer Stil"
   },
   "grid": {
     "all": "Alle",

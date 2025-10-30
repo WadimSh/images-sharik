@@ -54,7 +54,9 @@
     "comics": "Stile fumetto",
     "cartoon": "Stile cartone animato",
     "popArt": "Stile Pop Art",
-    "cake": "Stile pan di zenzero"
+    "cake": "Stile pan di zenzero",
+    "kawaii": "Stile Kawaii",
+    "minimalistic": "Stile Minimalista"
   },
   "grid": {
     "all": "Tutto",
