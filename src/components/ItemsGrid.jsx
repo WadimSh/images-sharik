@@ -280,6 +280,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   // Функция для создания нового дизайна с применением стиля
 const handleCreateNewDesign = async (baseCode) => {
+  
   try {
     const existingNumbers = items
       .filter(item => item.startsWith(`${baseCode}_`))
@@ -294,11 +295,11 @@ const handleCreateNewDesign = async (baseCode) => {
     
     // Получаем текущий стиль продукта
     const currentStyle = productMeta.styleVariant || 'default';
-  
+    
     const templateKey = productMeta.templateType || 'default';
     let selectedTemplate = templates.default;
   
-    if (templateKey === 'belbal' || templateKey === 'gemar' || templateKey === 'petard') {
+    if (templateKey === 'belbal' || templateKey === 'gemar' || templateKey === 'petard' || templateKey === 'winter') {
       const templateArray = templates[templateKey] || [];
       const imageIndex = newNumber - 1;
       const templateIndex = Math.min(imageIndex, templateArray.length - 1);
@@ -741,6 +742,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     belbal: t('grid.belbal'),
     gemar: t('grid.gemar'),
     petard: t('grid.petard'),
+    winter: t('grid.winter'),
     halloween: t('category.halloween'),
     main: t('grid.main'),
     default: t('grid.default'),

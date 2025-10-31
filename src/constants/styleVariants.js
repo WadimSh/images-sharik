@@ -20,10 +20,20 @@ export const STYLE_VARIANTS = {
     name: 'styles.green',
     icon: <TbSquareRoundedFilled size={16} color='#93c527' />
   },
+  teal: {
+    id: 'teal',
+    name: 'styles.teal',
+    icon: <TbSquareRoundedFilled size={16} color='#40E0D0' />
+  },
   yellow: {
     id: 'yellow',
     name: 'styles.yellow',
     icon: <TbSquareRoundedFilled size={16} color='#f6aa06' />
+  },
+  champagne: {
+    id: 'champagne',
+    name: 'styles.champagne',
+    icon: <TbSquareRoundedFilled size={16} color='#e3935a' />
   },
   crimson: {
     id: 'crimson',
