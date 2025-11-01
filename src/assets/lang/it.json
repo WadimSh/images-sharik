@@ -58,14 +58,15 @@
     "popArt": "Stile Pop Art",
     "cake": "Stile pan di zenzero",
     "kawaii": "Stile Kawaii",
-    "minimalistic": "Stile Minimalista"
+    "minimalistic": "Stile Minimalista",
+    "ice": "Stile di Ghiaccio"
   },
   "grid": {
     "all": "Tutto",
     "others": "Altri",
     "belbal": "Belbal (3 diapo)",
     "gemar": "Gemar (3 diapo)",
-    "winter": "Capodanno & Natale (3 diapo)",
+    "winter": "Periodo delle Feste (3 diapo)",
     "main": "Modello base",
     "default": "Modello immagine",
     "bubble": "Bolla",

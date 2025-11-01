@@ -125,6 +125,13 @@
 }
 
 @font-face {
+  font-family: 'Ice Kingdom';
+  src: url('./assets/fonts/icekingdomfrozencyrillic_bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'Pribambas';
   src: url('./assets/fonts/Pribambas-Regular.ttf') format('truetype');
   font-weight: normal;

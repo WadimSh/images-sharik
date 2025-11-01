@@ -3,6 +3,7 @@ import { IoPrism, IoMapSharp } from "react-icons/io5";
 import { IoMdHeart } from "react-icons/io";
 import { GiPumpkinLantern, GiBlood, GiPumpkinMask } from "react-icons/gi";
 import { FaOptinMonster } from "react-icons/fa";
+import { RiCake3Line } from "react-icons/ri";
 
 export const STYLE_VARIANTS = {
   default: {
@@ -79,5 +80,10 @@ export const STYLE_VARIANTS = {
     id: 'monsters',
     name: 'styles.monsters',
     icon: <FaOptinMonster size={24} color='#000000' />
+  },
+  cake: {
+    id: 'cake',
+    name: 'styles.cake',
+    icon: <RiCake3Line size={24} color="#c88b06" />
   }
 };

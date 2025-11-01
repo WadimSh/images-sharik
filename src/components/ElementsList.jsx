@@ -1259,6 +1259,7 @@ export const ElementsList = ({
                             <option value="Jolly Lodger" style={{ fontFamily: 'Jolly Lodger', fontSize: '18px' }}>Jolly Lodger 👻</option>
                             <option value="Swampy" style={{ fontFamily: 'Swampy', fontSize: '18px' }}>Swampy 👻</option>
                             <option value="Cartonsix NC" style={{ fontFamily: 'Cartonsix NC', fontSize: '18px' }}>Cartonsix 🎄</option>
+                            <option value="Ice Kingdom" style={{ fontFamily: 'Ice Kingdom', fontSize: '18px' }}>Ice Kingdom ⛄🎄</option>
                             <option value="Comic CAT" style={{ fontFamily: 'Comic CAT', fontSize: '18px' }}>Comic 🎄</option>
                             <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas 🎄</option>
                             <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans 🎄</option>

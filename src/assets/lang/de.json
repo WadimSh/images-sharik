@@ -58,14 +58,15 @@
     "popArt": "Pop-Art-Stil",
     "cake": "Lebkuchen-Stil",
     "kawaii": "Kawaii-Stil",
-    "minimalistic": "Minimalistischer Stil"
+    "minimalistic": "Minimalistischer Stil",
+    "ice": "Eis-Stil"
   },
   "grid": {
     "all": "Alle",
     "others": "Andere",
     "belbal": "Belbal (3 Folien)",
     "gemar": "Gemar (3 Folien)",
-    "winter_holidays": "Neujahr & Weihnachten (3 Folien)",
+    "winter": "Jahreswechselzeit (3 Folien)",
     "main": "Grundvorlage",
     "default": "Bildvorlage",
     "bubble": "Blase",
