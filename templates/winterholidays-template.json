@@ -1,0 +1,2114 @@
+[  
+  [
+    {
+      "id": 1744738384460,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/fon-05-01.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900,
+      "styles": {
+        "default": {
+          "backgroundImage": "/images/fon-05-01.png"
+        },
+        "teal": {
+          "backgroundImage": "/images/fon-05-02.png"
+        },
+        "champagne": {
+          "backgroundImage": "/images/fon-05-05.png"
+        },
+        "cake": {
+          "backgroundImage": "/images/fon-05-08.png"
+        }
+      }
+    },
+    {
+      "id": 1761815027072,
+      "type": "element",
+      "position": {
+        "x": 20,
+        "y": 124
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 39,
+      "height": 39,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 20,
+            "y": 124
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761815213468,
+      "type": "element",
+      "position": {
+        "x": 47,
+        "y": 177
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 47,
+            "y": 177
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761815222691,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 228
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 38,
+      "height": 38,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 38,
+          "height": 38,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 228
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761815235034,
+      "type": "element",
+      "position": {
+        "x": 320,
+        "y": 336
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 320,
+            "y": 336
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761815243547,
+      "type": "element",
+      "position": {
+        "x": 386,
+        "y": 289
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 36,
+      "height": 36,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 36,
+          "height": 36,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 386,
+            "y": 289
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761815258061,
+      "type": "element",
+      "position": {
+        "x": 370,
+        "y": 426
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 40,
+      "height": 40,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 40,
+          "height": 40,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 370,
+            "y": 426
+          }
+        },
+        "teal": {
+          "visibility": false
+        },
+        "champagne": {
+          "visibility": false
+        },
+        "cake": {
+          "visibility": false
+        }
+      }
+    },
+    {
+      "id": 1761899929298,
+      "type": "element",
+      "position": {
+        "x": 8.5,
+        "y": 118
+      },
+      "image": "/images/element-fon_086.png",
+      "width": 67,
+      "height": 68,
+      "originalWidth": 117,
+      "originalHeight": 118,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "visibility": false
+        },
+        "teal": {
+          "image": "/images/element-fon_086.png",
+          "width": 67,
+          "height": 68,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 8.5,
+            "y": 118
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_088.png",
+          "width": 67,
+          "height": 68,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 8.5,
+            "y": 118
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_091.png",
+          "width": 67,
+          "height": 67,
+          "originalWidth": 117,
+          "originalHeight": 117,
+          "rotation": 0,
+          "position": {
+            "x": 9,
+            "y": 118
+          }
+        }
+      }
+    },
+    {
+      "id": 1761899989717,
+      "type": "element",
+      "position": {
+        "x": 75.5,
+        "y": 207
+      },
+      "image": "/images/element-fon_086.png",
+      "width": 33,
+      "height": 33.5,
+      "originalWidth": 117,
+      "originalHeight": 118,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "visibility": false
+        },
+        "teal": {
+          "image": "/images/element-fon_086.png",
+          "width": 33,
+          "height": 33.5,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 75.5,
+            "y": 207
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_088.png",
+          "width": 33,
+          "height": 33.5,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 75.5,
+            "y": 207
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_091.png",
+          "width": 34,
+          "height": 34,
+          "originalWidth": 117,
+          "originalHeight": 117,
+          "rotation": 0,
+          "position": {
+            "x": 76,
+            "y": 207
+          }
+        }
+      }
+    },
+    {
+      "id": 1761900052728,
+      "type": "element",
+      "position": {
+        "x": 370.5,
+        "y": 328
+      },
+      "image": "/images/element-fon_086.png",
+      "width": 51,
+      "height": 51.5,
+      "originalWidth": 117,
+      "originalHeight": 118,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "visibility": false
+        },
+        "teal": {
+          "image": "/images/element-fon_086.png",
+          "width": 51,
+          "height": 51.5,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 370.5,
+            "y": 328
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_088.png",
+          "width": 51,
+          "height": 51.5,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 370.5,
+            "y": 328
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_091.png",
+          "width": 52,
+          "height": 52,
+          "originalWidth": 117,
+          "originalHeight": 117,
+          "rotation": 0,
+          "position": {
+            "x": 370,
+            "y": 328
+          }
+        }
+      }
+    },
+    {
+      "id": 1761900452218,
+      "type": "element",
+      "position": {
+        "x": 352.5,
+        "y": 404
+      },
+      "image": "/images/element-fon_086.png",
+      "width": 68,
+      "height": 69,
+      "originalWidth": 117,
+      "originalHeight": 118,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "visibility": false
+        },
+        "teal": {
+          "image": "/images/element-fon_086.png",
+          "width": 68,
+          "height": 69,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 352.5,
+            "y": 404
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_088.png",
+          "width": 68,
+          "height": 69,
+          "originalWidth": 117,
+          "originalHeight": 118,
+          "rotation": 0,
+          "position": {
+            "x": 352.5,
+            "y": 404
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_091.png",
+          "width": 68,
+          "height": 68,
+          "originalWidth": 117,
+          "originalHeight": 117,
+          "rotation": 0,
+          "position": {
+            "x": 352,
+            "y": 404
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221252268,
+      "type": "image",
+      "position": {
+        "x": -30,
+        "y": 116
+      },
+      "isFlipped": false,
+      "image": "{{ITEM_IMAGE}}",
+      "isProduct": true,
+      "width": 462,
+      "height": 462,
+      "originalWidth": 400,
+      "originalHeight": 400
+    },
+    {
+      "id": 1761814542615,
+      "type": "element",
+      "position": {
+        "x": 23,
+        "y": 38
+      },
+      "image": "/images/title_13.png",
+      "width": 407,
+      "height": 69,
+      "originalWidth": 801,
+      "originalHeight": 135,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/title_13.png",
+          "width": 407,
+          "height": 69,
+          "originalWidth": 801,
+          "originalHeight": 135,
+          "rotation": 0,
+          "position": {
+            "x": 23,
+            "y": 38
+          }
+        },
+        "teal": {
+          "image": "/images/title_16.png",
+          "width": 410,
+          "height": 69,
+          "originalWidth": 801,
+          "originalHeight": 135,
+          "rotation": 0,
+          "position": {
+            "x": 21,
+            "y": 38
+          }
+        },
+        "champagne": {
+          "image": "/images/title_19.png",
+          "width": 410,
+          "height": 69,
+          "originalWidth": 801,
+          "originalHeight": 135,
+          "rotation": 0,
+          "position": {
+            "x": 21,
+            "y": 38
+          }
+        },
+        "cake": {
+          "image": "/images/title_22.png",
+          "width": 410,
+          "height": 69,
+          "originalWidth": 801,
+          "originalHeight": 135,
+          "rotation": 0,
+          "position": {
+            "x": 20,
+            "y": 38
+          }
+        }
+      }
+    },
+    {
+      "id": 1761814595174,
+      "type": "element",
+      "position": {
+        "x": 312,
+        "y": 119
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 119
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "isFlipped": false,
+          "rotation": 0,
+          "position": {
+            "x": 311.5,
+            "y": 118
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_031.png",
+          "width": 190,
+          "height": 104,
+          "originalWidth": 349,
+          "originalHeight": 191,
+          "isFlipped": false,
+          "rotation": -52,
+          "position": {
+            "x": 287.5,
+            "y": 134.5
+          }
+        }
+      }
+    },
+    {
+      "id": 1744734115161,
+      "type": "text",
+      "position": {
+        "x": 360,
+        "y": 197
+      },
+      "text": "шт",
+      "fontSize": 32,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "width": 38,
+      "height": 29,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1744221504335,
+      "type": "text",
+      "position": {
+        "x": 334,
+        "y": 150
+      },
+      "text": "{{MULTIPLICITY}}",
+      "fontSize": 59,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 88,
+      "height": 51,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1761814842247,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 382
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 382
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "isFlipped": false,
+          "rotation": 0,
+          "position": {
+            "x": 13.5,
+            "y": 381
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "isFlipped": false,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 381
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_032.png",
+          "width": 124,
+          "height": 156,
+          "originalWidth": 227,
+          "originalHeight": 285,
+          "rotation": -18,
+          "position": {
+            "x": 11.5,
+            "y": 362
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221657494,
+      "type": "text",
+      "position": {
+        "x": 34,
+        "y": 430
+      },
+      "text": "{{SIZE}}",
+      "fontSize": 42,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 86,
+      "height": 42,
+      "image": null,
+      "rotation": 0,
+      "fontWeight": "normal"
+    }
+  ],
+  [
+    {
+      "id": 1744738384461,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/fon-05-01.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900,
+      "styles": {
+        "default": {
+          "backgroundImage": "/images/fon-05-01.png"
+        },
+        "teal": {
+          "backgroundImage": "/images/fon-05-03.png"
+        },
+        "champagne": {
+          "backgroundImage": "/images/fon-05-06.png"
+        },
+        "cake": {
+          "backgroundImage": "/images/fon-05-09.png"
+        }
+      }
+    },
+    {
+      "id": 1761815027073,
+      "type": "element",
+      "position": {
+        "x": 20,
+        "y": 124
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 39,
+      "height": 39,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 20,
+            "y": 124
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 54,
+          "height": 54,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 54,
+          "height": 53,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 54,
+          "height": 53,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815213469,
+      "type": "element",
+      "position": {
+        "x": 47,
+        "y": 177
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 47,
+            "y": 177
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 66,
+          "height": 65,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 66,
+          "height": 65,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815222692,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 228
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 38,
+      "height": 38,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 38,
+          "height": 38,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 228
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 49,
+          "height": 49,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 49,
+          "height": 48,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 49,
+          "height": 48,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815235035,
+      "type": "element",
+      "position": {
+        "x": 320,
+        "y": 336
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 320,
+            "y": 336
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 66,
+          "height": 65,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 66,
+          "height": 65,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815243548,
+      "type": "element",
+      "position": {
+        "x": 386,
+        "y": 289
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 36,
+      "height": 36,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 36,
+          "height": 36,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 386,
+            "y": 289
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 39,
+          "height": 38,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 39,
+          "height": 38,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815258062,
+      "type": "element",
+      "position": {
+        "x": 370,
+        "y": 426
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 40,
+      "height": 40,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 40,
+          "height": 40,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 370,
+            "y": 426
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 46,
+          "height": 46,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_089.png",
+          "width": 46,
+          "height": 45,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_092.png",
+          "width": 46,
+          "height": 45,
+          "originalWidth": 64,
+          "originalHeight": 63,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221252269,
+      "type": "image",
+      "position": {
+        "x": -30,
+        "y": 116
+      },
+      "isFlipped": false,
+      "image": "{{ITEM_IMAGE}}",
+      "isProduct": true,
+      "width": 462,
+      "height": 462,
+      "originalWidth": 400,
+      "originalHeight": 400
+    },
+    {
+      "id": 1761815398220,
+      "type": "element",
+      "position": {
+        "x": 56,
+        "y": 9
+      },
+      "image": "/images/title_14.png",
+      "width": 326,
+      "height": 128,
+      "originalWidth": 596,
+      "originalHeight": 234,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/title_14.png",
+          "width": 326,
+          "height": 128,
+          "originalWidth": 596,
+          "originalHeight": 234,
+          "rotation": 0,
+          "position": {
+            "x": 56,
+            "y": 9
+          }
+        },
+        "teal": {
+          "image": "/images/title_17.png",
+          "width": 326,
+          "height": 128,
+          "originalWidth": 596,
+          "originalHeight": 234,
+          "rotation": 0,
+          "position": {
+            "x": 55,
+            "y": 8
+          }
+        },
+        "champagne": {
+          "image": "/images/title_20.png",
+          "width": 326,
+          "height": 127,
+          "originalWidth": 593,
+          "originalHeight": 231,
+          "rotation": 0,
+          "position": {
+            "x": 55,
+            "y": 8
+          }
+        },
+        "cake": {
+          "image": "/images/title_23.png",
+          "width": 326,
+          "height": 127,
+          "originalWidth": 593,
+          "originalHeight": 231,
+          "rotation": 0,
+          "position": {
+            "x": 55,
+            "y": 8
+          }
+        }
+      }
+    },
+    {
+      "id": 1761814595175,
+      "type": "element",
+      "position": {
+        "x": 312,
+        "y": 119
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 119
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_033.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        }
+      }
+    },
+    {
+      "id": 1744734115162,
+      "type": "text",
+      "position": {
+        "x": 360,
+        "y": 197
+      },
+      "text": "шт",
+      "fontSize": 32,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "width": 38,
+      "height": 29,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1744221504336,
+      "type": "text",
+      "position": {
+        "x": 334,
+        "y": 150
+      },
+      "text": "{{MULTIPLICITY}}",
+      "fontSize": 59,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 88,
+      "height": 51,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1761814842248,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 382
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 382
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 383
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 383
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_033.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 383
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221657495,
+      "type": "text",
+      "position": {
+        "x": 34,
+        "y": 430
+      },
+      "text": "{{SIZE}}",
+      "fontSize": 42,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 86,
+      "height": 42,
+      "image": null,
+      "rotation": 0,
+      "fontWeight": "normal"
+    }
+  ],
+  [
+    {
+      "id": 1744738384462,
+      "type": "background",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "backgroundImage": "/images/fon-05-01.png",
+      "color": "#ffffff",
+      "gradient": null,
+      "height": 601,
+      "width": 451,
+      "originalImageHeight": 1200,
+      "originalImageWidth": 900,
+      "styles": {
+        "default": {
+          "backgroundImage": "/images/fon-05-01.png"
+        },
+        "teal": {
+          "backgroundImage": "/images/fon-05-04.png"
+        },
+        "champagne": {
+          "backgroundImage": "/images/fon-05-07.png"
+        },
+        "cake": {
+          "backgroundImage": "/images/fon-05-10.png"
+        }
+      }
+    },
+    {
+      "id": 1761815027074,
+      "type": "element",
+      "position": {
+        "x": 20,
+        "y": 124
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 39,
+      "height": 39,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 20,
+            "y": 124
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 54,
+          "height": 54,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 54,
+          "height": 54,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 54,
+          "height": 54,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 12,
+            "y": 116
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815213470,
+      "type": "element",
+      "position": {
+        "x": 47,
+        "y": 177
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 47,
+            "y": 177
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 46,
+            "y": 176
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815222693,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 228
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 38,
+      "height": 38,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 38,
+          "height": 38,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 228
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 49,
+          "height": 49,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 49,
+          "height": 49,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 49,
+          "height": 49,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 8,
+            "y": 223
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815235036,
+      "type": "element",
+      "position": {
+        "x": 320,
+        "y": 336
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 64,
+      "height": 64,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 64,
+          "height": 64,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 320,
+            "y": 336
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 66,
+          "height": 66,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 319,
+            "y": 335
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815243549,
+      "type": "element",
+      "position": {
+        "x": 386,
+        "y": 289
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 36,
+      "height": 36,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 36,
+          "height": 36,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 386,
+            "y": 289
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 39,
+          "height": 39,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 384,
+            "y": 287
+          }
+        }
+      }
+    },
+    {
+      "id": 1761815258061,
+      "type": "element",
+      "position": {
+        "x": 370,
+        "y": 426
+      },
+      "image": "/images/element-fon_085.png",
+      "width": 40,
+      "height": 40,
+      "originalWidth": 64,
+      "originalHeight": 64,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/element-fon_085.png",
+          "width": 40,
+          "height": 40,
+          "originalWidth": 64,
+          "originalHeight": 64,
+          "rotation": 0,
+          "position": {
+            "x": 370,
+            "y": 426
+          }
+        },
+        "teal": {
+          "image": "/images/element-fon_087.png",
+          "width": 46,
+          "height": 46,
+          "originalWidth": 66,
+          "originalHeight": 66,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        },
+        "champagne": {
+          "image": "/images/element-fon_090.png",
+          "width": 46,
+          "height": 46,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        },
+        "cake": {
+          "image": "/images/element-fon_090.png",
+          "width": 46,
+          "height": 46,
+          "originalWidth": 79,
+          "originalHeight": 79,
+          "rotation": 0,
+          "position": {
+            "x": 367,
+            "y": 423
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221252270,
+      "type": "image",
+      "position": {
+        "x": -30,
+        "y": 116
+      },
+      "isFlipped": false,
+      "image": "{{ITEM_IMAGE}}",
+      "isProduct": true,
+      "width": 462,
+      "height": 462,
+      "originalWidth": 400,
+      "originalHeight": 400
+    },
+    {
+      "id": 1761815476718,
+      "type": "element",
+      "position": {
+        "x": 19,
+        "y": 34
+      },
+      "image": "/images/title_15.png",
+      "width": 413,
+      "height": 73,
+      "originalWidth": 796,
+      "originalHeight": 140,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/title_15.png",
+          "width": 413,
+          "height": 73,
+          "originalWidth": 796,
+          "originalHeight": 140,
+          "rotation": 0,
+          "position": {
+            "x": 19,
+            "y": 34
+          }
+        },
+        "teal": {
+          "image": "/images/title_18.png",
+          "width": 414,
+          "height": 73,
+          "originalWidth": 796,
+          "originalHeight": 140,
+          "rotation": 0,
+          "position": {
+            "x": 19,
+            "y": 34
+          }
+        },
+        "champagne": {
+          "image": "/images/title_21.png",
+          "width": 414,
+          "height": 73,
+          "originalWidth": 796,
+          "originalHeight": 140,
+          "rotation": 0,
+          "position": {
+            "x": 19,
+            "y": 34
+          }
+        },
+        "cake": {
+          "image": "/images/title_24.png",
+          "width": 414,
+          "height": 73,
+          "originalWidth": 796,
+          "originalHeight": 140,
+          "rotation": 0,
+          "position": {
+            "x": 19,
+            "y": 34
+          }
+        }
+      }
+    },
+    {
+      "id": 1761814595176,
+      "type": "element",
+      "position": {
+        "x": 312,
+        "y": 119
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 119
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 312,
+            "y": 118
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_034.png",
+          "width": 142,
+          "height": 124,
+          "originalWidth": 306,
+          "originalHeight": 267,
+          "rotation": 0,
+          "position": {
+            "x": 305,
+            "y": 128.5
+          }
+        }
+      }
+    },
+    {
+      "id": 1744734115163,
+      "type": "text",
+      "position": {
+        "x": 360,
+        "y": 197
+      },
+      "text": "шт",
+      "fontSize": 32,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "width": 38,
+      "height": 29,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1744221504337,
+      "type": "text",
+      "position": {
+        "x": 334,
+        "y": 150
+      },
+      "text": "{{MULTIPLICITY}}",
+      "fontSize": 59,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 88,
+      "height": 51,
+      "image": null,
+      "rotation": 0
+    },
+    {
+      "id": 1761814842249,
+      "type": "element",
+      "position": {
+        "x": 14,
+        "y": 382
+      },
+      "image": "/images/bubbles_11_028.png",
+      "width": 127,
+      "height": 144,
+      "originalWidth": 248,
+      "originalHeight": 282,
+      "isFlipped": false,
+      "rotation": 0,
+      "styles": {
+        "default": {
+          "image": "/images/bubbles_11_028.png",
+          "width": 127,
+          "height": 144,
+          "originalWidth": 248,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 382
+          }
+        },
+        "teal": {
+          "image": "/images/bubbles_11_029.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 383
+          }
+        },
+        "champagne": {
+          "image": "/images/bubbles_11_030.png",
+          "width": 128,
+          "height": 145,
+          "originalWidth": 249,
+          "originalHeight": 282,
+          "rotation": 0,
+          "position": {
+            "x": 14,
+            "y": 383
+          }
+        },
+        "cake": {
+          "image": "/images/bubbles_11_034.png",
+          "width": 142,
+          "height": 124,
+          "originalWidth": 306,
+          "originalHeight": 267,
+          "rotation": 0,
+          "position": {
+            "x": 5,
+            "y": 387.5
+          }
+        }
+      }
+    },
+    {
+      "id": 1744221657496,
+      "type": "text",
+      "position": {
+        "x": 34,
+        "y": 430
+      },
+      "text": "{{SIZE}}",
+      "fontSize": 42,
+      "color": "#000000",
+      "fontFamily": "Cartonsix NC",
+      "textAlign": "center",
+      "width": 86,
+      "height": 42,
+      "image": null,
+      "rotation": 0,
+      "fontWeight": "normal"
+    }
+  ]
+]
