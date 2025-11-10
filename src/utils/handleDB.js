@@ -12,6 +12,20 @@ db.version(1).stores({
   users: '++id, login, email, passwordHash, createdAt, lastLogin, isActive' // Добавляем данные пользователя
 });
 
+db.version(2).stores({
+  designs: 'code',
+  collage: 'code', 
+  history: 'code',
+  products: 'code',
+  slides: 'code',
+  users: '++id, login, email, passwordHash, createdAt, lastLogin, isActive, synced' // добавляем synced
+}).upgrade(tx => {
+  // Добавляем поле synced = false для всех существующих пользователей
+  return tx.table('users').toCollection().modify(user => {
+    user.synced = false;
+  });
+});
+
 // Общий метод для очистки таблицы
 const clearTable = async (table) => {
   try {
@@ -107,6 +121,30 @@ export const usersDB = {
     } catch (error) {
       console.error('Error deactivating user:', error);
       throw error;
+    }
+  },
+
+  /**
+   * Получить флаг синхронизации пользователя
+   */
+  async getSyncFlag(userId) {
+    try {
+      const user = await db.users.get(userId);
+      return user?.synced || false;
+    } catch (error) {
+      console.error('Error getting sync flag:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Установить флаг синхронизации пользователя
+   */
+  async setSyncFlag(userId, synced) {
+    try {
+      await db.users.update(userId, { synced });
+    } catch (error) {
+      console.error('Error setting sync flag:', error);
     }
   }
 };

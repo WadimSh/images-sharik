@@ -346,6 +346,8 @@ export const Generator = () => {
             return { ...el, color: newColor, gradient: null };
           } else if (el.type === 'line') {
             return { ...el, color: newColor };
+          } else if (el.type === 'background') {
+            return { ...el, color: newColor, gradient: null };
           }
         }
         return el;

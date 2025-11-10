@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { usersDB } from '../../utils/handleDB';
+import { syncUserToBackend } from '../../services/temporaryService';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
 import { LanguageContext } from "../../contexts/contextLanguage";
 import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
@@ -64,6 +65,33 @@ export const SignIn = () => {
         return;
       }
 
+      // Проверяем флаг синхронизации конкретного пользователя
+      const isUserSynced = await usersDB.getSyncFlag(user.id);
+      
+      // Если флага нет - отправляем данные на сервер
+      if (!isUserSynced) {
+        try {
+          // Берем данные пользователя из базы
+          const userData = {
+            username: user.login,
+            email: user.email,
+            password: formData.password // используем введенный пароль
+          };
+
+          // Отправляем на сервер
+          await syncUserToBackend(userData);
+          
+          // Если успешно - выставляем флаг для этого пользователя
+          await usersDB.setSyncFlag(user.id, true);
+          console.log('User data synced to backend successfully');
+          
+        } catch (syncError) {
+          // Если ошибка - просто логируем и продолжаем работу
+          console.warn('Failed to sync user to backend, continuing with local auth:', syncError);
+          // НЕ блокируем пользователя, продолжаем как обычно
+        }
+      }
+
       // Обновляем время последнего входа
       await usersDB.update(user.id, { lastLogin: new Date() });
 
@@ -79,7 +107,7 @@ export const SignIn = () => {
       // Перенаправляем на главную страницу через 1.5 секунды
       setTimeout(() => {
         navigate('/');
-      }, 1500);
+      }, 1000);
 
     } catch (error) {
       console.error('Error when logging in:', error);
