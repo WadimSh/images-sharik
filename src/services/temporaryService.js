@@ -1,6 +1,8 @@
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://mp.sharik.ru';
+
 export const syncUserToBackend = async (userData) => {
   try {
-    const response = await fetch('/api/simple-user/create', {
+    const response = await fetch(`${API_BASE_URL}/api/users/simple`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
