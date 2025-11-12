@@ -2,7 +2,8 @@ import { useMemo } from "react";
 
 export const CollagePreview = ({ 
   initialElements,
-  onItemClick
+  onItemClick,
+  isGrid
 }) => {
   const selectedItems = useMemo(() => {
     return initialElements
@@ -33,7 +34,14 @@ export const CollagePreview = ({
   }, [initialElements]);
 
   return (
-    <div className="collage-preview-grid">
+    <div 
+      className="collage-preview-grid"
+      style={{ 
+      flexDirection: isGrid > 600 ? 'row' : 'column',
+      paddingTop: isGrid > 600 ? '8px' : '0px',
+      paddingLeft: isGrid > 600 ? '8px' : '0px',
+    }}
+    >
       {selectedItems.map((item) => {
                 
         return (

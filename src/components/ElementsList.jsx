@@ -11,7 +11,6 @@ import { RxBorderWidth } from "react-icons/rx";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { GrTextAlignLeft, GrTextAlignCenter, GrTextAlignRight } from "react-icons/gr";
-import { BsSnow2 } from "react-icons/bs";
 
 import { hexToRgba } from "../utils/hexToRgba";
 import { DraggableElementItem } from './DraggableElemetItem';

@@ -173,7 +173,8 @@
     "generatorMessageInput": "Drag and drop an image here",
     "templateMessageCreating": "To create your template, simply rearrange cards, remove unnecessary ones or add new layouts.",
     "templateMessageStarted": "To create a template, you need to add several layouts. Start by clicking the button.",
-    "templateStartedButton": "Add layouts"
+    "templateStartedButton": "Add layouts",
+    "canvasSizeLabel": "Canvas Size:"
   },
   "ui": {
     "ru": "Russian",

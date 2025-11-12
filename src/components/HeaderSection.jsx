@@ -28,7 +28,8 @@ export const HeaderSection = ({
   handleCreateTemplate,
   handleCreateCollageTemple,
   showBlindZones,
-  setShowBlindZones
+  setShowBlindZones,
+  sizeLabel
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -170,7 +171,7 @@ export const HeaderSection = ({
       ].join('');
 
       // Формирование имени файла
-      const fileName = `${baseCode}_${marketplace}_${slideType}_900x1200_${datePart}_${timePart}.png`;
+      const fileName = `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.png`;
 
       // Получаем ключ для хранилища
       const sessionKey = slideNumber ? `design-${id}` : 'design-collage';

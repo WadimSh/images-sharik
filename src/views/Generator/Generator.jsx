@@ -19,6 +19,7 @@ import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 import { CollageTempleModal } from '../../components/CollageTempleModal';
 import { BlindZones } from '../../components/BlindZones';
+import { CanvasSizeSelector, SIZE_PRESETS_BY_MARKETPLACE } from '../../components/CanvasSizeSelector';
 import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
@@ -130,6 +131,13 @@ export const Generator = () => {
   });
   // Состояние для отображения слепых зон
   const [showBlindZones, setShowBlindZones] = useState(false);
+  const [containerSize, setContainerSize] = useState(() => {
+    // Получаем размеры по умолчанию для текущего маркетплейса
+    const defaultSizes = SIZE_PRESETS_BY_MARKETPLACE[marketplace] || SIZE_PRESETS_BY_MARKETPLACE.WB;
+    return defaultSizes[0];
+  });
+
+  console.log(containerSize)
   
   const handleZoomIn = () => {
     setZoom(prev => ({
@@ -154,6 +162,11 @@ export const Generator = () => {
       setCurrentBorderElementId(null);
     };
   }, []);
+
+  // Обработчик изменения размера холста
+  const handleCanvasSizeChange = (newSize) => {
+    setContainerSize(newSize);
+  };
 
   // Обработка горячих клавиш зума
   useEffect(() => {
@@ -1282,6 +1295,7 @@ export const Generator = () => {
         handleCreateCollageTemple={handleCreateCollageTemple}
         showBlindZones={showBlindZones}
         setShowBlindZones={setShowBlindZones}
+        sizeLabel={containerSize.fileName}
       />
       <div className="content-wrapper">
         {(!isCollageMode && initialMetaDateElement !== null) && (
@@ -1290,17 +1304,25 @@ export const Generator = () => {
           />
         )}
         
-        <div className='design-area'>
+        <div 
+          className='design-area'
+          style={{ 
+            flexDirection: containerSize.width > 600 ? 'column-reverse' : 'row',
+            justifyContent: containerSize.width > 600 ? 'center' : 'none',
+          }}
+        >
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
               elements={elements}
               handleImageSelect={handleImageSelect}
+              isGrid={containerSize.width}
             />
           ) : (
             <CollagePreview
               initialElements={initialCollage} // Передаем исходные элементы
               onItemClick={handleProductSelect}
+              isGrid={containerSize.width}
             />
           )}
           
@@ -1308,6 +1330,10 @@ export const Generator = () => {
           <div 
             ref={captureRef} 
             className="design-container"
+            style={{ 
+              width: `${containerSize.width}px`, 
+              height: `${containerSize.height}px` 
+            }}
             onClick={(e) => {
               // Проверяем, не происходит ли клик внутри панели шрифтов
               const fontControlsWrapper = document.querySelector('.font-controls-wrapper');
@@ -1648,19 +1674,24 @@ export const Generator = () => {
           </div>
           </div>
         </div> 
-          <div style={{ marginTop: 'auto' }}>
-            <ZoomControls 
-              zoomLevel={zoom.level}
-              onZoomIn={handleZoomIn}
-              onZoomOut={handleZoomOut}
-              onReset={handleResetZoom}
-              minZoom={zoom.min}
-              maxZoom={zoom.max}
-              layout = 'vertical'
-              //showPercentage={false}
-            />
-          </div>
+        <div style={{ position: 'absolute', bottom: '0', right: '400px' }}>
+          <ZoomControls 
+            zoomLevel={zoom.level}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onReset={handleResetZoom}
+            minZoom={zoom.min}
+            maxZoom={zoom.max}
+            layout = 'vertical'
+            //showPercentage={false}
+          />
+        </div>
         <div>
+          <CanvasSizeSelector 
+            currentSize={containerSize}
+            onSizeChange={handleCanvasSizeChange}
+          />
+
           <ElementToolbar 
             onAddElement={handleAddElement} 
             isBackground={elements[0]?.type === 'background'}

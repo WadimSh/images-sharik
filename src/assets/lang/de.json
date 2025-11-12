@@ -173,7 +173,8 @@
     "generatorMessageInput": "Bild hierher ziehen",
     "templateMessageCreating": "Um Ihre Vorlage zu erstellen, ordnen Sie einfach Karten neu an, entfernen Sie unnötige oder fügen Sie neue Layouts hinzu.",
     "templateMessageStarted": "Um eine Vorlage zu erstellen, müssen Sie mehrere Layouts hinzufügen. Beginnen Sie mit einem Klick auf die Schaltfläche.",
-    "templateStartedButton": "Layouts hinzufügen"
+    "templateStartedButton": "Layouts hinzufügen",
+    "canvasSizeLabel": "Leinwand-Größe:"
   },
   "ui": {
     "ru": "Russisch",

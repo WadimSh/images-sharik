@@ -190,6 +190,7 @@
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
+  position: relative;
 }
 
 
@@ -202,8 +203,6 @@
 
 .design-container {
   position: relative;
-  width: 450px;
-  height: 600px;
   margin: 0 auto;
   background-color: #fff;
   background-image: radial-gradient(circle at 5px 5px, #e0e0e0 1px, transparent 1px);
@@ -462,7 +461,7 @@
 /* --- */
 .meta-info {
   width: 300px;
-  height: 87vh;
+  height: 82vh;
   padding: 20px;
   background: #f5f5f5;
   border-radius: 8px;
@@ -555,7 +554,7 @@
 /* --- */
 .sidebar {
   width: 350px;
-  height: 80vh;
+  height: 70vh;
   background: #f5f5f5;
   padding: 15px;
   border-radius: 8px;
@@ -591,7 +590,7 @@
 }
 
 .elements-list {
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   overflow-y: auto;
 }
 
@@ -1509,8 +1508,6 @@
   flex-direction: column;
   gap: 8px;
   margin: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .preview-item {
@@ -2032,4 +2029,20 @@
   gap: 10px;
   margin-right: 20px;
   z-index: 100;
+}
+
+.canvas-size-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 10px;
+  margin-bottom: 5px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  height: 52px;
+}
+
+.canvas-size-dropdown {
+  max-width: 160px;
 }

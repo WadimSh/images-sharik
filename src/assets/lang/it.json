@@ -173,7 +173,8 @@
     "generatorMessageInput": "Trascina un'immagine qui",
     "templateMessageCreating": "Per creare il tuo modello, riorganizza le carte, rimuovi quelle non necessarie o aggiungi nuovi layout.",
     "templateMessageStarted": "Per creare un modello, devi aggiungere diversi layout. Inizia cliccando il pulsante.",
-    "templateStartedButton": "Aggiungi layout"
+    "templateStartedButton": "Aggiungi layout",
+    "canvasSizeLabel": "Dimensione della Tela:"
   },
   "ui": {
     "ru": "Russo",
