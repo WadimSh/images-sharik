@@ -285,9 +285,6 @@
   "product": {
     "articlePlaceholder": "Укажите код товара в виде XXXX-XXXX",
     "imageAlt": "Изображение товара",
-    "notWB": "нет на WB",
-    "notOZ": "нет на OZON",
-    "notAM": "нет на AMAZON",
     "notData": "нет данных"
   }, 
   "auth": {

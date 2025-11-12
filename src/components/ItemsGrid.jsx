@@ -154,7 +154,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       return;
     }
     const wbCode = getCode(baseCode, "WB");
-    if (wbCode !== t('product.notWB')) {
+    if (wbCode !== baseCode) {
       const volLength = wbCode.length === 8 ? 3 : 4;
       const partLength = wbCode.length === 8 ? 5 : 6;
     
@@ -827,7 +827,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
   const renderTemplateControls = (baseCode, currentTemplate) => {
     const wbCode = getCode(baseCode, "WB");
     const ozCode = getCode(baseCode, "OZ");
-
+    console.log(ozCode)
     const template = templates[currentTemplate] || [];
     const availableStyles = getAvailableStyleVariants(template);
     const currentStyle = productMetas[baseCode]?.styleVariant || 'default';
@@ -877,8 +877,8 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
         </div>
         
         <div className="template-selector-controls">
-          {(wbCode !== t('product.notWB') || ozCode !== t('product.notOZ')) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
-          {wbCode !== t('product.notWB') && <a 
+          {(wbCode !== baseCode || ozCode !== baseCode) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
+          {wbCode !== baseCode && <a 
             className="template-selector-control"
             href={`https://www.wildberries.ru/catalog/${wbCode}/detail.aspx`}
             target="_blank"
@@ -900,7 +900,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
               </defs>
             </svg>
           </a>}
-          {ozCode !== t('product.notOZ') && <a 
+          {ozCode !== baseCode && <a 
             className="template-selector-control"
             href={`https://www.ozon.ru/product/${ozCode}`}
             target="_blank"

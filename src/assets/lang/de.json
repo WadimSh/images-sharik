@@ -285,9 +285,6 @@
   "product": {
     "articlePlaceholder": "Produktcode im Format XXXX-XXXX eingeben",
     "imageAlt": "Produktbild",
-    "notWB": "nicht auf WB",
-    "notOZ": "nicht auf OZON",
-    "notAM": "nicht auf AMAZON",
     "notData": "keine Daten"
   }, 
   "auth": {

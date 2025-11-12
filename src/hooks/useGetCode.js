@@ -8,11 +8,11 @@ export const useGetCode = () => {
 
   const getCode = (key, type) => {
     if (type === 'WB') {
-      return codeMappingWB[key] || t('product.notWB');
+      return codeMappingWB[key] || key;
     } else if (type === 'OZ') {
-      return codeMappingOZ[key] || t('product.notOZ');
+      return codeMappingOZ[key] || key;
     } else if (type === 'AM') {
-      return t('product.notAM');
+      return key;
     }
     return t('product.notData');
   };
