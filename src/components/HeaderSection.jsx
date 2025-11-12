@@ -54,9 +54,12 @@ export const HeaderSection = ({
     const slide = slideNumber || 'collage'; // По умолчанию первый слайд
     
     if (slide === 'collage') {
-      return marketplace === 'WB' 
-        ? t('header.wbCollage') 
-        : t('header.ozonCollage');
+      const collageTitles = {
+        'WB': t('header.wbCollage'),
+        'OZ': t('header.ozonCollage'),
+        'AM': t('header.amazonCollage')
+      };
+      return collageTitles[marketplace] || t('header.wbCollage');
     }
 
     if (slide === '1') {

@@ -18,6 +18,7 @@
     "downloadDesign": "Скачать дизайн",
     "wbCollage": "Коллаж для WB",
     "ozonCollage": "Коллаж для OZON",
+    "amazonCollage": "Коллаж для AMAZON",
     "mainSlide": "Основной слайд",
     "slideNumber": "Слайд",
     "addLayout": "Добавить макет",
@@ -285,6 +286,7 @@
     "imageAlt": "Изображение товара",
     "notWB": "нет на WB",
     "notOZ": "нет на OZON",
+    "notAM": "нет на AMAZON",
     "notData": "нет данных"
   }, 
   "auth": {

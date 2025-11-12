@@ -18,6 +18,7 @@
     "downloadDesign": "Scarica design",
     "wbCollage": "Collage per WB",
     "ozonCollage": "Collage per OZON",
+    "amazonCollage": "Collage per AMAZON",
     "mainSlide": "Slide principale",
     "slideNumber": "Slide",
     "addLayout": "Aggiungi layout",
@@ -285,6 +286,7 @@
     "imageAlt": "Immagine prodotto",
     "notWB": "non su WB",
     "notOZ": "non su OZON",
+    "notAM": "non su AMAZON",
     "notData": "nessun dato"
   }, 
   "auth": {

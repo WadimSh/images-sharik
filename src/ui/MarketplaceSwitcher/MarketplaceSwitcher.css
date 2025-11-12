@@ -5,7 +5,7 @@
   border-radius: 12px;
   padding: 4px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 180px;
+  width: 270px; /* Увеличиваем ширину для трех опций */
   height: 38px;
 }
 
@@ -16,19 +16,25 @@
   border-radius: 10px;
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   z-index: 1;
-  width: 50%;
+  width: calc(33.333% - 6px); /* 1/3 ширины минус отступы */
 }
 
 .switch.wb-active {
   left: 4px;
-  background: linear-gradient(35deg,  #7D256F 0%, #8D297F 25%, #BC3D96 45%, #EC238D 100%);
+  background: linear-gradient(35deg, #7D256F 0%, #8D297F 25%, #BC3D96 45%, #EC238D 100%);
   box-shadow: 0 4px 8px rgba(125, 60, 242, 0.2);
 }
 
 .switch.oz-active {
-  left: calc(50% - 4px);
+  left: calc(33.333% + 2px);
   background: linear-gradient(135deg, #005bff 0%, #0481CB 100%);
   box-shadow: 0 4px 8px rgba(255, 154, 25, 0.2);
+}
+
+.switch.am-active {
+  left: calc(66.666% + 0px);
+  background: linear-gradient(135deg, #ff9900 0%, #ff6b00 100%);
+  box-shadow: 0 4px 8px rgba(255, 107, 0, 0.2);
 }
 
 .option {
@@ -42,7 +48,7 @@
   cursor: pointer;
   transition: color 0.3s ease;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 16px; /* Немного уменьшаем шрифт для трех опций */
   color: #6c757d;
 }
 

@@ -334,8 +334,8 @@ export const Gallery = () => {
     }
   };
 
-   // Функция для парсинга и форматирования заголовка
-   const parseDesignTitle = (title) => {
+  // Функция для парсинга и форматирования заголовка
+  const parseDesignTitle = (title) => {
     const parts = title.split('_');
     
     // Проверяем минимальное количество частей
@@ -406,7 +406,7 @@ export const Gallery = () => {
     return {
       articles,
       marketplace,
-      marketplaceName: marketplace === 'WB' ? 'Wildberries' : marketplace === 'OZ' ? 'Ozon' : marketplace,
+      marketplaceName: marketplace === 'WB' ? 'Wildberries' : marketplace === 'OZ' ? 'Ozon' : marketplace === 'AM' ? 'Amazon' : marketplace,
       designType, // Уже определили как "Коллаж" или "Дизайн"
       dimensions,
       date: formattedDate,

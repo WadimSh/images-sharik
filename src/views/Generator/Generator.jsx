@@ -1256,6 +1256,9 @@ export const Generator = () => {
       { id: 'zone2', x: 4, y: 542, width: 206, height: 54 },
       { id: 'zone3', x: 4, y: 4, width: 56, height: 56 },
       { id: 'zone4', x: 260, y: 452, width: 180, height: 38 }
+    ],
+    'AM': [
+      { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
     ]
   }
   

@@ -11,6 +11,8 @@ export const useGetCode = () => {
       return codeMappingWB[key] || t('product.notWB');
     } else if (type === 'OZ') {
       return codeMappingOZ[key] || t('product.notOZ');
+    } else if (type === 'AM') {
+      return t('product.notAM');
     }
     return t('product.notData');
   };
