@@ -19,7 +19,7 @@ import { FontControls } from '../../components/FontControls';
 import { CollagePreview } from '../../components/CollagePreview';
 import { CollageTempleModal } from '../../components/CollageTempleModal';
 import { BlindZones } from '../../components/BlindZones';
-import { CanvasSizeSelector, SIZE_PRESETS_BY_MARKETPLACE } from '../../components/CanvasSizeSelector';
+import { CanvasSizeSelector } from '../../components/CanvasSizeSelector';
 import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
@@ -29,6 +29,7 @@ import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
 import { slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
 
 export const Generator = () => {
   const { id } = useParams();
@@ -1387,6 +1388,7 @@ export const Generator = () => {
                   return (
                     <BackgroundElement 
                       element={element}
+                      containerSize={containerSize}
                       key={element.id}
                     />
                   );

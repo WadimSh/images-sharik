@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { hexToRgba } from '../utils/hexToRgba';
 
-export const BackgroundElement = ({ element }) => {
+export const BackgroundElement = ({ element, containerSize }) => {
   const containerRef = useRef(null);
 
   // Стили для основного div (цвет/градиент)
@@ -29,10 +29,10 @@ export const BackgroundElement = ({ element }) => {
   // Стили для контейнера
   const getContainerStyle = () => ({
     position: 'relative',
-    top: -1,
-    left: -1,
-    width: `${element.width}px`,
-    height: `${element.height}px`,
+    top: 0,
+    left: 0,
+    width: `${containerSize.width}px`,
+    height: `${containerSize.height}px`,
     border: 'none',
     overflow: 'hidden'
   });
@@ -44,7 +44,7 @@ export const BackgroundElement = ({ element }) => {
     left: 0,
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'fill',
     objectPosition: 'center',
     display: element.backgroundImage ? 'block' : 'none',
 
