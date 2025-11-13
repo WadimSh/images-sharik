@@ -48,6 +48,8 @@ export const Generator = () => {
     ? 'design-collage' 
     : `design-${id}`;
   const savedDesign = isCollageMode ? localStorage.getItem(storageKey) : sessionStorage.getItem(storageKey);
+  const sizeCanvas = isCollageMode ? localStorage.getItem('size') : sessionStorage.getItem('size');
+  const parsedSize = JSON.parse(sizeCanvas);
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
   // Добавляем размеры по умолчанию для старых данных
@@ -75,6 +77,11 @@ export const Generator = () => {
 
   const { marketplace } = useMarketplace();
 
+  const defaultSizes = SIZE_PRESETS_BY_MARKETPLACE[marketplace] || SIZE_PRESETS_BY_MARKETPLACE.WB;
+  const foundPreset = SIZE_PRESETS_BY_MARKETPLACE[marketplace].find(preset => 
+    preset.fileName === parsedSize
+  );
+  
   const captureRef = useRef(null);
   const contextMenuRef = useRef(null);
   const colorInputRef = useRef(null);
@@ -133,13 +140,9 @@ export const Generator = () => {
   // Состояние для отображения слепых зон
   const [showBlindZones, setShowBlindZones] = useState(false);
   const [containerSize, setContainerSize] = useState(() => {
-    // Получаем размеры по умолчанию для текущего маркетплейса
-    const defaultSizes = SIZE_PRESETS_BY_MARKETPLACE[marketplace] || SIZE_PRESETS_BY_MARKETPLACE.WB;
-    return defaultSizes[0];
+    return foundPreset || defaultSizes[0];
   });
 
-  console.log(containerSize)
-  
   const handleZoomIn = () => {
     setZoom(prev => ({
       ...prev,
@@ -166,7 +169,7 @@ export const Generator = () => {
 
   // Обработчик изменения размера холста
   const handleCanvasSizeChange = (newSize) => {
-    setContainerSize(newSize);
+    setContainerSize({...newSize});
   };
 
   // Обработка горячих клавиш зума
@@ -231,7 +234,8 @@ export const Generator = () => {
           try {
             await slidesDB.put({ 
               code: `design-${id}`, 
-              data: elements
+              data: elements,
+              size: containerSize.fileName
             });
             sessionStorage.setItem(storageKey, JSON.stringify(elements));
           } catch (error) {
@@ -256,7 +260,7 @@ export const Generator = () => {
     };
   
     saveData();
-  }, [elements, storageKey]);
+  }, [elements, storageKey, containerSize]);
 
   // Добавляем начальный текстовый элемент с ID
   useEffect(() => {

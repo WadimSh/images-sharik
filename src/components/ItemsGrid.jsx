@@ -133,10 +133,16 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       await Promise.all(items.map(async (item) => {
         try {
           const slide = await slidesDB.get(`design-${item}`);
-          designs[item] = slide?.data || null;
+          designs[item] = {
+            data: slide?.data || null,
+            size: slide?.size || null // Получаем размер из базы, если есть
+          };
         } catch (error) {
           console.error(`Error loading design for ${item}:`, error);
-          designs[item] = null;
+          designs[item] = {
+            data: null,
+            size: null
+          };
         }
       }));
 
@@ -253,12 +259,15 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
 
   // Функция для получения отфильтрованных элементов для превью
   const getFilteredDesignForPreview = (designData, baseCode) => {
-    if (!designData || !Array.isArray(designData)) return [];
+    if (!designData || !designData.data || !Array.isArray(designData)) return [];
     
     const productMeta = productMetas[baseCode] || {};
     const currentStyle = productMeta.styleVariant || 'default';
     
-    return filterElementsByStyle(designData, currentStyle);
+    return {
+      elements: filterElementsByStyle(designData.data, currentStyle),
+      size: designData.size // Просто передаем существующий размер
+    };
   };
 
   // Инициализация и обновление порядка базовых кодов
@@ -376,7 +385,10 @@ const handleCreateNewDesign = async (baseCode) => {
     // Обновляем локальное состояние дизайнов
     setDesignsData(prev => ({
       ...prev,
-      [newDesignKey]: newDesign
+      [newDesignKey]: {
+        data: newDesign,
+        size: undefined // Не устанавливаем размер
+      }
     }));
     
   } catch (error) {
@@ -432,6 +444,7 @@ const handleTemplateChange = async (baseCode, templateKey) => {
       if (item.startsWith(`${baseCode}_`)) {
         const slide = await slidesDB.get(`design-${item}`);
         const currentDesign = slide?.data || [];
+        const currentSize = slide?.size;
 
         const validImages = currentDesign.filter(el => 
           el.type === 'image' && el.image?.startsWith('https://')
@@ -507,7 +520,11 @@ const handleTemplateChange = async (baseCode, templateKey) => {
 
         await slidesDB.update(`design-${item}`, { data: newDesign });
 
-        return { [item]: newDesign };
+        return { [item]: {
+            data: newDesign,
+            size: currentSize // Сохраняем существующий размер
+          } 
+        };
       }
       return null;
     });
@@ -554,6 +571,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
       if (item.startsWith(`${baseCode}_`)) {
         const slide = await slidesDB.get(`design-${item}`);
         const currentDesign = slide?.data || [];
+        const currentSize = slide?.size; // Получаем текущий размер, но не меняем его
 
         const validImages = currentDesign.filter(el =>
           el.type === 'image' && el.image?.startsWith('https://')
@@ -631,7 +649,11 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
         await slidesDB.update(`design-${item}`, { data: newDesign });
 
-        return { [item]: newDesign };
+        return { [item]: {
+            data: newDesign,
+            size: currentSize // Сохраняем существующий размер
+          }
+        };
       }
       return null;
     });
@@ -1010,9 +1032,9 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
                     
                     <div className="item-content">
                       {filteredDesign && filteredDesign.length > 0 ? (
-                        <PreviewDesign elements={filteredDesign} />
+                        <PreviewDesign elements={filteredDesign.elements} size={filteredDesign.size} />
                       ) : designData ? (
-                        <PreviewDesign elements={designData} />
+                        <PreviewDesign elements={designData.data} size={designData.size} />
                       ) : (
                         <div className="loader-container">
                           <div className="loader"></div>

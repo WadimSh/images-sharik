@@ -122,20 +122,20 @@ export const Gallery = () => {
   };
 
   // Функция извлечения данных для построения структуры данных для страницы генерации
-  const handleItemClick = async (key) => {
+  const handleItemClick = async (design) => {
     // Если включен режим выбора, обрабатываем клик как выбор элемента
     if (isSelectionMode) {
-      toggleItemSelection(key, { stopPropagation: () => {} });
+      toggleItemSelection(design.key, { stopPropagation: () => {} });
       return;
     }
 
-    setLoadingItemKey(key); // Устанавливаем ключ загружаемой карточки
+    setLoadingItemKey(design.key); // Устанавливаем ключ загружаемой карточки
     
     // Проверяем, является ли дизайн коллажем
-    if (key.includes('_collage')) {
+    if (design.key.includes('_collage')) {
       try {
         // Получаем данные дизайна из таблицы history
-        const historyItem = await historyDB.get(key);
+        const historyItem = await historyDB.get(design.key);
             
         if (!historyItem) {
             throw new Error('The design was not found in the history');
@@ -143,9 +143,9 @@ export const Gallery = () => {
         
         // Сохраняем основной объект коллажа
         localStorage.setItem('design-collage', JSON.stringify(historyItem.data));
-        
+        localStorage.setItem('size', JSON.stringify(design.size))
         // Извлекаем артикулы из ключа
-        const articles = extractArticlesFromKey(key);
+        const articles = extractArticlesFromKey(design.key);
         
         // Сохраняем массив артикулов
         localStorage.setItem('collage-articles', JSON.stringify(articles));
@@ -163,21 +163,21 @@ export const Gallery = () => {
     // Обработка обычных дизайнов (не коллажей)
     try {
       // Получаем данные дизайна из таблицы history
-      const historyItem = await historyDB.get(key);
+      const historyItem = await historyDB.get(design.key);
             
       if (!historyItem) {
           throw new Error('The design was not found in the history');
       }
 
       // Извлекаем информацию о типе дизайна
-      const designInfo = extractDesignInfo(key);
+      const designInfo = extractDesignInfo(design.key);
 
       // Формируем ключ для sessionStorage
       const storageKey = `design-${designInfo.article}_${designInfo.slideNumber}`;
 
       // Сохраняем данные в sessionStorage
       sessionStorage.setItem(storageKey, JSON.stringify(historyItem.data));
-
+      sessionStorage.setItem('size', JSON.stringify(design.size))
       // Выполняем запросы последовательно с await
       const searchResponse = await fetch(
         `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${designInfo.article}`
@@ -299,9 +299,11 @@ export const Gallery = () => {
           const parts = item.code.split('_');
           let date = '';
           let time = '';
+          let size = ''
           
           // Ищем индекс части с датой (обычно это предпоследняя часть)
           if (parts.length >= 6) {
+            size = parts[parts.length - 3];
             date = parts[parts.length - 2];
             time = parts[parts.length - 1];
           }
@@ -319,7 +321,8 @@ export const Gallery = () => {
             key: item.code,
             data: item.data,
             title: item.code,
-            sortKey: `${sortableDate} ${sortableTime}` // Ключ для сортировки
+            sortKey: `${sortableDate} ${sortableTime}`, // Ключ для сортировки
+            size: size
           };
         })
         // Сортируем по убыванию (новые сначала)
@@ -475,7 +478,7 @@ export const Gallery = () => {
             const info = parseDesignTitle(design.title);
             const isSelected = selectedItems.has(design.key);
             const isHovered = hoveredItem === design.key;
-
+            
             return (
               <div 
                 key={design.key} 
@@ -490,8 +493,8 @@ export const Gallery = () => {
                   if (isSelectionMode) {
                     toggleItemSelection(design.key, e);
                   } else {
-                    marketplace !== info.marketplace && toggleMarketplace();
-                    handleItemClick(design.key);
+                    marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
+                    handleItemClick(design);
                   }
                 }}
                 role="button"
@@ -528,7 +531,7 @@ export const Gallery = () => {
                 )}
 
                 <div className="item-content">
-                  <PreviewDesign elements={design.data} />
+                  <PreviewDesign elements={design.data} size={design.size} />
 
                   {loadingItemKey === design.key && 
                     <div className="loader-container-gallery">

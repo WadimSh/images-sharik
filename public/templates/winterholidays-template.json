@@ -10,8 +10,8 @@
       "backgroundImage": "/images/fon-05-01.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1200,
       "originalImageWidth": 900,
       "styles": {
@@ -758,8 +758,8 @@
       "backgroundImage": "/images/fon-05-01.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1200,
       "originalImageWidth": 900,
       "styles": {
@@ -1440,8 +1440,8 @@
       "backgroundImage": "/images/fon-05-01.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1200,
       "originalImageWidth": 900,
       "styles": {
