@@ -17,6 +17,10 @@ export const HeaderSection = ({
   slideNumber,
   templates,
   setTemplates,
+  templateSize,
+  collageSize,
+  setTemplateSize,
+  setCollageSize,
   selectedTemplate,
   setSelectedTemplate,
   collageTemples,
@@ -111,11 +115,15 @@ export const HeaderSection = ({
     const template = templates[templateName];
     if (!template) return;
   
-    // Формируем имя файла
+    const templateSizeValue = templateSize[templateName] || '900x1200';
+
+    // Формируем имя файла с размером
     const fileName = templateName
       .toLowerCase()
       .replace(/\s+/g, '_')
-      .replace(/[^a-zа-яё0-9_-]/gi, '') + '.json';
+      .replace(/[^a-zа-яё0-9_-]/gi, '') 
+      + '_' + templateSizeValue // Добавляем размер через нижнее подчеркивание
+      + '.json';
   
     // Создаем JSON строку
     const json = JSON.stringify(template, null, 2);
@@ -248,42 +256,14 @@ export const HeaderSection = ({
     onExport: slideNumber ? handleExportTemplate : undefined,
     onDelete: slideNumber ? handleDeleteTemplate : handleDeleteCollageTemple,
     showExport: !!slideNumber,
-    placeholder: t('header.placeholder')
+    placeholder: t('header.placeholder'),
+    size: slideNumber ? templateSize : collageSize,
   };
 
   // Эффект для загрузки макетов при монтировании и изменении
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const savedLocalTemplates = JSON.parse(localStorage.getItem('templatesLocal') || '{}');
-        const hasLocalTemplates = Object.keys(savedLocalTemplates).length > 0;
-        if (hasLocalTemplates) {
-          try {
-            // Переносим каждый шаблон в базу
-            await Promise.all(
-              Object.entries(savedLocalTemplates).map(async ([name, data]) => {
-                try {
-                  // Проверяем, нет ли уже такого шаблона в базе
-                  const existing = await designsDB.get(name);
-                  if (!existing) {
-                    await designsDB.add({
-                      code: name,
-                      data: data,
-                    });
-                  }
-                } catch (e) {
-                  console.error(`Template migration error ${name}:`, e);
-                }
-              })
-            );
-            
-            // Очищаем localStorage после успешного переноса
-            localStorage.removeItem('templatesLocal');
-          } catch (migrationError) {
-            console.error('Template migration error:', migrationError);
-          }
-        }
-
         const designsFromDB = await designsDB.getAll();
         if (designsFromDB.length > 0) {
           const templatesObj = designsFromDB.reduce((acc, template) => {
@@ -291,6 +271,12 @@ export const HeaderSection = ({
             return acc;
           }, {});
           setTemplates(templatesObj);
+
+          const templatesSize = designsFromDB.reduce((acc, template) => {
+            acc[template.code] = template.size || '900x1200';
+            return acc;
+          }, {});
+          setTemplateSize(templatesSize);
         }
 
       } catch (error) {
@@ -304,36 +290,6 @@ export const HeaderSection = ({
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const savedLocalCollages = JSON.parse(localStorage.getItem('collagesLocal') || '{}');
-        const hasLocalCollages = Object.keys(savedLocalCollages).length > 0;
-
-        if (hasLocalCollages) {
-          try {
-            // Переносим каждый шаблон в базу
-            await Promise.all(
-              Object.entries(savedLocalCollages).map(async ([name, data]) => {
-                try {
-                  // Проверяем, нет ли уже такого шаблона в базе
-                  const existing = await collageDB.get(name);
-                  if (!existing) {
-                    await collageDB.add({
-                      code: name,
-                      elements: data,
-                    });
-                  }
-                } catch (e) {
-                  console.error(`Template migration error ${name}:`, e); 
-                }
-              })
-            );
-            
-            // Очищаем localStorage после успешного переноса
-            localStorage.removeItem('collagesLocal');
-          } catch (migrationError) {
-            console.error('Template migration error:', migrationError);
-          }
-        }
-
         const collagesFromDB = await collageDB.getAll();
         if (collagesFromDB.length > 0) {
           const collagesObj = collagesFromDB.reduce((acc, collage) => {
@@ -341,6 +297,12 @@ export const HeaderSection = ({
             return acc;
           }, {});
           setCollageTemples(collagesObj);
+
+          const templatesSize = collagesFromDB.reduce((acc, template) => {
+            acc[template.code] = template.size || '900x1200';
+            return acc;
+          }, {});
+          setCollageSize(templatesSize);
         }
       } catch (error) {
         console.error('Error loading layouts:', error);

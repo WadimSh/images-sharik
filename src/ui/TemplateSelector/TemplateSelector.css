@@ -83,6 +83,12 @@
   cursor: pointer;
 }
 
+.template-size {
+  color: darkgrey;
+  font-size: small;
+  margin-left: auto;
+}
+
 .template-buttons {
   display: flex;
   gap: 5px;

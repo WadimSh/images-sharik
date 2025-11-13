@@ -34,6 +34,9 @@ export const TemplateModal = ({
       const storageKey = `design-${id}`;
       const savedDesign = sessionStorage.getItem(storageKey);
       const currentDesign = savedDesign ? JSON.parse(savedDesign) : [];
+      
+      const savedSize = sessionStorage.getItem('size');
+      const currentSize = savedSize ? JSON.parse(savedSize) : '900x1200';
   
       const modifiedDesign = currentDesign.map(element => ({
         ...element,
@@ -48,7 +51,8 @@ export const TemplateModal = ({
         
         await designsDB.add({
           code: name,          // Имя шаблона как ключ
-          data: modifiedDesign // Сам дизайн
+          data: modifiedDesign, // Сам дизайн
+          size: currentSize
         });
 
         // Обновляем список шаблонов из базы

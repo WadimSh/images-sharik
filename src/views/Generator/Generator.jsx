@@ -49,7 +49,7 @@ export const Generator = () => {
     : `design-${id}`;
   const savedDesign = isCollageMode ? localStorage.getItem(storageKey) : sessionStorage.getItem(storageKey);
   const sizeCanvas = isCollageMode ? localStorage.getItem('size') : sessionStorage.getItem('size');
-  const parsedSize = JSON.parse(sizeCanvas);
+  const parsedSize = sizeCanvas ? JSON.parse(sizeCanvas) : '900x1200';
   const initialElements = savedDesign ? JSON.parse(savedDesign) : [];
 
   // Добавляем размеры по умолчанию для старых данных
@@ -78,9 +78,9 @@ export const Generator = () => {
   const { marketplace } = useMarketplace();
 
   const defaultSizes = SIZE_PRESETS_BY_MARKETPLACE[marketplace] || SIZE_PRESETS_BY_MARKETPLACE.WB;
-  const foundPreset = SIZE_PRESETS_BY_MARKETPLACE[marketplace].find(preset => 
+  const foundPreset = SIZE_PRESETS_BY_MARKETPLACE[marketplace]?.find(preset => 
     preset.fileName === parsedSize
-  );
+  ) || defaultSizes[0];
   
   const captureRef = useRef(null);
   const contextMenuRef = useRef(null);
@@ -112,6 +112,8 @@ export const Generator = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   // Состояния для модалки создания макетов коллажей
   const [isCollageTempleModalOpen, setIsCollageTempleModalOpen] = useState(false);
+  const [templateSize, setTemplateSize] = useState(null);
+  const [collageSize, setCollageSize] = useState(null);
   // Для работы с макетами коллажей
   const [collageTemples, setCollageTemples] = useState({});
   const [selectedCollageTemple, setSelectedCollageTemple] = useState('');
@@ -238,11 +240,13 @@ export const Generator = () => {
               size: containerSize.fileName
             });
             sessionStorage.setItem(storageKey, JSON.stringify(elements));
+            sessionStorage.setItem('size', JSON.stringify(containerSize.fileName));
           } catch (error) {
             console.error('Error saving the design:', error);
           }
         } else {
           localStorage.setItem(storageKey, JSON.stringify(elements));
+          localStorage.setItem('size', JSON.stringify(containerSize.fileName));
         }
       } else {
         // Удаляем данные
@@ -278,6 +282,7 @@ export const Generator = () => {
   // Функция для загрузки макетов
   const loadTemplate = (templateName) => {
     const template = templates[templateName];
+    const size = templateSize[templateName];
     
     if (!template) return;
 
@@ -292,12 +297,20 @@ export const Generator = () => {
     }));
 
     setElements(modifiedElements);
+    const newSize = SIZE_PRESETS_BY_MARKETPLACE[marketplace]?.find(preset => 
+      preset.fileName === size
+    ) || defaultSizes[0];
+    
+    setContainerSize({...newSize});
+
     sessionStorage.setItem(storageKey, JSON.stringify(modifiedElements));
+    sessionStorage.setItem('size', JSON.stringify(size));
   };
 
   const loadCollageTemplate = (templateName) => {
     const template = collageTemples[templateName];
-    
+    const size = collageSize[templateName];
+
     if (!template) return;
 
     // Получаем данные для подстановки
@@ -347,7 +360,13 @@ export const Generator = () => {
 
     // Обновляем состояние и сохраняем
     setElements(resultElements);
+    const newSize = SIZE_PRESETS_BY_MARKETPLACE[marketplace]?.find(preset => 
+      preset.fileName === size
+    ) || defaultSizes[0];
+    setContainerSize({...newSize});
+
     localStorage.setItem('design-collage', JSON.stringify(resultElements));
+    localStorage.setItem('size', JSON.stringify(size));
   };
 
   // Обработчик изменения цвета
@@ -1262,24 +1281,43 @@ export const Generator = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleCopy, handlePaste, handleDelete, selectedElementId, selectedElementIds, copiedElement, editingTextId]);
 
-  const Zone = {
-    'WB': [
-      { id: 'zone1', x: 4, y: 4, width: 92, height: 92 },
-      { id: 'zone2', x: 353, y: 4, width: 94, height: 94 },
-      { id: 'zone3', x: 4, y: 510, width: 248, height: 88 },
-      { id: 'zone4', x: 314, y: 532, width: 132, height: 64 }
-    ],
-    'OZ': [
-      { id: 'zone1', x: 312, y: 4, width: 132, height: 72 },
-      { id: 'zone2', x: 4, y: 542, width: 206, height: 54 },
-      { id: 'zone3', x: 4, y: 4, width: 56, height: 56 },
-      { id: 'zone4', x: 260, y: 452, width: 180, height: 38 }
-    ],
-    'AM': [
-      { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
-    ]
-  }
-  
+  const zonesBySize = {
+    '900x1200': {
+      'WB': [
+        { id: 'zone1', x: 4, y: 4, width: 92, height: 92 },
+        { id: 'zone2', x: 353, y: 4, width: 94, height: 94 },
+        { id: 'zone3', x: 4, y: 510, width: 248, height: 88 },
+        { id: 'zone4', x: 314, y: 532, width: 132, height: 64 }
+      ],
+      'OZ': [
+        { id: 'zone1', x: 312, y: 4, width: 132, height: 72 },
+        { id: 'zone2', x: 4, y: 542, width: 206, height: 54 },
+        { id: 'zone3', x: 4, y: 4, width: 56, height: 56 },
+        { id: 'zone4', x: 260, y: 452, width: 180, height: 38 }
+      ]
+    },
+    '1416x708': {
+      'OZ': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    },
+    '708x708': {
+      'OZ': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    },
+    '1200x1200': {
+      'AM': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    },
+    '400x400': {
+      'AM': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    }
+  };
+
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -1288,6 +1326,10 @@ export const Generator = () => {
         slideNumber={slideNumber}
         templates={templates}
         setTemplates={setTemplates}
+        templateSize={templateSize}
+        collageSize={collageSize}
+        setTemplateSize={setTemplateSize}
+        setCollageSize={setCollageSize}
         selectedTemplate={selectedTemplate}
         setSelectedTemplate={setSelectedTemplate}
         collageTemples={collageTemples}
@@ -1375,7 +1417,7 @@ export const Generator = () => {
 
             <BlindZones 
               show={showBlindZones}
-              zones={Zone[marketplace]}
+              zones={zonesBySize[containerSize.fileName]?.[marketplace] || zonesBySize['900x1200'][marketplace]}
             />
 
             {/* Стилизованная область для визуальной обратной связи */}

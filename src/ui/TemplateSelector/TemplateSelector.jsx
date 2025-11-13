@@ -13,7 +13,8 @@ export const TemplateSelector = ({
   onDelete,
   onExport,
   showExport = true,
-  placeholder = 'Выберите макет'
+  placeholder = 'Выберите макет',
+  size
 }) => {
   const selectRef = useRef(null);
   const tooltipRef = useRef(null);
@@ -112,6 +113,9 @@ export const TemplateSelector = ({
                   }}
                 >
                   {name}
+                </span>
+                <span className="template-size">
+                  ({size[name] || '900x1200'})
                 </span>
                 <div className="template-buttons">
                   {showExport && (

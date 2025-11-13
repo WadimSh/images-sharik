@@ -31,6 +31,9 @@ export const CollageTempleModal = ({
       const storageKey = 'design-collage';
       const savedDesign = localStorage.getItem(storageKey);
       const currentDesign = savedDesign ? JSON.parse(savedDesign) : [];
+
+      const savedSize = localStorage.getItem('size');
+      const currentSize = savedSize ? JSON.parse(savedSize) : '900x1200';
   
       const modifiedDesign = currentDesign.map(element => ({
         ...element,
@@ -46,7 +49,8 @@ export const CollageTempleModal = ({
         
         await collageDB.add({
           code: name,
-          elements: modifiedDesign
+          elements: modifiedDesign,
+          size: currentSize
         });
 
         // Обновляем список шаблонов из базы

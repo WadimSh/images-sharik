@@ -444,7 +444,7 @@ const handleTemplateChange = async (baseCode, templateKey) => {
       if (item.startsWith(`${baseCode}_`)) {
         const slide = await slidesDB.get(`design-${item}`);
         const currentDesign = slide?.data || [];
-        const currentSize = slide?.size;
+        const currentSize = slide?.size; // Получаем текущий размер, но не меняем его
 
         const validImages = currentDesign.filter(el => 
           el.type === 'image' && el.image?.startsWith('https://')
@@ -518,11 +518,11 @@ const handleTemplateChange = async (baseCode, templateKey) => {
 
         const newDesign = replacePlaceholders(filteredTemplate, itemData, newStyleVariant);
 
-        await slidesDB.update(`design-${item}`, { data: newDesign });
+        await slidesDB.update(`design-${item}`, { data: newDesign, size: '900x1200' });
 
         return { [item]: {
             data: newDesign,
-            size: currentSize // Сохраняем существующий размер
+            size: '900x1200' // Сохраняем существующий размер
           } 
         };
       }
@@ -647,11 +647,11 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
         const newDesign = replacePlaceholders(filteredTemplate, itemData, styleVariant);
 
-        await slidesDB.update(`design-${item}`, { data: newDesign });
+        await slidesDB.update(`design-${item}`, { data: newDesign, size: '900x1200' });
 
         return { [item]: {
             data: newDesign,
-            size: currentSize // Сохраняем существующий размер
+            size: '900x1200' // Сохраняем существующий размер
           }
         };
       }
@@ -711,9 +711,13 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
       const designData = await slidesDB.get(`design-${itemId}`);
       const productData = await productsDB.get(`product-${baseCode}`);
-
+      
       if (designData?.data) {
         sessionStorage.setItem(`design-${itemId}`, JSON.stringify(designData.data));
+      }
+      
+      if (designData?.size) {
+        sessionStorage.setItem('size', JSON.stringify(designData.size))
       }
       
       if (productData?.data) {
@@ -849,7 +853,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
   const renderTemplateControls = (baseCode, currentTemplate) => {
     const wbCode = getCode(baseCode, "WB");
     const ozCode = getCode(baseCode, "OZ");
-    console.log(ozCode)
+    
     const template = templates[currentTemplate] || [];
     const availableStyles = getAvailableStyleVariants(template);
     const currentStyle = productMetas[baseCode]?.styleVariant || 'default';

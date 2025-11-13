@@ -34,6 +34,12 @@ export const SIZE_PRESETS_BY_MARKETPLACE = {
       height: 600, 
       label: '1200px x 1200px', 
       fileName: '1200x1200'
-    }
+    },
+    { 
+      width: 200, 
+      height: 200, 
+      label: '400px x 400px', 
+      fileName: '400x400'
+    },
   ]
 };
