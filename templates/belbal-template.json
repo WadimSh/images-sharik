@@ -10,8 +10,8 @@
       "backgroundImage": "/images/Belbal-background.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1355,
       "originalImageWidth": 1800
     },
@@ -219,8 +219,8 @@
       "backgroundImage": "/images/Belbal-background.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1355,
       "originalImageWidth": 1800
     },
@@ -352,8 +352,8 @@
       "backgroundImage": "/images/Belbal-background.png",
       "color": "#ffffff",
       "gradient": null,
-      "height": 601,
-      "width": 451,
+      "height": "100%",
+      "width": "100%",
       "originalImageHeight": 1355,
       "originalImageWidth": 1800
     },
