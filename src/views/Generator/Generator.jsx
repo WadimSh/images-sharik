@@ -1301,13 +1301,26 @@ export const Generator = () => {
         { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
       ]
     },
-    '708x708': {
-      'OZ': [
+    '1200x1200': {
+      'AM': [
         { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
       ]
     },
-    '1200x1200': {
-      'AM': [
+    '808x508': {
+      'WB': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    },
+    '708x908': {
+      'WB': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ]
+    },
+    '708x708': {
+      'OZ': [
+        { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
+      ],
+      'WB': [
         { id: 'zone1', x: 0, y: 0, width: 0, height: 0 }
       ]
     },
