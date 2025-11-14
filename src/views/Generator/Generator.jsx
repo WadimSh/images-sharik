@@ -1722,7 +1722,7 @@ export const Generator = () => {
           </div>
           </div>
         </div> 
-        <div style={{ position: 'absolute', bottom: '0', right: '400px', zIndex: '99999999' }}>
+        <div style={{ position: 'absolute', bottom: '0', right: '400px', zIndex: '9999999' }}>
           <ZoomControls 
             zoomLevel={zoom.level}
             onZoomIn={handleZoomIn}
