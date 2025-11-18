@@ -6,6 +6,7 @@ import { syncUserToBackend } from '../../services/temporaryService';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
 import { LanguageContext } from "../../contexts/contextLanguage";
 import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
+import { apiSignIn } from '../../services/authService';
 
 export const SignIn = () => {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export const SignIn = () => {
             email: user.email,
             password: formData.password // используем введенный пароль
           };
-
+      
           // Отправляем на сервер
           await syncUserToBackend(userData);
           
@@ -89,6 +90,20 @@ export const SignIn = () => {
           // Если ошибка - просто логируем и продолжаем работу
           console.warn('Failed to sync user to backend, continuing with local auth:', syncError);
           // НЕ блокируем пользователя, продолжаем как обычно
+        }
+      } else {
+        // Если флаг есть - авторизовываемся на бекенде
+        try {
+          const result = await apiSignIn({
+            email: user.email,
+            password: formData.password
+          });
+
+          if (result.user.company[0].id) {
+            localStorage.setItem('company', result.user.company[0].id);
+          }
+        } catch (authError) {
+          console.warn('Failed to sync user to backend, continuing with local auth:', authError);
         }
       }
 
