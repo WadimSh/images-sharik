@@ -288,8 +288,9 @@
     "notData": "нет данных"
   }, 
   "auth": {
-    "title": "Давайте познакомимся",
-    "subtitle": "Заполните несколько полей, чтобы получить свой аккаунт.",
+    "title": "У вас нет доступа к платформе",
+    "subtitle": "Для получения доступа к платформе обратитесь в компанию «Европа Уно Трейд»",
+    "registerButton": "На главную",
     "loginLabel": "Логин",
     "loginPlaceholder": "Введите ваш логин",
     "emailLabel": "Email",
@@ -299,7 +300,6 @@
     "passwordPlaceholder": "Введите пароль",
     "confirmPasswordLabel": "Подтверждение пароля",
     "confirmPasswordPlaceholder": "Повторите пароль",
-    "registerButton": "Зарегистрироваться",
     "registering": "Регистрация...",
     "loginLength": "Логин должен содержать минимум 3 символа",
     "emailInvalid": "Введите корректный email адрес",

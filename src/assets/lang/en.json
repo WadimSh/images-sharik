@@ -288,8 +288,9 @@
     "notData": "no data"
   }, 
   "auth": {
-    "title": "Let's get acquainted",
-    "subtitle": "Fill in a few fields to get your account.",
+    "title": "You don't have access to the platform",
+    "subtitle": "To get access to the platform, please contact Europa Uno Trade company",
+    "registerButton": "To main page",
     "loginLabel": "Login",
     "loginPlaceholder": "Enter your login",
     "emailLabel": "Email",
@@ -299,7 +300,6 @@
     "passwordPlaceholder": "Enter password",
     "confirmPasswordLabel": "Confirm password",
     "confirmPasswordPlaceholder": "Repeat password",
-    "registerButton": "Register",
     "registering": "Registering...",
     "loginLength": "Login must contain at least 3 characters",
     "emailInvalid": "Please enter a valid email address",

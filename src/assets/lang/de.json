@@ -288,8 +288,9 @@
     "notData": "keine Daten"
   }, 
   "auth": {
-    "title": "Lernen wir uns kennen",
-    "subtitle": "Füllen Sie einige Felder aus, um Ihr Konto zu erhalten.",
+    "title": "Sie haben keinen Zugang zur Plattform",
+    "subtitle": "Um Zugang zur Plattform zu erhalten, wenden Sie sich bitte an das Unternehmen Europa Uno Trade",
+    "registerButton": "Zur Hauptseite",
     "loginLabel": "Login",
     "loginPlaceholder": "Geben Sie Ihr Login ein",
     "emailLabel": "E-Mail",
@@ -299,7 +300,6 @@
     "passwordPlaceholder": "Passwort eingeben",
     "confirmPasswordLabel": "Passwort bestätigen",
     "confirmPasswordPlaceholder": "Passwort wiederholen",
-    "registerButton": "Registrieren",
     "registering": "Registrierung...",
     "loginLength": "Login muss mindestens 3 Zeichen enthalten",
     "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
