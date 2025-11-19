@@ -9,89 +9,6 @@ import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 import { apiSignIn } from '../../services/authService';
 import { apiCreateHistoriy } from '../../services/historiesService';
 
-// Парсит код истории для извлечения articles, marketplace, type, size
-// Артикулы разделены подчеркиванием, каждый артикул может содержать дефисы
-const parseHistoryCode = (code) => {
-  const parts = code.split('_');
-  
-  if (parts.length < 6) {
-    return {
-      articles: [],
-      marketplace: '',
-      type: 'unknown',
-      size: ''
-    };
-  }
-  
-  // Определяем индекс типа (collage, main, slideX)
-  let typeIndex = -1;
-  let type = 'unknown';
-  
-  // Ищем тип дизайна
-  if (parts.includes('collage')) {
-    typeIndex = parts.indexOf('collage');
-    type = 'collage';
-  } else if (parts.includes('main')) {
-    typeIndex = parts.indexOf('main');
-    type = 'main';
-  } else {
-    // Ищем любой слайд (slideX)
-    for (let i = 0; i < parts.length; i++) {
-      if (parts[i].startsWith('slide')) {
-        typeIndex = i;
-        type = parts[i]; // сохраняем как "slide1", "slide2" и т.д.
-        break;
-      }
-    }
-  }
-  
-  // Если не нашли тип, возвращаем значения по умолчанию
-  if (typeIndex === -1) {
-    return {
-      articles: [],
-      marketplace: '',
-      type: 'unknown',
-      size: ''
-    };
-  }
-  
-  // Артикулы - это все части ДО marketplace (то есть до typeIndex - 1)
-  const articles = parts.slice(0, typeIndex - 1);
-  const marketplace = parts[typeIndex - 1] || '';
-  const size = parts[typeIndex + 1] || '';
-  
-  return {
-    articles, // массив артикулов, где каждый элемент - это артикул (может содержать дефисы)
-    marketplace,
-    type,
-    size
-  };
-};
-
-// Преобразует историю из формата IndexedDB в формат бэкенда
-const transformHistoryForBackend = (historyItem) => {
-  try {
-    const { code, data } = historyItem;
-    
-    // Парсим код для извлечения дополнительных полей
-    const parsedInfo = parseHistoryCode(code);
-    
-    // Формируем объект для бэкенда
-    return {
-      name: code, // code становится name
-      data: data, // data остается как есть
-      company: localStorage.getItem('company'), // ID компании из localStorage
-      articles: parsedInfo.articles,
-      marketplace: parsedInfo.marketplace,
-      type: parsedInfo.type,
-      size: parsedInfo.size
-    };
-  } catch (error) {
-    console.error('Ошибка преобразования истории:', error, historyItem);
-    return null;
-  }
-};
-
 export const SignIn = () => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
@@ -142,7 +59,7 @@ export const SignIn = () => {
     try {
       // Проверяем учетные данные
       const user = await usersDB.verifyCredentials(formData.login, formData.password);
-
+      
       if (!user) {
         setMessage('auth.invalidCredentials');
         setIsError(true);
@@ -186,50 +103,7 @@ export const SignIn = () => {
           if (result.user.company[0].id) {
             localStorage.setItem('company', result.user.company[0].id);
           }
-
-          // Проверяем флаг миграции историй
-          const isHistoryMigration = await usersDB.getHistoryMigrationFlag(user.id);
-          
-          // Если флага нет
-          if (!isHistoryMigration) {
-            try {
-              // Получаем все записи из таблицы history
-              const allHistoryItems = await historyDB.getAll();
-
-              console.log(`Найдено ${allHistoryItems.length} историй для миграции`);
-
-              // Преобразуем и отправляем истории
-              const historiesToMigrate = allHistoryItems.map(historyItem => {
-                return transformHistoryForBackend(historyItem);
-              }).filter(Boolean);
-            
-              let successCount = 0;
-              let errorCount = 0;
-            
-              // Отправляем каждую историю по отдельности
-              for (const historyData of historiesToMigrate) {
-                try {
-                  await apiCreateHistoriy(historyData);
-                  successCount++;
-                  console.log(`✅ История ${historyData.name} успешно мигрирована`);
-
-                  // Небольшая задержка между запросами
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                } catch (error) {
-                  errorCount++;
-                  console.warn(`❌ Ошибка при миграции истории ${historyData.name}:`, error);
-                }
-              }
-            
-              console.log(`Миграция завершена: ${successCount} успешно, ${errorCount} с ошибками`);
-            
-              // Устанавливаем флаг, что миграция выполнена (даже если были ошибки)
-              await usersDB.setHistoryMigrationFlag(user.id, true);
-            
-            } catch (migrationError) {
-              console.error('Критическая ошибка при миграции историй:', migrationError);
-            }
-          }
+         
         } catch (authError) {
           console.warn('Failed to sync user to backend, continuing with local auth:', authError);
         }

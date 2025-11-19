@@ -6,7 +6,90 @@ import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { historyDB } from '../../utils/handleDB';
-import { apiGetAllHistories } from '../../services/historiesService';
+import { apiGetAllHistories, apiCreateHistoriy } from '../../services/historiesService';
+
+// Парсит код истории для извлечения articles, marketplace, type, size
+// Артикулы разделены подчеркиванием, каждый артикул может содержать дефисы
+const parseHistoryCode = (code) => {
+  const parts = code.split('_');
+  
+  if (parts.length < 6) {
+    return {
+      articles: [],
+      marketplace: '',
+      type: 'unknown',
+      size: ''
+    };
+  }
+  
+  // Определяем индекс типа (collage, main, slideX)
+  let typeIndex = -1;
+  let type = 'unknown';
+  
+  // Ищем тип дизайна
+  if (parts.includes('collage')) {
+    typeIndex = parts.indexOf('collage');
+    type = 'collage';
+  } else if (parts.includes('main')) {
+    typeIndex = parts.indexOf('main');
+    type = 'main';
+  } else {
+    // Ищем любой слайд (slideX)
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i].startsWith('slide')) {
+        typeIndex = i;
+        type = parts[i]; // сохраняем как "slide1", "slide2" и т.д.
+        break;
+      }
+    }
+  }
+  
+  // Если не нашли тип, возвращаем значения по умолчанию
+  if (typeIndex === -1) {
+    return {
+      articles: [],
+      marketplace: '',
+      type: 'unknown',
+      size: ''
+    };
+  }
+  
+  // Артикулы - это все части ДО marketplace (то есть до typeIndex - 1)
+  const articles = parts.slice(0, typeIndex - 1);
+  const marketplace = parts[typeIndex - 1] || '';
+  const size = parts[typeIndex + 1] || '';
+  
+  return {
+    articles, // массив артикулов, где каждый элемент - это артикул (может содержать дефисы)
+    marketplace,
+    type,
+    size
+  };
+};
+
+// Преобразует историю из формата IndexedDB в формат бэкенда
+const transformHistoryForBackend = (historyItem) => {
+  try {
+    const { code, data } = historyItem;
+    
+    // Парсим код для извлечения дополнительных полей
+    const parsedInfo = parseHistoryCode(code);
+    
+    // Формируем объект для бэкенда
+    return {
+      name: code, // code становится name
+      data: data, // data остается как есть
+      company: localStorage.getItem('company'), // ID компании из localStorage
+      articles: parsedInfo.articles,
+      marketplace: parsedInfo.marketplace,
+      type: parsedInfo.type,
+      size: parsedInfo.size
+    };
+  } catch (error) {
+    console.error('Ошибка преобразования истории:', error, historyItem);
+    return null;
+  }
+};
 
 export const Gallery = () => {
   const navigate = useNavigate();
@@ -18,7 +101,11 @@ export const Gallery = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
+
+  const is = localStorage.getItem('migrat')
+  const [isMigrat, setMigrat] = useState(is)
   
+
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
       console.error('Incorrect data for processing:', productsData);
@@ -345,6 +432,73 @@ export const Gallery = () => {
     }
   };
 
+  const handleMigration = async () => {
+    try {
+      // Получаем все записи из таблицы history
+      const allHistoryItems = await historyDB.getAll();
+
+      console.log(`Найдено ${allHistoryItems.length} историй для миграции`);
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      // Преобразуем и отправляем истории
+      const historiesToMigrate = allHistoryItems.map(historyItem => {
+        return transformHistoryForBackend(historyItem);
+      }).filter(Boolean);
+    
+      const sortedHistories = historiesToMigrate
+        .map(history => {
+          const size = new Blob([JSON.stringify(history.data)]).size;
+          return { history, size };
+        })
+        .sort((a, b) => a.size - b.size)
+        .map(item => item.history);
+      
+      for (const historyData of sortedHistories) {
+        try {
+          const dataSize = new Blob([JSON.stringify(historyData.data)]).size;
+          console.log(`Размер истории ${historyData.name}: ${(dataSize / 1024 / 1024).toFixed(2)} MB`);
+        
+          // ДИНАМИЧЕСКАЯ ЗАДЕРЖКА в зависимости от размера
+          let delay = 200; // базовая задержка
+          if (dataSize > 5 * 1024 * 1024) delay = 2000; // 2s для >5MB
+          else if (dataSize > 2 * 1024 * 1024) delay = 1000; // 1s для >2MB
+          else if (dataSize > 1 * 1024 * 1024) delay = 500; // 0.5s для >1MB
+        
+          await apiCreateHistoriy(historyData);
+          successCount++;
+          console.log(`✅ История ${historyData.name} успешно мигрирована`);
+        
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } catch (error) {
+          errorCount++;
+          console.warn(`❌ Ошибка при миграции истории ${historyData.name}:`, error);
+        
+          // ПРОБУЕМ ПОВТОРИТЬ запрос с увеличенной задержкой
+          if (error.message.includes('timeout') || error.message.includes('network')) {
+            console.log(`🔄 Повторная попытка для ${historyData.name}...`);
+            await new Promise(resolve => setTimeout(resolve, 3000)); // 3s пауза
+            try {
+              await apiCreateHistoriy(historyData);
+              successCount++;
+              errorCount--;
+              console.log(`✅ История ${historyData.name} мигрирована после повтора`);
+            } catch (retryError) {
+              console.warn(`❌ Повторная ошибка для ${historyData.name}:`, retryError);
+            }
+          }
+        }
+      }
+    
+      console.log(`Миграция завершена: ${successCount} успешно, ${errorCount} с ошибками`);
+      localStorage.setItem('migrat', true);
+      setMigrat(true)    
+    } catch (migrationError) {
+      console.error('Критическая ошибка при миграции историй:', migrationError);
+    }
+  }
+
   // Функция для парсинга и форматирования заголовка
   const parseDesignTitle = (title) => {
     const parts = title.split('_');
@@ -444,9 +598,11 @@ export const Gallery = () => {
     <div>
       <div className='header-section' style={{ margin: '10px'}}>
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
-        <HiOutlineChevronLeft /> {t('header.back')}
+          <HiOutlineChevronLeft /> {t('header.back')}
         </button>
         <h2 style={{ color: '#333'}}>{t('header.subtitle')}</h2>
+
+        {!isMigrat && <button onClick={handleMigration} className="template-button">Миграция данных</button>}
       </div>
 
       {/* Панель массового удаления */}

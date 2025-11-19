@@ -16,6 +16,7 @@ export async function apiCreateHistoriy(data) {
   return fetchDataWithFetch('/api/histories', {
     method: 'POST',
     data,
+    timeout: 60000,
   });
 }
 
