@@ -10,6 +10,7 @@ import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
 import { designsDB, collageDB, historyDB } from '../utils/handleDB';
 import { LanguageContext } from '../contexts/contextLanguage';
+import { apiCreateHistoriy } from '../services/historiesService';
 
 export const HeaderSection = ({
   captureRef,
@@ -143,6 +144,64 @@ export const HeaderSection = ({
     URL.revokeObjectURL(url);
   };
 
+  // Парсит код истории для извлечения articles, marketplace, type, size
+  const parseHistoryCode = (code) => {
+    const parts = code.split('_');
+
+    if (parts.length < 6) {
+      return {
+        articles: [],
+        marketplace: '',
+        type: 'unknown',
+        size: ''
+      };
+    }
+
+    // Определяем индекс типа (collage, main, slideX)
+    let typeIndex = -1;
+    let type = 'unknown';
+
+    // Ищем тип дизайна
+    if (parts.includes('collage')) {
+      typeIndex = parts.indexOf('collage');
+      type = 'collage';
+    } else if (parts.includes('main')) {
+      typeIndex = parts.indexOf('main');
+      type = 'main';
+    } else {
+      // Ищем любой слайд (slideX)
+      for (let i = 0; i < parts.length; i++) {
+        if (parts[i].startsWith('slide')) {
+          typeIndex = i;
+          type = parts[i];
+          break;
+        }
+      }
+    }
+
+    // Если не нашли тип, возвращаем значения по умолчанию
+    if (typeIndex === -1) {
+      return {
+        articles: [],
+        marketplace: '',
+        type: 'unknown',
+        size: ''
+      };
+    }
+
+    // Артикулы - это все части ДО marketplace
+    const articles = parts.slice(0, typeIndex - 1);
+    const marketplace = parts[typeIndex - 1] || '';
+    const size = parts[typeIndex + 1] || '';
+
+    return {
+      articles,
+      marketplace,
+      type,
+      size
+    };
+  };
+
   // Функция выгрузки слайда в формате png
   const handleDownload = async () => {
     try {
@@ -150,6 +209,10 @@ export const HeaderSection = ({
       setShowBlindZones(false);
       setZoom(prev => ({ ...prev, level: 1 }));
       await new Promise(resolve => setTimeout(resolve, 500));
+
+      const element = captureRef.current;
+      const width = Math.floor(element.offsetWidth);
+      const height = Math.floor(element.offsetHeight);
       
       let baseCode, slideType;
       let slideNumberPart = slideNumber;
@@ -192,19 +255,49 @@ export const HeaderSection = ({
       // Если данные есть и fileName определён - сохраняем в историю
       if (designData && fileName) {
         const historyKey = fileName.replace('.png', '');
+        const parsedDesignData = JSON.parse(designData);
+
         await historyDB.put({
           code: historyKey,  // Используем имя файла как ключ
-          data: JSON.parse(designData)   // Сохраняем сырые данные
+          data: parsedDesignData   // Сохраняем сырые данные
         });
+      
+        // 🔥 ОТПРАВЛЯЕМ ДАННЫЕ НА БЭКЕНД
+        try {
+          // Парсим код для извлечения дополнительных полей
+          const parsedInfo = parseHistoryCode(historyKey);
+          
+          // Формируем данные для бэкенда
+          const historyData = {
+            name: historyKey,
+            data: parsedDesignData,
+            company: localStorage.getItem('company'),
+            articles: parsedInfo.articles,
+            marketplace: parsedInfo.marketplace,
+            type: parsedInfo.type,
+            size: parsedInfo.size
+            // Не включаем опциональные поля чтобы избежать ошибок валидации
+          };
+
+          // Отправляем на бэкенд
+          await apiCreateHistoriy(historyData);
+          console.log('История успешно отправлена на сервер:', historyKey);
+        } catch (backendError) {
+          console.warn('Ошибка отправки истории на сервер:', backendError);
+          // Не блокируем скачивание из-за ошибки отправки
+        }
       }
 
       // Генерация изображения
-      const canvas = await html2canvas(captureRef.current, {
+      const canvas = await html2canvas(element, {
+        width: width,
+        height: height,
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#FFFFFF',
-        imageRendering: 'pixelated' // Улучшаем рендеринг
+        imageRendering: 'pixelated', // Улучшаем рендеринг
+        removeContainer: true
       });
 
       // Получаем сырые данные изображения

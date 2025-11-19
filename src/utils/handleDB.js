@@ -18,11 +18,11 @@ db.version(2).stores({
   history: 'code',
   products: 'code',
   slides: 'code',
-  users: '++id, login, email, passwordHash, createdAt, lastLogin, isActive, synced' // добавляем synced
+  users: '++id, login, email, passwordHash, createdAt, lastLogin, isActive, synced, historyMigrated' // добавляем synced
 }).upgrade(tx => {
   // Добавляем поле synced = false для всех существующих пользователей
   return tx.table('users').toCollection().modify(user => {
-    user.synced = false;
+    user.historyMigrated = false;
   });
 });
 
@@ -145,6 +145,31 @@ export const usersDB = {
       await db.users.update(userId, { synced });
     } catch (error) {
       console.error('Error setting sync flag:', error);
+    }
+  },
+
+  /**
+   * ПОЛУЧИТЬ флаг миграции историй пользователя
+   */
+  async getHistoryMigrationFlag(userId) {
+    try {
+      const user = await db.users.get(userId);
+      return user?.historyMigrated || false;
+    } catch (error) {
+      console.error('Error getting history migration flag:', error);
+      return false;
+    }
+  },
+
+  /**
+   * УСТАНОВИТЬ флаг миграции историй пользователя
+   */
+  async setHistoryMigrationFlag(userId, migrated) {
+    try {
+      await db.users.update(userId, { historyMigrated: migrated });
+    } catch (error) {
+      console.error('Error setting history migration flag:', error);
+      throw error;
     }
   }
 };

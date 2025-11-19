@@ -108,7 +108,7 @@ const SearchHeader = ({
     setIsToggled(false);
     productsDB.clearAll();
     slidesDB.clearAll();
-    sessionStorage.clear();
+    sessionStorage.removeItem('searchData');
 
     if (searchQuery.trim()) {
       // Нормализация введенных данных перед сохранением
@@ -152,7 +152,7 @@ const SearchHeader = ({
     // Полная очистка sessionStorage
     productsDB.clearAll();
     slidesDB.clearAll();
-    sessionStorage.clear();
+    sessionStorage.removeItem('searchData');
   };
 
   const handleKeyDown = (event) => {

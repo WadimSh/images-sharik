@@ -41,7 +41,7 @@ export async function fetchDataWithFetch(url, options = {}) {
     const { data, ...restOptions } = options;
     let accessToken = getAccessToken();
     
-    const config = {
+    let config = {
         credentials: 'include', // ✅ Всегда включаем credentials для cookies
         headers: {
             'Content-Type': 'application/json',
@@ -65,9 +65,12 @@ export async function fetchDataWithFetch(url, options = {}) {
             accessToken = await refreshToken();
             
             // Повторяем запрос с новым токеном
-            config.headers = {
-                ...config.headers,
-                'Authorization': `Bearer ${accessToken}`
+            config = {
+                ...config,
+                headers: {
+                    ...config.headers,
+                    'Authorization': `Bearer ${accessToken}`
+                }
             };
             
             response = await fetch(`${baseURL}${url}`, config);

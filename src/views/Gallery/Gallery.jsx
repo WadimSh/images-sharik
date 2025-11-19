@@ -6,6 +6,7 @@ import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { historyDB } from '../../utils/handleDB';
+import { apiGetAllHistories } from '../../services/historiesService';
 
 export const Gallery = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export const Gallery = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
-
+  
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
       console.error('Incorrect data for processing:', productsData);
@@ -284,13 +285,20 @@ export const Gallery = () => {
   const loadDesigns = async () => {
     try {
       setLoading(true);
+      
+      try {
+        const result = await apiGetAllHistories()
+        console.log(result)
+      } catch (error) {
+        console.log(error);
+      }
   
       // Регулярное выражение для поиска ключей с артикулами
       const articlePattern = /^\d{4}-\d{4}/;
   
       // Получаем все записи из таблицы history
       const allHistoryItems = await historyDB.getAll();
-  
+      
       // Фильтруем, преобразуем и сортируем данные
       const loadedDesigns = allHistoryItems
         .filter(item => articlePattern.test(item.code)) // Фильтруем по шаблону артикула
@@ -476,6 +484,7 @@ export const Gallery = () => {
         <div className="items-grid">
           {designs.map((design) => {
             const info = parseDesignTitle(design.title);
+            
             const isSelected = selectedItems.has(design.key);
             const isHovered = hoveredItem === design.key;
             
