@@ -373,12 +373,12 @@ export const Gallery = () => {
     try {
       setLoading(true);
       
-      try {
-        const result = await apiGetAllHistories()
-        console.log(result)
-      } catch (error) {
-        console.log(error);
-      }
+      //try {
+      //  const result = await apiGetAllHistories()
+      //  console.log(result)
+      //} catch (error) {
+      //  console.log(error);
+      //}
   
       // Регулярное выражение для поиска ключей с артикулами
       const articlePattern = /^\d{4}-\d{4}/;
