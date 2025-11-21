@@ -263,29 +263,29 @@ export const HeaderSection = ({
         });
       
         // 🔥 ОТПРАВЛЯЕМ ДАННЫЕ НА БЭКЕНД
-        //try {
-        //  // Парсим код для извлечения дополнительных полей
-        //  const parsedInfo = parseHistoryCode(historyKey);
-        //  
-        //  // Формируем данные для бэкенда
-        //  const historyData = {
-        //    name: historyKey,
-        //    data: parsedDesignData,
-        //    company: localStorage.getItem('company'),
-        //    articles: parsedInfo.articles,
-        //    marketplace: parsedInfo.marketplace,
-        //    type: parsedInfo.type,
-        //    size: parsedInfo.size
-        //    // Не включаем опциональные поля чтобы избежать ошибок валидации
-        //  };
-        //
-        //  // Отправляем на бэкенд
-        //  await apiCreateHistoriy(historyData);
-        //  console.log('История успешно отправлена на сервер:', historyKey);
-        //} catch (backendError) {
-        //  console.warn('Ошибка отправки истории на сервер:', backendError);
-        //  // Не блокируем скачивание из-за ошибки отправки
-        //}
+        try {
+          // Парсим код для извлечения дополнительных полей
+          const parsedInfo = parseHistoryCode(historyKey);
+          
+          // Формируем данные для бэкенда
+          const historyData = {
+            name: historyKey,
+            data: parsedDesignData,
+            company: localStorage.getItem('company'),
+            articles: parsedInfo.articles,
+            marketplace: parsedInfo.marketplace,
+            type: parsedInfo.type,
+            size: parsedInfo.size
+            // Не включаем опциональные поля чтобы избежать ошибок валидации
+          };
+        
+          // Отправляем на бэкенд
+          await apiCreateHistoriy(historyData);
+          console.log('История успешно отправлена на сервер:', historyKey);
+        } catch (backendError) {
+          console.warn('Ошибка отправки истории на сервер:', backendError);
+          // Не блокируем скачивание из-за ошибки отправки
+        }
       }
 
       // Генерация изображения

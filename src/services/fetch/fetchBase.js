@@ -17,7 +17,7 @@ const clearTokens = () => {
 export const refreshToken = async () => {
     const response = await fetch(`${baseURL}/api/refresh`, {
         method: 'POST',
-        credentials: 'include', // ✅ Важно! Отправляем cookies автоматически
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -37,32 +37,46 @@ export const refreshToken = async () => {
     throw new Error('Token refresh failed');
 };
 
+// 🔥 ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ СОЗДАНИЯ КОНФИГА
+const createRequestConfig = (options, accessToken, signal) => {
+    const { data, ...restOptions } = options;
+    
+    const config = {
+        credentials: 'include',
+        signal,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
+            ...options.headers,
+        },
+        ...restOptions,
+    };
+
+    if (data) {
+        config.body = JSON.stringify(data);
+    }
+
+    return config;
+};
+
 export async function fetchDataWithFetch(url, options = {}) {
-    const { data, timeout = 30000, ...restOptions } = options; // Увеличиваем таймаут по умолчанию до 60s
+    const { timeout = 60000, ...restOptions } = options;
     let accessToken = getAccessToken();
     
-    // Создаем AbortController для таймаута
+    // 🔥 СОХРАНЯЕМ ДАННЫЕ ДЛЯ ВОЗМОЖНОГО ПОВТОРА
+    const requestData = options.data;
+    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
         controller.abort();
     }, timeout);
 
     try {
-        let config = {
-            credentials: 'include',
-            signal: controller.signal, // Добавляем signal для прерывания
-            headers: {
-                'Content-Type': 'application/json',
-                ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-                ...options.headers,
-            },
-            ...restOptions,
-        };
+        // Создаем конфиг для первоначального запроса
+        let config = createRequestConfig(restOptions, accessToken, controller.signal);
 
-        if (data) {
-            config.body = JSON.stringify(data);
-            
-            // Логируем размер запроса для отладки
+        // Логируем размер запроса
+        if (config.body) {
             const requestSize = new Blob([config.body]).size;
             console.log(`📦 Размер запроса ${url}: ${(requestSize / 1024 / 1024).toFixed(2)} MB`);
         }
@@ -74,30 +88,33 @@ export async function fetchDataWithFetch(url, options = {}) {
             isRefreshing = true;
 
             try {
+                console.log('🔄 Токен истек, пытаемся обновить...');
                 accessToken = await refreshToken();
+                console.log('✅ Токен успешно обновлен');
                 
-                // Повторяем запрос с новым токеном (с новым controller)
+                // 🔥 ПОВТОРЯЕМ ЗАПРОС С НОВЫМ ТОКЕНОМ
                 const retryController = new AbortController();
                 const retryTimeoutId = setTimeout(() => {
                     retryController.abort();
                 }, timeout);
                 
                 try {
-                    config = {
-                        ...config,
-                        signal: retryController.signal,
-                        headers: {
-                            ...config.headers,
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    };
+                    console.log('🔄 Повторяем оригинальный запрос с новым токеном...');
                     
-                    response = await fetch(`${baseURL}${url}`, config);
+                    // Создаем НОВЫЙ конфиг с теми же данными и новым токеном
+                    const retryConfig = createRequestConfig(
+                        { ...restOptions, data: requestData }, // 🔥 ПЕРЕДАЕМ ОРИГИНАЛЬНЫЕ ДАННЫЕ
+                        accessToken, 
+                        retryController.signal
+                    );
+                    
+                    response = await fetch(`${baseURL}${url}`, retryConfig);
+                    console.log('✅ Повторный запрос выполнен успешно');
                 } finally {
                     clearTimeout(retryTimeoutId);
                 }
             } catch (error) {
-                // Если обновление токена не удалось, очищаем хранилище
+                console.error('❌ Ошибка при обновлении токена:', error);
                 clearTokens();
                 throw error;
             } finally {
@@ -114,6 +131,8 @@ export async function fetchDataWithFetch(url, options = {}) {
                 throw new Error(`Payload too large: ${errorMessage}`);
             } else if (response.status === 408) {
                 throw new Error(`Request timeout: ${errorMessage}`);
+            } else if (response.status === 429) {
+                throw new Error(`Rate limit exceeded: ${errorMessage}`);
             }
             
             throw new Error(errorMessage);
