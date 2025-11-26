@@ -15,6 +15,7 @@ const clearTokens = () => {
 };
 
 export const refreshToken = async () => {
+    
     const response = await fetch(`${baseURL}/api/refresh`, {
         method: 'POST',
         credentials: 'include',
@@ -22,14 +23,14 @@ export const refreshToken = async () => {
             'Content-Type': 'application/json',
         },
     });
-
+    
     if (!response.ok) {
         throw new Error('Failed to refresh token');
     }
-
+    
     const data = await response.json();
     
-    if (data.success) {
+    if (data) {
         setAccessToken(data.accessToken);
         return data.accessToken;
     }
@@ -59,12 +60,21 @@ const createRequestConfig = (options, accessToken, signal) => {
     return config;
 };
 
+const redirectToSignIn = () => {
+  // Очищаем токены перед редиректом
+  clearTokens();
+  
+  // Редирект на страницу входа
+  if (window.location.pathname !== '/sign-in') {
+    window.location.href = '/sign-in';
+  }
+};
+
 export async function fetchDataWithFetch(url, options = {}) {
-    const { timeout = 60000, ...restOptions } = options;
+    const originalOptions = { ...options };
+    const { timeout = 60000 } = originalOptions;
+
     let accessToken = getAccessToken();
-    
-    // 🔥 СОХРАНЯЕМ ДАННЫЕ ДЛЯ ВОЗМОЖНОГО ПОВТОРА
-    const requestData = options.data;
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -73,7 +83,7 @@ export async function fetchDataWithFetch(url, options = {}) {
 
     try {
         // Создаем конфиг для первоначального запроса
-        let config = createRequestConfig(restOptions, accessToken, controller.signal);
+        let config = createRequestConfig(originalOptions, accessToken, controller.signal);
 
         // Логируем размер запроса
         if (config.body) {
@@ -89,7 +99,7 @@ export async function fetchDataWithFetch(url, options = {}) {
 
             try {
                 console.log('🔄 Токен истек, пытаемся обновить...');
-                accessToken = await refreshToken();
+                let newAccessToken = await refreshToken();
                 console.log('✅ Токен успешно обновлен');
                 
                 // 🔥 ПОВТОРЯЕМ ЗАПРОС С НОВЫМ ТОКЕНОМ
@@ -103,8 +113,8 @@ export async function fetchDataWithFetch(url, options = {}) {
                     
                     // Создаем НОВЫЙ конфиг с теми же данными и новым токеном
                     const retryConfig = createRequestConfig(
-                        { ...restOptions, data: requestData }, // 🔥 ПЕРЕДАЕМ ОРИГИНАЛЬНЫЕ ДАННЫЕ
-                        accessToken, 
+                        originalOptions, 
+                        newAccessToken, 
                         retryController.signal
                     );
                     
@@ -115,7 +125,7 @@ export async function fetchDataWithFetch(url, options = {}) {
                 }
             } catch (error) {
                 console.error('❌ Ошибка при обновлении токена:', error);
-                clearTokens();
+                redirectToSignIn();
                 throw error;
             } finally {
                 isRefreshing = false;

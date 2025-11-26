@@ -93,23 +93,13 @@
   cursor: not-allowed;
 }
 
-.selection-checkbox-container {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  z-index: 10;  
-}
+
 
 .selection-checkbox {
   width: 24px;
   height: 24px;
   cursor: pointer;
   border-radius: 2px;
-}
-
-.item-card-selected {
-  border: 2px solid #1890ff;
-  border-radius: 6px;
 }
 
 @media (max-width: 768px) {
@@ -123,4 +113,34 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Обновленные стили для кнопок */
+.like-button, .delete-buttons {
+  background: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+.like-button:hover, .delete-buttons:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1);
+  opacity: 1;
+}
+
+.delete-buttons {
+  color: #747474;
+}
+
+.delete-buttons:hover {
+  color: #0056b3;
+}
+
+.like-button:active, .delete-button:active {
+  transform: scale(0.95);
+}
+
+/* Плавное появление чекбокса */
+.selection-checkbox-container {
+  transition: opacity 0.2s ease;
 }

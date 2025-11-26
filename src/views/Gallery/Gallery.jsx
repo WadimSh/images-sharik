@@ -1,12 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
+import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { historyDB } from '../../utils/handleDB';
 import { apiGetAllHistories, apiCreateHistoriy } from '../../services/historiesService';
+
+import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
 
 // Парсит код истории для извлечения articles, marketplace, type, size
 // Артикулы разделены подчеркиванием, каждый артикул может содержать дефисы
@@ -104,7 +107,47 @@ export const Gallery = () => {
 
   const is = localStorage.getItem('migrat')
   const [isMigrat, setMigrat] = useState(is)
-  
+
+  // ----
+  const [localLikes, setLocalLikes] = useState(() => {
+    // Загружаем из localStorage при инициализации
+    const saved = localStorage.getItem('gallery-likes');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(100);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Сбрасываем на первую страницу при изменении количества
+  };
+  // Функция для переключения лайка
+  const handleToggleLike = (designKey, e) => {
+    e.stopPropagation();
+    
+    setLocalLikes(prev => {
+      const currentLike = prev[designKey] || { likesCount: 0, hasLiked: false };
+      const newLike = {
+        likesCount: currentLike.hasLiked ? currentLike.likesCount - 1 : currentLike.likesCount + 1,
+        hasLiked: !currentLike.hasLiked
+      };
+      
+      const newLikes = {
+        ...prev,
+        [designKey]: newLike
+      };
+      
+      // Сохраняем в localStorage
+      localStorage.setItem('gallery-likes', JSON.stringify(newLikes));
+      return newLikes;
+    });
+  };
+  // -----
 
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
@@ -606,7 +649,7 @@ export const Gallery = () => {
       </div>
 
       {/* Панель массового удаления */}
-      
+    
         <div className={`bulk-action-bar ${isSelectionMode ? 'visible' : ''}`}>
           <div className="bulk-action-info">
             {t('selection.counter')} {selectedItems.size}
@@ -628,7 +671,6 @@ export const Gallery = () => {
           </div>
         </div>
       
-
       <div className="items-grid-container">
         {designs.length === 0 ? (
           <div 
@@ -640,7 +682,7 @@ export const Gallery = () => {
         <div className="items-grid">
           {designs.map((design) => {
             const info = parseDesignTitle(design.title);
-            
+            const likeInfo = localLikes[design.key] || { likesCount: 0, hasLiked: false };
             const isSelected = selectedItems.has(design.key);
             const isHovered = hoveredItem === design.key;
             
@@ -651,9 +693,10 @@ export const Gallery = () => {
                 onMouseEnter={() => setHoveredItem(design.key)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
+              
               <div 
-                className={`item-card ${isSelected ? 'item-card-selected' : ''}`}
-                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px' }}
+                className='item-card'
+                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px', position: 'relative' }}
                 onClick={(e) => {
                   if (isSelectionMode) {
                     toggleItemSelection(design.key, e);
@@ -667,23 +710,94 @@ export const Gallery = () => {
                 onMouseEnter={() => setHoveredItem(design.key)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
+                {/* Счетчик лайков - ВСЕГДА видим если есть лайки 
+                {likeInfo.likesCount > 0 && (
+                  <div 
+                    className="likes-count"
+                    style={{
+                      position: 'absolute',
+                      bottom: '42px',
+                      right: '16px',
+                      width: '20px',
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: '#626262',
+                      zIndex: 5
+                    }}
+                  >
+                    {likeInfo.likesCount}
+                  </div>
+                )}*/}
+                {/* Кнопка лайка - ВСЕГДА видима 
                 <button
-                  className="delete-button"
+                  className="like-button"
+                  onClick={(e) => handleToggleLike(design.key, e)}
+                  style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    right: '10px',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 5,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {likeInfo.hasLiked ? (
+                    <FaHeart color="#ff4757" size={16} />
+                  ) : (
+                    <FaRegHeart color="#ff4757" size={16} />
+                  )}
+                </button>*/}
+                
+                
+                {/* Кнопка удаления - ВСЕГДА видима */}
+                <button
+                  className="delete-buttons"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(design.key);
                   }}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 5,
+                    fontSize: '18px',
+                    fontWeight: '400',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
                 >
                   ×
                 </button>
-
-                {/* Чекбокс выбора */}
-                {(isHovered) && (
+                
+                {/* Чекбокс выбора - ТОЛЬКО при наведении */}
+                {(isHovered || isSelected) && (
                   <div 
                     className="selection-checkbox-container"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleItemSelection(design.key, e);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '10px',
+                      left: '10px',
+                      zIndex: 10
                     }}
                   >
                     <input
@@ -691,21 +805,24 @@ export const Gallery = () => {
                       className="selection-checkbox"
                       checked={isSelected}
                       readOnly
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer'
+                      }}
                     />
                   </div>
                 )}
 
                 <div className="item-content">
                   <PreviewDesign elements={design.data} size={design.size} />
-
+              
                   {loadingItemKey === design.key && 
                     <div className="loader-container-gallery">
                       <div className="loader"></div>
                     </div>
                   }
-
                 </div>
-
               </div>
               <div className="design-info-plate">
                   <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
@@ -732,6 +849,17 @@ export const Gallery = () => {
             );
           })} 
         </div>)}
+        {/*<div style={{ marginTop: 'auto', borderTop: "1px solid #ccc" }}>
+          <PaginationPanel
+            currentPage={currentPage}
+            totalCount={totalCount}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 25, 50, 100]} // опционально
+          />
+        </div>*/}
+        
       </div>
     </div>
   );

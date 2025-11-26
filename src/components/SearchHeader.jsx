@@ -127,7 +127,6 @@ const SearchHeader = ({
   const handleGalleryClick = async () => {
     const isAuthenticated = await checkUserAuthentication();
     if (isAuthenticated) {
-      localStorage.setItem('migrat', true);
       navigate('/gallery');
     }
   };

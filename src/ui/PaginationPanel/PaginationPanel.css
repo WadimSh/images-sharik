@@ -1,0 +1,54 @@
+.pagination-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pagination-panel__info {
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.pagination-panel__navigation {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.pagination-panel__controls {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 150px;
+}
+
+.pagination-panel__select {
+  min-width: 150px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .pagination-panel {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .pagination-panel__info {
+    order: 1;
+  }
+
+  .pagination-panel__navigation {
+    order: 2;
+    width: 100%;
+  }
+
+  .pagination-panel__controls {
+    order: 3;
+    justify-content: center;
+    width: 100%;
+  }
+}
