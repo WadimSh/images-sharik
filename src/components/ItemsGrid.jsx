@@ -729,7 +729,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     } catch (error) {
       console.error('Error checking user authentication:', error);
       // В случае ошибки тоже перенаправляем на регистрацию для безопасности
-      navigate('/sign-up');
+      navigate('/sign-in');
     }
   };
 

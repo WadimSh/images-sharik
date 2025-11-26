@@ -35,7 +35,7 @@ const DBProtectedRoute = ({ children }) => {
         
       } catch (error) {
         console.error('Error checking user authentication:', error);
-        setRedirectPath('/sign-up');
+        setRedirectPath('/sign-in');
         setIsChecking(false);
       }
     };

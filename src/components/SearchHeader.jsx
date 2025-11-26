@@ -77,7 +77,7 @@ const SearchHeader = ({
       return true;
     } catch (error) {
       console.error('Error checking user authentication:', error);
-      navigate('/sign-up');
+      navigate('/sign-in');
       return false;
     }
   };
