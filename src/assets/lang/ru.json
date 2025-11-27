@@ -331,5 +331,20 @@
     "passwordResetSuccess": "Пароль успешно изменен! Теперь вы можете войти с новым паролем.",
     "resetError": "Произошла ошибка. Попробуйте позже.",
     "backToSignIn": "Вернуться к входу"
+  },
+  "filters": {
+    "all": "Все",
+    "mine": "Мои", 
+    "allMarketplaces": "Все маркетплейсы",
+    "allSizes": "Все размеры",
+    "newestFirst": "Сначала новые",
+    "oldestFirst": "Сначала старые",
+    "searchPlaceholderAll": "Поиск по артикулам или автору...",
+    "searchPlaceholderMine": "Поиск по артикулам...",
+    "selectMarketplaceFirst": "Сначала выберите маркетплейс"
+  },
+  "pagination": {
+    "itemsPerPage": "на странице",
+    "showRange": "Показано {start}-{end} из {total} элементов"
   }
 } 

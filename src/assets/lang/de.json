@@ -331,5 +331,20 @@
     "passwordResetSuccess": "Passwort erfolgreich geändert! Sie können sich jetzt mit Ihrem neuen Passwort anmelden.",
     "resetError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
     "backToSignIn": "Zurück zur Anmeldung"
-  }  
+  },
+   "filters": {
+    "all": "Alle",
+    "mine": "Meine",
+    "allMarketplaces": "Alle Marktplätze",
+    "allSizes": "Alle Größen", 
+    "newestFirst": "Neueste zuerst",
+    "oldestFirst": "Älteste zuerst",
+    "searchPlaceholderAll": "Suche nach Artikeln oder Autor...",
+    "searchPlaceholderMine": "Suche nach Artikeln...",
+    "selectMarketplaceFirst": "Wählen Sie zuerst den Marktplatz"
+  },
+  "pagination": {
+    "itemsPerPage": "pro Seite",
+    "showRange": "Zeige {start}-{end} von {total} Elementen"
+  }
 }

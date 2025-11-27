@@ -331,5 +331,20 @@
     "passwordResetSuccess": "Password successfully changed! You can now log in with your new password.",
     "resetError": "An error occurred. Please try again later.",
     "backToSignIn": "Back to login"
-  }  
+  },
+  "filters": {
+    "all": "All",
+    "mine": "Mine",
+    "allMarketplaces": "All marketplaces", 
+    "allSizes": "All sizes",
+    "newestFirst": "Newest first",
+    "oldestFirst": "Oldest first",
+    "searchPlaceholderAll": "Search by articles or author...",
+    "searchPlaceholderMine": "Search by articles...",
+    "selectMarketplaceFirst": "Select marketplace first"
+  },
+  "pagination": {
+    "itemsPerPage": "per page",
+    "showRange": "Showing {start}-{end} of {total} items"
+  }
 } 

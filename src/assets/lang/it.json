@@ -331,5 +331,20 @@
     "passwordResetSuccess": "Password cambiata con successo! Ora puoi accedere con la nuova password.",
     "resetError": "Si è verificato un errore. Riprova più tardi.",
     "backToSignIn": "Torna all'accesso"
-  }  
+  },
+  "filters": {
+    "all": "Tutti",
+    "mine": "Miei",
+    "allMarketplaces": "Tutti i marketplace",
+    "allSizes": "Tutte le dimensioni",
+    "newestFirst": "Prima i più recenti",
+    "oldestFirst": "Prima i più vecchi", 
+    "searchPlaceholderAll": "Cerca per articoli o autore...",
+    "searchPlaceholderMine": "Cerca per articoli...",
+    "selectMarketplaceFirst": "Seleziona prima il marketplace"
+  },
+  "pagination": {
+    "itemsPerPage": "per pagina",
+    "showRange": "Mostrati {start}-{end} di {total} elementi"
+  }
 } 

@@ -7,6 +7,7 @@ import ResetPassword from "../views/ResetPassword";
 import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
+import { Gallery2 } from "../views/Gallery/Gallery2";
 import Template from "../views/Template";
 import ProtectedRoute from "./ProtectedRoute";
 import DBProtectedRoute from "./DBProtectedRoute";
@@ -33,7 +34,7 @@ const AllRoutes = () => {
         path="/gallery" 
         element={
           <DBProtectedRoute>
-            <Gallery />
+            <Gallery2 />
           </DBProtectedRoute>
         } 
       />

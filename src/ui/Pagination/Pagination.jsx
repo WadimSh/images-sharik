@@ -56,7 +56,6 @@ const Pagination = ({
           onClick={() => handlePageClick(currentPage - 1)}
           disabled={currentPage === 1}
           className="pagination__arrow"
-          aria-label="Предыдущая страница"
         >
           <HiOutlineChevronLeft size={16} />
         </button>
@@ -81,8 +80,6 @@ const Pagination = ({
             className={`pagination__page ${
               isActive ? 'pagination__page--active' : ''
             }`}
-            aria-label={`Страница ${pageNumber}`}
-            aria-current={isActive ? 'page' : undefined}
           >
             {pageNumber}
           </button>
@@ -94,7 +91,6 @@ const Pagination = ({
           onClick={() => handlePageClick(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="pagination__arrow"
-          aria-label="Следующая страница"
         >
           <HiOutlineChevronRight size={16} />
         </button>

@@ -254,7 +254,7 @@ export const SignIn = () => {
         </button>
       </form>
 
-      <div style={{
+      {/*<div style={{
         marginTop: '20px',
         textAlign: 'center',
         fontSize: '14px',
@@ -269,7 +269,7 @@ export const SignIn = () => {
         }}>
           {t('auth.forgotPassword')}
         </a>
-      </div>
+      </div>*/}
 
       {message && (
         <div style={{

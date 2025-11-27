@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+
 import Pagination from "../Pagination/Pagination"; 
-import { CustomSelect } from "../CustomSelect/CustomSelect"; // ваш кастомный селект
+import { CustomSelect } from "../CustomSelect/CustomSelect";
+import { LanguageContext } from "../../contexts/contextLanguage";
 import './PaginationPanel.css';
 
 const PaginationPanel = ({
@@ -12,6 +14,7 @@ const PaginationPanel = ({
   className = "",
   itemsPerPageOptions = [10, 20, 30, 40, 50]
 }) => {
+  const { t } = useContext(LanguageContext);
   const [localItemsPerPage, setLocalItemsPerPage] = useState(itemsPerPage);
 
   // Синхронизируем локальное состояние с пропсами
@@ -27,7 +30,7 @@ const PaginationPanel = ({
 
   // Создаем опции для селекта
   const itemsPerPageOptionsObj = itemsPerPageOptions.reduce((acc, option) => {
-    acc[option] = `${option} на странице`;
+    acc[option] = `${option} ${t('pagination.itemsPerPage')}`;
     return acc;
   }, {});
 
@@ -42,11 +45,17 @@ const PaginationPanel = ({
 
   if (totalCount === 0) return null;
 
+  // Форматируем текст с диапазоном
+  const rangeText = t('pagination.showRange')
+    .replace('{start}', start)
+    .replace('{end}', end)
+    .replace('{total}', totalCount);
+
   return (
     <div className={`pagination-panel ${className}`}>
       {/* Левая часть - информация о диапазоне */}
       <div className="pagination-panel__info">
-        Показано {start}-{end} из {totalCount} элементов
+        {rangeText}
       </div>
 
       {/* Центральная часть - пагинация */}

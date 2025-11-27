@@ -649,7 +649,7 @@ export const Gallery = () => {
       </div>
 
       {/* Панель массового удаления */}
-    
+      
         <div className={`bulk-action-bar ${isSelectionMode ? 'visible' : ''}`}>
           <div className="bulk-action-info">
             {t('selection.counter')} {selectedItems.size}
@@ -693,7 +693,8 @@ export const Gallery = () => {
                 onMouseEnter={() => setHoveredItem(design.key)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-              
+
+                
               <div 
                 className='item-card'
                 style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px', position: 'relative' }}
@@ -710,7 +711,7 @@ export const Gallery = () => {
                 onMouseEnter={() => setHoveredItem(design.key)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                {/* Счетчик лайков - ВСЕГДА видим если есть лайки 
+                {/* Счетчик лайков - ВСЕГДА видим если есть лайки */}
                 {likeInfo.likesCount > 0 && (
                   <div 
                     className="likes-count"
@@ -728,8 +729,8 @@ export const Gallery = () => {
                   >
                     {likeInfo.likesCount}
                   </div>
-                )}*/}
-                {/* Кнопка лайка - ВСЕГДА видима 
+                )}
+                {/* Кнопка лайка - ВСЕГДА видима */}
                 <button
                   className="like-button"
                   onClick={(e) => handleToggleLike(design.key, e)}
@@ -754,12 +755,12 @@ export const Gallery = () => {
                   ) : (
                     <FaRegHeart color="#ff4757" size={16} />
                   )}
-                </button>*/}
+                </button>
                 
                 
                 {/* Кнопка удаления - ВСЕГДА видима */}
                 <button
-                  className="delete-buttons"
+                  className="delete-button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(design.key);
@@ -813,7 +814,7 @@ export const Gallery = () => {
                     />
                   </div>
                 )}
-
+              
                 <div className="item-content">
                   <PreviewDesign elements={design.data} size={design.size} />
               
@@ -849,7 +850,7 @@ export const Gallery = () => {
             );
           })} 
         </div>)}
-        {/*<div style={{ marginTop: 'auto', borderTop: "1px solid #ccc" }}>
+        <div style={{ marginTop: 'auto', borderTop: "1px solid #ccc" }}>
           <PaginationPanel
             currentPage={currentPage}
             totalCount={totalCount}
@@ -858,7 +859,7 @@ export const Gallery = () => {
             onItemsPerPageChange={handleItemsPerPageChange}
             itemsPerPageOptions={[10, 25, 50, 100]} // опционально
           />
-        </div>*/}
+        </div>
         
       </div>
     </div>
