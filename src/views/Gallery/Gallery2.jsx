@@ -225,9 +225,6 @@ export const Gallery2 = () => {
     navigate(-1);
   };
 
-
-  // переделать
-
   // Функция для удаления дизайна
   const handleDelete = async (key) => {
     try {
@@ -370,62 +367,42 @@ export const Gallery2 = () => {
   const handleItemClick = async (design) => {
     // Если включен режим выбора, обрабатываем клик как выбор элемента
     if (isSelectionMode) {
-      toggleItemSelection(design.key, { stopPropagation: () => {} });
+      toggleItemSelection(design.id, { stopPropagation: () => {} });
       return;
     }
 
-    setLoadingItemKey(design.key); // Устанавливаем ключ загружаемой карточки
-    
-    // Проверяем, является ли дизайн коллажем
-    if (design.key.includes('_collage')) {
-      try {
-        // Получаем данные дизайна из таблицы history
-        const historyItem = await historyDB.get(design.key);
-            
-        if (!historyItem) {
-            throw new Error('The design was not found in the history');
-        }
-        
-        // Сохраняем основной объект коллажа
-        localStorage.setItem('design-collage', JSON.stringify(historyItem.data));
-        localStorage.setItem('size', JSON.stringify(design.size))
-        // Извлекаем артикулы из ключа
-        const articles = extractArticlesFromKey(design.key);
-        
-        // Сохраняем массив артикулов
-        localStorage.setItem('collage-articles', JSON.stringify(articles));
-        
-        // Перенаправляем на страницу коллажа
+    setLoadingItemKey(design.id); // Устанавливаем ключ загружаемой карточки
+
+    try {
+      const isCollage = design.type === 'collage';
+
+      if (isCollage) {
+        localStorage.setItem('design-collage', JSON.stringify(design.data || []));
+        localStorage.setItem('size', JSON.stringify(design.size));
+        localStorage.setItem('collage-articles', JSON.stringify(design.articles || []));
+
         navigate('/template/collage');
         return;
-      } catch (error) {
-        console.error('Error in collage processing:', error);
-      } finally {
-        setLoadingItemKey(null); // Изменено здесь
       }
-    }
     
-    // Обработка обычных дизайнов (не коллажей)
-    try {
-      // Получаем данные дизайна из таблицы history
-      const historyItem = await historyDB.get(design.key);
-            
-      if (!historyItem) {
-          throw new Error('The design was not found in the history');
+      const article = design.articles?.[0];
+
+      if (!article) {
+        throw new Error("Не удалось определить артикул дизайна");
       }
 
       // Извлекаем информацию о типе дизайна
-      const designInfo = extractDesignInfo(design.key);
+      const designInfo = extractDesignInfo(design.type);
 
       // Формируем ключ для sessionStorage
-      const storageKey = `design-${designInfo.article}_${designInfo.slideNumber}`;
+      const storageKey = `design-${article}_${designInfo.slideNumber}`;
 
       // Сохраняем данные в sessionStorage
-      sessionStorage.setItem(storageKey, JSON.stringify(historyItem.data));
+      sessionStorage.setItem(storageKey, JSON.stringify(design.data || []));
       sessionStorage.setItem('size', JSON.stringify(design.size))
       // Выполняем запросы последовательно с await
       const searchResponse = await fetch(
-        `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${designInfo.article}`
+        `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${article}`
       );
 
       const searchData = await searchResponse.json();
@@ -461,7 +438,7 @@ export const Gallery2 = () => {
       });
 
       // Формируем роут для перехода
-      const route = `/template/${designInfo.article}_${designInfo.slideNumber}`;
+      const route = `/template/${article}_${designInfo.slideNumber}`;
 
       // Перенаправляем
       navigate(route);
@@ -514,17 +491,12 @@ export const Gallery2 = () => {
   };
 
   // Функция для извлечения информации о дизайне из ключа
-  const extractDesignInfo = (key) => {
-    const parts = key.split('_');
-
-    // Извлекаем артикул (первая часть)
-    const article = parts[0];
-
+  const extractDesignInfo = (types) => {
     // Определяем номер слайда
     let slideNumber = 1; // По умолчанию main = 1
 
     // Ищем часть, содержащую информацию о типе слайда
-    const slidePart = parts.find(part => 
+    const slidePart = types.find(part => 
       part === 'main' || part.startsWith('slide')
     );
 
@@ -542,27 +514,9 @@ export const Gallery2 = () => {
     }
 
     return {
-      article,
       slideNumber
     };
   };
-
-  // Функция для извлечения артикулов из ключа
-  const extractArticlesFromKey = (key) => {
-    // Разбиваем ключ на части
-    const parts = key.split('_');
-    
-    // Первая часть содержит артикулы
-    const articlesPart = parts[0];
-    
-    // Разделяем артикулы (могут быть через дефис или подчеркивание)
-    const articlePattern = /\d{4}-\d{4}/g;
-    const matches = articlesPart.match(articlePattern);
-    
-    return matches || [];
-  };
-
-  
 
   return (
     <div>
@@ -628,16 +582,16 @@ export const Gallery2 = () => {
         <div className="items-grid">
           {designs.map((design) => {
             const info = parseDesignTitle(design);
-            const isSelected = selectedItems.has(design.key || design.id);
-            const isHovered = hoveredItem === (design.key || design.id);
+            const isSelected = selectedItems.has(design.id);
+            const isHovered = hoveredItem === (design.id);
             const isLiking = likingItem === design.id;
             const belongsToUser = isDesignBelongsToUser(design);
-            
+            console.log(design)
             return (
               <div 
-                key={design.key || design.id} 
+                key={design.id} 
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-                onMouseEnter={() => setHoveredItem(design.key || design.id)}
+                onMouseEnter={() => setHoveredItem(design.id)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
                
@@ -646,7 +600,7 @@ export const Gallery2 = () => {
                 style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px', position: 'relative' }}
                 onClick={(e) => {
                   if (isSelectionMode) {
-                    toggleItemSelection(design.key || design.id, e);
+                    toggleItemSelection(design.id, e);
                   } else {
                     marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
                     handleItemClick(design);
@@ -654,7 +608,7 @@ export const Gallery2 = () => {
                 }}
                 role="button"
                 tabIndex={0}
-                onMouseEnter={() => setHoveredItem(design.key || design.id)}
+                onMouseEnter={() => setHoveredItem(design.id)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
                 
@@ -746,7 +700,7 @@ export const Gallery2 = () => {
                     className="selection-checkbox-container"
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleItemSelection(design.key || design.id, e);
+                      toggleItemSelection(design.id, e);
                     }}
                     style={{
                       position: 'absolute',
@@ -772,7 +726,7 @@ export const Gallery2 = () => {
                 <div className="item-content">
                   <PreviewDesign elements={design.data} size={design.size} />
               
-                  {loadingItemKey === (design.key || design.id) && 
+                  {loadingItemKey === design.id && 
                     <div className="loader-container-gallery">
                       <div className="loader"></div>
                     </div>
