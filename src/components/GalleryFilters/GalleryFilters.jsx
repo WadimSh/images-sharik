@@ -1,5 +1,4 @@
-import { useContext, useRef, useMemo } from "react";
-
+import { useContext, useRef, useMemo, useState, useEffect } from "react";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import { CustomSelect } from "../../ui/CustomSelect/CustomSelect";
 import './GalleryFilters.css';
@@ -11,6 +10,9 @@ const GalleryFilters = ({
 }) => {
   const { t } = useContext(LanguageContext);
   const searchInputRef = useRef(null);
+  const [searchValue, setSearchValue] = useState(filters.search || '');
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [hasError, setHasError] = useState(false);
 
   // Опции для селектов
   const marketplaceOptions = {
@@ -29,14 +31,12 @@ const GalleryFilters = ({
   const getAllSizeOptions = useMemo(() => {
     const allSizes = [];
     
-    // Собираем все размеры из всех маркетплейсов
     Object.values(marketplaceSizes).forEach(sizes => {
       sizes.forEach(size => {
         allSizes.push(size);
       });
     });
     
-    // Убираем дубликаты по fileName
     const uniqueSizes = allSizes.reduce((acc, size) => {
       if (!acc.find(s => s.fileName === size.fileName)) {
         acc.push(size);
@@ -44,14 +44,11 @@ const GalleryFilters = ({
       return acc;
     }, []);
     
-    // Сортируем по размеру (можно настроить логику сортировки)
     uniqueSizes.sort((a, b) => {
-      // Сортируем по ширине, затем по высоте
       if (a.width !== b.width) return a.width - b.width;
       return a.height - b.height;
     });
     
-    // Преобразуем в объект для селекта
     const options = { '': t('filters.allSizes') };
     uniqueSizes.forEach(size => {
       options[size.fileName] = size.label;
@@ -63,22 +60,108 @@ const GalleryFilters = ({
   // Определяем плейсхолдер в зависимости от фильтра "Мои"
   const getSearchPlaceholder = () => {
     return filters.mine 
-      ? t('filters.searchPlaceholderMine', 'Поиск по артикулам...')
-      : t('filters.searchPlaceholderAll', 'Поиск по артикулам или автору...');
+      ? t('filters.searchPlaceholderMine', 'Поиск по артикулам... (минимум 2 цифры)')
+      : t('filters.searchPlaceholderAll', 'Поиск по артикулам или автору... (минимум 2 символа)');
+  };
+
+  // Функция для определения типа поиска
+  const getSearchType = (value) => {
+    if (!value || value.length < 2) return null;
+    
+    // Проверяем первые два символа
+    const firstTwoChars = value.substring(0, 2);
+    
+    // Если фильтр "Мои" - ТОЛЬКО поиск по артикулам (цифры)
+    if (filters.mine) {
+      return 'articles'; // В режиме "Мои" всегда поиск по артикулам
+    }
+    
+    // Если фильтр "Все" - определяем тип по первым символам
+    if (/^\d{2}/.test(firstTwoChars)) {
+      return 'articles';
+    }
+    
+    return 'ownerSearch';
+  };
+
+  // Проверка, можно ли использовать значение для поиска
+  const canUseSearchValue = (value) => {
+    // Минимум 2 символа
+    if (value.length < 2) return false;
+    
+    // Если фильтр "Мои" - проверяем, что это цифры
+    if (filters.mine) {
+      // Проверяем, что первые 2 символа - цифры
+      const firstTwoChars = value.substring(0, 2);
+      return /^\d{2}/.test(firstTwoChars);
+    }
+    
+    // Если фильтр "Все" - можно любой текст
+    return true;
   };
 
   const handleSearchChange = (value) => {
-    onFilterChange('search', value);
+    setSearchValue(value);
+
+    const isError = canUseSearchValue(value);
+    setHasError(!isError);
+    
+    // Очищаем предыдущий таймаут
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    
+    // Проверяем, можно ли использовать значение для поиска
+    if (!canUseSearchValue(value)) {
+      // Если нельзя использовать - очищаем поиск
+      if (filters.search || filters.ownerSearch) {
+        onFilterChange('search', '');
+        onFilterChange('ownerSearch', '');
+      }
+      return;
+    }
+    
+    // Устанавливаем новый таймаут для задержки поиска (500ms)
+    const newTimeout = setTimeout(() => {
+      const searchType = getSearchType(value);
+      
+      if (searchType === 'articles') {
+        onFilterChange('search', value);
+        onFilterChange('ownerSearch', '');
+      } else if (searchType === 'ownerSearch') {
+        onFilterChange('ownerSearch', value);
+        onFilterChange('search', '');
+      }
+
+      setHasError(false);
+    }, 500);
+    
+    setTypingTimeout(newTimeout);
   };
 
   const handleClearSearch = () => {
+    setSearchValue('');
     onFilterChange('search', '');
+    onFilterChange('ownerSearch', '');
+    
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+      setTypingTimeout(null);
+    }
+    
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
   };
 
   const handleToggleMine = (value) => {
+    // При переключении режима очищаем поиск
+    if (searchValue) {
+      setSearchValue('');
+      onFilterChange('search', '');
+      onFilterChange('ownerSearch', '');
+    }
+    
     onFilterChange('mine', value);
   };
 
@@ -90,11 +173,45 @@ const GalleryFilters = ({
 
   const handleMarketplaceChange = (value) => {
     onFilterChange('marketplace', value);
-    // Теперь размер не сбрасывается при смене маркетплейса
   };
 
   const handleSizeChange = (value) => {
     onFilterChange('size', value);
+  };
+
+  // Очищаем таймаут при размонтировании
+  useEffect(() => {
+    return () => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+    };
+  }, [typingTimeout]);
+
+  // Синхронизируем локальное состояние с внешними фильтрами
+  useEffect(() => {
+    if (!filters.search && !filters.ownerSearch) {
+      setSearchValue('');
+    } else if (filters.search) {
+      setSearchValue(filters.search);
+    } else if (filters.ownerSearch) {
+      setSearchValue(filters.ownerSearch);
+    }
+  }, [filters.search, filters.ownerSearch]);
+
+  // Проверка на Enter
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && searchValue.length > 0 && canUseSearchValue(searchValue)) {
+      const searchType = getSearchType(searchValue);
+      
+      if (searchType === 'articles') {
+        onFilterChange('search', searchValue);
+        onFilterChange('ownerSearch', '');
+      } else if (searchType === 'ownerSearch') {
+        onFilterChange('ownerSearch', searchValue);
+        onFilterChange('search', '');
+      }
+    }
   };
 
   return (
@@ -123,11 +240,12 @@ const GalleryFilters = ({
               ref={searchInputRef}
               type="text"
               placeholder={getSearchPlaceholder()}
-              value={filters.search}
+              value={searchValue}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="search-input"
+              onKeyUp={handleKeyPress}
+              className={`search-input ${hasError ? 'error' : ''}`}
             />
-            {filters.search && (
+            {searchValue && (
               <button
                 className="search-clear-btn"
                 onClick={handleClearSearch}
@@ -150,7 +268,7 @@ const GalleryFilters = ({
             />
           </div>
 
-          {/* Фильтр по размеру - теперь независимый */}
+          {/* Фильтр по размеру */}
           <div className="select-filter">
             <CustomSelect
               options={getAllSizeOptions}

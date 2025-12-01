@@ -9,7 +9,11 @@ export async function apiGetAllHistories(params = {}) {
   
   // Добавляем параметры фильтрации
   if (params.mine !== undefined) queryParams.append('mine', params.mine);
-  if (params.search) queryParams.append('articles', params.search);
+  if (params.search) {
+    queryParams.append('articles', params.search);
+  } else if (params.ownerSearch) {
+    queryParams.append('ownerSearch', params.ownerSearch);
+  };
   if (params.marketplace) queryParams.append('marketplace', params.marketplace);
   if (params.size) queryParams.append('size', params.size);
   if (params.sortBy) queryParams.append('sortBy', params.sortBy);

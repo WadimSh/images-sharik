@@ -31,7 +31,8 @@ export const Gallery2 = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState({
     mine: false,
-    search: '',
+    search: '',      // для поиска по артикулам (если первые 2 символа цифры)
+    ownerSearch: '', // для поиска по автору (если первые 2 символа НЕ цифры)
     marketplace: '',
     size: '',
     sortBy: 'createdAt',
@@ -489,7 +490,7 @@ export const Gallery2 = () => {
           itemsPerPage={itemsPerPage}
           onPageChange={handlePageChange}
           onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPageOptions={[10, 25, 50, 100]} // опционально
+          itemsPerPageOptions={[10, 25, 50]}
         />
         
       {loading ? (
