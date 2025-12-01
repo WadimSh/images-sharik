@@ -7,10 +7,9 @@ import ResetPassword from "../views/ResetPassword";
 import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
-import { Gallery2 } from "../views/Gallery/Gallery2";
+import { NewGallery } from "../views/Gallery/NewGallery";
 import Template from "../views/Template";
 import ProtectedRoute from "./ProtectedRoute";
-import DBProtectedRoute from "./DBProtectedRoute";
 
 const AllRoutes = () => {
   
@@ -19,8 +18,7 @@ const AllRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/sign-in" element={<SignIn />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-
+      
       <Route 
         path="/template/:id" 
         element={
@@ -34,7 +32,7 @@ const AllRoutes = () => {
         path="/gallery" 
         element={
           <ProtectedRoute>
-            <Gallery2 />
+            <NewGallery />
           </ProtectedRoute>
         } 
       />

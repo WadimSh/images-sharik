@@ -8,9 +8,10 @@ import UPNG from 'upng-js';
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
-import { designsDB, collageDB, historyDB } from '../utils/handleDB';
+import { designsDB, collageDB } from '../utils/handleDB';
 import { LanguageContext } from '../contexts/contextLanguage';
 import { apiCreateHistoriy } from '../services/historiesService';
+import { useAuth } from '../contexts/AuthContext';
 
 export const HeaderSection = ({
   captureRef,
@@ -40,6 +41,8 @@ export const HeaderSection = ({
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
+  const { user } = useAuth();
+  
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
   const [loading, setLoading] = useState(false);
     
@@ -257,11 +260,6 @@ export const HeaderSection = ({
         const historyKey = fileName.replace('.png', '');
         const parsedDesignData = JSON.parse(designData);
 
-        await historyDB.put({
-          code: historyKey,  // Используем имя файла как ключ
-          data: parsedDesignData   // Сохраняем сырые данные
-        });
-      
         // 🔥 ОТПРАВЛЯЕМ ДАННЫЕ НА БЭКЕНД
         try {
           // Парсим код для извлечения дополнительных полей
@@ -271,7 +269,7 @@ export const HeaderSection = ({
           const historyData = {
             name: historyKey,
             data: parsedDesignData,
-            company: localStorage.getItem('company'),
+            company: user.company[0].id,
             articles: parsedInfo.articles,
             marketplace: parsedInfo.marketplace,
             type: parsedInfo.type,
@@ -284,7 +282,7 @@ export const HeaderSection = ({
           console.log('История успешно отправлена на сервер:', historyKey);
         } catch (backendError) {
           console.warn('Ошибка отправки истории на сервер:', backendError);
-          // Не блокируем скачивание из-за ошибки отправки
+          alert(`Ошибка отправки истории на сервер: ${backendError}`);
         }
       }
 

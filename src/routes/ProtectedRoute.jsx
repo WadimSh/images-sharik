@@ -18,6 +18,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    sessionStorage.removeItem('searchData');
     return <Navigate to="/" replace />;
   }
 

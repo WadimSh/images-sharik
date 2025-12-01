@@ -7,7 +7,7 @@ import { MdCreateNewFolder } from "react-icons/md";
 import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
 import { useAuth } from "../contexts/AuthContext";
-import { db, productsDB, slidesDB, usersDB } from "../utils/handleDB";
+import { productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
 
@@ -39,24 +39,6 @@ const SearchHeader = ({
 
   const userName = getUserName();
 
-  // Функция для проверки аутентификации пользователя
-  const checkUserAuthentication = async () => {
-    try {
-      const user = localStorage.getItem('user');
-            
-      if (!user) {
-        navigate('/sign-in');
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Auth check error:', error);
-      navigate('/sign-in');
-      return false;
-    }
-  };
-
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
     if (event.target.value === '') {
@@ -65,6 +47,11 @@ const SearchHeader = ({
   };
 
   const handleSearch = () => {
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+
     setIsToggled(false);
     productsDB.clearAll();
     slidesDB.clearAll();
@@ -85,24 +72,27 @@ const SearchHeader = ({
   };
   
   const handleGalleryClick = async () => {
-    const isAuthenticated = await checkUserAuthentication();
-    if (isAuthenticated) {
-      navigate('/gallery');
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
     }
+      navigate('/gallery');
   };
 
   const handleCreateTamplete = async () => {
-    const isAuthenticated = await checkUserAuthentication();
-    if (isAuthenticated) {
-      setIsPinModalOpen(true)
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
     }
+      setIsPinModalOpen(true)
   }
 
   const handleToggleCollage = async () => {
-    const isAuthenticated = await checkUserAuthentication();
-    if (isAuthenticated) {
-      setIsToggled(!isToggled);
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
     }
+      setIsToggled(!isToggled);
   };
 
   const handleClear = () => {

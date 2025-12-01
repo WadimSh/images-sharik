@@ -129,25 +129,25 @@
 .custom-select-container {
   width: 100%;
   min-width: 180px;
-  max-width: 180px;
+  max-width: 240px;
 }
 
 .custom-select-header {
   width: 100%;
   min-width: 180px;
-  max-width: 180px;
+  max-width: 240px;
 }
 
 .custom-select-input {
   width: 100%;
   min-width: 180px;
-  max-width: 180px;
+  max-width: 240px;
 }
 
 .custom-select-dropdown {
   width: 100%;
   min-width: 180px;
-  max-width: 180px;
+  max-width: 240px;
 }
 
 /* Адаптивность */

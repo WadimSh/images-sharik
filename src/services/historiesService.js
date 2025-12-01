@@ -53,3 +53,9 @@ export async function apiBulkDeactivateHistories(ids) {
     body: JSON.stringify({ ids })
   });
 }
+
+export async function apiCheckArticleHistories(id) {
+  return fetchDataWithFetch(`/api/histories/check-article/${id}`, {
+    method: 'GET'
+  });
+}

@@ -55,8 +55,7 @@ export const AuthProvider = ({ children }) => {
       // Очищаем локальное хранилище
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      localStorage.removeItem('company');
-      
+            
       // Обновляем состояние
       setUser(null);
       setIsAuthenticated(false);

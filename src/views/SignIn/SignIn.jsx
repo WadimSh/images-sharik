@@ -67,10 +67,6 @@ export const SignIn = () => {
 
       login(result);
 
-      if (result.user.company[0].id) {
-        localStorage.setItem('company', result.user.company[0].id);
-      }
-        
       // Очищаем форму
       setFormData({ login: '', password: ''});
       setTimeout(() => navigate('/'), 1000);

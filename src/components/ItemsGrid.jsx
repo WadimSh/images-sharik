@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
+import { IoFolderOpen } from 'react-icons/io5';
 
 import { replacePlaceholders } from '../utils/replacePlaceholders';
 import { useMarketplace } from '../contexts/contextMarketplace';
@@ -12,7 +13,7 @@ import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
 import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
 import { Tooltip } from '../ui/Tooltip/Tooltip';
 import { ImageSliderModal } from './ImageSliderModal';
-import { isToday } from '../utils/isToday';
+import { apiCheckArticleHistories } from '../services/historiesService';
 
 // Добавляем вспомогательную функцию для фильтрации элементов по стилю
 const filterElementsByStyle = (elements, styleVariant) => {
@@ -41,6 +42,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const { marketplace } = useMarketplace();
   const getCode = useGetCode();
   
+  const [galleryCounts, setGalleryCounts] = useState({});
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
@@ -224,6 +226,55 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
       // Сохраняем изображения в состояние
       updateProductImages({ [baseCode]: workingImages });
     }
+  };
+
+  // Функция для проверки наличия дизайнов в галерее
+  const checkGalleryDesigns = async (baseCode) => {
+    try {
+      const response = await apiCheckArticleHistories(baseCode);
+      if (response && typeof response.hasHistories !== 'undefined') {
+        setGalleryCounts(prev => ({
+          ...prev,
+          [baseCode]: {
+            hasHistories: response.hasHistories,
+            count: response.count || 0
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(`Error checking gallery designs for ${baseCode}:`, error);
+      setGalleryCounts(prev => ({
+        ...prev,
+        [baseCode]: {
+          hasHistories: false,
+          count: 0
+        }
+      }));
+    }
+  };
+
+  // Эффект для проверки дизайнов при загрузке компонента
+  useEffect(() => {
+    const checkAllGalleryDesigns = async () => {
+      const uniqueBaseCodes = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+      
+      for (const baseCode of uniqueBaseCodes) {
+        // Проверяем только если еще не проверяли или если нужно обновить
+        if (!galleryCounts[baseCode]) {
+          await checkGalleryDesigns(baseCode);
+        }
+      }
+    };
+
+    if (items.length > 0) {
+      checkAllGalleryDesigns();
+    }
+  }, [items]);
+
+  // Функция для обработки клика по кнопке галереи
+  const handleGalleryButtonClick = (baseCode) => {
+    // Переходим на страницу галереи с фильтром по артикулу
+    navigate(`/gallery?search=${baseCode}`);
   };
 
   // Загрузка изображений при изменении baseCodes
@@ -839,6 +890,48 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     // blowouts: t('grid.blowouts'),
   };
 
+  const GalleryButtonMinimal = ({ baseCode }) => {
+    const galleryInfo = galleryCounts[baseCode];
+    
+    if (!galleryInfo || !galleryInfo.hasHistories) {
+      return null;
+    }
+
+    return (
+      <div style={{ marginLeft: 'auto' }}>
+        <Tooltip
+          content={`Перейти к ${galleryInfo.count} дизайнам в галерее`}
+          position="bottom"
+        >
+          <button
+            className="gallery-button"
+            onClick={() => handleGalleryButtonClick(baseCode)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 12px',
+              backgroundColor: '#669fdcff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
+          >
+            <IoFolderOpen size={16} />
+            <span style={{ paddingTop: "2px" }}>В Галерее:</span> 
+            <span style={{ paddingTop: "2px" }}>{galleryInfo.count}</span>
+          </button>
+        </Tooltip>
+      </div>
+    );
+  };
+
   // Вспомогательная функция для рендеринга контролов выбора шаблона
   const renderTemplateControls = (baseCode, currentTemplate) => {
     const wbCode = getCode(baseCode, "WB");
@@ -850,26 +943,30 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
 
     // Определяем, какой стиль должен быть активным
     const getActiveStyleId = () => {
-    if (availableStyles.includes(currentStyle)) {
-      return currentStyle;
-    }
-    if (availableStyles.includes('default')) {
-      return 'default';
-    }
-    return availableStyles.length > 0 ? availableStyles[0] : 'default';
-  };
+      if (availableStyles.includes(currentStyle)) {
+        return currentStyle;
+      }
+      if (availableStyles.includes('default')) {
+        return 'default';
+      }
+      return availableStyles.length > 0 ? availableStyles[0] : 'default';
+    };
     
     const activeStyleId = getActiveStyleId();
+    const galleryInfo = galleryCounts[baseCode];
 
     return (
       <div className={`template-selector ${marketplace}`} >
         <div className="template-selector-controls">
-          <CustomSelect 
-            options={templateOptions}
-            value={currentTemplate}
-            onChange={(value) => handleTemplateChange(baseCode, value)}
-            dropdownMaxHeight="300px"
-          />
+          <div style={{ width: '240px' }}>
+            <CustomSelect 
+              options={templateOptions}
+              value={currentTemplate}
+              onChange={(value) => handleTemplateChange(baseCode, value)}
+              dropdownMaxHeight="300px"
+            />
+          </div>
+          
 
           {availableStyles.length > 1 && (
             <div className="style-buttons">
@@ -891,6 +988,10 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
             </div>
           )}
         </div>
+        
+        {galleryInfo?.hasHistories && (
+          <GalleryButtonMinimal baseCode={baseCode} />
+        )}
         
         <div className="template-selector-controls">
           {(wbCode !== baseCode || ozCode !== baseCode) ? <span>{t('grid.linkTo')}</span> : <span>{t('grid.linkNo')}</span>}
@@ -995,6 +1096,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
                 {baseCode}
                 {productMeta.name && <span className="item-subtitle">  {productMeta.name}</span>}
               </h2>
+
               {marketplace === 'WB' && (renderImagePreviews(baseCode))}
             </div>
 

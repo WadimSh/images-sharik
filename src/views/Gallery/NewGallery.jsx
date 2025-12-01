@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
@@ -10,12 +10,12 @@ import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
-import { historyDB } from '../../utils/handleDB';
 import { apiGetAllHistories, apiToggleLikeHistoriy, apiDeleteHistoriy, apiBulkDeactivateHistories } from '../../services/historiesService';
 import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
 
-export const Gallery2 = () => {
+export const NewGallery = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
@@ -31,18 +31,52 @@ export const Gallery2 = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  
+  // Инициализируем фильтры с возможностью получения search из URL
   const [filters, setFilters] = useState({
     mine: false,
-    search: '',      // для поиска по артикулам (если первые 2 символа цифры)
-    ownerSearch: '', // для поиска по автору (если первые 2 символа НЕ цифры)
+    search: '',
+    ownerSearch: '',
     marketplace: '',
     size: '',
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
   
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   const currentUserId = user?.id || null; 
   
+  // Функция для извлечения query-параметров из URL
+  const getSearchFromUrl = () => {
+    const searchParams = new URLSearchParams(location.search);
+    return searchParams.get('search') || '';
+  };
+  
+  // Инициализация фильтров с учетом URL параметров
+  useEffect(() => {
+    if (isInitialized) return; // Защита от повторной инициализации
+    
+    const urlSearch = getSearchFromUrl();
+    
+    if (urlSearch) {
+      // Определяем, является ли поиск по артикулу или по автору
+      const isArticleSearch = /^\d{2}/.test(urlSearch);
+      
+      setFilters(prev => ({
+        ...prev,
+        search: isArticleSearch ? urlSearch : '',
+        ownerSearch: !isArticleSearch ? urlSearch : ''
+      }));
+      
+      // Очищаем URL после использования
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    setIsInitialized(true);
+  }, [location.search, isInitialized]);
+
   const transformDesignData = (design) => {
     const likesArray = design.likes || [];
     const likesCount = likesArray.length;
@@ -57,18 +91,17 @@ export const Gallery2 = () => {
 
   const isDesignBelongsToUser = (design) => {
     if (!user || !design.owner) return false;
-
     return design.owner._id === user.id;
   }
 
-  const loadDesignsFromBackend = useCallback(async () => {
+  const loadDesignsFromBackend = useCallback(async (currentFilters) => {
     try {
       setLoading(true);
       
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        ...filters
+        ...currentFilters
       };
       
       Object.keys(params).forEach(key => {
@@ -95,7 +128,7 @@ export const Gallery2 = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, itemsPerPage, filters]);
+  }, [currentPage, itemsPerPage, currentUserId]); // Убрали filters из зависимостей
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -113,6 +146,20 @@ export const Gallery2 = () => {
     }));
     setCurrentPage(1);
   };
+
+  // Основной эффект для загрузки данных
+  useEffect(() => {
+    if (isInitialized) {
+      loadDesignsFromBackend(filters);
+    }
+  }, [loadDesignsFromBackend, filters, isInitialized]); // Теперь filters правильно обновляется
+
+  // Эффект для обработки изменения currentPage и itemsPerPage
+  useEffect(() => {
+    if (isInitialized) {
+      loadDesignsFromBackend(filters);
+    }
+  }, [currentPage, itemsPerPage, isInitialized]); // Отдельный эффект для пагинации
 
   const handleToggleLike = async (designId, e) => {
     e.stopPropagation();
@@ -159,20 +206,16 @@ export const Gallery2 = () => {
         }));
       } else {
         console.warn('Like toggle response was not successful:', result);
-        await loadDesignsFromBackend();
+        loadDesignsFromBackend(filters);
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      await loadDesignsFromBackend();
+      loadDesignsFromBackend(filters);
     } finally {
       setLikingItem(null);
     }
   };
 
-  useEffect(() => {
-    loadDesignsFromBackend();
-  }, [loadDesignsFromBackend]);
- 
   // Функция для отмены выбора
   const handleCancelSelection = () => {
     setSelectedItems(new Set());
@@ -190,12 +233,9 @@ export const Gallery2 = () => {
         newSet.add(key);
       }
       
-      // Если есть выбранные элементы, включаем режим выбора
       if (newSet.size > 0 && !isSelectionMode) {
         setIsSelectionMode(true);
-      }
-      // Если все элементы отменены, выключаем режим выбора
-      else if (newSet.size === 0 && isSelectionMode) {
+      } else if (newSet.size === 0 && isSelectionMode) {
         setIsSelectionMode(false);
       }
       
@@ -205,7 +245,6 @@ export const Gallery2 = () => {
 
   // Функция для парсинга и форматирования заголовка
   const parseDesignTitle = (design) => {
-    
     return {
       articles: design.articles || '---',
       marketplace: design.marketplace || t('views.galleryUndefined'),
@@ -228,7 +267,6 @@ export const Gallery2 = () => {
   // Функция для удаления дизайна
   const handleDelete = async (key) => {
     try {
-      // Получаем дизайн по ключу или ID
       const design = designs.find(item => item.key === key || item.id === key);
 
       if (!design) {
@@ -236,27 +274,21 @@ export const Gallery2 = () => {
         return;
       }
 
-      // Проверяем, что дизайн принадлежит текущему пользователю
       if (!isDesignBelongsToUser(design)) {
-        console.error('Cannot delete: design does not belong to current user');
-        // Можно показать сообщение пользователю
         alert('Вы можете удалять только свои дизайны');
         return;
       }
 
-      // Проверяем наличие ID для удаления с бэкенда
       if (!design.id) {
-        console.error('Design has no ID for backend deletion:', design);
         alert('Ошибка: дизайн не может быть удален');
         return;
       }
 
-      // Показываем подтверждение
       if (!window.confirm('Вы уверены, что хотите удалить этот дизайн?')) {
         return;
       }
 
-      // Оптимистичное обновление UI - сразу удаляем из интерфейса
+      // Оптимистичное обновление UI
       setDesigns(prev => prev.filter(item => item.id !== design.id));
       setSelectedItems(prev => {
         const newSet = new Set(prev);
@@ -264,33 +296,25 @@ export const Gallery2 = () => {
         return newSet;
       });
 
-      // Удаляем с бэкенда
       await apiDeleteHistoriy(design.id);
       console.log('Design deleted from backend:', design.id);
-
-      // Показываем сообщение об успехе (опционально)
-      // Можно добавить Toast или другое уведомление
 
     } catch (error) {
       console.error('Error deleting design:', error);
 
-      // Восстанавливаем дизайн в UI при ошибке
       const design = designs.find(item => item.key === key || item.id === key);
       if (design) {
         setDesigns(prev => [...prev, design].sort((a, b) => {
-          // Сохраняем исходный порядок сортировки
           return new Date(b.createdAt) - new Date(a.createdAt);
         }));
       }
 
-      // Обработка ошибок
       if (error.response?.status === 404) {
         alert('Дизайн не найден или уже удален');
       } else if (error.response?.status === 403) {
         alert('У вас нет прав для удаления этого дизайна');
       } else if (error.response?.status === 401) {
         alert('Необходима авторизация');
-        // Перенаправляем на страницу входа
         navigate('/sign-in');
       } else if (error.response?.status === 400) {
         alert('Некорректный запрос на удаление');
@@ -304,7 +328,6 @@ export const Gallery2 = () => {
   const handleBulkDelete = async () => {
     if (selectedItems.size === 0) return;
   
-    // Проверяем ограничение в 100 элементов
     if (selectedItems.size > 100) {
       alert(`Можно удалить не более 100 дизайнов за раз. Вы выбрали: ${selectedItems.size}`);
       return;
@@ -318,11 +341,9 @@ export const Gallery2 = () => {
       const idsToDelete = [];
       const validDesigns = [];
 
-      // Собираем только валидные ID
       selectedItems.forEach(key => {
         const design = designs.find(item => item.key === key || item.id === key);
         if (design && design.id && isDesignBelongsToUser(design)) {
-          // Проверка формата MongoDB ID
           if (/^[0-9a-fA-F]{24}$/.test(design.id)) {
             idsToDelete.push(design.id);
             validDesigns.push(design);
@@ -343,21 +364,16 @@ export const Gallery2 = () => {
       setSelectedItems(new Set());
       setIsSelectionMode(false);
 
-      // Отправляем на бэкенд
       await apiBulkDeactivateHistories(idsToDelete);
-
-      // Успешное удаление
       console.log(`Bulk deletion successful: ${idsToDelete.length} items`);
 
     } catch (error) {
       console.error('Bulk deletion error:', error);
 
-      // При ошибке перезагружаем данные
-      await loadDesignsFromBackend();
+      loadDesignsFromBackend(filters);
       setSelectedItems(new Set());
       setIsSelectionMode(false);
 
-      // Показываем сообщение об ошибке
       const errorMsg = error.response?.data?.message || 'Ошибка при удалении дизайнов';
       alert(errorMsg);
     }
@@ -365,13 +381,12 @@ export const Gallery2 = () => {
 
   // Функция извлечения данных для построения структуры данных для страницы генерации
   const handleItemClick = async (design) => {
-    // Если включен режим выбора, обрабатываем клик как выбор элемента
     if (isSelectionMode) {
       toggleItemSelection(design.id, { stopPropagation: () => {} });
       return;
     }
 
-    setLoadingItemKey(design.id); // Устанавливаем ключ загружаемой карточки
+    setLoadingItemKey(design.id);
 
     try {
       const isCollage = design.type === 'collage';
@@ -391,16 +406,12 @@ export const Gallery2 = () => {
         throw new Error("Не удалось определить артикул дизайна");
       }
 
-      // Извлекаем информацию о типе дизайна
       const designInfo = extractDesignInfo(design.type);
-
-      // Формируем ключ для sessionStorage
       const storageKey = `design-${article}_${designInfo.slideNumber}`;
 
-      // Сохраняем данные в sessionStorage
       sessionStorage.setItem(storageKey, JSON.stringify(design.data || []));
-      sessionStorage.setItem('size', JSON.stringify(design.size))
-      // Выполняем запросы последовательно с await
+      sessionStorage.setItem('size', JSON.stringify(design.size));
+      
       const searchResponse = await fetch(
         `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${article}`
       );
@@ -424,10 +435,8 @@ export const Gallery2 = () => {
 
       const detailedData = await detailedResponse.json();
 
-      // Обрабатываем полученные данные API
       const processedMetaResults = processProductsMeta(detailedData);
 
-      // Сохраняем обработанные данные
       processedMetaResults.forEach(item => {
         if (item) {
           sessionStorage.setItem(
@@ -437,15 +446,12 @@ export const Gallery2 = () => {
         }
       });
 
-      // Формируем роут для перехода
       const route = `/template/${article}_${designInfo.slideNumber}`;
-
-      // Перенаправляем
       navigate(route);
     } catch (error) {
       console.error('Design processing error:', error);
     } finally {
-      setLoadingItemKey(null); // Сбрасываем после завершения
+      setLoadingItemKey(null);
     }
   };
 
@@ -464,7 +470,6 @@ export const Gallery2 = () => {
       const properties = item.properties || [];
       const originProperties = item.origin_properties || [];
   
-      // Формируем массив ссылок на изображения
       const images = item.images.map(image => 
         `https://new.sharik.ru${image.image}`
       );
@@ -472,7 +477,6 @@ export const Gallery2 = () => {
       const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
       const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
 
-      // Добавляем определение типа шаблона
       const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
       const brand = brandProperty ? brandProperty.value : '';
       const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : 'main';
@@ -482,20 +486,17 @@ export const Gallery2 = () => {
         name: item.name,
         multiplicity: item.multiplicity,
         link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
-        images: images, // Массив ссылок на все изображения товара
+        images: images,
         properties: propertiesList,
         originProperties: originPropertiesList,
-        templateType: templateType, // Добавлено новое поле
+        templateType: templateType,
       };
-    }); // Фильтруем некорректные элементы
+    }).filter(Boolean);
   };
 
-  // Функция для извлечения информации о дизайне из ключа
   const extractDesignInfo = (types) => {
-    // Определяем номер слайда
-    let slideNumber = 1; // По умолчанию main = 1
+    let slideNumber = 1;
 
-    // Ищем часть, содержащую информацию о типе слайда
     const slidePart = types.find(part => 
       part === 'main' || part.startsWith('slide')
     );
@@ -504,7 +505,6 @@ export const Gallery2 = () => {
       if (slidePart === 'main') {
         slideNumber = 1;
       } else if (slidePart.startsWith('slide')) {
-        // Извлекаем номер из slide2, slide3 и т.д.
         const numberPart = slidePart.replace('slide', '');
         const parsedNumber = parseInt(numberPart, 10);
         if (!isNaN(parsedNumber)) {
@@ -513,9 +513,7 @@ export const Gallery2 = () => {
       }
     }
 
-    return {
-      slideNumber
-    };
+    return { slideNumber };
   };
 
   return (
@@ -535,236 +533,230 @@ export const Gallery2 = () => {
       />
 
       {/* Панель массового удаления */}
-        <div className={`bulk-action-bar ${isSelectionMode ? 'visible' : ''}`}>
-          <div className="bulk-action-info">
-            {t('selection.counter')} {selectedItems.size}
-          </div>
-          <div className="bulk-action-buttons">
-            <button 
-              className="bulk-cancel-button"
-              onClick={handleCancelSelection}
-            >
-              {t('modals.cancel')}
-            </button>
-            <button 
-              className="bulk-delete-button"
-              onClick={handleBulkDelete}
-              disabled={selectedItems.size === 0}
-            >
-              {t('modals.delete')} ({selectedItems.size})
-            </button>
-          </div>
+      <div className={`bulk-action-bar ${isSelectionMode ? 'visible' : ''}`}>
+        <div className="bulk-action-info">
+          {t('selection.counter')} {selectedItems.size}
         </div>
+        <div className="bulk-action-buttons">
+          <button 
+            className="bulk-cancel-button"
+            onClick={handleCancelSelection}
+          >
+            {t('modals.cancel')}
+          </button>
+          <button 
+            className="bulk-delete-button"
+            onClick={handleBulkDelete}
+            disabled={selectedItems.size === 0}
+          >
+            {t('modals.delete')} ({selectedItems.size})
+          </button>
+        </div>
+      </div>
 
       {/* Пагинация */} 
-        <PaginationPanel
-          currentPage={currentPage}
-          totalCount={totalCount}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPageOptions={[10, 25, 50]}
-        />
+      <PaginationPanel
+        currentPage={currentPage}
+        totalCount={totalCount}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        itemsPerPageOptions={[10, 25, 50]}
+      />
         
       {loading ? (
         <div className="loader-container-gallery">
           <div className="loader"></div>
         </div>
       ) : (
-      <div className="items-grid-container" style={{ paddingBottom: '86px' }}>
-        {designs.length === 0 ? (
-          <div 
-          style={{ color: '#333', fontSize: '16px', textAlign: 'center', marginTop: '20px' }}>
-            <p>{t('views.galleryMessageTitle')}</p>
-            <p>{t('views.galleryMessageSubtitle')}</p>
-          </div>
-        ) : (
-        <div className="items-grid">
-          {designs.map((design) => {
-            const info = parseDesignTitle(design);
-            const isSelected = selectedItems.has(design.id);
-            const isHovered = hoveredItem === (design.id);
-            const isLiking = likingItem === design.id;
-            const belongsToUser = isDesignBelongsToUser(design);
-            console.log(design)
-            return (
-              <div 
-                key={design.id} 
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-                onMouseEnter={() => setHoveredItem(design.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-               
-              <div 
-                className='item-card'
-                style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px', position: 'relative' }}
-                onClick={(e) => {
-                  if (isSelectionMode) {
-                    toggleItemSelection(design.id, e);
-                  } else {
-                    marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
-                    handleItemClick(design);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                onMouseEnter={() => setHoveredItem(design.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
+        <div className="items-grid-container" style={{ paddingBottom: '86px' }}>
+          {designs.length === 0 ? (
+            <div 
+              style={{ color: '#333', fontSize: '16px', textAlign: 'center', marginTop: '20px' }}
+            >
+              <p>{t('views.galleryMessageTitle')}</p>
+              <p>{t('views.galleryMessageSubtitle')}</p>
+            </div>
+          ) : (
+            <div className="items-grid">
+              {designs.map((design) => {
+                const info = parseDesignTitle(design);
+                const isSelected = selectedItems.has(design.id);
+                const isHovered = hoveredItem === design.id;
+                const isLiking = likingItem === design.id;
+                const belongsToUser = isDesignBelongsToUser(design);
                 
-                {/* Кнопка лайка */}
-                <button
-                  className="like-button"
-                  onClick={(e) => handleToggleLike(design.id, e)}
-                  style={{
-                    position: 'absolute',
-                    bottom: '10px',
-                    right: '10px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '38px',
-                    height: '38px',
-                    paddingBottom: design.likesCount > 0 ? '10px' : '0px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 5,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  {isLiking ? (
-                    <div className="loader-small"></div>
-                  ) : design.hasLiked ? (
-                    <FaHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
-                  ) : (
-                    <FaRegHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
-                  )}
-                </button>
-                
-                {/* Счетчик лайков - ВСЕГДА видим если есть лайки */}
-                {design.likesCount > 0 && (
+                return (
                   <div 
-                    className="likes-count"
-                    onClick={(e) => handleToggleLike(design.id, e)}
-                    style={{
-                      cursor: 'pointer',
-                      position: 'absolute',
-                      bottom: '12px',
-                      right: '19px',
-                      width: '20px',
-                      textAlign: 'center',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#2d2d2d',
-                      zIndex: 5
-                    }}
+                    key={design.id} 
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                    onMouseEnter={() => setHoveredItem(design.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
                   >
-                    {design.likesCount}
-                  </div>
-                )}
-                
-                {/* Кнопка удаления */}
-                {belongsToUser && (
-                  <button
-                    className="delete-buttons"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(design.id);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '32px',
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      zIndex: 5,
-                      fontSize: '18px',
-                      fontWeight: '400',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-                                
-                {/* Чекбокс выбора - ТОЛЬКО при наведении */}
-                {(isHovered || isSelected) && belongsToUser && (
-                  <div 
-                    className="selection-checkbox-container"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleItemSelection(design.id, e);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      bottom: '10px',
-                      left: '10px',
-                      zIndex: 10
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      className="selection-checkbox"
-                      checked={isSelected}
-                      readOnly
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        cursor: 'pointer'
+                    <div 
+                      className='item-card'
+                      style={{ flexDirection: 'column', width: '100%', maxWidth: '270px', maxHeight: '360px', minWidth: '270px', minHeight: '360px', position: 'relative' }}
+                      onClick={(e) => {
+                        if (isSelectionMode) {
+                          toggleItemSelection(design.id, e);
+                        } else {
+                          marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
+                          handleItemClick(design);
+                        }
                       }}
-                    />
-                  </div>
-                )}
-              
-                <div className="item-content">
-                  <PreviewDesign elements={design.data} size={design.size} />
-              
-                  {loadingItemKey === design.id && 
-                    <div className="loader-container-gallery">
-                      <div className="loader"></div>
+                      role="button"
+                      tabIndex={0}
+                    >
+                      {/* Кнопка лайка */}
+                      <button
+                        className="like-button"
+                        onClick={(e) => handleToggleLike(design.id, e)}
+                        style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          right: '10px',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '38px',
+                          height: '38px',
+                          paddingBottom: design.likesCount > 0 ? '10px' : '0px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          zIndex: 5,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        {isLiking ? (
+                          <div className="loader-small"></div>
+                        ) : design.hasLiked ? (
+                          <FaHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
+                        ) : (
+                          <FaRegHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
+                        )}
+                      </button>
+                      
+                      {design.likesCount > 0 && (
+                        <div 
+                          className="likes-count"
+                          onClick={(e) => handleToggleLike(design.id, e)}
+                          style={{
+                            cursor: 'pointer',
+                            position: 'absolute',
+                            bottom: '12px',
+                            right: '19px',
+                            width: '20px',
+                            textAlign: 'center',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            color: '#2d2d2d',
+                            zIndex: 5
+                          }}
+                        >
+                          {design.likesCount}
+                        </div>
+                      )}
+                      
+                      {belongsToUser && (
+                        <button
+                          className="delete-buttons"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(design.id);
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '10px',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            zIndex: 5,
+                            fontSize: '18px',
+                            fontWeight: '400',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                          }}
+                        >
+                          ×
+                        </button>
+                      )}
+                                      
+                      {(isHovered || isSelected) && belongsToUser && (
+                        <div 
+                          className="selection-checkbox-container"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleItemSelection(design.id, e);
+                          }}
+                          style={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            left: '10px',
+                            zIndex: 10
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            className="selection-checkbox"
+                            checked={isSelected}
+                            readOnly
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              cursor: 'pointer'
+                            }}
+                          />
+                        </div>
+                      )}
+                    
+                      <div className="item-content">
+                        <PreviewDesign elements={design.data} size={design.size} />
+                    
+                        {loadingItemKey === design.id && 
+                          <div className="loader-container-gallery">
+                            <div className="loader"></div>
+                          </div>
+                        }
+                      </div>
                     </div>
-                  }
-                </div>
-              </div>
-              <div className="design-info-plate">
-                  <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
-                    <span className="info-label">{info.designType} {t('views.galleryLabelFor')} {info.marketplaceName}</span>
-                  </div>
+                    <div className="design-info-plate">
+                      <div className="info-row" style={{ fontSize: '14px', marginBottom: '10px' }}>
+                        <span className="info-label">{info.designType} {t('views.galleryLabelFor')} {info.marketplaceName}</span>
+                      </div>
 
-                  <div className="info-row">
-                    <span className="info-label">{t('views.galleryLabelProducts')}</span>
-                    <span className="info-value">{info.articles}</span>
-                  </div>
+                      <div className="info-row">
+                        <span className="info-label">{t('views.galleryLabelProducts')}</span>
+                        <span className="info-value">{info.articles}</span>
+                      </div>
 
-                  <div className="info-row">
-                    <span className="info-label">{t('views.galleryLabelSlideSize')}</span>
-                    <span className="info-value">{info.dimensions}</span>
-                  </div>
+                      <div className="info-row">
+                        <span className="info-label">{t('views.galleryLabelSlideSize')}</span>
+                        <span className="info-value">{info.dimensions}</span>
+                      </div>
 
-                  <div className="info-row">
-                    <span className="info-label">{t('views.galleryLabelGenerated')}</span>
-                    <span className="info-value">{info.date} {t('views.galleryLabelAt')} {info.time}</span>
-                  </div>
+                      <div className="info-row">
+                        <span className="info-label">{t('views.galleryLabelGenerated')}</span>
+                        <span className="info-value">{info.date} {t('views.galleryLabelAt')} {info.time}</span>
+                      </div>
 
-                  <div className="info-row">
-                    <span className="info-label">{t('Автор:')}</span>
-                    <span className="info-value">{info.owner}</span>
+                      <div className="info-row">
+                        <span className="info-label">{t('Автор:')}</span>
+                        <span className="info-value">{info.owner}</span>
+                      </div>
+                    </div>
                   </div>
-
-                  </div>
-              </div>
-            );
-          })} 
-        </div>)}
-      </div>)}
+                );
+              })} 
+            </div>
+          )}
+        </div>
+      )}
     </div>
-    
   );
 };
