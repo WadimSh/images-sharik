@@ -9,6 +9,7 @@ import { PreviewDesign } from '../../components/PreviewDesign';
 
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { useAuth } from '../../contexts/AuthContext';
 import { historyDB } from '../../utils/handleDB';
 import { apiGetAllHistories, apiToggleLikeHistoriy } from '../../services/historiesService';
 import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
@@ -18,6 +19,7 @@ export const Gallery2 = () => {
 
   const { t } = useContext(LanguageContext);
   const { marketplace, toggleMarketplace } = useMarketplace();
+  const { user } = useAuth();
 
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,12 +41,12 @@ export const Gallery2 = () => {
     sortOrder: 'desc'
   });
   
-  const currentUserId = '69202f02ff749d8f8a1bf1c4'; 
+  const currentUserId = user?.id || null; 
   
   const transformDesignData = (design) => {
     const likesArray = design.likes || [];
     const likesCount = likesArray.length;
-    const hasLiked = likesArray.includes(currentUserId);
+    const hasLiked = currentUserId ? likesArray.includes(currentUserId) : false;
     
     return {
       ...design,
@@ -52,6 +54,12 @@ export const Gallery2 = () => {
       hasLiked
     };
   };
+
+  const isDesignBelongsToUser = (design) => {
+    if (!user || !design.owner) return false;
+
+    return design.owner._id === user.id;
+  }
 
   const loadDesignsFromBackend = useCallback(async () => {
     try {
@@ -108,6 +116,11 @@ export const Gallery2 = () => {
 
   const handleToggleLike = async (designId, e) => {
     e.stopPropagation();
+
+    if (!user) {
+      navigate('/sign-in');
+      return;
+    }
     
     if (likingItem === designId) return;
     
@@ -190,7 +203,7 @@ export const Gallery2 = () => {
     });
   };
 
-  // Функция для парсинга и форматирования заголовка - ИСПРАВЛЕННАЯ
+  // Функция для парсинга и форматирования заголовка
   const parseDesignTitle = (design) => {
     
     return {
@@ -512,6 +525,7 @@ export const Gallery2 = () => {
             const isSelected = selectedItems.has(design.key || design.id);
             const isHovered = hoveredItem === (design.key || design.id);
             const isLiking = likingItem === design.id;
+            const belongsToUser = isDesignBelongsToUser(design);
             
             return (
               <div 
@@ -537,26 +551,8 @@ export const Gallery2 = () => {
                 onMouseEnter={() => setHoveredItem(design.key || design.id)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                {/* Счетчик лайков - ВСЕГДА видим если есть лайки */}
-                {design.likesCount > 0 && (
-                  <div 
-                    className="likes-count"
-                    style={{
-                      position: 'absolute',
-                      bottom: '42px',
-                      right: '16px',
-                      width: '20px',
-                      textAlign: 'center',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#626262',
-                      zIndex: 5
-                    }}
-                  >
-                    {design.likesCount}
-                  </div>
-                )}
-                {/* Кнопка лайка - ВСЕГДА видима */}
+                
+                {/* Кнопка лайка */}
                 <button
                   className="like-button"
                   onClick={(e) => handleToggleLike(design.id, e)}
@@ -566,8 +562,9 @@ export const Gallery2 = () => {
                     right: '10px',
                     border: 'none',
                     borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    width: '38px',
+                    height: '38px',
+                    paddingBottom: design.likesCount > 0 ? '10px' : '0px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -579,41 +576,64 @@ export const Gallery2 = () => {
                   {isLiking ? (
                     <div className="loader-small"></div>
                   ) : design.hasLiked ? (
-                    <FaHeart color="#ff4757" size={16} />
+                    <FaHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
                   ) : (
-                    <FaRegHeart color="#ff4757" size={16} />
+                    <FaRegHeart color="#ff4757" size={design.likesCount > 0 ? 16 : 20} />
                   )}
                 </button>
                 
+                {/* Счетчик лайков - ВСЕГДА видим если есть лайки */}
+                {design.likesCount > 0 && (
+                  <div 
+                    className="likes-count"
+                    onClick={(e) => handleToggleLike(design.id, e)}
+                    style={{
+                      cursor: 'pointer',
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '19px',
+                      width: '20px',
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: '#2d2d2d',
+                      zIndex: 5
+                    }}
+                  >
+                    {design.likesCount}
+                  </div>
+                )}
                 
-                {/* Кнопка удаления - ВСЕГДА видима */}
-                <button
-                  className="delete-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(design.key || design.id);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 5,
-                    fontSize: '18px',
-                    fontWeight: '400',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  ×
-                </button>
-                
+                {/* Кнопка удаления */}
+                {belongsToUser && (
+                  <button
+                    className="delete-buttons"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(design.key || design.id);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '32px',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 5,
+                      fontSize: '18px',
+                      fontWeight: '400',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+                                
                 {/* Чекбокс выбора - ТОЛЬКО при наведении */}
                 {(isHovered || isSelected) && (
                   <div 
