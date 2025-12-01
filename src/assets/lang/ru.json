@@ -312,7 +312,7 @@
     "signInTitle": "Вход в систему",
     "signInButton": "Войти",
     "signingIn": "Вход...",
-    "invalidCredentials": "Неверный логин или пароль",
+    "invalidCredentials": "Неверный email или пароль",
     "signInSuccess": "Вход выполнен успешно!",
     "signInError": "Произошла ошибка при входе. Попробуйте позже.",
     "forgotPassword": "Забыли пароль?",

@@ -6,10 +6,10 @@ import { MdCreateNewFolder } from "react-icons/md";
 
 import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
+import { useAuth } from "../contexts/AuthContext";
 import { db, productsDB, slidesDB, usersDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
-import { isToday } from "../utils/isToday";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -24,76 +24,36 @@ const SearchHeader = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
+  const { user, isAuthenticated } = useAuth();
+
   const headerRightRef = useRef(null);
-  const [hasKeys, setHasKeys] = useState(false);
-  const [hasUsers, setHasUsers] = useState(false); 
-  const [userLogin, setUserLogin] = useState(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
-  // Функция для проверки наличия пользователей
-  const checkUsers = async () => {
-    try {
-      const users = await usersDB.getAll();
-
-      if (users.length === 0) {
-        setHasUsers(false);
-        return;
-      }
-
-      // Проверяем всех пользователей на наличие сегодняшнего логина
-      const hasUserLoggedInToday = users.some(user => 
-        user.lastLogin && isToday(user.lastLogin)
-      );
-
-      setHasUsers(hasUserLoggedInToday);
-
-    } catch (error) {
-      console.error('Error checking users:', error);
-      setHasUsers(false);
-    }
+  const getUserName = () => {
+    if (!user) return null;
+    
+    // Возвращаем username или часть email
+    return user.username || (user.email ? user.email.split('@')[0] : null);
   };
+
+  const userName = getUserName();
 
   // Функция для проверки аутентификации пользователя
   const checkUserAuthentication = async () => {
     try {
-      const users = await usersDB.getAll();
-      
-      // Если нет пользователей - перенаправляем на регистрацию
-      if (users.length === 0) {
-        navigate('/sign-up');
-        return false;
-      }
-      
-      // Если есть пользователи, проверяем lastLogin
-      const currentUser = users[0];
-      
-      // Проверяем, что lastLogin не сегодня
-      if (!isToday(currentUser.lastLogin)) {
+      const user = localStorage.getItem('user');
+            
+      if (!user) {
         navigate('/sign-in');
         return false;
       }
-      
+
       return true;
     } catch (error) {
-      console.error('Error checking user authentication:', error);
+      console.error('Auth check error:', error);
       navigate('/sign-in');
       return false;
-    }
-  };
-
-  const getUserLogin = async () => {
-    try {
-      const users = await usersDB.getAll();
-      if (users.length === 0) {
-        return null; 
-      }
-
-      return users[0].login || null;
-
-    } catch (error) {
-      console.error('Error:', error);
-      return null;
     }
   };
 
@@ -177,78 +137,57 @@ const SearchHeader = ({
     };
   }, []);
 
-  useEffect(() => {
-    const checkHistory = async () => {
-      try {
-        // Получаем количество записей в таблице
-        const count = await db.history.count();
-        setHasKeys(count > 0);
-      } catch (error) {
-        console.error('Error checking the history:', error);
-        setHasKeys(false);
-      }
-    };
-  
-    checkHistory();
-  }, []);
-
-  // Проверяем наличие пользователей при загрузке компонента
-   useEffect(() => {
-    const initializeUserData = async () => {
-      await checkUsers();
-      
-      // Если есть пользователи, получаем логин
-      if (hasUsers) {
-        const login = await getUserLogin();
-        setUserLogin(login);
-      }
-    };
-
-    initializeUserData();
-  }, [hasUsers]);
-
   return (
     <div className={`search-header ${isSearchActive ? 'active' : ''}`}>
       <div ref={headerRightRef} className={`header-right ${isHeaderHidden ? 'hidden' : ''}`}>
-        {hasUsers && (
+        {/*hasUsers && (
           <button onClick={handleCreateTamplete} className="creat-temp-button">
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
-        )}
+        )*/}
         <LanguageSwitcher />
       </div>
       <div className="header-top">
-        {!hasUsers ? (<>
-          <h2 style={{
-            paddingBottom: '12px',
-            margin: 0
-          }}>
-            {t('header.title')}
-          </h2>
-          <p style={{
-            fontSize: '20px',
-            color: 'rgba(0,0,0,0.8)',
-            margin: '0px',
-            paddingBottom: '18px'
-          }}>
-            {t('header.description')}
-          </p>
-        </>) : (<>
-          <h2 style={{
-            paddingBottom: '12px',
-            margin: 0
-          }}>
-            {userLogin ? `${t('header.titleNext')}, ${userLogin}!` : t('header.titleNext')}
-          </h2>
-          <p style={{
-            fontSize: '20px',
-            color: 'rgba(0,0,0,0.8)',
-            margin: '0px',
-            paddingBottom: '18px'
-          }}>
-            {t('header.descriptionNext')}
-          </p>
-        </>)}
+        {!isAuthenticated ? (
+          // Для неавторизованных пользователей - стандартный заголовок
+          <>
+            <h2 style={{
+              paddingBottom: '12px',
+              margin: 0
+            }}>
+              {t('header.title')}
+            </h2>
+            <p style={{
+              fontSize: '20px',
+              color: 'rgba(0,0,0,0.8)',
+              margin: '0px',
+              paddingBottom: '18px'
+            }}>
+              {t('header.description')}
+            </p>
+          </>
+        ) : (
+          // Для авторизованных пользователей - приветствие с именем
+          <>
+            <h2 style={{
+              paddingBottom: '12px',
+              margin: 0
+            }}>
+              {userName 
+                ? `${t('header.titleNext')}, ${userName}!` 
+                : t('header.titleNext')
+              }
+            </h2>
+            <p style={{
+              fontSize: '20px',
+              color: 'rgba(0,0,0,0.8)',
+              margin: '0px',
+              paddingBottom: '18px'
+            }}>
+              {t('header.descriptionNext')}
+            </p>
+          </>
+        )}
       </div>
       <div className="search-wrapper">
         <div className="input-container">
@@ -298,21 +237,16 @@ const SearchHeader = ({
         <button onClick={handleToggleCollage} className="template-button" style={{ background: 'transparent' }}>
           <RiCollageFill /> {t('header.createCollage')}
         </button>
-        <button 
-          onClick={handleGalleryClick} 
-          className="template-button" 
-          style={{ background: 'transparent' }}
-          disabled={!hasKeys}
-        >
+        <button onClick={handleGalleryClick} className="template-button" style={{ background: 'transparent' }}>
           <IoFolderOpen /> {t('header.gallery')}
         </button>
       </div>}
-      {isPinModalOpen && (
+      {/*isPinModalOpen && (
         <PinModal 
         isOpen={isPinModalOpen} 
         onClose={() => setIsPinModalOpen(false)} 
       />
-      )}
+      )*/}
     </div>
   );
 };

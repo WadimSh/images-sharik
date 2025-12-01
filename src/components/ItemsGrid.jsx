@@ -689,19 +689,9 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
   const handleItemClick = async (itemId) => {
     try {
       // Проверяем наличие пользователей
-      const users = await usersDB.getAll();
-      
-      // Если нет пользователей - перенаправляем на регистрацию
-      if (users.length === 0) {
-        navigate('/sign-up');
-        return;
-      }
-      
-      // Если есть пользователи, проверяем lastLogin
-      const currentUser = users[0]; // Берем первого пользователя (предполагаем одного пользователя)
-      
-      // Проверяем, что lastLogin не сегодня
-      if (!isToday(currentUser.lastLogin)) {
+      const user = localStorage.getItem('user');
+            
+      if (!user) {
         navigate('/sign-in');
         return;
       }

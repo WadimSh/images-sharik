@@ -312,7 +312,7 @@
     "signInTitle": "Login to system",
     "signInButton": "Log in",
     "signingIn": "Logging in...",
-    "invalidCredentials": "Invalid login or password",
+    "invalidCredentials": "Invalid email or password",
     "signInSuccess": "Login successful!",
     "signInError": "An error occurred during login. Please try again later.",
     "forgotPassword": "Forgot password?",

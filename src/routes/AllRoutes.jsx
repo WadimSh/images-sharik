@@ -24,29 +24,29 @@ const AllRoutes = () => {
       <Route 
         path="/template/:id" 
         element={
-          <DBProtectedRoute>
+          <ProtectedRoute>
             <Generator />
-          </DBProtectedRoute>
+          </ProtectedRoute>
         } 
       />
       
       <Route 
         path="/gallery" 
         element={
-          <DBProtectedRoute>
+          <ProtectedRoute>
             <Gallery2 />
-          </DBProtectedRoute>
+          </ProtectedRoute>
         } 
       />
       
-      <Route 
+      {/*<Route 
         path="/create" 
         element={
           <ProtectedRoute>
             <Template />
           </ProtectedRoute>
         } 
-      />
+      />*/}
     </Routes>
   );
 };

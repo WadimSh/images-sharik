@@ -1,19 +1,19 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { usersDB, historyDB } from '../../utils/handleDB';
-import { syncUserToBackend } from '../../services/temporaryService';
 import { PasswordInput } from '../../ui/PasswordInput/PasswordInput';
 import { LanguageContext } from "../../contexts/contextLanguage";
 import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 import { apiSignIn } from '../../services/authService';
-import { apiCreateHistoriy } from '../../services/historiesService';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const SignIn = () => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
+  const { login } = useAuth();
+
   const [formData, setFormData] = useState({
-    login: '',
+    email: '',
     password: ''
   });
   const [message, setMessage] = useState('');
@@ -32,8 +32,9 @@ export const SignIn = () => {
     setMessage('');
     setIsError(false);
 
-    if (formData.login.length < 3) {
-      setMessage('auth.loginLength');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage('Введите корректный email адрес');
       setIsError(true);
       return false;
     }
@@ -50,6 +51,8 @@ export const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setMessage('');
+    setIsError(false);
 
     if (!validateForm()) {
       setIsLoading(false);
@@ -57,87 +60,30 @@ export const SignIn = () => {
     }
 
     try {
-      // Проверяем учетные данные
-      const user = await usersDB.verifyCredentials(formData.login, formData.password);
-      
-      if (!user) {
-        setMessage('auth.invalidCredentials');
-        setIsError(true);
-        setIsLoading(false);
-        return;
-      }
-      
-      // Проверяем флаг синхронизации конкретного пользователя
-      const isUserSynced = await usersDB.getSyncFlag(user.id);
-      
-      // Если флага нет - отправляем данные на сервер
-      if (!isUserSynced) {
-        try {
-          // Берем данные пользователя из базы
-          const userData = {
-            username: user.login,
-            email: user.email,
-            password: formData.password // используем введенный пароль
-          };
-      
-          // Отправляем на сервер
-          await syncUserToBackend(userData);
-          
-          // Если успешно - выставляем флаг для этого пользователя
-          await usersDB.setSyncFlag(user.id, true);
-          console.log('User data synced to backend successfully');
-          
-        } catch (syncError) {
-          // Если ошибка - просто логируем и продолжаем работу
-          console.warn('Failed to sync user to backend, continuing with local auth:', syncError);
-          // НЕ блокируем пользователя, продолжаем как обычно
-        }
-      } else {
-        // Если флаг есть - авторизовываемся на бекенде
-        try {
-          const result = await apiSignIn({
-            email: user.email,
-            password: formData.password
-          });
-
-          if (result.user.company[0].id) {
-            localStorage.setItem('company', result.user.company[0].id);
-          }
-         
-        } catch (authError) {
-          console.warn('Failed to sync user to backend, continuing with local auth:', authError);
-        }
-      }
-
-      // Обновляем время последнего входа
-      await usersDB.update(user.id, { lastLogin: new Date() });
-
-      setMessage('auth.signInSuccess');
-      setIsError(false);
-
-      // Очищаем форму
-      setFormData({
-        login: '',
-        password: ''
+      const result = await apiSignIn({
+        email: formData.email,
+        password: formData.password
       });
 
-      // Перенаправляем на главную страницу через 1.5 секунды
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
+      login(result);
 
+      if (result.user.company[0].id) {
+        localStorage.setItem('company', result.user.company[0].id);
+      }
+        
+      // Очищаем форму
+      setFormData({ login: '', password: ''});
+      setTimeout(() => navigate('/'), 1000);
     } catch (error) {
       console.error('Error when logging in:', error);
-      setMessage('auth.signInError');
+      setMessage(error.response?.status === 401 
+        ? 'auth.invalidCredentials' 
+        : 'auth.signInError'
+      );
       setIsError(true);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleForgotPassword = () => {
-    sessionStorage.setItem('fromSignIn', 'true');
-    navigate('/reset-password');
   };
 
   return (
@@ -181,18 +127,17 @@ export const SignIn = () => {
             color: '#555',
             fontSize: '14px'
           }}>
-            {t('auth.loginLabel')} <span style={{ color: '#c62828' }}>*</span>
+            {t('auth.emailLabel')} <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
-            type="text"
-            id="login"
-            name="login"
-            value={formData.login}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleInputChange}
             required
-            minLength={3}
             disabled={isLoading}
-            placeholder={t('auth.loginPlaceholder')}
+            placeholder={t('auth.emailPlaceholder')}
             style={{ 
               width: '100%', 
               padding: '12px', 
@@ -253,23 +198,6 @@ export const SignIn = () => {
           {isLoading ? t('auth.signingIn') : t('auth.signInButton')}
         </button>
       </form>
-
-      {/*<div style={{
-        marginTop: '20px',
-        textAlign: 'center',
-        fontSize: '14px',
-        color: '#666'
-      }}>
-        <a 
-          href="#reset-password" 
-          onClick={handleForgotPassword}
-          style={{
-          color: '#007bff',
-          textDecoration: 'none'
-        }}>
-          {t('auth.forgotPassword')}
-        </a>
-      </div>*/}
 
       {message && (
         <div style={{

@@ -312,7 +312,7 @@
     "signInTitle": "Anmeldung im System",
     "signInButton": "Anmelden",
     "signingIn": "Anmeldung...",
-    "invalidCredentials": "Ungültiger Login oder Passwort",
+    "invalidCredentials": "Ungültiger E-Mail oder Passwort",
     "signInSuccess": "Anmeldung erfolgreich!",
     "signInError": "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
     "forgotPassword": "Passwort vergessen?",
