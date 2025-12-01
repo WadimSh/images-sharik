@@ -11,7 +11,7 @@ import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 import { historyDB } from '../../utils/handleDB';
-import { apiGetAllHistories, apiToggleLikeHistoriy } from '../../services/historiesService';
+import { apiGetAllHistories, apiToggleLikeHistoriy, apiDeleteHistoriy, apiBulkDeactivateHistories } from '../../services/historiesService';
 import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
 
 export const Gallery2 = () => {
@@ -230,33 +230,139 @@ export const Gallery2 = () => {
 
   // Функция для удаления дизайна
   const handleDelete = async (key) => {
-    await historyDB.delete(key);
-    setDesigns(prev => prev.filter(item => item.key !== key));
-    // Удаляем из выбранных, если был выбран
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(key);
-      return newSet;
-    });
+    try {
+      // Получаем дизайн по ключу или ID
+      const design = designs.find(item => item.key === key || item.id === key);
+
+      if (!design) {
+        console.error('Design not found:', key);
+        return;
+      }
+
+      // Проверяем, что дизайн принадлежит текущему пользователю
+      if (!isDesignBelongsToUser(design)) {
+        console.error('Cannot delete: design does not belong to current user');
+        // Можно показать сообщение пользователю
+        alert('Вы можете удалять только свои дизайны');
+        return;
+      }
+
+      // Проверяем наличие ID для удаления с бэкенда
+      if (!design.id) {
+        console.error('Design has no ID for backend deletion:', design);
+        alert('Ошибка: дизайн не может быть удален');
+        return;
+      }
+
+      // Показываем подтверждение
+      if (!window.confirm('Вы уверены, что хотите удалить этот дизайн?')) {
+        return;
+      }
+
+      // Оптимистичное обновление UI - сразу удаляем из интерфейса
+      setDesigns(prev => prev.filter(item => item.id !== design.id));
+      setSelectedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(key);
+        return newSet;
+      });
+
+      // Удаляем с бэкенда
+      await apiDeleteHistoriy(design.id);
+      console.log('Design deleted from backend:', design.id);
+
+      // Показываем сообщение об успехе (опционально)
+      // Можно добавить Toast или другое уведомление
+
+    } catch (error) {
+      console.error('Error deleting design:', error);
+
+      // Восстанавливаем дизайн в UI при ошибке
+      const design = designs.find(item => item.key === key || item.id === key);
+      if (design) {
+        setDesigns(prev => [...prev, design].sort((a, b) => {
+          // Сохраняем исходный порядок сортировки
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }));
+      }
+
+      // Обработка ошибок
+      if (error.response?.status === 404) {
+        alert('Дизайн не найден или уже удален');
+      } else if (error.response?.status === 403) {
+        alert('У вас нет прав для удаления этого дизайна');
+      } else if (error.response?.status === 401) {
+        alert('Необходима авторизация');
+        // Перенаправляем на страницу входа
+        navigate('/sign-in');
+      } else if (error.response?.status === 400) {
+        alert('Некорректный запрос на удаление');
+      } else {
+        alert('Ошибка при удалении дизайна. Пожалуйста, попробуйте снова.');
+      }
+    }
   };
 
   // Функция для массового удаления выбранных дизайнов
   const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) return;
+  
+    // Проверяем ограничение в 100 элементов
+    if (selectedItems.size > 100) {
+      alert(`Можно удалить не более 100 дизайнов за раз. Вы выбрали: ${selectedItems.size}`);
+      return;
+    }
+
+    if (!window.confirm(`Вы уверены, что хотите удалить ${selectedItems.size} выбранных дизайнов?`)) {
+      return;
+    }
+
     try {
-      const keysToDelete = Array.from(selectedItems);
-      
-      // Удаляем из базы данных
-      for (const key of keysToDelete) {
-        await historyDB.delete(key);
+      const idsToDelete = [];
+      const validDesigns = [];
+
+      // Собираем только валидные ID
+      selectedItems.forEach(key => {
+        const design = designs.find(item => item.key === key || item.id === key);
+        if (design && design.id && isDesignBelongsToUser(design)) {
+          // Проверка формата MongoDB ID
+          if (/^[0-9a-fA-F]{24}$/.test(design.id)) {
+            idsToDelete.push(design.id);
+            validDesigns.push(design);
+          }
+        }
+      });
+
+      if (idsToDelete.length === 0) {
+        alert('Нет выбранных дизайнов, которые можно удалить');
+        return;
       }
-      
-      // Обновляем состояние
-      setDesigns(prev => prev.filter(item => !selectedItems.has(item.key)));
+
+      // Оптимистичное обновление
+      setDesigns(prev => prev.filter(design => 
+        !validDesigns.some(d => d.id === design.id)
+      ));
+
       setSelectedItems(new Set());
       setIsSelectionMode(false);
-            
+
+      // Отправляем на бэкенд
+      await apiBulkDeactivateHistories(idsToDelete);
+
+      // Успешное удаление
+      console.log(`Bulk deletion successful: ${idsToDelete.length} items`);
+
     } catch (error) {
-      console.error('Error during bulk deletion:', error);
+      console.error('Bulk deletion error:', error);
+
+      // При ошибке перезагружаем данные
+      await loadDesignsFromBackend();
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
+
+      // Показываем сообщение об ошибке
+      const errorMsg = error.response?.data?.message || 'Ошибка при удалении дизайнов';
+      alert(errorMsg);
     }
   };
 
@@ -610,7 +716,7 @@ export const Gallery2 = () => {
                     className="delete-buttons"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(design.key || design.id);
+                      handleDelete(design.id);
                     }}
                     style={{
                       position: 'absolute',
@@ -635,7 +741,7 @@ export const Gallery2 = () => {
                 )}
                                 
                 {/* Чекбокс выбора - ТОЛЬКО при наведении */}
-                {(isHovered || isSelected) && (
+                {(isHovered || isSelected) && belongsToUser && (
                   <div 
                     className="selection-checkbox-container"
                     onClick={(e) => {
@@ -655,8 +761,8 @@ export const Gallery2 = () => {
                       checked={isSelected}
                       readOnly
                       style={{
-                        width: '18px',
-                        height: '18px',
+                        width: '20px',
+                        height: '20px',
                         cursor: 'pointer'
                       }}
                     />
