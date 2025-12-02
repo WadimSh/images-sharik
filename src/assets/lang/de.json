@@ -148,7 +148,9 @@
     "blowouts": "Ausblaser",
     "linkTo": "Produktlinks auf:",
     "linkNo": "Produkt nicht auf Marktplätzen verfügbar",
-    "placeholder": "Neuen Slider erstellen"
+    "placeholder": "Neuen Slider erstellen",
+    "buttonMinimal": "In Galerie:",
+    "tooltipMinimal": "Zu {count} Designs in der Galerie gehen"
   },
   "views": {
     "homeMissingCode": "Ändern Sie die Suchparameter oder verwenden Sie andere Schlüsselwörter.",

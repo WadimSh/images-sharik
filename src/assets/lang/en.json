@@ -148,7 +148,9 @@
     "blowouts": "Blowouts",
     "linkTo": "product links on:",
     "linkNo": "product not available on marketplaces",
-    "placeholder": "Create new slider"
+    "placeholder": "Create new slider",
+    "buttonMinimal": "In Gallery:",
+    "tooltipMinimal": "Go to {count} designs in gallery"
   },
   "views": {
     "homeMissingCode": "Try changing your search parameters or use different keywords.",

@@ -7,7 +7,6 @@ import ResetPassword from "../views/ResetPassword";
 import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
-import { NewGallery } from "../views/Gallery/NewGallery";
 import Template from "../views/Template";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -32,7 +31,7 @@ const AllRoutes = () => {
         path="/gallery" 
         element={
           <ProtectedRoute>
-            <NewGallery />
+            <Gallery />
           </ProtectedRoute>
         } 
       />

@@ -897,10 +897,13 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
       return null;
     }
 
+    const rangeText = t('grid.tooltipMinimal')
+    .replace('{count}', galleryInfo.count);
+
     return (
       <div style={{ marginLeft: 'auto' }}>
         <Tooltip
-          content={`Перейти к ${galleryInfo.count} дизайнам в галерее`}
+          content={rangeText}
           position="bottom"
         >
           <button
@@ -911,7 +914,6 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
               alignItems: 'center',
               gap: '6px',
               padding: '9px 12px',
-              backgroundColor: '#669fdcff',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -920,12 +922,10 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
               fontWeight: '500',
               transition: 'all 0.2s ease',
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
           >
             <IoFolderOpen size={16} />
-            <span style={{ paddingTop: "2px" }}>В Галерее:</span> 
-            <span style={{ paddingTop: "2px" }}>{galleryInfo.count}</span>
+            <span className="span" style={{ paddingTop: "2px" }}>{t('grid.buttonMinimal')}</span> 
+            <span className="span" style={{ paddingTop: "2px" }}>{galleryInfo.count}</span>
           </button>
         </Tooltip>
       </div>

@@ -148,7 +148,9 @@
     "blowouts": "Soffietti",
     "linkTo": "collegamenti al prodotto su:",
     "linkNo": "prodotto non disponibile sui marketplace",
-    "placeholder": "Crea nuovo slider"
+    "placeholder": "Crea nuovo slider",
+    "buttonMinimal": "In Galleria:",
+    "tooltipMinimal": "Vai a {count} design in galleria"
   },
   "views": {
     "homeMissingCode": "Prova a modificare i parametri di ricerca o utilizza parole chiave diverse.",
