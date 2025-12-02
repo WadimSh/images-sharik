@@ -10,7 +10,7 @@ import { PreviewDesign } from '../../components/PreviewDesign';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
-import { apiGetAllHistories, apiToggleLikeHistoriy, apiDeleteHistoriy, apiBulkDeactivateHistories } from '../../services/historiesService';
+import { apiGetAllHistories, apiToggleLikeHistory, apiDeleteHistory, apiBulkDeactivateHistories } from '../../services/historiesService';
 import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
 
 export const Gallery = () => {
@@ -191,7 +191,7 @@ export const Gallery = () => {
         return design;
       }));
       
-      const result = await apiToggleLikeHistoriy(designId);
+      const result = await apiToggleLikeHistory(designId);
       
       if (result && result.success && result.data) {
         setDesigns(prev => prev.map(design => {
@@ -296,7 +296,7 @@ export const Gallery = () => {
         return newSet;
       });
 
-      await apiDeleteHistoriy(design.id);
+      await apiDeleteHistory(design.id);
       console.log('Design deleted from backend:', design.id);
 
     } catch (error) {

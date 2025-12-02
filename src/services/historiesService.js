@@ -27,7 +27,7 @@ export async function apiGetAllHistories(params = {}) {
   });
 }
 
-export async function apiCreateHistoriy(data) {
+export async function apiCreateHistory(data) {
   return fetchDataWithFetch('/api/histories', {
     method: 'POST',
     data,
@@ -35,13 +35,13 @@ export async function apiCreateHistoriy(data) {
   });
 }
 
-export async function apiDeleteHistoriy(id) {
+export async function apiDeleteHistory(id) {
   return fetchDataWithFetch(`/api/histories/${id}`, {
     method: 'PATCH'
-  })
+  });
 }
 
-export async function apiToggleLikeHistoriy(id) {
+export async function apiToggleLikeHistory(id) {
   return fetchDataWithFetch(`/api/histories/${id}/likes`, {
     method: 'PUT'
   });

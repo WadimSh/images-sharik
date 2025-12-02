@@ -10,7 +10,7 @@ import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
 import { designsDB, collageDB } from '../utils/handleDB';
 import { LanguageContext } from '../contexts/contextLanguage';
-import { apiCreateHistoriy } from '../services/historiesService';
+import { apiCreateHistory } from '../services/historiesService';
 import { useAuth } from '../contexts/AuthContext';
 
 export const HeaderSection = ({
@@ -278,7 +278,7 @@ export const HeaderSection = ({
           };
         
           // Отправляем на бэкенд
-          await apiCreateHistoriy(historyData);
+          await apiCreateHistory(historyData);
           console.log('История успешно отправлена на сервер:', historyKey);
         } catch (backendError) {
           console.warn('Ошибка отправки истории на сервер:', backendError);
