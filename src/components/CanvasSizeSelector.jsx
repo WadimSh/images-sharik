@@ -48,12 +48,15 @@ export const CanvasSizeSelector = ({
   return (
     <div className="canvas-size-wrapper">
       <span>{t('views.canvasSizeLabel')}</span>
-      <CustomSelect
-        options={sizeOptions}
-        value={currentSize.fileName}
-        onChange={handleSizeChange}
-        className="canvas-size-dropdown"
-      />
+      <div style={{ width: '220px' }}>
+        <CustomSelect
+          options={sizeOptions}
+          value={currentSize.fileName}
+          onChange={handleSizeChange}
+          className="canvas-size-dropdown"
+        />
+      </div>
+      
     </div>
   );
 };
