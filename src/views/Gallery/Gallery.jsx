@@ -746,7 +746,7 @@ export const Gallery = () => {
                       </div>
 
                       <div className="info-row">
-                        <span className="info-label">{t('Автор:')}</span>
+                        <span className="info-label">{t('views.galleryLabelOwner')}</span>
                         <span className="info-value">{info.owner}</span>
                       </div>
                     </div>

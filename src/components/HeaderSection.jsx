@@ -42,7 +42,7 @@ export const HeaderSection = ({
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const { user } = useAuth();
-  
+  console.log(templates)
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
   const [loading, setLoading] = useState(false);
     
