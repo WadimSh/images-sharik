@@ -256,6 +256,8 @@ const GalleryFilters = ({
             )}
           </div>
         </div>
+
+        <div style={{ width: '124px' }}></div>
         
         <div className="search-filter-wrapper">
           {/* Фильтр по маркетплейсу */}

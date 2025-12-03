@@ -187,7 +187,6 @@ const SearchHeader = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={t('header.searchPlaceholder')}
-            pattern="[\d\s,+-]+"
           />
           {searchQuery && (
             <button 
