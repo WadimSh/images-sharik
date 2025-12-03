@@ -6,6 +6,7 @@ import { LanguageContext } from "../../contexts/contextLanguage";
 import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 import { apiSignIn } from '../../services/authService';
 import { useAuth } from '../../contexts/AuthContext';
+import { designsDB, collageDB } from '../../utils/handleDB';
 
 export const SignIn = () => {
   const navigate = useNavigate();
@@ -67,6 +68,17 @@ export const SignIn = () => {
 
       login(result);
 
+      const designsFromDB = await designsDB.getAll();
+      if (designsFromDB.length > 0) {
+        console.log("Макеты дизайнов:", designsFromDB);
+      }
+      
+      const collagesFromDB = await collageDB.getAll();
+      if (collagesFromDB.length > 0) {
+        console.log("Макеты коллажей:", collagesFromDB)
+      }
+      
+
       // Очищаем форму
       setFormData({ login: '', password: ''});
       setTimeout(() => navigate('/'), 1000);
@@ -77,6 +89,7 @@ export const SignIn = () => {
         : 'auth.signInError'
       );
       setIsError(true);
+      setTimeout(() => navigate('/sign-up'), 1000);
     } finally {
       setIsLoading(false);
     }

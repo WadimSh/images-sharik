@@ -1837,11 +1837,13 @@ export const Generator = () => {
         setIsCollageTempleModalOpen={setIsCollageTempleModalOpen}
         setCollageTemples={setCollageTemples}
         setSelectedCollageTemple={setSelectedCollageTemple}
+        setCollageSize={setCollageSize}
       />}
       {isTemplateModalOpen && <TemplateModal 
         setIsTemplateModalOpen={setIsTemplateModalOpen}
         setTemplates={setTemplates}
         setSelectedTemplate={setSelectedTemplate}
+        setTemplateSize={setTemplateSize}
       />}
       {isImageLibraryOpen && (
         <ImageLibraryModal 

@@ -42,7 +42,7 @@ export const HeaderSection = ({
   const { t } = useContext(LanguageContext);
   const { marketplace } = useMarketplace();
   const { user } = useAuth();
-  console.log(templates)
+  
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
   const [loading, setLoading] = useState(false);
     
@@ -88,8 +88,14 @@ export const HeaderSection = ({
         acc[template.code] = template.data;
         return acc;
       }, {});
-
       setTemplates(updatedTemplatesObj);
+
+      const updatedTemplatesSize = updatedTemplates.reduce((acc, template) => {
+            acc[template.code] = template.size || '900x1200';
+            return acc;
+          }, {});
+      setTemplateSize(updatedTemplatesSize);
+
       if (selectedTemplate === templateName) setSelectedTemplate('');
     } catch (error) {
       console.error('Layout deletion error:', error);
@@ -105,8 +111,14 @@ export const HeaderSection = ({
         acc[collage.code] = collage.elements;
         return acc;
       }, {});
-
       setCollageTemples(updatedCollagesObj);
+
+      const templatesSize = updatedCollages.reduce((acc, template) => {
+        acc[template.code] = template.size || '900x1200';
+        return acc;
+      }, {});
+      setCollageSize(templatesSize);
+
       if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
     } catch (error) {
       console.error('Layout deletion error:', error);
@@ -356,6 +368,7 @@ export const HeaderSection = ({
     const loadTemplates = async () => {
       try {
         const designsFromDB = await designsDB.getAll();
+        
         if (designsFromDB.length > 0) {
           const templatesObj = designsFromDB.reduce((acc, template) => {
             acc[template.code] = template.data;
@@ -382,6 +395,7 @@ export const HeaderSection = ({
     const loadTemplates = async () => {
       try {
         const collagesFromDB = await collageDB.getAll();
+        
         if (collagesFromDB.length > 0) {
           const collagesObj = collagesFromDB.reduce((acc, collage) => {
             acc[collage.code] = collage.elements;

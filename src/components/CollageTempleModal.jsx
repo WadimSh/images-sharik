@@ -5,7 +5,8 @@ import { collageDB } from '../utils/handleDB';
 export const CollageTempleModal = ({
   setIsCollageTempleModalOpen,
   setCollageTemples,
-  setSelectedCollageTemple
+  setSelectedCollageTemple,
+  setCollageSize
 }) => {
   const { t } = useContext(LanguageContext);
   const [templateName, setTemplateName] = useState('');
@@ -59,12 +60,18 @@ export const CollageTempleModal = ({
           acc[collage.code] = collage.elements;
           return acc;
         }, {});
+        const updatedTemplatesSize = updatedCollages.reduce((acc, template) => {
+          acc[template.code] = template.size || '900x1200';
+          return acc;
+        }, {});
 
         // Успешное сохранение
         setModalStep('success');
         setModalMessage(t('template.saved'));
 
         setCollageTemples(updatedTemplates); // Обновляем состояние шаблонов
+        setCollageSize(updatedTemplatesSize);
+
         setSelectedCollageTemple(name); // Выбираем новый шаблон
 
         // Автоматическое закрытие через 2 сек

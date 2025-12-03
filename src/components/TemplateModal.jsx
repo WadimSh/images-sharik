@@ -6,7 +6,8 @@ import { designsDB } from '../utils/handleDB';
 export const TemplateModal = ({
   setIsTemplateModalOpen,
   setTemplates,
-  setSelectedTemplate
+  setSelectedTemplate,
+  setTemplateSize
 }) => {
   const { id } = useParams();
   const { t } = useContext(LanguageContext);
@@ -61,12 +62,19 @@ export const TemplateModal = ({
           acc[design.code] = design.data;
           return acc;
         }, {});
+        const updatedTemplatesSize = updatedDesigns.reduce((acc, template) => {
+          acc[template.code] = template.size || '900x1200';
+          return acc;
+        }, {});
+        
         
         // Успешное сохранение
         setModalStep('success');
         setModalMessage(t('template.saved'));
 
         setTemplates(updatedTemplates); // Обновляем состояние шаблонов
+        setTemplateSize(updatedTemplatesSize);
+        
         setSelectedTemplate(name); // Выбираем новый шаблон
 
         // Автоматическое закрытие через 2 сек
