@@ -245,8 +245,24 @@ export const Gallery = () => {
 
   // Функция для парсинга и форматирования заголовка
   const parseDesignTitle = (design) => {
+    const getArticlesDisplay = () => {
+      if (!design.articles) return t('views.galleryUndefined');
+
+      if (design.type === 'collage') {
+        // Для коллажа: массив артикулов через пробел
+        return Array.isArray(design.articles) 
+          ? design.articles.join(' ')
+          : design.articles;
+      } else {
+        if (Array.isArray(design.articles)) {
+          return design.articles[0] || t('views.galleryUndefined');
+        }
+        return design.articles;
+      }
+    };
+
     return {
-      articles: design.articles || t('views.galleryUndefined'),
+      articles: getArticlesDisplay(),
       marketplace: design.marketplace || t('views.galleryUndefined'),
       marketplaceName: design.marketplace === 'WB' ? 'Wildberries' : 
                        design.marketplace === 'OZ' ? 'Ozon' : 
@@ -498,22 +514,16 @@ export const Gallery = () => {
     }).filter(Boolean);
   };
 
-  const extractDesignInfo = (types) => {
+  const extractDesignInfo = (type) => {
     let slideNumber = 1;
 
-    const slidePart = types.find(part => 
-      part === 'main' || part.startsWith('slide')
-    );
-
-    if (slidePart) {
-      if (slidePart === 'main') {
-        slideNumber = 1;
-      } else if (slidePart.startsWith('slide')) {
-        const numberPart = slidePart.replace('slide', '');
-        const parsedNumber = parseInt(numberPart, 10);
-        if (!isNaN(parsedNumber)) {
-          slideNumber = parsedNumber;
-        }
+    if (type === 'main') {
+      slideNumber = 1;
+    } else if (type.startsWith('slide')) {
+      const numberPart = type.replace('slide', '');
+      const parsedNumber = parseInt(numberPart, 10);
+      if (!isNaN(parsedNumber)) {
+        slideNumber = parsedNumber;
       }
     }
 
@@ -566,6 +576,7 @@ export const Gallery = () => {
         onPageChange={handlePageChange}
         onItemsPerPageChange={handleItemsPerPageChange}
         itemsPerPageOptions={[10, 25, 50]}
+        loading={loading}
       />
         
       {loading ? (

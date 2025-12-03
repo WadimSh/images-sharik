@@ -12,7 +12,8 @@ const PaginationPanel = ({
   onPageChange,
   onItemsPerPageChange,
   className = "",
-  itemsPerPageOptions = [10, 20, 30, 40, 50]
+  itemsPerPageOptions = [10, 20, 30, 40, 50],
+  loading = false // ← Добавляем проп loading
 }) => {
   const { t } = useContext(LanguageContext);
   const [localItemsPerPage, setLocalItemsPerPage] = useState(itemsPerPage);
@@ -23,9 +24,16 @@ const PaginationPanel = ({
   }, [itemsPerPage]);
 
   const handleItemsPerPageChange = (newValue) => {
+    if (loading) return; // ← Блокируем во время загрузки
+    
     const newItemsPerPage = parseInt(newValue);
     setLocalItemsPerPage(newItemsPerPage);
     onItemsPerPageChange(newItemsPerPage);
+  };
+
+  const handlePageChange = (page) => {
+    if (loading) return; // ← Блокируем во время загрузки
+    onPageChange(page);
   };
 
   // Создаем опции для селекта
@@ -55,7 +63,7 @@ const PaginationPanel = ({
     <div className={`pagination-panel ${className}`}>
       {/* Левая часть - информация о диапазоне */}
       <div className="pagination-panel__info">
-        {rangeText}
+        {!loading && rangeText}
       </div>
 
       {/* Центральная часть - пагинация */}
@@ -64,7 +72,8 @@ const PaginationPanel = ({
           currentPage={currentPage}
           totalCount={totalCount}
           itemsPerPage={itemsPerPage}
-          onPageChange={onPageChange}
+          onPageChange={handlePageChange}
+          disabled={loading} // ← Передаем disabled в Pagination
         />
       </div>
 
@@ -76,6 +85,7 @@ const PaginationPanel = ({
           onChange={handleItemsPerPageChange}
           className="pagination-panel__select"
           dropdownMaxHeight="150px"
+          disabled={loading} // ← Добавляем disabled
         />
       </div>
     </div>

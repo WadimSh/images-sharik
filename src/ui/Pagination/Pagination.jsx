@@ -7,7 +7,8 @@ const Pagination = ({
   totalCount,
   itemsPerPage,
   onPageChange,
-  className = ''
+  className = '',
+  disabled = false
 }) => {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   
@@ -42,6 +43,7 @@ const Pagination = ({
   };
 
   const handlePageClick = (page) => {
+    if (disabled) return;
     if (typeof page === 'number') {
       onPageChange(page);
     }
@@ -54,7 +56,7 @@ const Pagination = ({
       {totalPages > 1 && (
         <button
           onClick={() => handlePageClick(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={disabled || currentPage === 1}
           className="pagination__arrow"
         >
           <HiOutlineChevronLeft size={16} />
@@ -77,6 +79,7 @@ const Pagination = ({
           <button
             key={pageNumber}
             onClick={() => handlePageClick(pageNumber)}
+            disabled={disabled}
             className={`pagination__page ${
               isActive ? 'pagination__page--active' : ''
             }`}
@@ -89,7 +92,7 @@ const Pagination = ({
       {totalPages > 1 && (
         <button
           onClick={() => handlePageClick(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={disabled || currentPage === totalPages}
           className="pagination__arrow"
         >
           <HiOutlineChevronRight size={16} />

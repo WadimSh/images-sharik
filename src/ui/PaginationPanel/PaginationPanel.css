@@ -17,6 +17,7 @@
 }
 
 .pagination-panel__info {
+  width: 226px;
   font-size: 14px;
   color: #6b7280;
   white-space: nowrap;

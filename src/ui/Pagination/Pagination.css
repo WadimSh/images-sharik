@@ -29,6 +29,7 @@
   border-color: #9ca3af;
 }
 
+.pagination__page:disabled,
 .pagination__arrow:disabled {
   opacity: 0.5;
   cursor: not-allowed;
