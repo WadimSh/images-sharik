@@ -246,7 +246,7 @@ export const Gallery = () => {
   // Функция для парсинга и форматирования заголовка
   const parseDesignTitle = (design) => {
     return {
-      articles: design.articles || '---',
+      articles: design.articles || t('views.galleryUndefined'),
       marketplace: design.marketplace || t('views.galleryUndefined'),
       marketplaceName: design.marketplace === 'WB' ? 'Wildberries' : 
                        design.marketplace === 'OZ' ? 'Ozon' : 
@@ -255,8 +255,12 @@ export const Gallery = () => {
       designType: design.type === 'collage' ? t('views.galleryCollage') : t('views.galleryDesign'),
       dimensions: design.size || t('views.galleryUndefined'),
       date: design.createdAt ? new Date(design.createdAt).toLocaleDateString() : t('views.galleryUndefined'),
-      time: design.createdAt ? new Date(design.createdAt).toLocaleTimeString() : t('views.galleryUndefined'),
-      owner: design.owner?.username || '---'
+      time: design.createdAt ? new Date(design.createdAt).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false
+      }) : t('views.galleryUndefined'),
+      owner: design.owner?.username || t('views.galleryUndefined')
     };
   };
 

@@ -6,7 +6,7 @@ import { LanguageContext } from "../../contexts/contextLanguage";
 import LanguageSwitcher from "../../ui/LanguageSwitcher/LanguageSwitcher";
 import { apiSignIn } from '../../services/authService';
 import { useAuth } from '../../contexts/AuthContext';
-import { designsDB, collageDB } from '../../utils/handleDB';
+import { designsDB, collageDB, usersDB, historyDB } from '../../utils/handleDB';
 
 export const SignIn = () => {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ export const SignIn = () => {
       
 
       // Очищаем форму
-      setFormData({ login: '', password: ''});
+      setFormData({ email: '', password: ''});
       setTimeout(() => navigate('/'), 1000);
     } catch (error) {
       console.error('Error when logging in:', error);
@@ -91,6 +91,8 @@ export const SignIn = () => {
       setIsError(true);
       setTimeout(() => navigate('/sign-up'), 1000);
     } finally {
+      usersDB.clearAll();
+      historyDB.clearAll();
       setIsLoading(false);
     }
   };

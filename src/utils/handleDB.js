@@ -171,6 +171,10 @@ export const usersDB = {
       console.error('Error setting history migration flag:', error);
       throw error;
     }
+  },
+
+  async clearAll() {
+    return await clearTable(db.users);
   }
 };
 
@@ -340,6 +344,10 @@ export const historyDB = {
       console.error('Error deleting an entry:', error);
       throw error;
     }
+  },
+
+  async clearAll() {
+    return await clearTable(db.history);
   }
 };
 
