@@ -7,9 +7,10 @@ import { MdCreateNewFolder } from "react-icons/md";
 import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
 import { useAuth } from "../contexts/AuthContext";
-import { productsDB, slidesDB } from "../utils/handleDB";
+import { productsDB, slidesDB, designsDB, collageDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
+import { migrationService } from "../utils/migrationService";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -29,6 +30,8 @@ const SearchHeader = ({
   const headerRightRef = useRef(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationMessage, setMigrationMessage] = useState('');
 
   const getUserName = () => {
     if (!user) return null;
@@ -46,11 +49,53 @@ const SearchHeader = ({
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!isAuthenticated) {
       navigate('/sign-in');
       return;
     }
+
+    if (user && user.company && user.company[0]) {
+      try {
+        const companyId = user.company[0].id;
+        
+        // Проверяем, нужна ли миграция
+        const needsMigration = await migrationService.needsMigration(user);
+        
+        if (needsMigration) {
+          setIsMigrating(true);
+          setMigrationMessage(t('migration.inProgress') || 'Миграция данных...');
+          
+          // Выполняем миграцию
+          const migrationResult = await migrationService.migrateAllData(user, companyId);
+          
+          if (migrationResult.totalMigrated > 0) {
+            setMigrationMessage(
+              t('migration.completed') || 
+              `Миграция завершена. Перенесено ${migrationResult.totalMigrated} макетов`
+            );
+            
+            // Показываем сообщение об успехе на 3 секунды
+            setTimeout(() => {
+              setMigrationMessage('');
+              setIsMigrating(false);
+            }, 3000);
+          } else {
+            setIsMigrating(false);
+            setMigrationMessage('');
+          }
+        }
+      } catch (migrationError) {
+        console.error('Migration error:', migrationError);
+        setIsMigrating(false);
+        setMigrationMessage(t('migration.error') || 'Ошибка миграции данных');
+        
+        // Скрываем сообщение об ошибке через 5 секунд
+        setTimeout(() => {
+          setMigrationMessage('');
+        }, 5000);
+      }
+    }  
 
     setIsToggled(false);
     productsDB.clearAll();

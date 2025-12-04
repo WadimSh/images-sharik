@@ -1,6 +1,13 @@
 import { useState, useContext } from 'react';
+
 import { LanguageContext } from '../contexts/contextLanguage';
-import { collageDB } from '../utils/handleDB';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  apiCreateCollage, 
+  apiGetCollageByName, 
+  apiUpdateCollage,
+  apiGetAllCollages
+} from '../services/templateService';
 
 export const CollageTempleModal = ({
   setIsCollageTempleModalOpen,
@@ -9,22 +16,27 @@ export const CollageTempleModal = ({
   setCollageSize
 }) => {
   const { t } = useContext(LanguageContext);
+  const { user } = useAuth();
+
   const [templateName, setTemplateName] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveTemplate = async (isOverwrite = false) => {
     try {
-      const name = templateName.trim().toLowerCase();
+      const name = templateName.trim();
       if (!name) return;
-  
-      // Проверяем дубликаты в IndexedDB
-      const existingInDB = await collageDB.getAll();
-      const dbDuplicate = existingInDB.some(d => d.code.toLowerCase() === name);
+      
+      setIsSaving(true);
 
-      if (!isOverwrite && dbDuplicate) {
+      // Проверяем дубликаты через API
+      const existingCollage = await apiGetCollageByName(name);
+
+      if (!isOverwrite && existingCollage) {
         setModalStep('overwrite');
         setModalMessage(t('template.exists'));
+        setIsSaving(false);
         return;
       }
   
@@ -36,67 +48,82 @@ export const CollageTempleModal = ({
       const savedSize = localStorage.getItem('size');
       const currentSize = savedSize ? JSON.parse(savedSize) : '900x1200';
   
+      // Заменяем динамические данные на плейсхолдеры
       const modifiedDesign = currentDesign.map(element => ({
         ...element,
         image: element.type === 'image' && element.isProduct ? "{{ITEM_IMAGE}}" : element.image,
         text: element.type === 'text' && element.isProductCode ? "{{ITEM_CODE}}" : element.text
       }));
+
+      // Формируем данные для API
+      const collageData = {
+        name: name,
+        data: modifiedDesign,
+        size: currentSize,
+        company: user.company[0].id
+      };
   
       try {
-        if (isOverwrite) {
-          // Удаляем старую версию, если перезаписываем
-          await collageDB.delete(name);
+        if (isOverwrite && existingCollage) {
+          // Обновляем существующий коллаж по ID
+          await apiUpdateCollage(existingCollage.id, {
+            data: modifiedDesign,
+            size: currentSize
+          });
+        } else {
+          // Создаем новый коллаж
+          await apiCreateCollage(collageData);
         }
-        
-        await collageDB.add({
-          code: name,
-          elements: modifiedDesign,
-          size: currentSize
-        });
 
-        // Обновляем список шаблонов из базы
-        const updatedCollages = await collageDB.getAll();
-        const updatedTemplates = updatedCollages.reduce((acc, collage) => {
-          acc[collage.code] = collage.elements;
-          return acc;
-        }, {});
-        const updatedTemplatesSize = updatedCollages.reduce((acc, template) => {
-          acc[template.code] = template.size || '900x1200';
-          return acc;
-        }, {});
+        // Обновляем список коллажей из API
+        const updatedCollages = await apiGetAllCollages(true); // force refresh
+        
+        const updatedTemplates = {};
+        const updatedTemplatesSize = {};
+        
+        updatedCollages.forEach(collage => {
+          updatedTemplates[collage.name] = collage.data;
+          updatedTemplatesSize[collage.name] = collage.size || '900x1200';
+        });
 
         // Успешное сохранение
         setModalStep('success');
         setModalMessage(t('template.saved'));
 
-        setCollageTemples(updatedTemplates); // Обновляем состояние шаблонов
+        setCollageTemples(updatedTemplates);
         setCollageSize(updatedTemplatesSize);
 
-        setSelectedCollageTemple(name); // Выбираем новый шаблон
+        setSelectedCollageTemple(name);
 
         // Автоматическое закрытие через 2 сек
         setTimeout(() => {
           setIsCollageTempleModalOpen(false);
           setModalStep('input');
           setTemplateName('');
+          setIsSaving(false);
         }, 2000);
         
-      } catch (dbError) {
-        console.error('DB Error:', dbError);
-        throw new Error("Save error");
+      } catch (apiError) {
+        console.error('API Error:', apiError);
+        throw new Error("Save error: " + (apiError.message || 'Unknown error'));
       }
     } catch (error) {
       setModalStep('error');
-      setModalMessage("Save error" + ': ' + error.message);
+      setModalMessage(t('template.saveError') + ': ' + error.message);
+      setIsSaving(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (!isSaving) {
+      setIsCollageTempleModalOpen(false);
+      setModalStep('input');
+      setTemplateName('');
     }
   };
   
   return (
-    <div className="modal-overlay" onClick={() => {
-      setIsCollageTempleModalOpen(false);
-      setModalStep('input');
-      setTemplateName('');
-    }}>
+    <div className="modal-overlay" onClick={handleCloseModal}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {modalStep === 'input' ? (
           <>
@@ -108,8 +135,9 @@ export const CollageTempleModal = ({
               placeholder={t('template.namePlaceholder')}
               className="template-input"
               maxLength={50} // Ограничение длины
+              disabled={isSaving}
               onKeyDown={(e) => { 
-                if (e.key === 'Enter' && templateName.trim()) {
+                if (e.key === 'Enter' && templateName.trim() && !isSaving) {
                   handleSaveTemplate();
                 }
               }}
@@ -117,17 +145,15 @@ export const CollageTempleModal = ({
             <div className="modal-actions">
               <button 
                 className="cancel-button"
-                onClick={() => {
-                  setIsCollageTempleModalOpen(false);
-                  setTemplateName('');
-                }}
+                onClick={handleCloseModal}
+                disabled={isSaving}
               >
                 {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(false)}
-                disabled={!templateName.trim()}
+                disabled={!templateName.trim() || isSaving}
               >
                 {t('template.create')}
               </button>
@@ -140,13 +166,18 @@ export const CollageTempleModal = ({
             <div className="modal-actions">
               <button
                 className="cancel-button"
-                onClick={() => setModalStep('input')}
+                onClick={() => {
+                  setModalStep('input');
+                  setIsSaving(false);
+                }}
+                disabled={isSaving}
               >
                 {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(true)}
+                disabled={isSaving}
               >
                 {t('template.overwrite')}
               </button>
@@ -159,11 +190,8 @@ export const CollageTempleModal = ({
             <div className="modal-actions">
               <button
                 className="close-button"
-                onClick={() => {
-                  setIsCollageTempleModalOpen(false);
-                  setModalStep('input');
-                  setTemplateName('');
-                }}
+                onClick={handleCloseModal}
+                disabled={isSaving && modalStep === 'success'}
               >
                 {t('modals.close')}
               </button>

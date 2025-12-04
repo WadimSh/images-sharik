@@ -8,7 +8,14 @@ import UPNG from 'upng-js';
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
-import { designsDB, collageDB } from '../utils/handleDB';
+import { 
+  apiGetAllDesigns, 
+  apiGetAllCollages, 
+  apiGetDesignByName, 
+  apiDeleteDesign, 
+  apiGetCollageByName, 
+  apiDeleteCollage 
+} from '../services/templateService';
 import { LanguageContext } from '../contexts/contextLanguage';
 import { apiCreateHistory } from '../services/historiesService';
 import { useAuth } from '../contexts/AuthContext';
@@ -81,19 +88,27 @@ export const HeaderSection = ({
   // Функция для удаления макета
   const handleDeleteTemplate = async(templateName) => {
     try {
-      await designsDB.delete(templateName);
+      // Находим макет по имени из кэша
+      const design = await apiGetDesignByName(templateName);
+      if (!design) {
+        console.error('Template not found:', templateName);
+        return;
+      }
 
-      const updatedTemplates = await designsDB.getAll();
-      const updatedTemplatesObj = updatedTemplates.reduce((acc, template) => {
-        acc[template.code] = template.data;
-        return acc;
-      }, {});
+      // Удаляем через API по ID
+      await apiDeleteDesign(design.id);
+
+      // Обновляем локальное состояние из кэша
+      const updatedDesigns = await apiGetAllDesigns();
+      const updatedTemplatesObj = {};
+      const updatedTemplatesSize = {};
+
+      updatedDesigns.forEach(design => {
+        updatedTemplatesObj[design.name] = design.data;
+        updatedTemplatesSize[design.name] = design.size || '900x1200';
+      });
+
       setTemplates(updatedTemplatesObj);
-
-      const updatedTemplatesSize = updatedTemplates.reduce((acc, template) => {
-            acc[template.code] = template.size || '900x1200';
-            return acc;
-          }, {});
       setTemplateSize(updatedTemplatesSize);
 
       if (selectedTemplate === templateName) setSelectedTemplate('');
@@ -104,27 +119,34 @@ export const HeaderSection = ({
 
   const handleDeleteCollageTemple = async(templateName) => {
     try {
-      await collageDB.delete(templateName);
+      // Находим макет по имени из кэша
+      const collage = await apiGetCollageByName(templateName);
+      if (!collage) {
+        console.error('Template not found:', templateName);
+        return;
+      }
 
-      const updatedCollages = await collageDB.getAll();
-      const updatedCollagesObj = updatedCollages.reduce((acc, collage) => {
-        acc[collage.code] = collage.elements;
-        return acc;
-      }, {});
-      setCollageTemples(updatedCollagesObj);
+      // Удаляем через API по ID
+      await apiDeleteCollage(collage.id);
 
-      const templatesSize = updatedCollages.reduce((acc, template) => {
-        acc[template.code] = template.size || '900x1200';
-        return acc;
-      }, {});
-      setCollageSize(templatesSize);
+      // Обновляем локальное состояние из кэша
+      const updatedCollages = await apiGetAllCollages();
+      const updatedTemplatesObj = {};
+      const updatedTemplatesSize = {};
+
+      updatedCollages.forEach(collage => {
+        updatedTemplatesObj[collage.name] = collage.data;
+        updatedTemplatesSize[collage.name] = collage.size || '900x1200';
+      });
+
+      setCollageTemples(updatedTemplatesObj);
+      setCollageSize(updatedTemplatesSize);
 
       if (selectedCollageTemple === templateName) setSelectedCollageTemple('');
     } catch (error) {
       console.error('Layout deletion error:', error);
     }
   };
-
 
   // Функция выгрузки макета в одельный файл
   const handleExportTemplate = (templateName) => {
@@ -348,7 +370,7 @@ export const HeaderSection = ({
       setLoading(false);
     }
   };
-
+  
   const templateProps = {
     templates: slideNumber ? templates : collageTemples,
     selectedTemplate: slideNumber ? selectedTemplate : selectedCollageTemple,
@@ -367,17 +389,17 @@ export const HeaderSection = ({
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const designsFromDB = await designsDB.getAll();
+        const designsFromDB = await apiGetAllDesigns();
         
         if (designsFromDB.length > 0) {
           const templatesObj = designsFromDB.reduce((acc, template) => {
-            acc[template.code] = template.data;
+            acc[template.name] = template.data;
             return acc;
           }, {});
           setTemplates(templatesObj);
 
           const templatesSize = designsFromDB.reduce((acc, template) => {
-            acc[template.code] = template.size || '900x1200';
+            acc[template.name] = template.size || '900x1200';
             return acc;
           }, {});
           setTemplateSize(templatesSize);
@@ -394,17 +416,17 @@ export const HeaderSection = ({
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const collagesFromDB = await collageDB.getAll();
+        const collagesFromDB = await apiGetAllCollages();
         
         if (collagesFromDB.length > 0) {
           const collagesObj = collagesFromDB.reduce((acc, collage) => {
-            acc[collage.code] = collage.elements;
+            acc[collage.name] = collage.data;
             return acc;
           }, {});
           setCollageTemples(collagesObj);
 
           const templatesSize = collagesFromDB.reduce((acc, template) => {
-            acc[template.code] = template.size || '900x1200';
+            acc[template.name] = template.size || '900x1200';
             return acc;
           }, {});
           setCollageSize(templatesSize);

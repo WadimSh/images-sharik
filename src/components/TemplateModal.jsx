@@ -1,7 +1,14 @@
 import { useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+
 import { LanguageContext } from '../contexts/contextLanguage';
-import { designsDB } from '../utils/handleDB';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  apiCreateDesign, 
+  apiGetDesignByName, 
+  apiUpdateDesign,
+  apiGetAllDesigns
+} from '../services/templateService';
 
 export const TemplateModal = ({
   setIsTemplateModalOpen,
@@ -11,23 +18,27 @@ export const TemplateModal = ({
 }) => {
   const { id } = useParams();
   const { t } = useContext(LanguageContext);
+  const { user } = useAuth();
 
   const [templateName, setTemplateName] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalStep, setModalStep] = useState('input'); // 'input', 'overwrite', 'success', 'error'
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveTemplate = async (isOverwrite = false) => {
     try {
       const name = templateName.trim().toLowerCase();
       if (!name) return;
+
+      setIsSaving(true);
   
       // Проверяем дубликаты в IndexedDB
-      const existingInDB = await designsDB.getAll();
-      const dbDuplicate = existingInDB.some(d => d.code.toLowerCase() === name);
-
-      if (!isOverwrite && dbDuplicate) {
+      const existingDesign = await apiGetDesignByName(name);
+      
+      if (!isOverwrite && existingDesign) {
         setModalStep('overwrite');
         setModalMessage(t('template.exists'));
+        setIsSaving(false);
         return;
       }
   
@@ -43,31 +54,35 @@ export const TemplateModal = ({
         ...element,
         image: element.type === 'image' && element.isProduct ? "{{ITEM_IMAGE}}" : element.image
       }));
+
+      const designData = {
+        name: name,
+        data: modifiedDesign,
+        size: currentSize,
+        company: user.company[0].id
+      };
   
       try {
-        if (isOverwrite) {
-          // Удаляем старую версию, если перезаписываем
-          await designsDB.delete(name);
+        if (isOverwrite && existingDesign) {
+          await apiUpdateDesign(existingDesign.id, {
+            data: modifiedDesign,
+            size: currentSize
+          });
+        } else {
+          await apiCreateDesign(designData);
         }
         
-        await designsDB.add({
-          code: name,          // Имя шаблона как ключ
-          data: modifiedDesign, // Сам дизайн
-          size: currentSize
+        // Обновляем список шаблонов из базы
+        const updatedDesigns = await apiGetAllDesigns(true);
+
+        const updatedTemplates = {};
+        const updatedTemplatesSize = {};
+        
+        updatedDesigns.forEach(design => {
+          updatedTemplates[design.name] = design.data;
+          updatedTemplatesSize[design.name] = design.size || '900x1200';
         });
 
-        // Обновляем список шаблонов из базы
-        const updatedDesigns = await designsDB.getAll();
-        const updatedTemplates = updatedDesigns.reduce((acc, design) => {
-          acc[design.code] = design.data;
-          return acc;
-        }, {});
-        const updatedTemplatesSize = updatedDesigns.reduce((acc, template) => {
-          acc[template.code] = template.size || '900x1200';
-          return acc;
-        }, {});
-        
-        
         // Успешное сохранение
         setModalStep('success');
         setModalMessage(t('template.saved'));
@@ -84,8 +99,8 @@ export const TemplateModal = ({
           setTemplateName('');
         }, 2000);
 
-      } catch (dbError) {
-        console.error('DB Error:', dbError);
+      } catch (apiError) {
+        console.error('API Error:', apiError);
         throw new Error("Save error");
       }
       
@@ -94,13 +109,17 @@ export const TemplateModal = ({
       setModalMessage("Save error" + ': ' + error.message);
     }
   };
-  
-  return (
-    <div className="modal-overlay" onClick={() => {
+
+  const handleCloseModal = () => {
+    if (!isSaving) {
       setIsTemplateModalOpen(false);
       setModalStep('input');
       setTemplateName('');
-    }}>
+    }
+  };
+  
+  return (
+    <div className="modal-overlay" onClick={handleCloseModal}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {modalStep === 'input' ? (
           <>
@@ -112,8 +131,9 @@ export const TemplateModal = ({
               placeholder={t('template.namePlaceholder')}
               className="template-input"
               maxLength={50} // Ограничение длины
+              disabled={isSaving}
               onKeyDown={(e) => { 
-                if (e.key === 'Enter' && templateName.trim()) {
+                if (e.key === 'Enter' && templateName.trim() && !isSaving) {
                   handleSaveTemplate();
                 }
               }}
@@ -121,17 +141,15 @@ export const TemplateModal = ({
             <div className="modal-actions">
               <button 
                 className="cancel-button"
-                onClick={() => {
-                  setIsTemplateModalOpen(false);
-                  setTemplateName('');
-                }}
+                onClick={handleCloseModal}
+                disabled={isSaving}
               >
                 {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(false)}
-                disabled={!templateName.trim()}
+                disabled={!templateName.trim() || isSaving}
               >
                 {t('template.create')}
               </button>
@@ -144,13 +162,18 @@ export const TemplateModal = ({
             <div className="modal-actions">
               <button
                 className="cancel-button"
-                onClick={() => setModalStep('input')}
+                onClick={() => {
+                  setModalStep('input');
+                  setIsSaving(false);
+                }}
+                disabled={isSaving}
               >
                 {t('modals.cancel')}
               </button>
               <button
                 className="create-button"
                 onClick={() => handleSaveTemplate(true)}
+                disabled={isSaving}
               >
                 {t('template.overwrite')}
               </button>
@@ -163,11 +186,8 @@ export const TemplateModal = ({
             <div className="modal-actions">
               <button
                 className="close-button"
-                onClick={() => {
-                  setIsTemplateModalOpen(false);
-                  setModalStep('input');
-                  setTemplateName('');
-                }}
+                onClick={handleCloseModal}
+                disabled={isSaving && modalStep === 'success'}
               >
                 {t('modals.close')}
               </button>

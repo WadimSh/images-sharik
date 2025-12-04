@@ -283,7 +283,7 @@ export const Generator = () => {
   const loadTemplate = (templateName) => {
     const template = templates[templateName];
     const size = templateSize[templateName];
-    
+   
     if (!template) return;
 
     // Заменяем плейсхолдер на текущее изображение товара
@@ -310,7 +310,7 @@ export const Generator = () => {
   const loadCollageTemplate = (templateName) => {
     const template = collageTemples[templateName];
     const size = collageSize[templateName];
-
+    
     if (!template) return;
 
     // Получаем данные для подстановки
