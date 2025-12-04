@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.8ae04032.css",
-    "main.js": "./static/js/main.d88091c9.js",
+    "main.css": "./static/css/main.b3b3b914.css",
+    "main.js": "./static/js/main.f63e740a.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
@@ -29,12 +29,12 @@
     "static/media/aa_badaboom.ttf": "./static/media/aa_badaboom.8f0fd95679075dcc294a.ttf",
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
-    "main.8ae04032.css.map": "./static/css/main.8ae04032.css.map",
-    "main.d88091c9.js.map": "./static/js/main.d88091c9.js.map",
+    "main.b3b3b914.css.map": "./static/css/main.b3b3b914.css.map",
+    "main.f63e740a.js.map": "./static/js/main.f63e740a.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.8ae04032.css",
-    "static/js/main.d88091c9.js"
+    "static/css/main.b3b3b914.css",
+    "static/js/main.f63e740a.js"
   ]
 }
