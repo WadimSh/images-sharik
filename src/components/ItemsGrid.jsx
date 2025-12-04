@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { IoFolderOpen } from 'react-icons/io5';
 
 import { replacePlaceholders } from '../utils/replacePlaceholders';
@@ -42,7 +42,6 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   const { marketplace } = useMarketplace();
   const getCode = useGetCode();
   
-  const [galleryCounts, setGalleryCounts] = useState({});
   const [baseCodesOrder, setBaseCodesOrder] = useState([]);
   const [productMetas, setProductMetas] = useState({});
   const [designsData, setDesignsData] = useState({});
@@ -57,6 +56,26 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
     currentIndex: 0,
     baseCode: ''
   });
+
+  const [galleryCounts, setGalleryCounts] = useState(() => {
+    const saved = sessionStorage.getItem('galleryCountsCache');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const abortControllersRef = useRef(new Map());
+  const [pendingRequests, setPendingRequests] = useState(new Set());
+
+  useEffect(() => {
+    sessionStorage.setItem('galleryCountsCache', JSON.stringify(galleryCounts));
+  }, [galleryCounts]);
+
+  useEffect(() => {
+    return () => {
+      abortControllersRef.current.forEach(controller => {
+        controller.abort();
+      });
+      abortControllersRef.current.clear();
+    };
+  }, []);
 
   const updateProductImages = (newImages) => {
     setProductImages(prev => {
@@ -137,7 +156,7 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
           const slide = await slidesDB.get(`design-${item}`);
           designs[item] = {
             data: slide?.data || null,
-            size: slide?.size || null // Получаем размер из базы, если есть
+            size: slide?.size || null 
           };
         } catch (error) {
           console.error(`Error loading design for ${item}:`, error);
@@ -229,53 +248,198 @@ const ItemsGrid = ({ items, onItemsUpdate, templates }) => {
   };
 
   // Функция для проверки наличия дизайнов в галерее
-  const checkGalleryDesigns = async (baseCode) => {
+  const checkGalleryDesigns = useCallback(async (baseCode) => {
+    // Если запрос уже в процессе для этого baseCode, не делаем новый
+    if (pendingRequests.has(baseCode)) {
+      return;
+    }
+
+    // Проверяем кэш: если данные есть и свежие (< 5 минут), не делаем запрос
+    const existingData = galleryCounts[baseCode];
+    const CACHE_TIMEOUT = 5 * 60 * 1000; // 5 минут
+    const now = Date.now();
+
+    if (existingData && existingData.timestamp && (now - existingData.timestamp < CACHE_TIMEOUT)) {
+      return; // Используем кэшированные данные
+    }
+
+    // Отменяем предыдущий запрос для этого baseCode
+    if (abortControllersRef.current.has(baseCode)) {
+      abortControllersRef.current.get(baseCode).abort();
+      abortControllersRef.current.delete(baseCode);
+    }
+
+    setPendingRequests(prev => new Set(prev).add(baseCode));
+
+    const controller = new AbortController();
+    abortControllersRef.current.set(baseCode, controller);
+
     try {
-      const response = await apiCheckArticleHistories(baseCode);
+      const response = await apiCheckArticleHistories(baseCode, controller.signal);
+
+      if (controller.signal.aborted) {
+        return;
+      }
+
       if (response && typeof response.hasHistories !== 'undefined') {
+        const newData = {
+          hasHistories: response.hasHistories,
+          count: response.count || 0,
+          timestamp: Date.now() // Обновляем timestamp
+        };
+
         setGalleryCounts(prev => ({
           ...prev,
-          [baseCode]: {
-            hasHistories: response.hasHistories,
-            count: response.count || 0
-          }
+          [baseCode]: newData
         }));
       }
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log(`Request for ${baseCode} was cancelled`);
+        return;
+      }
+
       console.error(`Error checking gallery designs for ${baseCode}:`, error);
-      setGalleryCounts(prev => ({
-        ...prev,
-        [baseCode]: {
-          hasHistories: false,
-          count: 0
-        }
-      }));
+
+      if (!controller.signal.aborted) {
+        // Сохраняем ошибку в кэш, чтобы не пытаться снова сразу
+        setGalleryCounts(prev => ({
+          ...prev,
+          [baseCode]: {
+            hasHistories: false,
+            count: 0,
+            error: true,
+            timestamp: Date.now() // Все равно ставим timestamp
+          }
+        }));
+      }
+    } finally {
+      setPendingRequests(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(baseCode);
+        return newSet;
+      });
+      abortControllersRef.current.delete(baseCode);
     }
-  };
+  }, [galleryCounts, pendingRequests]);
 
   // Эффект для проверки дизайнов при загрузке компонента
   useEffect(() => {
+    let isActive = true;
+    
     const checkAllGalleryDesigns = async () => {
+      if (!isActive || items.length === 0) return;
+    
       const uniqueBaseCodes = [...new Set(items.map(item => item.split('_').slice(0, -1).join('_')))];
+    
+      // Отменяем запросы для baseCodes, которых больше нет
+      const currentBaseCodes = new Set(uniqueBaseCodes);
       
-      for (const baseCode of uniqueBaseCodes) {
-        // Проверяем только если еще не проверяли или если нужно обновить
-        if (!galleryCounts[baseCode]) {
-          await checkGalleryDesigns(baseCode);
+      // Отменяем устаревшие запросы
+      for (const [code, controller] of abortControllersRef.current.entries()) {
+        if (!currentBaseCodes.has(code)) {
+          controller.abort();
+          abortControllersRef.current.delete(code);
+          
+          setPendingRequests(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(code);
+            return newSet;
+          });
+          
+          // Удаляем устаревшие данные из состояния
+          if (isActive) {
+            setGalleryCounts(prev => {
+              const newState = { ...prev };
+              delete newState[code];
+              return newState;
+            });
+          }
         }
       }
+    
+      // ЗАПУСКАЕМ ПРОВЕРКИ ТОЛЬКО ДЛЯ ТЕХ, КТО НУЖДАЕТСЯ В ОБНОВЛЕНИИ
+      const CACHE_TIMEOUT = 5 * 60 * 1000;
+      const now = Date.now();
+    
+      // Разделяем baseCodes на те, что нужно проверить, и те, что уже в кэше
+      const baseCodesToCheck = uniqueBaseCodes.filter(baseCode => {
+        const existingData = galleryCounts[baseCode];
+        
+        // Если данных нет вообще - нужно проверить
+        if (!existingData) return true;
+        
+        // Если есть ошибка, проверяем снова (но не сразу)
+        if (existingData.error) {
+          // Ждем 30 секунд после ошибки перед повторной проверкой
+          return now - existingData.timestamp > 30000;
+        }
+        
+        // Если данные устарели (> 5 минут) - нужно обновить
+        return now - existingData.timestamp > CACHE_TIMEOUT;
+      });
+    
+      // ОГРАНИЧИВАЕМ КОЛИЧЕСТВО ПАРАЛЛЕЛЬНЫХ ЗАПРОСОВ
+      const MAX_PARALLEL_REQUESTS = 3;
+      const chunks = [];
+      
+      for (let i = 0; i < baseCodesToCheck.length; i += MAX_PARALLEL_REQUESTS) {
+        chunks.push(baseCodesToCheck.slice(i, i + MAX_PARALLEL_REQUESTS));
+      }
+    
+      // Запускаем запросы чанками
+      for (const chunk of chunks) {
+        if (!isActive) break;
+        
+        const promises = chunk.map(baseCode => 
+          checkGalleryDesigns(baseCode).catch(() => {})
+        );
+        
+        await Promise.allSettled(promises);
+      }
     };
-
-    if (items.length > 0) {
+  
+    // ДОБАВЛЯЕМ НЕБОЛЬШУЮ ЗАДЕРЖКУ ПЕРЕД ПРОВЕРКОЙ, ЧТОБЫ НЕ БЛОКИРОВАТЬ ПЕРВОНАЧАЛЬНУЮ ЗАГРУЗКУ
+    const timeoutId = setTimeout(() => {
       checkAllGalleryDesigns();
-    }
+    }, 500); // 500ms задержка
+  
+    return () => {
+      isActive = false;
+      clearTimeout(timeoutId);
+    };
   }, [items]);
 
+  // Добавляем очистку запросов при изменении items
+  useEffect(() => {
+    return () => {
+      // При размонтировании или изменении items отменяем все запросы
+      abortControllersRef.current.forEach(controller => {
+        controller.abort();
+      });
+      abortControllersRef.current.clear();
+    };
+  }, []);
+
   // Функция для обработки клика по кнопке галереи
-  const handleGalleryButtonClick = (baseCode) => {
-    // Переходим на страницу галереи с фильтром по артикулу
-    navigate(`/gallery?search=${baseCode}`);
-  };
+  const handleGalleryButtonClick = useCallback((baseCode) => {
+    // ПРОВЕРЯЕМ И ОБНОВЛЯЕМ ДАННЫЕ СРАЗУ, БЕЗ ОЖИДАНИЯ
+    const galleryInfo = galleryCounts[baseCode];
+    
+    // Если данные уже есть, используем их
+    if (galleryInfo?.hasHistories) {
+      // Навигация без задержки
+      navigate(`/gallery?search=${baseCode}`);
+    } else {
+      // Если данных нет, запускаем проверку и навигацию параллельно
+      checkGalleryDesigns(baseCode)
+        .catch(() => {}) // Игнорируем ошибки для навигации
+        .finally(() => {
+          // Переходим даже если запрос упал
+          navigate(`/gallery?search=${baseCode}`);
+        });
+    }
+  }, [galleryCounts, navigate, checkGalleryDesigns]);
 
   // Загрузка изображений при изменении baseCodes
   useEffect(() => {
@@ -897,8 +1061,8 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
       return null;
     }
 
-    const rangeText = t('grid.tooltipMinimal')
-    .replace('{count}', galleryInfo.count);
+    const isPending = pendingRequests.has(baseCode);
+    const rangeText = t('grid.tooltipMinimal').replace('{count}', galleryInfo.count);
 
     return (
       <div style={{ marginLeft: 'auto' }}>
@@ -908,7 +1072,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
         >
           <button
             className="gallery-button"
-            onClick={() => handleGalleryButtonClick(baseCode)}
+            onClick={() => !isPending && handleGalleryButtonClick(baseCode)}
             style={{
               display: 'flex',
               alignItems: 'center',

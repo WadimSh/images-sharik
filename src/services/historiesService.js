@@ -54,8 +54,9 @@ export async function apiBulkDeactivateHistories(ids) {
   });
 }
 
-export async function apiCheckArticleHistories(id) {
+export async function apiCheckArticleHistories(id, signal) {
   return fetchDataWithFetch(`/api/histories/check-article/${id}`, {
-    method: 'GET'
+    method: 'GET',
+    signal
   });
 }

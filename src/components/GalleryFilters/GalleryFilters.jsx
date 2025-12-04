@@ -13,6 +13,7 @@ const GalleryFilters = ({
   const [searchValue, setSearchValue] = useState(filters.search || '');
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [hasError, setHasError] = useState(false);
+  const [lastSearchValue, setLastSearchValue] = useState(''); // Добавляем отслеживание последнего отправленного значения
 
   // Опции для селектов
   const marketplaceOptions = {
@@ -100,49 +101,65 @@ const GalleryFilters = ({
     return true;
   };
 
+  // Функция отправки поискового запроса
+  const performSearch = (value) => {
+    // Проверяем, отличается ли новое значение от последнего отправленного
+    if (value === lastSearchValue) return;
+    
+    const searchType = getSearchType(value);
+    
+    if (searchType === 'articles') {
+      onFilterChange('search', value);
+      onFilterChange('ownerSearch', '');
+    } else if (searchType === 'ownerSearch') {
+      onFilterChange('ownerSearch', value);
+      onFilterChange('search', '');
+    }
+    
+    // Сохраняем последнее отправленное значение
+    setLastSearchValue(value);
+  };
+
+  // Функция сброса поиска
+  const resetSearch = () => {
+    onFilterChange('search', '');
+    onFilterChange('ownerSearch', '');
+    setLastSearchValue('');
+  };
+
   const handleSearchChange = (value) => {
     setSearchValue(value);
-
-    const isError = canUseSearchValue(value);
-    setHasError(!isError);
+    
+    const isValid = canUseSearchValue(value);
+    setHasError(!isValid);
     
     // Очищаем предыдущий таймаут
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
     
-    // Проверяем, можно ли использовать значение для поиска
-    if (!canUseSearchValue(value)) {
-      // Если нельзя использовать - очищаем поиск
+    // Если значение невалидно или пустое - сбрасываем поиск
+    if (!isValid || !value) {
       if (filters.search || filters.ownerSearch) {
-        onFilterChange('search', '');
-        onFilterChange('ownerSearch', '');
+        resetSearch();
       }
       return;
     }
     
-    // Устанавливаем новый таймаут для задержки поиска (500ms)
-    const newTimeout = setTimeout(() => {
-      const searchType = getSearchType(value);
+    // Делаем debounce только если значение валидно и не равно последнему отправленному
+    if (value !== lastSearchValue) {
+      const newTimeout = setTimeout(() => {
+        performSearch(value);
+        setHasError(false);
+      }, 800); // Увеличиваем debounce время до 500ms
       
-      if (searchType === 'articles') {
-        onFilterChange('search', value);
-        onFilterChange('ownerSearch', '');
-      } else if (searchType === 'ownerSearch') {
-        onFilterChange('ownerSearch', value);
-        onFilterChange('search', '');
-      }
-
-      setHasError(false);
-    }, 500);
-    
-    setTypingTimeout(newTimeout);
+      setTypingTimeout(newTimeout);
+    }
   };
 
   const handleClearSearch = () => {
     setSearchValue('');
-    onFilterChange('search', '');
-    onFilterChange('ownerSearch', '');
+    resetSearch();
     
     if (typingTimeout) {
       clearTimeout(typingTimeout);
@@ -158,8 +175,7 @@ const GalleryFilters = ({
     // При переключении режима очищаем поиск
     if (searchValue) {
       setSearchValue('');
-      onFilterChange('search', '');
-      onFilterChange('ownerSearch', '');
+      resetSearch();
     }
     
     onFilterChange('mine', value);
@@ -179,6 +195,19 @@ const GalleryFilters = ({
     onFilterChange('size', value);
   };
 
+  // Проверка на Enter
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && searchValue.length > 0 && canUseSearchValue(searchValue)) {
+      // Очищаем таймаут при ручном подтверждении
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        setTypingTimeout(null);
+      }
+      
+      performSearch(searchValue);
+    }
+  };
+
   // Очищаем таймаут при размонтировании
   useEffect(() => {
     return () => {
@@ -192,27 +221,15 @@ const GalleryFilters = ({
   useEffect(() => {
     if (!filters.search && !filters.ownerSearch) {
       setSearchValue('');
+      setLastSearchValue('');
     } else if (filters.search) {
       setSearchValue(filters.search);
+      setLastSearchValue(filters.search);
     } else if (filters.ownerSearch) {
       setSearchValue(filters.ownerSearch);
+      setLastSearchValue(filters.ownerSearch);
     }
   }, [filters.search, filters.ownerSearch]);
-
-  // Проверка на Enter
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && searchValue.length > 0 && canUseSearchValue(searchValue)) {
-      const searchType = getSearchType(searchValue);
-      
-      if (searchType === 'articles') {
-        onFilterChange('search', searchValue);
-        onFilterChange('ownerSearch', '');
-      } else if (searchType === 'ownerSearch') {
-        onFilterChange('ownerSearch', searchValue);
-        onFilterChange('search', '');
-      }
-    }
-  };
 
   return (
     <div className="filters-panel">

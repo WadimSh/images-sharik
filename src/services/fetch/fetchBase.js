@@ -72,18 +72,23 @@ const redirectToSignIn = () => {
 
 export async function fetchDataWithFetch(url, options = {}) {
     const originalOptions = { ...options };
-    const { timeout = 60000 } = originalOptions;
+    const { timeout = 60000, signal: externalSignal } = originalOptions;
 
     let accessToken = getAccessToken();
     
-    const controller = new AbortController();
+    // Создаем внутренний controller только если не передан внешний signal
+    const internalController = !externalSignal ? new AbortController() : null;
+    const signal = externalSignal || internalController?.signal;
+    
     const timeoutId = setTimeout(() => {
-        controller.abort();
+        if (internalController) {
+            internalController.abort();
+        }
     }, timeout);
 
     try {
-        // Создаем конфиг для первоначального запроса
-        let config = createRequestConfig(originalOptions, accessToken, controller.signal);
+        // Создаем конфиг с текущим signal
+        let config = createRequestConfig(originalOptions, accessToken, signal);
 
         // Логируем размер запроса
         if (config.body) {
@@ -102,20 +107,23 @@ export async function fetchDataWithFetch(url, options = {}) {
                 let newAccessToken = await refreshToken();
                 console.log('✅ Токен успешно обновлен');
                 
-                // 🔥 ПОВТОРЯЕМ ЗАПРОС С НОВЫМ ТОКЕНОМ
-                const retryController = new AbortController();
+                // Для повторного запроса используем тот же signal
+                const retryController = !externalSignal ? new AbortController() : null;
+                const retrySignal = externalSignal || retryController?.signal;
                 const retryTimeoutId = setTimeout(() => {
-                    retryController.abort();
+                    if (retryController) {
+                        retryController.abort();
+                    }
                 }, timeout);
                 
                 try {
                     console.log('🔄 Повторяем оригинальный запрос с новым токеном...');
                     
-                    // Создаем НОВЫЙ конфиг с теми же данными и новым токеном
+                    // Создаем новый конфиг с обновленным токеном
                     const retryConfig = createRequestConfig(
                         originalOptions, 
                         newAccessToken, 
-                        retryController.signal
+                        retrySignal
                     );
                     
                     response = await fetch(`${baseURL}${url}`, retryConfig);
@@ -136,7 +144,6 @@ export async function fetchDataWithFetch(url, options = {}) {
             const errorData = await response.json().catch(() => ({}));
             const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
             
-            // Специальная обработка для больших payload
             if (response.status === 413) {
                 throw new Error(`Payload too large: ${errorMessage}`);
             } else if (response.status === 408) {
@@ -150,7 +157,6 @@ export async function fetchDataWithFetch(url, options = {}) {
 
         const responseData = await response.json();
 
-        // Сохраняем accessToken если он пришел в ответе
         if (responseData.accessToken) {
             setAccessToken(responseData.accessToken);
         }
@@ -158,19 +164,24 @@ export async function fetchDataWithFetch(url, options = {}) {
         return responseData;
 
     } catch (error) {
-        // Обрабатываем ошибки таймаута и прерывания
+        // Обрабатываем ошибки отмены
         if (error.name === 'AbortError') {
-            throw new Error(`Request timeout after ${timeout}ms`);
+            // Проверяем, был ли отменен внешний signal
+            if (externalSignal?.aborted) {
+                console.log('🛑 Запрос отменен внешним signal');
+                throw error; // Пробрасываем оригинальный AbortError
+            } else {
+                console.log('⏰ Запрос отменен по таймауту');
+                throw new Error(`Request timeout after ${timeout}ms`);
+            }
         }
         
-        // Пробрасываем сетевые ошибки
         if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
             throw new Error('Network error: Failed to connect to server');
         }
         
         throw error;
     } finally {
-        // Всегда очищаем таймаут
         clearTimeout(timeoutId);
     }
 }

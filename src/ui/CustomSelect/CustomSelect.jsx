@@ -9,6 +9,7 @@ export const CustomSelect = ({
   onChange,
   className = "",
   dropdownMaxHeight = "200px",
+  disabled = false
 }) => {
   const { t } = useContext(LanguageContext);
   const [isOpen, setIsOpen] = useState(false);
@@ -61,17 +62,21 @@ export const CustomSelect = ({
   }, []);
 
   const handleSelectClick = () => {
+    if (disabled) return;
+
     setIsOpen(!isOpen);
     setSearchTerm("");
   };
 
   const handleOptionClick = (key) => {
+    if (disabled) return;
+
     onChange(key);
     setIsOpen(false);
   };
 
   return (
-    <div className={`custom-select-container ${className}`} ref={selectRef}>
+    <div className={`custom-select-container ${className} ${disabled ? 'disabled' : ''}`}  ref={selectRef}>
       {/* Заголовок заменяется на инпут при открытии */}
       {isOpen ? (
         <input
@@ -81,9 +86,10 @@ export const CustomSelect = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder={options[value] || t('ui.searchPlaceholder')}
+          disabled={disabled}
         />
       ) : (
-        <div className="custom-select-header" onClick={handleSelectClick}>
+        <div className={`custom-select-header ${disabled ? 'disabled' : ''}`}  onClick={handleSelectClick}>
           <span>{options[value] || t('ui.selectedMessage')}</span>
           <span className={`arrow ${isOpen ? 'up' : 'down'}`}></span>
         </div>
