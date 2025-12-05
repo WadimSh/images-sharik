@@ -1,6 +1,6 @@
 // services/migrationService.js
 import { designsDB, collageDB } from '../utils/handleDB';
-import { apiCreateDesign, apiCreateCollage } from '../services/templateService';
+import { apiCreateDesign, apiCreateCollage } from '../services/templatesService';
 
 export const migrationService = {
   /**

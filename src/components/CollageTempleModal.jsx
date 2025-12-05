@@ -7,7 +7,7 @@ import {
   apiGetCollageByName, 
   apiUpdateCollage,
   apiGetAllCollages
-} from '../services/templateService';
+} from '../services/templatesService';
 
 export const CollageTempleModal = ({
   setIsCollageTempleModalOpen,

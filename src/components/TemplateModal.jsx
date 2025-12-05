@@ -8,7 +8,7 @@ import {
   apiGetDesignByName, 
   apiUpdateDesign,
   apiGetAllDesigns
-} from '../services/templateService';
+} from '../services/templatesService';
 
 export const TemplateModal = ({
   setIsTemplateModalOpen,

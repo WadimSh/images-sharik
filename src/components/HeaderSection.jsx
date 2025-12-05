@@ -15,7 +15,7 @@ import {
   apiDeleteDesign, 
   apiGetCollageByName, 
   apiDeleteCollage 
-} from '../services/templateService';
+} from '../services/templatesService';
 import { LanguageContext } from '../contexts/contextLanguage';
 import { apiCreateHistory } from '../services/historiesService';
 import { useAuth } from '../contexts/AuthContext';

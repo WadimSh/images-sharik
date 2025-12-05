@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useContext } from 'react';
+import { useState, useCallback, useEffect, useContext, useRef } from 'react';
 
 import SearchHeader from "../../components/SearchHeader";
 import ItemsGrid from "../../components/ItemsGrid";
@@ -8,6 +8,7 @@ import { replacePlaceholders } from '../../utils/replacePlaceholders';
 import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { apiGetAllLayouts } from '../../services/layoutsService';
 
 export const Home = () => {
   const savedData = sessionStorage.getItem('searchData');
@@ -29,11 +30,54 @@ export const Home = () => {
     main: [],
     default: [],
   });
+  const templatesCache = useRef({
+    data: null,
+    loaded: false,
+    timestamp: 0
+  });
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [infoMessage, setInfoMessage] = useState(null);
   const [isToggled, setIsToggled] = useState(false);
+
+  const loadTemplates = useCallback(async () => {
+    if (templatesCache.current.loaded && templatesCache.current.data) {
+      setTemplates(templatesCache.current.data);
+      return templatesCache.current.data;
+    }
+    
+    try {
+      const templatesArray = await apiGetAllLayouts();
+      
+      const transformed = {};
+      templatesArray.forEach(template => {
+        const key = template.name.toLowerCase();
+        if (key in templates) { 
+          transformed[key] = Array.isArray(template.data) ? template.data : [];
+        }
+      });
+      
+      const newTemplates = { ...templates, ...transformed };
+      
+      templatesCache.current = {
+        data: newTemplates,
+        loaded: true,
+        timestamp: Date.now()
+      };
+      
+      setTemplates(newTemplates);
+      return newTemplates;
+      
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      return templates;
+    } 
+  }, []);
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
   
   useEffect(() => {
     // Только для синхронизации при обновлениях из других вкладок
@@ -64,28 +108,6 @@ export const Home = () => {
     }
   }, [searchQuery, validArticles]);
   
-  // Загрузка шаблонов дизайнов
-  useEffect(() => {
-    const loadTemplates = async () => {
-      try {
-        const [mainTemplate, defaultTemplate, gemarTemplate, belbalTemplate, petardTemplate, halloweenTemplate, winterTemplate] = await Promise.all([
-          fetch('/templates/main-template.json').then(r => r.json()),
-          fetch('/templates/default-template.json').then(r => r.json()),
-          fetch('/templates/gemar-template.json').then(r => r.json()),
-          fetch('/templates/belbal-template.json').then(r => r.json()),
-          fetch('/templates/petard-template.json').then(r => r.json()),
-          fetch('/templates/halloween-template.json').then(r => r.json()),
-          fetch('/templates/winterholidays-template.json').then(r => r.json())
-        ]);
-        setTemplates({ winter: winterTemplate, halloween: halloweenTemplate, petard: petardTemplate, belbal: belbalTemplate, gemar: gemarTemplate, main: mainTemplate, default: defaultTemplate  });
-      } catch (error) {
-        console.error('Error loading templates:', error);
-      }
-    };
-
-    loadTemplates();
-  }, []);
-
   const processProductsMeta = (productsData) => {
     if (!Array.isArray(productsData)) {
       console.error('Invalid data for processing:', productsData);
@@ -389,83 +411,89 @@ export const Home = () => {
   }, [templates]);
 
   // В компоненте Home обновляем handleSearch
-const handleSearch = useCallback((normalizedArticles) => {
-  setError(null);
-  setInfoMessage(null);
+  const handleSearch = useCallback(async (normalizedArticles) => {
+    setError(null);
+    setInfoMessage(null);
 
-  if (!normalizedArticles.length) {
-    setValidArticles([]);
-    setIsSearchActive(false);
-    return
-  };
-
-    setLoading(true);
-    
-    const searchQuery = normalizedArticles.join(' ');
-    const encodedSearch = encodeURIComponent(searchQuery);
-    
-    fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.results.length === 0) {
-          const message = t('views.homeMissingCode');
-          setInfoMessage(message);
-          return Promise.reject(message);
-        }
-    
-        const productIds = data.results.map(product => product.id);
-        const idsParam = productIds.join(',');
-        return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-      })
-      .then(response => response?.json())
-      .then(detailedData => {
-        if (!detailedData) return;
-
-      // Обрабатываем полученные данные API
-      //const processedResults = processProductsData(data);
-      //const processedMetaResults = processProductsMeta(data);
-      const processedResults = processProductsData(detailedData);
-      const processedMetaResults = processProductsMeta(detailedData);
-            
-      // Сохраняем в sessionStorage
-      processedResults.forEach(item => {
-        const designData = generateDesignData(item);
-        slidesDB.add({
-          code: `design-${item.code}`, 
-          data: designData
-        });
-      });
-
-      processedMetaResults.forEach(item => {
-        productsDB.add({
-          code: `product-${item.code}`, 
-          data: item   
-        });
-      });
-
-      // Обновляем состояние
-      const codes = processedResults.map(item => item.code);
-      setValidArticles(codes);
-      setIsSearchActive(codes.length > 0);
-
-      // Сохраняем оригинальные артикулы
-      sessionStorage.setItem('searchData', JSON.stringify({
-        query: searchQuery,
-        articles: codes
-      }));
-
-      return processedResults;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setError(error.message || "An error occurred");
+    if (!normalizedArticles.length) {
       setValidArticles([]);
       setIsSearchActive(false);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-}, [generateDesignData, isToggled]);
+      return
+    };
+
+    // Ждем загрузки шаблонов если они еще не загружены
+    if (!templatesCache.current.loaded) {
+      setInfoMessage('Загрузка шаблонов...');
+      await loadTemplates();
+    }
+
+      setLoading(true);
+
+      const searchQuery = normalizedArticles.join(' ');
+      const encodedSearch = encodeURIComponent(searchQuery);
+
+      fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&supplier_category__isnull=False`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results.length === 0) {
+            const message = t('views.homeMissingCode');
+            setInfoMessage(message);
+            return Promise.reject(message);
+          }
+        
+          const productIds = data.results.map(product => product.id);
+          const idsParam = productIds.join(',');
+          return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+        })
+        .then(response => response?.json())
+        .then(detailedData => {
+          if (!detailedData) return;
+
+        // Обрабатываем полученные данные API
+        //const processedResults = processProductsData(data);
+        //const processedMetaResults = processProductsMeta(data);
+        const processedResults = processProductsData(detailedData);
+        const processedMetaResults = processProductsMeta(detailedData);
+
+        // Сохраняем в sessionStorage
+        processedResults.forEach(item => {
+          const designData = generateDesignData(item);
+          slidesDB.add({
+            code: `design-${item.code}`, 
+            data: designData
+          });
+        });
+
+        processedMetaResults.forEach(item => {
+          productsDB.add({
+            code: `product-${item.code}`, 
+            data: item   
+          });
+        });
+
+        // Обновляем состояние
+        const codes = processedResults.map(item => item.code);
+        setValidArticles(codes);
+        setIsSearchActive(codes.length > 0);
+
+        // Сохраняем оригинальные артикулы
+        sessionStorage.setItem('searchData', JSON.stringify({
+          query: searchQuery,
+          articles: codes
+        }));
+
+        return processedResults;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setError(error.message || "An error occurred");
+        setValidArticles([]);
+        setIsSearchActive(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {
     setValidArticles(newItems);
