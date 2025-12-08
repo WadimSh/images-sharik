@@ -18,6 +18,7 @@ export const LineElement = ({
   element,
   selectedElementId,
   selectedElementIds,
+  lockedElementId,
   onDeselect,
   zoom,
   captureRef
@@ -94,6 +95,7 @@ export const LineElement = ({
       onClick={onClick}
       selectedElementId={selectedElementId}
       selectedElementIds={selectedElementIds}
+      lockedElementId={lockedElementId}
       onDeselect={onDeselect}
       zoom={zoom}
       captureRef={captureRef}

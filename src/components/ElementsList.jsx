@@ -6,7 +6,7 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
 import { LuImageOff, LuImagePlus } from "react-icons/lu";
-import { BsBorderWidth } from "react-icons/bs";
+import { BsBorderWidth, BsLockFill, BsUnlockFill } from "react-icons/bs";
 import { RxBorderWidth } from "react-icons/rx";
 import { MdOpacity } from "react-icons/md";
 import { FaArrowUp, FaArrowDown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
@@ -50,6 +50,8 @@ export const ElementsList = ({
   setSelectedElementId,
   selectedElementIds,
   setSelectedElementIds,
+  lockedElementId,
+  setLockedElementId,
   expandedElementId,
   setExpandedElementId,
   onPositionChange,
@@ -283,6 +285,7 @@ export const ElementsList = ({
         {[...elements].reverse().map((element, index) => {
           const originalIndex = elements.length - 1 - index;
           const isExpanded = expandedElementId === element.id;
+          const isLocked = lockedElementId.has(element.id);
           const isBackground = element.type === 'background';
                  
           return (
@@ -305,7 +308,7 @@ export const ElementsList = ({
                     elementRefs.current.delete(element.id);
                   }
                 }}
-                className={`element-item ${element.id === selectedElementId ? 'selected' : ''} ${selectedElementIds.includes(element.id) ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
+                className={`element-item ${(element.id === selectedElementId) && !isLocked ? 'selected' : ''} ${selectedElementIds.includes(element.id) && !isLocked ? 'selected' : ''} ${isExpanded ? 'disabled-drag' : ''}`}
                 onClick={(e) => {
                   if (isBackground) return; // Запрещаем выбор фона
                   if (e.shiftKey) {
@@ -390,15 +393,37 @@ export const ElementsList = ({
                   {element.type === 'line' && t('elements.labelLine')}
                   {element.type === 'background' && t('elements.labelBackground')}
                 </div>
-                <button 
-                  className={`expand-button ${isExpanded ? 'expanded' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedElementId(isExpanded ? null : element.id);
-                  }}
-                >
-                  <FaChevronDown />
-                </button>
+                
+                <div>
+                  {/* ---- */}
+                  <button 
+                    className='expand-button'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLockedElementId(prev => {
+                        const newSet = new Set(prev);
+                        if (newSet.has(element.id)) {
+                          newSet.delete(element.id); // Разблокируем
+                        } else {
+                          newSet.add(element.id); // Блокируем
+                        }
+                        return newSet;
+                      });
+                    }}
+                  >
+                    {isLocked ? <BsLockFill /> : <BsUnlockFill />}
+                  </button>
+
+                  <button 
+                    className={`expand-button ${isExpanded ? 'expanded' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedElementId(isExpanded ? null : element.id);
+                    }}
+                  >
+                    <FaChevronDown />
+                  </button>
+                </div>
               </div>
 
               {isExpanded && (

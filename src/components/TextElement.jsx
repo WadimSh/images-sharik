@@ -17,6 +17,7 @@ export const TextElement = ({
   onClick,
   selectedElementId,
   selectedElementIds,
+  lockedElementId,
   onDeselect,
   zoom,
   captureRef
@@ -93,6 +94,7 @@ export const TextElement = ({
       onClick={onClick}
       selectedElementId={selectedElementId}
       selectedElementIds={selectedElementIds}
+      lockedElementId={lockedElementId}
       onDeselect={onDeselect}
       splitResizable
       hideOverlay={isEditing}

@@ -7,6 +7,7 @@ const DraggableElement = ({
   id,
   selectedElementId,
   selectedElementIds = [],
+  lockedElementId,
   position, 
   onDrag, 
   onResize,
@@ -33,6 +34,8 @@ const DraggableElement = ({
   const overlayRef = useRef(null);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const animationFrameRef = useRef(null);
+
+  const isLocked = lockedElementId.has(id);
   
   useEffect(() => {
     setCurrentRotation(rotation);
@@ -59,7 +62,7 @@ const DraggableElement = ({
   };
 
   useEffect(() => {
-    if (hideOverlay) {
+    if (hideOverlay || isLocked) {
       setIsOverlayVisible(false);
       return;
     }
@@ -69,7 +72,7 @@ const DraggableElement = ({
     } else {
       setIsOverlayVisible(false);
     }
-  }, [selectedElementId, selectedElementIds, id, position, dimensions, hideOverlay]);
+  }, [selectedElementId, selectedElementIds, id, position, dimensions, hideOverlay, isLocked]);
 
   // Клик вне элемента
   useEffect(() => {
@@ -102,7 +105,7 @@ const DraggableElement = ({
   }, [selectedElementIds, id]);
 
   const handleRotateStart = (e) => {
-    if (!isOverlayVisible) return;
+    if (!isOverlayVisible || isLocked) return; // Запрещаем вращение для заблокированных
     e.stopPropagation();
     const rect = elementRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width/2;
@@ -134,7 +137,7 @@ const DraggableElement = ({
   };
 
   const handleProportionalResize = (e, direction) => {
-    if (!isOverlayVisible) return;
+    if (!isOverlayVisible || isLocked) return; // Запрещаем ресайз для заблокированных
     e.stopPropagation();
     e.preventDefault();
     const rect = elementRef.current.getBoundingClientRect();
@@ -160,7 +163,7 @@ const DraggableElement = ({
   };
   
   const handleDirectionalResize = (e, direction) => {
-    if (!isOverlayVisible) return;
+    if (!isOverlayVisible || isLocked) return; // Запрещаем ресайз для заблокированных
     e.stopPropagation();
     e.preventDefault();
     const rect = elementRef.current.getBoundingClientRect();
@@ -175,7 +178,7 @@ const DraggableElement = ({
   };
 
   const handleMouseDown = (e) => {
-    if (e.button !== 0 || isResizing) return;
+    if (e.button !== 0 || isResizing || isLocked) return; // Запрещаем перетаскивание для заблокированных
     
     const rect = elementRef.current.getBoundingClientRect();
     setOffset({
@@ -187,6 +190,8 @@ const DraggableElement = ({
   };
 
   const handleMouseMove = (e) => {
+    if (isLocked) return; // Запрещаем все действия для заблокированных элементов
+    
     if (isResizing && elementRef.current) {
       const deltaX = e.clientX - initialSize.current.x;
       const deltaY = e.clientY - initialSize.current.y;
@@ -285,6 +290,27 @@ const DraggableElement = ({
     };
   }, [isDragging, isResizing]);
 
+  const handleElementClick = (e) => {
+    if (isLocked) {
+      // Для заблокированных элементов просто вызываем onClick без показа оверлея
+      e.stopPropagation();
+      onClick?.(e);
+      return;
+    }
+    
+    // Для незаблокированных элементов стандартное поведение
+    onClick?.(e);
+  };
+
+  const handleElementContextMenu = (e) => {
+    if (isLocked) {
+      // Запрещаем контекстное меню для заблокированных элементов
+      e.preventDefault();
+      return;
+    }
+    onContextMenu?.(e);
+  };
+
   return (<>
     <div
       ref={elementRef}
@@ -296,24 +322,25 @@ const DraggableElement = ({
         userSelect: 'none',
         width: 'auto',
         height: 'auto',
+        cursor: isLocked ? '' : 'default', // Меняем курсор для заблокированных
       }} 
    >
       <div style={{
         width: dimensions ? `${dimensions.width}px` : 'auto',
         height: dimensions ? `${dimensions.height}px` : 'auto',
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isLocked ? '' : (isDragging ? 'grabbing' : 'grab'),
         transform: `rotate(${currentRotation}deg)`,
         transformOrigin: 'center center'
       }}
       onMouseDown={handleMouseDown}
-      onContextMenu={onContextMenu}
-      onClick={onClick}
+      onContextMenu={handleElementContextMenu}
+      onClick={handleElementClick}
       >
         {children}
       </div>
     </div>
     {/* Overlay через Portal */}
-    {isOverlayVisible && captureRef?.current && ReactDOM.createPortal(
+    {isOverlayVisible && !isLocked && captureRef?.current && ReactDOM.createPortal(
       <div 
         ref={overlayRef}
         className={`dragging-overlay visible`}

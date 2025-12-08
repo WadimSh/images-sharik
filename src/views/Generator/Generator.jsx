@@ -92,6 +92,7 @@ export const Generator = () => {
   const [selectedColorElementId, setSelectedColorElementId] = useState(null);
   const [selectedElementId, setSelectedElementId] = useState(null);
   const [selectedElementIds, setSelectedElementIds] = useState([]);
+  const [lockedElementId, setLockedElementId] = useState(new Set());
   const [copiedElement, setCopiedElement] = useState(null);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -1472,6 +1473,7 @@ export const Generator = () => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (lockedElementId.has(element.id)) return;
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1480,6 +1482,7 @@ export const Generator = () => {
                       }}
                       selectedElementId={selectedElementId}
                       selectedElementIds={selectedElementIds}
+                      lockedElementId={lockedElementId}
                       onDeselect={() => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
@@ -1509,6 +1512,7 @@ export const Generator = () => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (lockedElementId.has(element.id)) return;
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1517,6 +1521,7 @@ export const Generator = () => {
                       }}
                       selectedElementId={selectedElementId}
                       selectedElementIds={selectedElementIds}
+                      lockedElementId={lockedElementId}
                       onDeselect={() => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
@@ -1544,6 +1549,7 @@ export const Generator = () => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (lockedElementId.has(element.id)) return;
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1552,6 +1558,7 @@ export const Generator = () => {
                       }}
                       selectedElementId={selectedElementId}
                       selectedElementIds={selectedElementIds}
+                      lockedElementId={lockedElementId}
                       onDeselect={() => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
@@ -1579,6 +1586,7 @@ export const Generator = () => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (lockedElementId.has(element.id)) return;
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1587,6 +1595,7 @@ export const Generator = () => {
                       }}
                       selectedElementId={selectedElementId}
                       selectedElementIds={selectedElementIds}
+                      lockedElementId={lockedElementId}
                       onDeselect={() => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
@@ -1618,6 +1627,7 @@ export const Generator = () => {
                       onContextMenu={(e) => handleContextMenu(e, element.id)}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (lockedElementId.has(element.id)) return;
                         if (e.shiftKey) {
                           setSelectedElementIds(prev => [...prev, element.id]);
                         } else {
@@ -1626,6 +1636,7 @@ export const Generator = () => {
                       }}
                       selectedElementId={selectedElementId}
                       selectedElementIds={selectedElementIds}
+                      lockedElementId={lockedElementId}
                       onDeselect={() => {
                         setSelectedElementId(null);
                         setSelectedElementIds([]);
@@ -1787,6 +1798,8 @@ export const Generator = () => {
             setSelectedElementId={handleElementClick}
             selectedElementIds={selectedElementIds}
             setSelectedElementIds={setSelectedElementIds}
+            lockedElementId={lockedElementId}
+            setLockedElementId={setLockedElementId}
             expandedElementId={expandedElementId}
             setExpandedElementId={setExpandedElementId}
             onPositionChange={handlePositionChange}

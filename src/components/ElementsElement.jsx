@@ -19,6 +19,7 @@ export const ElementsElement = ({
   onClick,
   selectedElementId,
   selectedElementIds,
+  lockedElementId,
   onDeselect,
   zoom,
   captureRef
@@ -70,6 +71,7 @@ export const ElementsElement = ({
       onClick={onClick}
       selectedElementId={selectedElementId}
       selectedElementIds={selectedElementIds}
+      lockedElementId={lockedElementId}
       onDeselect={onDeselect}
       zoom={zoom}
       captureRef={captureRef}
