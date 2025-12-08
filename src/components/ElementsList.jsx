@@ -395,8 +395,7 @@ export const ElementsList = ({
                 </div>
                 
                 <div>
-                  {/* ---- */}
-                  <button 
+                  {!isBackground && <button 
                     className='expand-button'
                     onClick={(e) => {
                       e.stopPropagation();
@@ -412,7 +411,7 @@ export const ElementsList = ({
                     }}
                   >
                     {isLocked ? <BsLockFill /> : <BsUnlockFill />}
-                  </button>
+                  </button>}
 
                   <button 
                     className={`expand-button ${isExpanded ? 'expanded' : ''}`}
