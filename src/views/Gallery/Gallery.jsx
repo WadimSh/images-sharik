@@ -544,6 +544,8 @@ export const Gallery = () => {
         filters={filters}
         onFilterChange={handleFilterChange}
         marketplaceSizes={SIZE_PRESETS_BY_MARKETPLACE}
+        loading={loading}
+        initialSearchValue={getSearchFromUrl()}
       />
 
       {/* Панель массового удаления */}
