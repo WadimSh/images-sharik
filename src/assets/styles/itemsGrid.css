@@ -643,14 +643,6 @@
   background-color: #007bff;
 }
 
-.gallery-button:hover .span {
-  background-color: #007bff;
-}
-
-.gallery-button .span:hover {
-  background-color: #007bff;
-}
-
 /* Адаптивность */
 @media (max-width: 768px) {
   .slider-arrow-prev {

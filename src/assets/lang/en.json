@@ -344,7 +344,9 @@
     "oldestFirst": "Oldest first",
     "searchPlaceholderAll": "Search by articles or author...",
     "searchPlaceholderMine": "Search by articles...",
-    "selectMarketplaceFirst": "Select marketplace first"
+    "selectMarketplaceFirst": "Select marketplace first",
+    "showSimilar": "Similar items:",
+    "hideSimilar": "Hide similar"
   },
   "pagination": {
     "itemsPerPage": "per page",

@@ -344,7 +344,9 @@
     "oldestFirst": "Prima i più vecchi", 
     "searchPlaceholderAll": "Cerca per articoli o autore...",
     "searchPlaceholderMine": "Cerca per articoli...",
-    "selectMarketplaceFirst": "Seleziona prima il marketplace"
+    "selectMarketplaceFirst": "Seleziona prima il marketplace",
+    "showSimilar": "Ci sono simili:",
+    "hideSimilar": "Nascondi simili"
   },
   "pagination": {
     "itemsPerPage": "per pagina",

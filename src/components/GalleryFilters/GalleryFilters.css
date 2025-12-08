@@ -43,6 +43,14 @@
   background: #f8f9fa;
 }
 
+.similar-button {
+  background: #fff;
+}
+
+.similar-button:hover {
+  background: #f8f9fa;
+}
+
 /* Поиск */
 .search-filter-input {
   flex: 1;

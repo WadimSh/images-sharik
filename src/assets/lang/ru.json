@@ -344,7 +344,9 @@
     "oldestFirst": "Сначала старые",
     "searchPlaceholderAll": "Поиск по артикулам или автору...",
     "searchPlaceholderMine": "Поиск по артикулам...",
-    "selectMarketplaceFirst": "Сначала выберите маркетплейс"
+    "selectMarketplaceFirst": "Сначала выберите маркетплейс",
+    "showSimilar": "Есть похожие:",
+    "hideSimilar": "Скрыть похожие"
   },
   "pagination": {
     "itemsPerPage": "на странице",

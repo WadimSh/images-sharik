@@ -1,6 +1,7 @@
-import { useContext, useRef, useMemo, useState, useEffect } from "react";
+import { useContext, useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import { CustomSelect } from "../../ui/CustomSelect/CustomSelect";
+import { apiCheckArticleHistories } from '../../services/historiesService';
 import './GalleryFilters.css';
 
 const GalleryFilters = ({ 
@@ -10,10 +11,23 @@ const GalleryFilters = ({
 }) => {
   const { t } = useContext(LanguageContext);
   const searchInputRef = useRef(null);
-  const [searchValue, setSearchValue] = useState(filters.search || '');
+  const [searchValue, setSearchValue] = useState(filters.search || filters.ownerSearch || '');
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [hasError, setHasError] = useState(false);
-  const [lastSearchValue, setLastSearchValue] = useState(''); // Добавляем отслеживание последнего отправленного значения
+  const [lastSearchValue, setLastSearchValue] = useState('');
+  
+  // Состояние для кнопки похожих товаров
+  const [similarButtonState, setSimilarButtonState] = useState({
+    isVisible: false,
+    hasSimilar: false,
+    baseCode: '',
+    originalSearch: '', // сохраняем оригинальный поиск
+    count: 0,
+    showSimilar: false
+  });
+
+  // Реф для отслеживания, является ли текущий поиск похожим
+  const isSimilarSearchRef = useRef(false);
 
   // Опции для селектов
   const marketplaceOptions = {
@@ -58,6 +72,145 @@ const GalleryFilters = ({
     return options;
   }, [marketplaceSizes, t]);
 
+  // Функция для извлечения baseCode из searchValue
+  const extractBaseCode = useCallback((value) => {
+    if (!value) return null;
+    
+    // Проверяем разные форматы артикулов
+    const patterns = [
+      /^(\d{4})-\d{4}$/, // XXXX-XXXX
+      /^(\d{4})$/,       // XXXX
+      /^(\d{4})_/,       // XXXX_...
+      /^(\d{4})-/,       // XXXX-...
+    ];
+    
+    for (const pattern of patterns) {
+      const match = value.match(pattern);
+      if (match) {
+        return match[1]; // первые 4 цифры
+      }
+    }
+    
+    return null;
+  }, []);
+
+  // Проверка наличия похожих товаров
+  const checkSimilarProducts = useCallback(async (baseCode, currentSearchValue) => {
+    if (!baseCode) return;
+    
+    setSimilarButtonState(prev => ({
+      ...prev,
+      isVisible: true,
+      baseCode,
+      originalSearch: currentSearchValue || ''
+    }));
+    
+    try {
+      const response = await apiCheckArticleHistories(baseCode);
+      
+      if (response && response.hasHistories && response.count > 0) {
+        setSimilarButtonState(prev => ({
+          ...prev,
+          hasSimilar: true,
+          count: response.count,
+          isLoading: false
+        }));
+      } else {
+        setSimilarButtonState(prev => ({
+          ...prev,
+          hasSimilar: false,
+          count: 0,
+          isVisible: false
+        }));
+      }
+    } catch (error) {
+      console.error('Error checking similar products:', error);
+      setSimilarButtonState(prev => ({
+        ...prev,
+        hasSimilar: false,
+        isVisible: false
+      }));
+    }
+  }, []);
+
+  // Функция для обновления состояния кнопки на основе текущего поиска
+  const updateSimilarButtonFromSearch = useCallback((searchVal) => {
+    if (!searchVal) {
+      setSimilarButtonState({
+        isVisible: false,
+        hasSimilar: false,
+        baseCode: '',
+        originalSearch: '',
+        count: 0,
+        showSimilar: false
+      });
+      isSimilarSearchRef.current = false;
+      return;
+    }
+    
+    const baseCode = extractBaseCode(searchVal);
+    if (baseCode && baseCode !== similarButtonState.baseCode) {
+      checkSimilarProducts(baseCode, searchVal);
+    }
+  }, [extractBaseCode, checkSimilarProducts, similarButtonState.baseCode]);
+
+  // Обработчик клика по кнопке "Показать похожие"
+  const handleShowSimilar = useCallback(() => {
+    const baseCode = similarButtonState.baseCode;
+    const originalSearch = similarButtonState.originalSearch || searchValue;
+    
+    if (baseCode) {
+      // Устанавливаем флаг показа похожих
+      setSimilarButtonState(prev => ({
+        ...prev,
+        showSimilar: true
+      }));
+      
+      isSimilarSearchRef.current = true;
+      
+      // Выполняем поиск по baseCode, НЕ меняя значение в инпуте
+      onFilterChange('search', baseCode);
+      onFilterChange('ownerSearch', '');
+      
+      // Обновляем lastSearchValue чтобы предотвратить повторный запрос
+      setLastSearchValue(baseCode);
+    }
+  }, [similarButtonState.baseCode, similarButtonState.originalSearch, searchValue, onFilterChange]);
+
+  // Обработчик клика по кнопке "Скрыть похожие"
+  const handleHideSimilar = useCallback(() => {
+    const originalSearch = similarButtonState.originalSearch;
+    
+    // Сбрасываем флаг показа похожих
+    setSimilarButtonState(prev => ({
+      ...prev,
+      showSimilar: false
+    }));
+    
+    isSimilarSearchRef.current = false;
+    
+    // Возвращаемся к оригинальному поиску
+    if (originalSearch) {
+      const searchType = getSearchType(originalSearch);
+      
+      if (searchType === 'articles') {
+        onFilterChange('search', originalSearch);
+        onFilterChange('ownerSearch', '');
+      } else if (searchType === 'ownerSearch') {
+        onFilterChange('ownerSearch', originalSearch);
+        onFilterChange('search', '');
+      }
+      
+      // Обновляем lastSearchValue
+      setLastSearchValue(originalSearch);
+    } else {
+      // Если оригинального поиска нет, очищаем
+      onFilterChange('search', '');
+      onFilterChange('ownerSearch', '');
+      setLastSearchValue('');
+    }
+  }, [similarButtonState.originalSearch, onFilterChange]);
+
   // Определяем плейсхолдер в зависимости от фильтра "Мои"
   const getSearchPlaceholder = () => {
     return filters.mine 
@@ -74,7 +227,7 @@ const GalleryFilters = ({
     
     // Если фильтр "Мои" - ТОЛЬКО поиск по артикулам (цифры)
     if (filters.mine) {
-      return 'articles'; // В режиме "Мои" всегда поиск по артикулам
+      return 'articles';
     }
     
     // Если фильтр "Все" - определяем тип по первым символам
@@ -103,21 +256,37 @@ const GalleryFilters = ({
 
   // Функция отправки поискового запроса
   const performSearch = (value) => {
-    // Проверяем, отличается ли новое значение от последнего отправленного
-    if (value === lastSearchValue) return;
-    
-    const searchType = getSearchType(value);
-    
-    if (searchType === 'articles') {
-      onFilterChange('search', value);
-      onFilterChange('ownerSearch', '');
-    } else if (searchType === 'ownerSearch') {
-      onFilterChange('ownerSearch', value);
-      onFilterChange('search', '');
+    // Если это поиск похожих, не обновляем originalSearch
+    if (!isSimilarSearchRef.current) {
+      // Проверяем, отличается ли новое значение от последнего отправленного
+      if (value === lastSearchValue && value) return;
+      
+      // Проверяем, есть ли baseCode для поиска похожих
+      const baseCode = extractBaseCode(value);
+      if (baseCode) {
+        checkSimilarProducts(baseCode, value);
+      } else {
+        // Сбрасываем состояние кнопки если не формат артикула
+        setSimilarButtonState(prev => ({
+          ...prev,
+          isVisible: false,
+          hasSimilar: false
+        }));
+      }
+      
+      const searchType = getSearchType(value);
+      
+      if (searchType === 'articles') {
+        onFilterChange('search', value);
+        onFilterChange('ownerSearch', '');
+      } else if (searchType === 'ownerSearch') {
+        onFilterChange('ownerSearch', value);
+        onFilterChange('search', '');
+      }
+      
+      // Сохраняем последнее отправленное значение
+      setLastSearchValue(value);
     }
-    
-    // Сохраняем последнее отправленное значение
-    setLastSearchValue(value);
   };
 
   // Функция сброса поиска
@@ -125,6 +294,19 @@ const GalleryFilters = ({
     onFilterChange('search', '');
     onFilterChange('ownerSearch', '');
     setLastSearchValue('');
+    
+    // Сбрасываем состояние кнопки похожих
+    setSimilarButtonState({
+      isVisible: false,
+      isLoading: false,
+      hasSimilar: false,
+      baseCode: '',
+      originalSearch: '',
+      count: 0,
+      showSimilar: false
+    });
+    
+    isSimilarSearchRef.current = false;
   };
 
   const handleSearchChange = (value) => {
@@ -151,7 +333,7 @@ const GalleryFilters = ({
       const newTimeout = setTimeout(() => {
         performSearch(value);
         setHasError(false);
-      }, 800); // Увеличиваем debounce время до 500ms
+      }, 800);
       
       setTypingTimeout(newTimeout);
     }
@@ -208,6 +390,72 @@ const GalleryFilters = ({
     }
   };
 
+  // Компонент кнопки похожих товаров
+  const SimilarProductsButton = () => {
+    if (!similarButtonState.isVisible) return null;
+    
+    if (similarButtonState.hasSimilar) {
+      if (similarButtonState.showSimilar) {
+        // Кнопка "Скрыть похожие"
+        return (
+          <button
+            className="similar-button"
+            onClick={handleHideSimilar}
+            style={{
+              width: '172px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '9px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span className="span" style={{ paddingTop: "2px" }}>
+              {t('filters.hideSimilar')}
+            </span> 
+          </button>
+        );
+      } else {
+        // Кнопка "Есть похожие"
+        return (
+          <button
+            className="gallery-button"
+            onClick={handleShowSimilar}
+            style={{
+              width: '172px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '9px 12px',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span className="span" style={{ paddingTop: "2px" }}>
+              {t('filters.showSimilar')}
+            </span> 
+            <span className="span" style={{ paddingTop: "2px" }}>
+              {similarButtonState.count}
+            </span>
+          </button>
+        );
+      }
+    }
+    
+    return null;
+  };
+
   // Очищаем таймаут при размонтировании
   useEffect(() => {
     return () => {
@@ -219,17 +467,40 @@ const GalleryFilters = ({
 
   // Синхронизируем локальное состояние с внешними фильтрами
   useEffect(() => {
-    if (!filters.search && !filters.ownerSearch) {
+    const currentFilterValue = filters.search || filters.ownerSearch || '';
+    
+    if (!currentFilterValue) {
       setSearchValue('');
       setLastSearchValue('');
-    } else if (filters.search) {
-      setSearchValue(filters.search);
-      setLastSearchValue(filters.search);
-    } else if (filters.ownerSearch) {
-      setSearchValue(filters.ownerSearch);
-      setLastSearchValue(filters.ownerSearch);
+      
+      // Сбрасываем состояние кнопки похожих
+      if (similarButtonState.isVisible) {
+        setSimilarButtonState(prev => ({
+          ...prev,
+          isVisible: false,
+          showSimilar: false
+        }));
+      }
+      isSimilarSearchRef.current = false;
+    } else {
+      // Обновляем searchValue только если это не поиск похожих
+      if (!isSimilarSearchRef.current || currentFilterValue !== similarButtonState.baseCode) {
+        setSearchValue(currentFilterValue);
+        setLastSearchValue(currentFilterValue);
+        
+        // Проверяем наличие похожих товаров для нового поиска
+        updateSimilarButtonFromSearch(currentFilterValue);
+      }
     }
-  }, [filters.search, filters.ownerSearch]);
+  }, [filters.search, filters.ownerSearch, similarButtonState.baseCode, similarButtonState.isVisible, updateSimilarButtonFromSearch]);
+
+  // При монтировании проверяем текущий поиск на наличие похожих
+  useEffect(() => {
+    const currentFilterValue = filters.search || filters.ownerSearch || '';
+    if (currentFilterValue) {
+      updateSimilarButtonFromSearch(currentFilterValue);
+    }
+  }, []);
 
   return (
     <div className="filters-panel">
@@ -273,9 +544,12 @@ const GalleryFilters = ({
             )}
           </div>
         </div>
-
-        <div style={{ width: '124px' }}></div>
         
+        {/* Кнопка похожих товаров */}
+        <div style={{ width: '172px' }}>
+          <SimilarProductsButton />
+        </div>
+                
         <div className="search-filter-wrapper">
           {/* Фильтр по маркетплейсу */}
           <div className="select-filter">
@@ -307,7 +581,6 @@ const GalleryFilters = ({
             />
           </div>
         </div>
-        
       </div>
     </div>
   );
