@@ -128,8 +128,8 @@ const GalleryFilters = ({
   // Определяем плейсхолдер в зависимости от фильтра "Мои"
   const getSearchPlaceholder = () => {
     return filters.mine 
-      ? t('filters.searchPlaceholderMine', 'Поиск по артикулам... (минимум 2 цифры)')
-      : t('filters.searchPlaceholderAll', 'Поиск по артикулам или автору... (минимум 2 символа)');
+      ? t('filters.searchPlaceholderMine')
+      : t('filters.searchPlaceholderAll');
   };
 
   // Функция для определения типа поиска
