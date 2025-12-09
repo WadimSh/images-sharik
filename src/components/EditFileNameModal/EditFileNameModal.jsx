@@ -189,7 +189,6 @@ const EditFileNameModal = ({
             onChange={(e) => setSelectedMarketplace(e.target.value)}
             className="select-field"
           >
-            <option value="">{t('header.selectMarketplace') || 'Выберите площадку'}</option>
             <option value="WB">Wildberries (WB)</option>
             <option value="OZ">Ozon (OZ)</option>
             <option value="AM">Amazon (AM)</option>

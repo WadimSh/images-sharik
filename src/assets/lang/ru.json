@@ -31,7 +31,8 @@
     "marketplace": "Торговая площадка",
     "newFileName": "Новое название файла:",
     "articlesRequired": "Пожалуйста, введите артикул",
-    "marketplaceRequired": "Пожалуйста, выберите торговую площадку"
+    "marketplaceRequired": "Пожалуйста, выберите торговую площадку",
+    "newArticle": "Новый артикул"
   },
   "category": {
     "all": "Все",
@@ -274,7 +275,8 @@
     "subcategories": "Подкатегории",
     "recentSelected": "Последнее выбранное",
     "noRecentImages": "Нет недавно выбранных изображений",
-    "inRecent": "в недавних"
+    "inRecent": "в недавних",
+    "copyDesign": "Копировать дизайн"
   },
   "template": {
     "create": "Создать макет",

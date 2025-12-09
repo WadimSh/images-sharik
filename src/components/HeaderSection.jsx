@@ -55,8 +55,7 @@ export const HeaderSection = ({
   const [loading, setLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState('');
-  const [fileInfoForDownload, setFileInfoForDownload] = useState(null);
-    
+      
   const handleBack = () => {
     if (!slideNumber) {
       localStorage.removeItem('design-collage');
@@ -303,7 +302,7 @@ export const HeaderSection = ({
       const element = captureRef.current;
       const width = Math.floor(element.offsetWidth);
       const height = Math.floor(element.offsetHeight);
-      
+
       let baseCode, slideType;
       let slideNumberPart = slideNumber;
       // Определяем параметры для сохранения

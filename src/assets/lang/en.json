@@ -31,7 +31,8 @@
     "marketplace": "Marketplace",
     "newFileName": "New file name:",
     "articlesRequired": "Please enter article number",
-    "marketplaceRequired": "Please select marketplace"
+    "marketplaceRequired": "Please select marketplace",
+    "newArticle": "New article"
   },
   "category": {
     "all": "All",
@@ -274,7 +275,8 @@
     "subcategories": "Subcategories",
     "recentSelected": "Recently Selected",
     "noRecentImages": "No recently selected images",
-    "inRecent": "in recent"
+    "inRecent": "in recent",
+    "copyDesign": "Copy design"
   },
   "template": {
     "create": "Create template",

@@ -6,6 +6,7 @@ import { FaCopy } from "react-icons/fa6";
 
 import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
 import GalleryFilters from '../../components/GalleryFilters/GalleryFilters';
+import { CopyDesignModal } from '../../components/CopyDesignModal/CopyDesignModal';
 import { PreviewDesign } from '../../components/PreviewDesign';
 
 import { useMarketplace } from '../../contexts/contextMarketplace';
@@ -32,6 +33,11 @@ export const Gallery = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Новые состояния для модального окна копирования
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [selectedDesignForCopy, setSelectedDesignForCopy] = useState(null);
+  const [copyLoading, setCopyLoading] = useState(false);
   
   // Инициализируем фильтры с возможностью получения search из URL
   const [filters, setFilters] = useState({
@@ -43,7 +49,6 @@ export const Gallery = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
-  
   const [isInitialized, setIsInitialized] = useState(false);
   
   const currentUserId = user?.id || null; 
@@ -77,6 +82,105 @@ export const Gallery = () => {
     
     setIsInitialized(true);
   }, [location.search, isInitialized]);
+
+  // Функция для открытия модального окна копирования
+  const handleCopyClick = (design, e) => {
+    e.stopPropagation();
+    
+    if (design.type === 'collage') return;
+        
+    setSelectedDesignForCopy(design);
+    setCopyModalOpen(true);
+  };
+
+  // Функция для копирования дизайна на новый товар
+  const handleCopyDesign = async (newArticle, newMarketplace) => {
+    if (!selectedDesignForCopy) return;
+    
+    try {
+      setCopyLoading(true);
+
+      // Изменяем marketplace через контекст
+      if (newMarketplace && marketplace !== newMarketplace) {
+        toggleMarketplace(newMarketplace);
+      }
+
+      // Копируем данные дизайна
+      const designData = [...selectedDesignForCopy.data];
+
+      // Получаем информацию о новом товаре
+      const searchResponse = await fetch(
+        `https://new.sharik.ru/api/rest/v1/products_lite/?page_size=1&search=${newArticle}`
+      );
+      const searchData = await searchResponse.json();
+
+      if (!searchData.results || searchData.results.length === 0) {
+        throw new Error("A product with this item number is not active.");
+      }
+
+      const productIds = searchData.results.map(product => product.id);
+      const idsParam = productIds.join(',');
+
+      const detailedResponse = await fetch(
+        `https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`
+      );
+
+      if (!detailedResponse.ok) {
+        throw new Error('Error when receiving detailed information');
+      }
+
+      const detailedData = await detailedResponse.json();
+      const processedMetaResults = processProductsMeta(detailedData);
+
+      if (!processedMetaResults || processedMetaResults.length === 0) {
+        throw new Error("Failed to get product data");
+      }
+
+      const newProduct = processedMetaResults[0];
+
+      // Заменяем фото товара в дизайне
+      const updatedDesignData = designData.map(element => {
+        if (element.type === "image" && element.isProduct === true && newProduct.images?.[0]) {
+          return {
+            ...element,
+            image: newProduct.images[0] // Только меняем URL изображения
+          };
+        }
+        return element;
+      });
+
+      // Сохраняем в sessionStorage
+      const designInfo = extractDesignInfo(selectedDesignForCopy.type);
+      const storageKey = `design-${newArticle}_${designInfo.slideNumber}`;
+
+      sessionStorage.setItem(storageKey, JSON.stringify(updatedDesignData));
+      sessionStorage.setItem('size', JSON.stringify(selectedDesignForCopy.size));
+
+      // Сохраняем информацию о товаре
+      processedMetaResults.forEach(item => {
+        if (item) {
+          sessionStorage.setItem(
+            `product-${item.code}`, 
+            JSON.stringify(item)
+          );
+        }
+      });
+
+      // Закрываем модальное окно
+      setCopyModalOpen(false);
+      setSelectedDesignForCopy(null);
+
+      // Переходим на страницу редактирования
+      const route = `/template/${newArticle}_${designInfo.slideNumber}`;
+      navigate(route);
+
+    } catch (error) {
+      console.error('Error copying design:', error);
+      alert(`Ошибка при копировании дизайна: ${error.message}`);
+    } finally {
+      setCopyLoading(false);
+    }
+  };
 
   const transformDesignData = (design) => {
     const likesArray = design.likes || [];
@@ -629,9 +733,7 @@ export const Gallery = () => {
                       {design.type !== 'collage' && (
                         <button
                           className="like-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
+                          onClick={(e) => handleCopyClick(design, e)}
                           style={{
                             position: 'absolute',
                             bottom: '60px',
@@ -800,6 +902,19 @@ export const Gallery = () => {
             </div>
           )}
         </div>
+      )}
+
+      {selectedDesignForCopy && (
+        <CopyDesignModal
+          isOpen={copyModalOpen}
+          onClose={() => {
+            setCopyModalOpen(false);
+            setSelectedDesignForCopy(null);
+          }}
+          onConfirm={handleCopyDesign}
+          currentMarketplace={selectedDesignForCopy.marketplace}
+          loading={copyLoading}
+        />
       )}
     </div>
   );

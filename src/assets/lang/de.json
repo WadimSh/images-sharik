@@ -31,7 +31,8 @@
     "marketplace": "Marktplatz",
     "newFileName": "Neuer Dateiname:",
     "articlesRequired": "Bitte Artikelnummer eingeben",
-    "marketplaceRequired": "Bitte Marktplatz auswählen"
+    "marketplaceRequired": "Bitte Marktplatz auswählen",
+    "newArticle": "Neuer Artikel"
   },
   "category": {
     "all": "Alle",
@@ -274,7 +275,8 @@
     "subcategories": "Unterkategorien",
     "recentSelected": "Zuletzt Ausgewählt",
     "noRecentImages": "Keine kürzlich ausgewählten Bilder",
-    "inRecent": "in den letzten"
+    "inRecent": "in den letzten",
+    "copyDesign": "Design kopieren"
   },
   "template": {
     "create": "Vorlage erstellen",

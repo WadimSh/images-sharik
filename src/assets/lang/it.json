@@ -31,7 +31,8 @@
     "marketplace": "Piattaforma di vendita",
     "newFileName": "Nuovo nome file:",
     "articlesRequired": "Inserisci codice articolo",
-    "marketplaceRequired": "Seleziona piattaforma di vendita"
+    "marketplaceRequired": "Seleziona piattaforma di vendita",
+    "newArticle": "Nuovo articolo"
   },
   "category": {
     "all": "Tutto",
@@ -274,7 +275,8 @@
     "subcategories": "Sottocategorie",
     "recentSelected": "Selezionati di Recente",
     "noRecentImages": "Nessuna immagine selezionata di recente",
-    "inRecent": "nei recenti"
+    "inRecent": "nei recenti",
+    "copyDesign": "Copia design"
   },
   "template": {
     "create": "Crea template",
