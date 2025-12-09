@@ -24,7 +24,14 @@
     "addLayout": "Добавить макет",
     "downloadLayout": "Создать шаблон",
     "showBlindZones": "Показать слепые зоны",
-    "hideBlindZones": "Скрыть слепые зоны"
+    "hideBlindZones": "Скрыть слепые зоны",
+    "editFileName": "Редактирование названия файла",
+    "originalName": "Исходное название:",
+    "article": "Артикул",
+    "marketplace": "Торговая площадка",
+    "newFileName": "Новое название файла:",
+    "articlesRequired": "Пожалуйста, введите артикул",
+    "marketplaceRequired": "Пожалуйста, выберите торговую площадку"
   },
   "category": {
     "all": "Все",
@@ -241,6 +248,7 @@
     "delete": "Удалить",
     "edit": "Редактировать",
     "download": "Скачать",
+    "confirm": "Подтвердить",
     "preview": "Предпросмотр",
     "loading": "Загрузка...",
     "addProduct": "Добавить товар",

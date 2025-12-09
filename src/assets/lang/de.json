@@ -24,7 +24,14 @@
     "addLayout": "Layout hinzufügen",
     "downloadLayout": "Vorlage erstellen",
     "showBlindZones": "Tote Winkel anzeigen",
-    "hideBlindZones": "Tote Winkel ausblenden"
+    "hideBlindZones": "Tote Winkel ausblenden",
+    "editFileName": "Dateinamen bearbeiten",
+    "originalName": "Originalname:",
+    "article": "Artikelnummer",
+    "marketplace": "Marktplatz",
+    "newFileName": "Neuer Dateiname:",
+    "articlesRequired": "Bitte Artikelnummer eingeben",
+    "marketplaceRequired": "Bitte Marktplatz auswählen"
   },
   "category": {
     "all": "Alle",
@@ -241,6 +248,7 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "download": "Herunterladen",
+    "confirm": "Bestätigen",
     "preview": "Vorschau",
     "loading": "Wird geladen...",
     "addProduct": "Produkt hinzufügen",

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import { FaCopy } from "react-icons/fa6";
 
 import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
 import GalleryFilters from '../../components/GalleryFilters/GalleryFilters';
@@ -624,7 +625,33 @@ export const Gallery = () => {
                       role="button"
                       tabIndex={0}
                     >
-                      {/* Кнопка лайка */}
+
+                      {design.type !== 'collage' && (
+                        <button
+                          className="like-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            position: 'absolute',
+                            bottom: '60px',
+                            right: '10px',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '38px',
+                            height: '38px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            zIndex: 5,
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                          }}
+                        >
+                          <FaCopy size={18} />
+                        </button>
+                      )}
+                      
                       <button
                         className="like-button"
                         onClick={(e) => handleToggleLike(design.id, e)}

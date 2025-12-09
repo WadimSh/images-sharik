@@ -24,7 +24,14 @@
     "addLayout": "Add layout",
     "downloadLayout": "Create template",
     "showBlindZones": "Show blind zones",
-    "hideBlindZones": "Hide blind zones"
+    "hideBlindZones": "Hide blind zones",
+    "editFileName": "Edit file name",
+    "originalName": "Original name:",
+    "article": "Article number",
+    "marketplace": "Marketplace",
+    "newFileName": "New file name:",
+    "articlesRequired": "Please enter article number",
+    "marketplaceRequired": "Please select marketplace"
   },
   "category": {
     "all": "All",
@@ -241,6 +248,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "download": "Download",
+    "confirm": "Confirm",
     "preview": "Preview",
     "loading": "Loading...",
     "addProduct": "Add product",

@@ -5,6 +5,7 @@ import { HiOutlineChevronLeft } from "react-icons/hi2";
 import html2canvas from 'html2canvas';
 import UPNG from 'upng-js';
 
+import EditFileNameModal from './EditFileNameModal/EditFileNameModal';
 import { TemplateSelector } from '../ui/TemplateSelector/TemplateSelector';
 import { ToggleSwitch } from '../ui/ToggleSwitch/ToggleSwitch';
 import { useMarketplace } from '../contexts/contextMarketplace';
@@ -52,6 +53,9 @@ export const HeaderSection = ({
   
   const [isTemplateListOpen, setIsTemplateListOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [generatedFileName, setGeneratedFileName] = useState('');
+  const [fileInfoForDownload, setFileInfoForDownload] = useState(null);
     
   const handleBack = () => {
     if (!slideNumber) {
@@ -83,6 +87,55 @@ export const HeaderSection = ({
     }
 
     return `${t('header.slideNumber')} ${slide}`;
+  };
+
+  // Генерация имени файла по умолчанию
+  const generateDefaultFileName = (baseCode, slideType) => {
+    const now = new Date();
+    const datePart = [
+      String(now.getDate()).padStart(2, '0'),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      now.getFullYear()
+    ].join('');
+  
+    const timePart = [
+      String(now.getHours()).padStart(2, '0'),
+      String(now.getMinutes()).padStart(2, '0'),
+      String(now.getSeconds()).padStart(2, '0')
+    ].join('');
+    
+    return `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.png`;
+  };
+
+  // Функция для подготовки скачивания
+  const prepareDownload = () => {
+    if (!slideNumber) {
+      // Для коллажей скачиваем сразу без редактирования
+      handleDownload();
+      return;
+    }
+    
+    // Для слайдов формируем имя файла и показываем окно редактирования
+    let baseCode, slideType;
+    
+    if (slideNumber === '') {
+      const articles = JSON.parse(localStorage.getItem('collage-articles')) || [];
+      baseCode = articles.length > 0 ? articles.join('_') : 'collage';
+      slideType = 'collage';
+    } else {
+      [baseCode, slideType] = id.split('_');
+      slideType = slideType === '1' ? 'main' : `slide${slideType}`;
+    }
+    
+    const defaultFileName = generateDefaultFileName(baseCode, slideType);
+    setGeneratedFileName(defaultFileName);
+    setShowEditModal(true);
+  };
+  
+  // Обработчик подтверждения редактирования
+  const handleEditConfirm = (newFileName, articles, marketplace) => {
+    // Запускаем скачивание с обновленными данными
+    handleDownload(newFileName, articles, marketplace);
   };
 
   // Функция для удаления макета
@@ -239,8 +292,8 @@ export const HeaderSection = ({
     };
   };
 
-  // Функция выгрузки слайда в формате png
-  const handleDownload = async () => {
+  // Основная функция скачивания
+  const handleDownload = async (customFileName = null, customArticles = null, customMarketplace = null) => {
     try {
       setLoading(true);
       setShowBlindZones(false);
@@ -253,34 +306,41 @@ export const HeaderSection = ({
       
       let baseCode, slideType;
       let slideNumberPart = slideNumber;
+      // Определяем параметры для сохранения
+      let fileName;
+      let articlesForHistory;
+      let marketplaceForHistory;
+      let slideTypeForHistory;
       
-      // Определяем базовый код в зависимости от режима
-      if (slideNumber === '') {
+      if (customFileName) {
+        // Используем кастомное имя файла
+        fileName = customFileName;
+        
+        // Парсим данные из кастомного имени
+        const parts = customFileName.replace('.png', '').split('_');
+        if (parts.length >= 6) {
+          articlesForHistory = parts.slice(0, parts.length - 5);
+          marketplaceForHistory = parts[parts.length - 5];
+          slideTypeForHistory = parts[parts.length - 4];
+        }
+      } else if (slideNumber === '') {
+        // Для коллажа
         const articles = JSON.parse(localStorage.getItem('collage-articles')) || [];
-        baseCode = articles.length > 0 ? articles.join('_') : 'collage';
-        slideType = 'collage';
+        const baseCode = articles.length > 0 ? articles.join('_') : 'collage';
+        fileName = generateDefaultFileName(baseCode, 'collage');
+        articlesForHistory = articles;
+        marketplaceForHistory = marketplace;
+        slideTypeForHistory = 'collage';
       } else {
+        // Для слайда по умолчанию
         [baseCode, slideNumberPart] = id.split('_');
         slideType = slideNumberPart === '1' ? 'main' : `slide${slideNumberPart}`;
+        fileName = generateDefaultFileName(baseCode, slideType);
+        articlesForHistory = baseCode.split('_');
+        marketplaceForHistory = marketplace;
+        slideTypeForHistory = slideType;
       }
-    
-      // Формируем дату и время
-      const now = new Date();
-      const datePart = [
-        String(now.getDate()).padStart(2, '0'),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        now.getFullYear()
-      ].join('');
-    
-      const timePart = [
-        String(now.getHours()).padStart(2, '0'),
-        String(now.getMinutes()).padStart(2, '0'),
-        String(now.getSeconds()).padStart(2, '0')
-      ].join('');
-
-      // Формирование имени файла
-      const fileName = `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.png`;
-
+      
       // Получаем ключ для хранилища
       const sessionKey = slideNumber ? `design-${id}` : 'design-collage';
 
@@ -294,24 +354,18 @@ export const HeaderSection = ({
         const historyKey = fileName.replace('.png', '');
         const parsedDesignData = JSON.parse(designData);
 
-        // 🔥 ОТПРАВЛЯЕМ ДАННЫЕ НА БЭКЕНД
         try {
-          // Парсим код для извлечения дополнительных полей
-          const parsedInfo = parseHistoryCode(historyKey);
-          
-          // Формируем данные для бэкенда
+          // Формируем данные для бэкенда с учетом кастомных значений
           const historyData = {
             name: historyKey,
             data: parsedDesignData,
             company: user.company[0].id,
-            articles: parsedInfo.articles,
-            marketplace: parsedInfo.marketplace,
-            type: parsedInfo.type,
-            size: parsedInfo.size
-            // Не включаем опциональные поля чтобы избежать ошибок валидации
+            articles: articlesForHistory,
+            marketplace: marketplaceForHistory || marketplace,
+            type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
+            size: sizeLabel
           };
         
-          // Отправляем на бэкенд
           await apiCreateHistory(historyData);
           console.log('История успешно отправлена на сервер:', historyKey);
         } catch (backendError) {
@@ -328,29 +382,26 @@ export const HeaderSection = ({
         useCORS: true,
         logging: false,
         backgroundColor: '#FFFFFF',
-        imageRendering: 'pixelated', // Улучшаем рендеринг
+        imageRendering: 'pixelated',
         removeContainer: true
       });
 
-      // Получаем сырые данные изображения
       const ctx = canvas.getContext('2d');
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     
-      // Оптимизация с UPNG с лучшими настройками для градиентов
       const pngBuffer = UPNG.encode(
         [imageData.data.buffer],
         canvas.width,
         canvas.height,
-        0,    // 0 = 32-bit RGBA, сохраняем полное качество цвета
-        0,    // Задержка для анимации
+        0,
+        0,
         {
-          cnum: 50000,  // Увеличиваем количество цветов в палитре
-          dith: 1,      // Включаем дизеринг для лучших градиентов
-          filter: 0     // Используем адаптивную фильтрацию
+          cnum: 50000,
+          dith: 1,
+          filter: 0
         }
       );
 
-      // Создаем Blob и URL
       const blob = new Blob([pngBuffer], { type: 'image/png' });
       const url = URL.createObjectURL(blob);
   
@@ -359,14 +410,14 @@ export const HeaderSection = ({
       link.href = url;
       document.body.appendChild(link);
       link.click();
-      setLoading(false);
-      // Очистка
+      
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      
+      setLoading(false);
     } catch (error) {
       console.error('Generation error:', error);
       alert('Error during image generation!');
-    } finally {
       setLoading(false);
     }
   };
@@ -440,6 +491,7 @@ export const HeaderSection = ({
   }, []);
   
   return (
+    <>
     <div className={`header-section ${marketplace}`}>
       <button onClick={handleBack} className='button-back'>
         <HiOutlineChevronLeft /> {t('header.back')}
@@ -461,7 +513,7 @@ export const HeaderSection = ({
       <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
         <FaClipboardCheck /> {`${t('header.createLayout')}`}
       </button>
-      <button onClick={handleDownload} className="download-button">
+      <button onClick={prepareDownload} className="download-button">
         {!loading ? (
           <><FaDownload /> {`${t('header.downloadDesign')}`}</>
         ) : (
@@ -469,5 +521,17 @@ export const HeaderSection = ({
         )}
       </button>
     </div>
+
+    {/* Модальное окно для редактирования названия (только для слайдов) */}
+      {slideNumber && (
+        <EditFileNameModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onConfirm={handleEditConfirm}
+          initialFileName={generatedFileName}
+          slideNumber={slideNumber}
+        />
+      )}
+    </>
   );
 };
