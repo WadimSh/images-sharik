@@ -78,7 +78,7 @@
   color: #3b82f6; /* Синий для кнопки увеличения и уменьшения */
 }
 
-.zoom-reset {
+.zoom-reset, .zoom-preview {
   color: #64748b; /* Серый для кнопки сброса */
 }
 
@@ -89,8 +89,15 @@
   border-color: #007bff;
 }
 
+.zoom-preview:hover,
 .zoom-reset:hover {
   background: #f8fafc;
   border-color: #e2e8f0;
   color: #3b82f6;
+}
+
+.active-preview {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
 }

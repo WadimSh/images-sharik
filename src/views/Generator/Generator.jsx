@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom';
+import { VscPreview } from "react-icons/vsc";
 
 import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
@@ -24,6 +25,7 @@ import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
 import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 import { ZoomControls } from '../../ui/ZoomControls/ZoomControls';
+import { PreviewDesign } from '../../components/PreviewDesign';
 
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
@@ -145,6 +147,26 @@ export const Generator = () => {
   const [containerSize, setContainerSize] = useState(() => {
     return foundPreset || defaultSizes[0];
   });
+  // Состояние и логика для показа превью карточки на мобильных устройствах
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const handleShowMobilePreview = () => {
+    setShowMobilePreview(!showMobilePreview);
+  };
+
+  const previewContainerStyle = {
+    position: 'absolute',
+    top: '10px',
+    right: '400px',
+    width: '167px',
+    height: '223px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    boxShadow: '0 3px 6px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+    overflow: 'hidden'
+};
+
+// 3. Выносим условие в отдельную переменну
+const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === '900x1200';
 
   const handleZoomIn = () => {
     setZoom(prev => ({
@@ -1364,14 +1386,8 @@ export const Generator = () => {
             initialMetaDateElement={initialMetaDateElement}
           />
         )}
-        
-        <div 
-          className='design-area'
-          style={{ 
-            flexDirection: containerSize.width > 600 ? 'column-reverse' : 'row',
-            justifyContent: containerSize.width > 600 ? 'center' : 'none',
-          }}
-        >
+
+        <div style={{ position: 'absolute', top: '10px', left: '512px'}}>
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
@@ -1386,367 +1402,382 @@ export const Generator = () => {
               isGrid={containerSize.width}
             />
           )}
-          
+        </div>
+        
+        <div 
+          className='design-area'
+          style={{ 
+            flexDirection: containerSize.width > 600 ? 'column-reverse' : 'row',
+            justifyContent: containerSize.width > 600 ? 'center' : 'none',
+          }}
+        >
           <div className="zoom-wrapper" style={{ transform: `scale(${zoom.level})`, transformOrigin: 'top center',zIndex: '999' }}>
-          <div 
-            ref={captureRef} 
-            className="design-container"
-            style={{ 
-              width: `${containerSize.width}px`, 
-              height: `${containerSize.height}px` 
-            }}
-            onClick={(e) => {
-              // Проверяем, не происходит ли клик внутри панели шрифтов
-              const fontControlsWrapper = document.querySelector('.font-controls-wrapper');
-              if (fontControlsWrapper && fontControlsWrapper.contains(e.target)) {
-                return;
-              }
-              closeContextMenu();
-              setSelectedElementId(null);
-              setSelectedElementIds([]);
-            }}
-            onContextMenu={(e) => {
-              e.preventDefault();
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              setIsDragging(false);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              setIsDragging(false);
+            <div 
+              ref={captureRef} 
+              className="design-container"
+              style={{ 
+                width: `${containerSize.width}px`, 
+                height: `${containerSize.height}px` 
+              }}
+              onClick={(e) => {
+                // Проверяем, не происходит ли клик внутри панели шрифтов
+                const fontControlsWrapper = document.querySelector('.font-controls-wrapper');
+                if (fontControlsWrapper && fontControlsWrapper.contains(e.target)) {
+                  return;
+                }
+                closeContextMenu();
+                setSelectedElementId(null);
+                setSelectedElementIds([]);
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
 
-              const files = Array.from(e.dataTransfer.files);
-              const imageFile = files.find(file => file.type.startsWith('image/'));
+                const files = Array.from(e.dataTransfer.files);
+                const imageFile = files.find(file => file.type.startsWith('image/'));
 
-              if (imageFile) {
-                handleFileUpload(imageFile, setElements);
-              }
-            }}
-          >
+                if (imageFile) {
+                  handleFileUpload(imageFile, setElements);
+                }
+              }}
+            >
 
-            <BlindZones 
-              show={showBlindZones}
-              zones={zonesBySize[containerSize.fileName]?.[marketplace] || zonesBySize['900x1200'][marketplace]}
-            />
+              <BlindZones 
+                show={showBlindZones}
+                zones={zonesBySize[containerSize.fileName]?.[marketplace] || zonesBySize['900x1200'][marketplace]}
+              />
 
-            {/* Стилизованная область для визуальной обратной связи */}
-            <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
-              {isDragging && (
-                <div className="drop-message">
-                  {t('views.generatorMessageInput')}
-                </div>
-              )}
-            </div>            
-            {elements.map((element) => {
-              switch (element.type) {
-                case 'background': 
-                  return (
-                    <BackgroundElement 
-                      element={element}
-                      containerSize={containerSize}
-                      key={element.id}
-                    />
-                  );
-                case 'image':
-                  return (
-                    <ImageElement
-                      contextMenuRef={contextMenuRef}
-                      element={element}
-                      key={element.id}
-                      src={element.image} // Берем изображение из данных элемента
-                      position={element.position}
-                      width={element.width}
-                      height={element.height}
-                      isFlipped={element.isFlipped}
-                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
-                      onRemove={() => handleRemoveElement(element.id)}
-                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                      rotation={element.rotation} // Передаем поворот
-                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                      containerWidth={450}
-                      containerHeight={600}
-                      onContextMenu={(e) => handleContextMenu(e, element.id)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (lockedElementId.has(element.id)) return;
-                        if (e.shiftKey) {
-                          setSelectedElementIds(prev => [...prev, element.id]);
-                        } else {
-                          setSelectedElementId(element.id);
-                        }
-                      }}
-                      selectedElementId={selectedElementId}
-                      selectedElementIds={selectedElementIds}
-                      lockedElementId={lockedElementId}
-                      onDeselect={() => {
-                        setSelectedElementId(null);
-                        setSelectedElementIds([]);
-                      }}
-                      zoom={zoom.level}
-                      captureRef={captureRef}
-                    />
-                  );
-                case 'element':
-                  return (
-                    <ElementsElement
-                      contextMenuRef={contextMenuRef}
-                      element={element}
-                      key={element.id}
-                      src={element.image} // Берем изображение из данных элемента
-                      position={element.position}
-                      width={element.width}
-                      height={element.height}
-                      isFlipped={element.isFlipped}
-                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
-                      onRemove={() => handleRemoveElement(element.id)}
-                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                      rotation={element.rotation} // Передаем поворот
-                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                      containerWidth={450}
-                      containerHeight={600}
-                      onContextMenu={(e) => handleContextMenu(e, element.id)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (lockedElementId.has(element.id)) return;
-                        if (e.shiftKey) {
-                          setSelectedElementIds(prev => [...prev, element.id]);
-                        } else {
-                          setSelectedElementId(element.id);
-                        }
-                      }}
-                      selectedElementId={selectedElementId}
-                      selectedElementIds={selectedElementIds}
-                      lockedElementId={lockedElementId}
-                      onDeselect={() => {
-                        setSelectedElementId(null);
-                        setSelectedElementIds([]);
-                      }}
-                      zoom={zoom.level}
-                      captureRef={captureRef}
-                    />
-                  );
-                case 'shape':
-                  return (
-                    <ShapeElement
-                      contextMenuRef={contextMenuRef}
-                      element={element}
-                      key={element.id}
-                      position={element.position}
-                      width={element.width}
-                      height={element.height}
-                      color={element.color || '#ccc'} // Добавляем цвет
-                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
-                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                      rotation={element.rotation} // Передаем поворот
-                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                      containerWidth={450}
-                      containerHeight={600}
-                      onContextMenu={(e) => handleContextMenu(e, element.id)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (lockedElementId.has(element.id)) return;
-                        if (e.shiftKey) {
-                          setSelectedElementIds(prev => [...prev, element.id]);
-                        } else {
-                          setSelectedElementId(element.id);
-                        }
-                      }}
-                      selectedElementId={selectedElementId}
-                      selectedElementIds={selectedElementIds}
-                      lockedElementId={lockedElementId}
-                      onDeselect={() => {
-                        setSelectedElementId(null);
-                        setSelectedElementIds([]);
-                      }}
-                      zoom={zoom.level}
-                      captureRef={captureRef}
-                    />
-                  );
-                case 'line':
-                  return (
-                    <LineElement 
-                      contextMenuRef={contextMenuRef}
-                      element={element}
-                      key={element.id}
-                      position={element.position}
-                      width={element.width}
-                      height={element.height}
-                      color={element.color || '#000'} // Добавляем цвет
-                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
-                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                      rotation={element.rotation} // Передаем поворот
-                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                      containerWidth={110}
-                      containerHeight={10}
-                      onContextMenu={(e) => handleContextMenu(e, element.id)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (lockedElementId.has(element.id)) return;
-                        if (e.shiftKey) {
-                          setSelectedElementIds(prev => [...prev, element.id]);
-                        } else {
-                          setSelectedElementId(element.id);
-                        }
-                      }}
-                      selectedElementId={selectedElementId}
-                      selectedElementIds={selectedElementIds}
-                      lockedElementId={lockedElementId}
-                      onDeselect={() => {
-                        setSelectedElementId(null);
-                        setSelectedElementIds([]);
-                      }}
-                      zoom={zoom.level}
-                      captureRef={captureRef}
-                    />
-                  );
-                case 'text':
-                  return (
-                    <TextElement
-                      contextMenuRef={contextMenuRef}
-                      element={element}
-                      key={element.id}
-                      position={element.position}
-                      onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
-                      onRemove={() => handleRemoveElement(element.id)}
-                      onRotate={(newRotation) => handleRotate(element.id, newRotation)}
-                      onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
-                      onTextChange={(newText) => {
-                        setElements(prev => prev.map(el => 
-                          el.id === element.id ? {...el, text: newText} : el
-                        ));
-                      }}
-                      isEditing={editingTextId === element.id}
-                      onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
-                      containerWidth={400}
-                      containerHeight={600}
-                      onContextMenu={(e) => handleContextMenu(e, element.id)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (lockedElementId.has(element.id)) return;
-                        if (e.shiftKey) {
-                          setSelectedElementIds(prev => [...prev, element.id]);
-                        } else {
-                          setSelectedElementId(element.id);
-                        }
-                      }}
-                      selectedElementId={selectedElementId}
-                      selectedElementIds={selectedElementIds}
-                      lockedElementId={lockedElementId}
-                      onDeselect={() => {
-                        setSelectedElementId(null);
-                        setSelectedElementIds([]);
-                      }}
-                      zoom={zoom.level}
-                      captureRef={captureRef}
-                    />
-                  );
-                default:
-                  return null;
-              }
-            })}
+              {/* Стилизованная область для визуальной обратной связи */}
+              <div className={`drop-zone ${isDragging ? 'active' : ''}`}>
+                {isDragging && (
+                  <div className="drop-message">
+                    {t('views.generatorMessageInput')}
+                  </div>
+                )}
+              </div>            
+              {elements.map((element) => {
+                switch (element.type) {
+                  case 'background': 
+                    return (
+                      <BackgroundElement 
+                        element={element}
+                        containerSize={containerSize}
+                        key={element.id}
+                      />
+                    );
+                  case 'image':
+                    return (
+                      <ImageElement
+                        contextMenuRef={contextMenuRef}
+                        element={element}
+                        key={element.id}
+                        src={element.image} // Берем изображение из данных элемента
+                        position={element.position}
+                        width={element.width}
+                        height={element.height}
+                        isFlipped={element.isFlipped}
+                        onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                        onRemove={() => handleRemoveElement(element.id)}
+                        onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                        rotation={element.rotation} // Передаем поворот
+                        onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                        containerWidth={450}
+                        containerHeight={600}
+                        onContextMenu={(e) => handleContextMenu(e, element.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (lockedElementId.has(element.id)) return;
+                          if (e.shiftKey) {
+                            setSelectedElementIds(prev => [...prev, element.id]);
+                          } else {
+                            setSelectedElementId(element.id);
+                          }
+                        }}
+                        selectedElementId={selectedElementId}
+                        selectedElementIds={selectedElementIds}
+                        lockedElementId={lockedElementId}
+                        onDeselect={() => {
+                          setSelectedElementId(null);
+                          setSelectedElementIds([]);
+                        }}
+                        zoom={zoom.level}
+                        captureRef={captureRef}
+                      />
+                    );
+                  case 'element':
+                    return (
+                      <ElementsElement
+                        contextMenuRef={contextMenuRef}
+                        element={element}
+                        key={element.id}
+                        src={element.image} // Берем изображение из данных элемента
+                        position={element.position}
+                        width={element.width}
+                        height={element.height}
+                        isFlipped={element.isFlipped}
+                        onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                        onRemove={() => handleRemoveElement(element.id)}
+                        onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                        rotation={element.rotation} // Передаем поворот
+                        onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                        containerWidth={450}
+                        containerHeight={600}
+                        onContextMenu={(e) => handleContextMenu(e, element.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (lockedElementId.has(element.id)) return;
+                          if (e.shiftKey) {
+                            setSelectedElementIds(prev => [...prev, element.id]);
+                          } else {
+                            setSelectedElementId(element.id);
+                          }
+                        }}
+                        selectedElementId={selectedElementId}
+                        selectedElementIds={selectedElementIds}
+                        lockedElementId={lockedElementId}
+                        onDeselect={() => {
+                          setSelectedElementId(null);
+                          setSelectedElementIds([]);
+                        }}
+                        zoom={zoom.level}
+                        captureRef={captureRef}
+                      />
+                    );
+                  case 'shape':
+                    return (
+                      <ShapeElement
+                        contextMenuRef={contextMenuRef}
+                        element={element}
+                        key={element.id}
+                        position={element.position}
+                        width={element.width}
+                        height={element.height}
+                        color={element.color || '#ccc'} // Добавляем цвет
+                        onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                        onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                        rotation={element.rotation} // Передаем поворот
+                        onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                        containerWidth={450}
+                        containerHeight={600}
+                        onContextMenu={(e) => handleContextMenu(e, element.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (lockedElementId.has(element.id)) return;
+                          if (e.shiftKey) {
+                            setSelectedElementIds(prev => [...prev, element.id]);
+                          } else {
+                            setSelectedElementId(element.id);
+                          }
+                        }}
+                        selectedElementId={selectedElementId}
+                        selectedElementIds={selectedElementIds}
+                        lockedElementId={lockedElementId}
+                        onDeselect={() => {
+                          setSelectedElementId(null);
+                          setSelectedElementIds([]);
+                        }}
+                        zoom={zoom.level}
+                        captureRef={captureRef}
+                      />
+                    );
+                  case 'line':
+                    return (
+                      <LineElement 
+                        contextMenuRef={contextMenuRef}
+                        element={element}
+                        key={element.id}
+                        position={element.position}
+                        width={element.width}
+                        height={element.height}
+                        color={element.color || '#000'} // Добавляем цвет
+                        onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                        onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                        rotation={element.rotation} // Передаем поворот
+                        onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                        containerWidth={110}
+                        containerHeight={10}
+                        onContextMenu={(e) => handleContextMenu(e, element.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (lockedElementId.has(element.id)) return;
+                          if (e.shiftKey) {
+                            setSelectedElementIds(prev => [...prev, element.id]);
+                          } else {
+                            setSelectedElementId(element.id);
+                          }
+                        }}
+                        selectedElementId={selectedElementId}
+                        selectedElementIds={selectedElementIds}
+                        lockedElementId={lockedElementId}
+                        onDeselect={() => {
+                          setSelectedElementId(null);
+                          setSelectedElementIds([]);
+                        }}
+                        zoom={zoom.level}
+                        captureRef={captureRef}
+                      />
+                    );
+                  case 'text':
+                    return (
+                      <TextElement
+                        contextMenuRef={contextMenuRef}
+                        element={element}
+                        key={element.id}
+                        position={element.position}
+                        onDrag={(pos, delta) => handleDrag(element.id, pos, delta)}
+                        onRemove={() => handleRemoveElement(element.id)}
+                        onRotate={(newRotation) => handleRotate(element.id, newRotation)}
+                        onResize={(newSize) => handleResizeWithPosition(element.id, newSize)}
+                        onTextChange={(newText) => {
+                          setElements(prev => prev.map(el => 
+                            el.id === element.id ? {...el, text: newText} : el
+                          ));
+                        }}
+                        isEditing={editingTextId === element.id}
+                        onEditToggle={(isEditing) => handleTextEditToggle(element.id, isEditing)}
+                        containerWidth={400}
+                        containerHeight={600}
+                        onContextMenu={(e) => handleContextMenu(e, element.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (lockedElementId.has(element.id)) return;
+                          if (e.shiftKey) {
+                            setSelectedElementIds(prev => [...prev, element.id]);
+                          } else {
+                            setSelectedElementId(element.id);
+                          }
+                        }}
+                        selectedElementId={selectedElementId}
+                        selectedElementIds={selectedElementIds}
+                        lockedElementId={lockedElementId}
+                        onDeselect={() => {
+                          setSelectedElementId(null);
+                          setSelectedElementIds([]);
+                        }}
+                        zoom={zoom.level}
+                        captureRef={captureRef}
+                      />
+                    );
+                  default:
+                    return null;
+                }
+              })}
 
-            {/* Контекстное меню */}
-            {contextMenu.visible && captureRef.current && (() => {
-              const element = elements.find(el => el.id === selectedElementId);
-              const containerRect = captureRef.current.getBoundingClientRect();
-              const left = containerRect.left + contextMenu.x * zoom.level;
-              const top = containerRect.top + contextMenu.y * zoom.level;
-              return ReactDOM.createPortal(
-                <div 
-                  ref={contextMenuRef}
-                  className="context-menu"
-                  style={{
-                    position: 'fixed',
-                    left,
-                    top,
-                    zIndex: 1000000000
-                  }}
-                >
-                  <button onClick={handleCopy}>
-                    {t('views.generatorMenuCopy')}
-                  </button>
-                  <button 
-                    onClick={handlePaste}
-                    disabled={!copiedElement}
-                  >
-                    {t('views.generatorMenuPaste')}
-                  </button>
-                  
-                  <div className='separator'/>
-                  
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTextEditToggle(element.id, true);
+              {/* Контекстное меню */}
+              {contextMenu.visible && captureRef.current && (() => {
+                const element = elements.find(el => el.id === selectedElementId);
+                const containerRect = captureRef.current.getBoundingClientRect();
+                const left = containerRect.left + contextMenu.x * zoom.level;
+                const top = containerRect.top + contextMenu.y * zoom.level;
+                return ReactDOM.createPortal(
+                  <div 
+                    ref={contextMenuRef}
+                    className="context-menu"
+                    style={{
+                      position: 'fixed',
+                      left,
+                      top,
+                      zIndex: 1000000000
                     }}
-                    disabled={selectedElementIds.length > 0 || element?.type !== 'text'}
-                    className="remove-bg-button"
                   >
-                    {t('views.generatorMenuTextEdit')}
-                  </button>
-                  
-                  <button 
-                    onClick={() => {
-                      setSelectedTextEdit({
-                        elementId: element.id,
-                        isMulti: areAllSelectedText,
-                        selectedIds: selectedElementIds
-                      });
-                      closeContextMenu();
-                    }}
-                    disabled={
-                      (selectedElementIds.length === 0 && element?.type !== 'text') || 
-                      (selectedElementIds.length > 0 && !areAllSelectedText)
-                    }
-                  >
-                    {t('views.generatorMenuFont')}
-                  </button>
+                    <button onClick={handleCopy}>
+                      {t('views.generatorMenuCopy')}
+                    </button>
+                    <button 
+                      onClick={handlePaste}
+                      disabled={!copiedElement}
+                    >
+                      {t('views.generatorMenuPaste')}
+                    </button>
 
-                  <button 
-                    onClick={() => handleFlipImage(element.id)}
-                    disabled={selectedElementIds.length > 0 || (element?.type !== 'image' && element?.type !== 'element')}
-                  >
-                    {t('views.generatorMenuFlipImage')}
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleRemoveBackground(element.id)}
-                    disabled={selectedElementIds.length > 0 || element?.type !== 'image'}
-                  >
-                    {t('views.generatorMenuRemoveBackground')}
-                  </button>
+                    <div className='separator'/>
 
-                  <button 
-                    onClick={() => handleColorButtonClick(areAllSelectedShape ? selectedElementIds : element.id)}
-                    disabled={
-                      (selectedElementIds.length === 0 && element?.type !== 'shape') || 
-                      (selectedElementIds.length > 0 && !areAllSelectedShape)
-                    }
-                  >
-                    {t('views.generatorMenuChangeColor')}
-                  </button>
-                                   
-                  <div className='separator'></div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTextEditToggle(element.id, true);
+                      }}
+                      disabled={selectedElementIds.length > 0 || element?.type !== 'text'}
+                      className="remove-bg-button"
+                    >
+                      {t('views.generatorMenuTextEdit')}
+                    </button>
+                    
+                    <button 
+                      onClick={() => {
+                        setSelectedTextEdit({
+                          elementId: element.id,
+                          isMulti: areAllSelectedText,
+                          selectedIds: selectedElementIds
+                        });
+                        closeContextMenu();
+                      }}
+                      disabled={
+                        (selectedElementIds.length === 0 && element?.type !== 'text') || 
+                        (selectedElementIds.length > 0 && !areAllSelectedText)
+                      }
+                    >
+                      {t('views.generatorMenuFont')}
+                    </button>
 
-                  <button
-                    className='context-delete'
-                    onClick={handleDelete}
-                  >
-                    {t('views.generatorMenuDelete')}
-                  </button>
-                </div>,
-                document.body
-              );
-            })()}
-          </div>
+                    <button 
+                      onClick={() => handleFlipImage(element.id)}
+                      disabled={selectedElementIds.length > 0 || (element?.type !== 'image' && element?.type !== 'element')}
+                    >
+                      {t('views.generatorMenuFlipImage')}
+                    </button>
+                    
+                    <button 
+                      onClick={() => handleRemoveBackground(element.id)}
+                      disabled={selectedElementIds.length > 0 || element?.type !== 'image'}
+                    >
+                      {t('views.generatorMenuRemoveBackground')}
+                    </button>
+
+                    <button 
+                      onClick={() => handleColorButtonClick(areAllSelectedShape ? selectedElementIds : element.id)}
+                      disabled={
+                        (selectedElementIds.length === 0 && element?.type !== 'shape') || 
+                        (selectedElementIds.length > 0 && !areAllSelectedShape)
+                      }
+                    >
+                      {t('views.generatorMenuChangeColor')}
+                    </button>
+
+                    <div className='separator'></div>
+
+                    <button
+                      className='context-delete'
+                      onClick={handleDelete}
+                    >
+                      {t('views.generatorMenuDelete')}
+                    </button>
+                  </div>,
+                  document.body
+                );
+              })()}
+            </div>
           </div>
         </div> 
-        <div style={{ position: 'absolute', bottom: '0', right: '400px', zIndex: '9999999' }}>
+        {shouldShowMobilePreview && (
+          <div style={previewContainerStyle}>
+            <div style={{ transform: 'scale(0.6185)', transformOrigin: 'top left' }}>
+              <PreviewDesign elements={elements} size={containerSize.fileName} />
+            </div>
+          </div>
+        )}
+        <div style={{ position: 'absolute', bottom: '0', right: '400px', zIndex: '999' }}>
           <ZoomControls 
             zoomLevel={zoom.level}
             onZoomIn={handleZoomIn}
@@ -1756,9 +1787,12 @@ export const Generator = () => {
             maxZoom={zoom.max}
             layout = 'vertical'
             //showPercentage={false}
+            setShowMobilePreview={handleShowMobilePreview}
+            showMobilePreview={showMobilePreview}
+            containerSize={containerSize}
           />
         </div>
-        <div>
+        <div style={{ height: '100%' }}>
           <CanvasSizeSelector 
             currentSize={containerSize}
             onSizeChange={handleCanvasSizeChange}
