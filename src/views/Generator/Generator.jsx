@@ -1387,7 +1387,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
           />
         )}
 
-        <div style={{ position: 'absolute', top: '10px', left: '512px'}}>
+        <div style={{ marginLeft: 'auto' }}>
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}

@@ -8,7 +8,7 @@ import { LanguageContext } from '../contexts/contextLanguage';
 import { useGetCode } from '../hooks/useGetCode';
 import { PreviewDesign } from './PreviewDesign';
 import { CustomSelect } from '../ui/CustomSelect/CustomSelect';
-import { productsDB, slidesDB, usersDB } from '../utils/handleDB';
+import { productsDB, slidesDB } from '../utils/handleDB';
 import { getAvailableStyleVariants } from '../utils/getAvailableStyleVariants';
 import { getStyleDisplayName, getStyleIcon } from '../utils/getStylesVariants';
 import { Tooltip } from '../ui/Tooltip/Tooltip';

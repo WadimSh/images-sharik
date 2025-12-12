@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error restoring auth:', error);
-        logout();
+        //logout();
       } finally {
         setIsLoading(false);
       }
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
       
       // Перенаправляем на страницу входа
-      window.location.href = '/sign-in';
+      //window.location.href = '/sign-in';
     } catch (error) {
       console.error('Error during logout:', error);
     }

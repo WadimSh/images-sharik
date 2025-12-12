@@ -516,7 +516,9 @@
 /* --- */
 .design-area {
   display: flex;
-  margin: 0 auto;
+  margin: 0;
+  padding-right: 90px;
+  margin-right: auto;
 }
 
 .images-grid {

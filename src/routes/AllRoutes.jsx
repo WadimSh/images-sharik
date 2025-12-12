@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 
 import SignUp from "../views/SignUp";
 import SignIn from "../views/SignIn";
-import ResetPassword from "../views/ResetPassword";
 
 import Home from "../views/Home";
 import Generator from "../views/Generator";

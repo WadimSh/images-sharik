@@ -83,6 +83,66 @@ export const Gallery = () => {
     setIsInitialized(true);
   }, [location.search, isInitialized]);
 
+  const loadDesignsFromBackend = useCallback(async (currentFilters) => {
+    try {
+      setLoading(true);
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        ...currentFilters
+      };
+      
+      Object.keys(params).forEach(key => {
+        if (params[key] === '' || params[key] === undefined) {
+          delete params[key];
+        }
+      });
+      
+      const result = await apiGetAllHistories(params);
+      
+      if (result && result.data) {
+        const transformedDesigns = result.data.map(transformDesignData);
+        setDesigns(transformedDesigns);
+        setTotalCount(result.pagination.total);
+      } else {
+        setDesigns([]);
+        setTotalCount(0);
+      }
+      
+    } catch (error) {
+      console.error('Error loading designs from backend:', error);
+      setDesigns([]);
+      setTotalCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, itemsPerPage, currentUserId]);
+
+  const transformDesignData = (design) => {
+    const likesArray = design.likes || [];
+    const likesCount = likesArray.length;
+    const hasLiked = currentUserId ? likesArray.includes(currentUserId) : false;
+    
+    return {
+      ...design,
+      likesCount,
+      hasLiked
+    };
+  };
+
+  // ОСНОВНОЙ ЭФФЕКТ ДЛЯ ЗАГРУЗКИ ДАННЫХ
+  useEffect(() => {
+    if (!isInitialized) return;
+    
+    // Используем debounce для избежания слишком частых запросов
+    const timeoutId = setTimeout(() => {
+      loadDesignsFromBackend(filters);
+    }, 100); // Небольшая задержка для агрегации изменений
+    
+    return () => clearTimeout(timeoutId);
+  }, [filters, currentPage, itemsPerPage, isInitialized, loadDesignsFromBackend]);
+
   // Функция для открытия модального окна копирования
   const handleCopyClick = (design, e) => {
     e.stopPropagation();
@@ -182,58 +242,10 @@ export const Gallery = () => {
     }
   };
 
-  const transformDesignData = (design) => {
-    const likesArray = design.likes || [];
-    const likesCount = likesArray.length;
-    const hasLiked = currentUserId ? likesArray.includes(currentUserId) : false;
-    
-    return {
-      ...design,
-      likesCount,
-      hasLiked
-    };
-  };
-
   const isDesignBelongsToUser = (design) => {
     if (!user || !design.owner) return false;
     return design.owner._id === user.id;
   }
-
-  const loadDesignsFromBackend = useCallback(async (currentFilters) => {
-    try {
-      setLoading(true);
-      
-      const params = {
-        page: currentPage,
-        limit: itemsPerPage,
-        ...currentFilters
-      };
-      
-      Object.keys(params).forEach(key => {
-        if (params[key] === '' || params[key] === undefined) {
-          delete params[key];
-        }
-      });
-      
-      const result = await apiGetAllHistories(params);
-      
-      if (result && result.data) {
-        const transformedDesigns = result.data.map(transformDesignData);
-        setDesigns(transformedDesigns);
-        setTotalCount(result.pagination.total);
-      } else {
-        setDesigns([]);
-        setTotalCount(0);
-      }
-      
-    } catch (error) {
-      console.error('Error loading designs from backend:', error);
-      setDesigns([]);
-      setTotalCount(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, itemsPerPage, currentUserId]); // Убрали filters из зависимостей
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -251,20 +263,6 @@ export const Gallery = () => {
     }));
     setCurrentPage(1);
   };
-
-  // Основной эффект для загрузки данных
-  useEffect(() => {
-    if (isInitialized) {
-      loadDesignsFromBackend(filters);
-    }
-  }, [loadDesignsFromBackend, filters, isInitialized]); // Теперь filters правильно обновляется
-
-  // Эффект для обработки изменения currentPage и itemsPerPage
-  useEffect(() => {
-    if (isInitialized) {
-      loadDesignsFromBackend(filters);
-    }
-  }, [currentPage, itemsPerPage, isInitialized]); // Отдельный эффект для пагинации
 
   const handleToggleLike = async (designId, e) => {
     e.stopPropagation();
