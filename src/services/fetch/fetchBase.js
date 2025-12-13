@@ -65,9 +65,7 @@ const redirectToSignIn = () => {
   clearTokens();
   
   // Редирект на страницу входа
-  if (window.location.pathname !== '/sign-in') {
-    window.location.href = '';
-  }
+  window.location.hash = '/sign-in';
 };
 
 export async function fetchDataWithFetch(url, options = {}) {

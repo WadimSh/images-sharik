@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -6,6 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Для проверки начального состояния
+
+  const navigate = useNavigate();
 
   // Проверяем сохраненные данные при инициализации
   useEffect(() => {
@@ -20,7 +23,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error restoring auth:', error);
-        //logout();
+        logout();
       } finally {
         setIsLoading(false);
       }
@@ -61,7 +64,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
       
       // Перенаправляем на страницу входа
-      //window.location.href = '/sign-in';
+      navigate('/sign-in', { replace: true });
     } catch (error) {
       console.error('Error during logout:', error);
     }
