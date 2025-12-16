@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
-import { MdCreateNewFolder } from "react-icons/md";
+import { TbReport } from "react-icons/tb";
+// import { MdCreateNewFolder } from "react-icons/md";
 
-import PinModal from "../ui/PinModal/PinModal";
+// import PinModal from "../ui/PinModal/PinModal";
 import { LanguageContext } from "../contexts/contextLanguage";
 import { useAuth } from "../contexts/AuthContext";
 import { productsDB, slidesDB } from "../utils/handleDB";
@@ -24,11 +25,11 @@ const SearchHeader = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
 
   const headerRightRef = useRef(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  // const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   
   const getUserName = () => {
     if (!user) return null;
@@ -79,13 +80,21 @@ const SearchHeader = ({
       navigate('/gallery');
   };
 
-  const handleCreateTamplete = async () => {
+  const handleReportClick = async () => {
     if (!isAuthenticated) {
       navigate('/sign-in');
       return;
     }
-      setIsPinModalOpen(true)
+      navigate('/reports');
   }
+
+  // const handleCreateTamplete = async () => {
+  //   if (!isAuthenticated) {
+  //     navigate('/sign-in');
+  //     return;
+  //   }
+  //     setIsPinModalOpen(true)
+  // }
 
   const handleToggleCollage = async () => {
     if (!isAuthenticated) {
@@ -135,6 +144,12 @@ const SearchHeader = ({
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         )*/}
+        {isAdmin && (
+          <button onClick={handleReportClick} className="creat-temp-button">
+            <TbReport className="creat-temp-icon" />
+            <span>Отчеты</span>
+          </button>
+        )}
         <LanguageSwitcher />
       </div>
       <div className="header-top">

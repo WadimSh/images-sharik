@@ -6,7 +6,9 @@ import SignIn from "../views/SignIn";
 import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
+import Reports from "../views/Reports";
 import Template from "../views/Template";
+import AdminProtectedRoute from "./AdminProtectedRoute";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AllRoutes = () => {
@@ -32,6 +34,15 @@ const AllRoutes = () => {
           <ProtectedRoute>
             <Gallery />
           </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/reports" 
+        element={
+          <AdminProtectedRoute>
+            <Reports />
+          </AdminProtectedRoute>
         } 
       />
       
