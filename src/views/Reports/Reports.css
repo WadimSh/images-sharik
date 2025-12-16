@@ -1,0 +1,368 @@
+.reports-container {
+  padding: 0 15px;
+  margin: 0 auto;
+}
+
+.reports-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  padding: 20px;
+  min-height: 400px;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+}
+
+.report-summary {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #eaeaea;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.employees-table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid #eaeaea;
+}
+
+.employees-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.employees-table th {
+  background: #f8f9fa;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #eaeaea;
+  white-space: nowrap;
+}
+
+.employees-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+  vertical-align: middle;
+}
+
+.employees-table tr:last-child td {
+  border-bottom: none;
+}
+
+.employees-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.expanded-row {
+  background-color: #f0f7ff !important;
+}
+
+.inactive-employee {
+  background-color: #f8f9fa;
+}
+
+.inactive-employee:hover {
+  background-color: #f1f3f4;
+}
+
+.expand-icon {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  padding: 0 !important;
+  width: 30px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.employee-info {
+  min-width: 250px;
+}
+
+.employee-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.employee-email {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.last-operation {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.total-stats,
+.period-stats,
+.wb-stats,
+.ozon-stats,
+.other-stats {
+  font-weight: 600;
+  color: #2c5282;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.zero-stats {
+  color: #999;
+  font-weight: 400;
+}
+
+/* Стили для детальной информации */
+.detailed-row {
+  background-color: #fafcff !important;
+  border-top: 2px dashed #e0e7ff;
+}
+
+.detailed-row td {
+  padding: 0 !important;
+}
+
+.detailed-period-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
+}
+
+.detailed-period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.detailed-period-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.total-period {
+  background: #2c5282;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Стили для таблицы детальной статистики */
+.detailed-period-table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid #e0e7ff;
+  background: white;
+}
+
+.detailed-period-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 500px;
+}
+
+.detailed-period-table th {
+  background: #f0f7ff;
+  padding: 10px 12px;
+  text-align: center;
+  font-weight: 600;
+  color: #2c5282;
+  border-bottom: 2px solid #e0e7ff;
+  white-space: nowrap;
+}
+
+.detailed-period-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.detailed-period-table tr:last-child td {
+  border-bottom: none;
+}
+
+.detailed-period-table tbody tr:hover {
+  background-color: #f8fbff;
+}
+
+.date-header {
+  font-size: 12px;
+  font-weight: 600;
+  background: #e6f0ff !important;
+}
+
+.value-label {
+  font-weight: 600;
+  color: #333;
+  background: #f8f9fa;
+  text-align: left !important;
+  padding-left: 20px !important;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.day-value-cell {
+  font-weight: 600;
+  color: #2c5282;
+  background-color: white;
+}
+
+.day-value-cell .zero-stats {
+  color: #ccc;
+  font-weight: 400;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .detailed-period-table {
+    font-size: 12px;
+  }
+  
+  .detailed-period-table th,
+  .detailed-period-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .reports-container {
+    padding: 0 10px;
+  }
+  
+  .reports-content {
+    padding: 15px;
+  }
+  
+  .report-summary {
+    gap: 20px;
+  }
+  
+  .summary-label {
+    font-size: 11px;
+  }
+  
+  .summary-value {
+    font-size: 14px;
+  }
+  
+  .employees-table th,
+  .employees-table td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+  
+  .employee-info {
+    min-width: 200px;
+  }
+  
+  .employee-name {
+    font-size: 14px;
+  }
+  
+  .employee-email {
+    font-size: 12px;
+  }
+  
+  .last-operation {
+    font-size: 11px;
+  }
+  
+  .detailed-period-table {
+    font-size: 11px;
+  }
+  
+  .detailed-period-table th,
+  .detailed-period-table td {
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .report-summary {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .summary-label {
+    font-size: 10px;
+  }
+  
+  .summary-value {
+    font-size: 13px;
+  }
+  
+  .detailed-period-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .detailed-period-table {
+    font-size: 10px;
+  }
+  
+  .detailed-period-table th,
+  .detailed-period-table td {
+    padding: 5px 6px;
+  }
+}
