@@ -1,0 +1,266 @@
+.date-range-picker {
+  position: relative;
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.date-range-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.date-range-input:hover {
+  border-color: #94a3b8;
+}
+
+.date-range-input:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.calendar-icon {
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.date-range-value {
+  flex: 1;
+  font-size: 14px;
+  color: #1e293b;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date-range-value.placeholder {
+  color: #94a3b8;
+}
+
+.clear-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.clear-button:hover {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Dropdown styles */
+.date-range-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 20px 48px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.date-range-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.month-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #475569;
+}
+
+.nav-button:hover {
+  background: #e2e8f0;
+}
+
+.nav-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.current-month {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Calendar grid */
+.calendar-container {
+  padding: 8px 10px;
+}
+
+.days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.day-header {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 8px 0;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #1e293b;
+  position: relative;
+}
+
+.day-cell:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.day-cell.other-month {
+  color: #cbd5e1;
+}
+
+.day-cell.today {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.day-cell.in-range {
+  background: #dbeafe;
+  border-radius: 0;
+}
+
+.day-cell.range-edge {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.day-cell.range-edge:hover {
+  background: #2563eb;
+}
+
+.day-cell:disabled {
+  cursor: not-allowed;
+  color: #e2e8f0;
+}
+
+.day-cell:disabled:hover {
+  background: transparent;
+}
+
+/* Footer */
+.date-range-footer {
+  padding: 8px 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.selected-range {
+  text-align: center;
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 12px;
+  min-height: 20px;
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-button {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.footer-button.reset {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.footer-button.reset:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.footer-button.apply {
+  background: #3b82f6;
+  color: white;
+}
+
+.footer-button.apply:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.footer-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+

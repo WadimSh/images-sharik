@@ -6,20 +6,31 @@ export async function apiGetReport(companyId, params = {}) {
   
   if (params.startDate) {
     const startDate = new Date(params.startDate);
-    startDate.setHours(0, 0, 0, 0);
-
-    queryParams.append('startDate', startDate.toISOString().split('T')[0]);
+    
+    // Форматируем дату как YYYY-MM-DD в локальном времени
+    const formattedDate = startDate.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).split('.').reverse().join('-');
+    
+    queryParams.append('startDate', formattedDate);
   }
   
   if (params.endDate) {
     const endDate = new Date(params.endDate);
-    
+        
     // КРИТИЧЕСКО ВАЖНО: добавляем +1 день для полуоткрытого интервала
-    // Пользователь думает "включительно", API работает с [start, end)
     endDate.setDate(endDate.getDate() + 1);
-    endDate.setHours(0, 0, 0, 0); 
     
-    queryParams.append('endDate', endDate.toISOString().split('T')[0]);
+    // Форматируем дату как YYYY-MM-DD в локальном времени
+    const formattedDate = endDate.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).split('.').reverse().join('-');
+    
+    queryParams.append('endDate', formattedDate);
   }
   
   if (params.grouping) {
@@ -41,9 +52,12 @@ export async function apiGetReport(companyId, params = {}) {
 // Получение отчета за последние N дней
 export async function apiGetReportLastDays(companyId, days = 30) {
   const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(endDate.getDate() - (days - 1)); // -1 чтобы включить сегодняшний день
+  endDate.setHours(0, 0, 0, 0); 
   
+  const startDate = new Date();
+  startDate.setDate(endDate.getDate() - (days - 1)); 
+  startDate.setHours(0, 0, 0, 0);
+
   return apiGetReport(companyId, {
     startDate,
     endDate,
