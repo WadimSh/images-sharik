@@ -212,7 +212,6 @@ export const Reports = () => {
         </button>
         <h2 style={{ color: '#333'}}>{'Отчет по сотрудникам'}</h2>
 
-        {/* Добавляем компонент выбора дат */}
         <div className="date-picker-container" style={{ marginLeft: '10px' }}>
           {!loading && reportData && (
             <DateRangePicker 
@@ -231,7 +230,6 @@ export const Reports = () => {
         
         {reportData && !loading && (
           <>
-            {/* Dashboard Cards */}
             <div className="dashboard-cards">
               <div className="dashboard-card employees-card">
                 <div className="card-content">
@@ -246,7 +244,7 @@ export const Reports = () => {
 
               <div className="dashboard-card total-card">
                 <div className="card-content">
-                  <span className="card-label">Всего</span>
+                  <span className="card-label">Всего за период</span>
                   <span className="card-sublabel">(дизайнов/товаров)</span>
                   <span className="card-value">{reportData.companySummary.formatted}</span>
                 </div>
@@ -314,7 +312,6 @@ export const Reports = () => {
               </div>
             </div>
 
-            {/* Employees Table Container */}
             <div className="table-container">
               <div className="table-scroll-container">
                 <table className="employees-table">
@@ -323,8 +320,8 @@ export const Reports = () => {
                       <th style={{ width: '30px' }}></th>
                       <th>Сотрудник</th>
                       <th>Последняя операция</th>
-                      <th style={{ textAlign: 'center' }}>Дизайнов/Товаров<br/> (всего)</th>
-                      <th style={{ textAlign: 'center' }}>Дизайнов/Товаров<br/> (за период)</th>
+                      <th style={{ textAlign: 'center' }}>Всего</th>
+                      <th style={{ textAlign: 'center' }}>За период</th>
                       <th style={{ textAlign: 'center' }}>WB</th>
                       <th style={{ textAlign: 'center' }}>OZON</th>
                       <th style={{ textAlign: 'center' }}>Другие</th>
@@ -386,7 +383,6 @@ export const Reports = () => {
                             </td>
                           </tr>
                           
-                          {/* Детальная информация по дням */}
                           {isExpanded && hasActivityInPeriod && (
                             <tr className="detailed-row">
                               <td colSpan="8">
