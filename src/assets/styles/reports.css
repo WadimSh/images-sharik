@@ -452,7 +452,7 @@
 .skeleton-table-header {
   display: grid;
   grid-template-columns: 
-   minmax(38px, 0.8fr)      
+   minmax(38px, 0.3fr)      
    minmax(200px, 2fr)     
    minmax(150px, 1.5fr)   
    repeat(5, minmax(100px, 1fr));
@@ -472,7 +472,7 @@
 .skeleton-table-row {
   display: grid;
   grid-template-columns: 
-   minmax(38px, 0.8fr)      
+   minmax(38px, 0.3fr)      
    minmax(200px, 2fr)     
    minmax(150px, 1.5fr)   
    repeat(5, minmax(100px, 1fr));
