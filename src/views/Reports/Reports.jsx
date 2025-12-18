@@ -13,7 +13,6 @@ import { DateRangePicker } from '../../ui/DateRangePicker/DateRangePicker';
 import { apiGetReport, apiGetReportLastDays } from '../../services/reportsService';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
-import './Reports.css';
 
 export const Reports = () => {
   const navigate = useNavigate();
@@ -167,71 +166,11 @@ export const Reports = () => {
     setExpandedRows(newExpandedRows);
   };
 
-  // Подсчет общей активности за период
-  const calculatePeriodStats = (detailedPeriodStats) => {
-    const totalActive = detailedPeriodStats.reduce((sum, day) => sum + day.activeHistories, 0);
-    const totalUnique = detailedPeriodStats.reduce((sum, day) => sum + day.uniqueArticles, 0);
-    return { totalActive, totalUnique, formatted: `${totalActive}/${totalUnique}` };
-  };
-
-  // Генерация всех дат в периоде
-  const generateAllDatesInPeriod = () => {
-    if (!reportData || !reportData.timeRange) return [];
+  // Получаем данные для отображения (исключаем последний день)
+  const getDisplayDataForEmployee = (employee) => {
+    if (!employee?.detailedPeriodStats) return [];
     
-    const startDate = new Date(reportData.timeRange.startDate);
-    const endDate = new Date(reportData.timeRange.endDate);
-    
-    // API возвращает endDate уже увеличенным на 1 день
-    // Поэтому нам нужно уменьшить его на 1 день для отображения
-    const adjustedEndDate = new Date(endDate);
-    adjustedEndDate.setDate(adjustedEndDate.getDate() - 1);
-    
-    const dates = [];
-    const currentDate = new Date(startDate);
-    
-    // Создаем даты для каждого дня в периоде
-    while (currentDate <= adjustedEndDate) {
-      // Форматируем дату как YYYY-MM-DD для сравнения с данными
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const day = String(currentDate.getDate()).padStart(2, '0');
-      const dateString = `${year}-${month}-${day}`;
-      dates.push(dateString);
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    return dates;
-  };
-
-  // Проверяем, есть ли активность у сотрудника в определенный день
-  const getDayStatsForEmployee = (employee, date) => {
-    // Ищем точное совпадение даты
-    const dayStat = employee.detailedPeriodStats.find(
-      day => day.period === date
-    );
-    
-    if (dayStat) {
-      return dayStat.formatted;
-    }
-    
-    // Если не нашли, проверяем другие возможные форматы
-    const dateObj = new Date(date);
-    
-    // Проверяем формат с ведущими нулями (2025-11-16)
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    
-    const foundWithFormat = employee.detailedPeriodStats.find(
-      day => day.period === formattedDate
-    );
-    
-    if (foundWithFormat) {
-      return foundWithFormat.formatted;
-    }
-    
-    return '0/0';
+    return employee.detailedPeriodStats.slice(0, -1);
   };
 
   // Скелетон для загрузки
@@ -266,7 +205,7 @@ export const Reports = () => {
   );
 
   return (
-    <div className="reports-dashboard">
+    <div>
       <div className='header-section' style={{ margin: '10px 10px 20px'}}>
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
           <HiOutlineChevronLeft /> {t('header.back')}
@@ -393,9 +332,9 @@ export const Reports = () => {
                   </thead>
                   <tbody>
                     {reportData.employees.map((employee) => {
-                      const periodStats = calculatePeriodStats(employee.detailedPeriodStats);
-                      const hasActivityInPeriod = periodStats.totalActive > 0;
+                      const hasActivityInPeriod = employee.periodStats.activeHistories > 0;
                       const isExpanded = expandedRows.has(employee.employeeId);
+                      const displayData = getDisplayDataForEmployee(employee);
                       
                       return (
                         <React.Fragment key={employee.employeeId}>
@@ -426,8 +365,8 @@ export const Reports = () => {
                               </span>
                             </td>
                             <td className="period-stats">
-                              <span className={periodStats.totalActive === 0 ? 'zero-stats' : ''}>
-                                {periodStats.formatted}
+                              <span className={employee.periodStats.activeHistories === 0 ? 'zero-stats' : ''}>
+                                {employee.periodStats.formatted}
                               </span>
                             </td>
                             <td className="wb-stats">
@@ -459,23 +398,19 @@ export const Reports = () => {
                                     <table className="detailed-period-table">
                                       <thead>
                                         <tr>
-                                          {generateAllDatesInPeriod().map((date, index) => (
+                                          {displayData.map((day, index) => (
                                             <th key={index} className="date-header">
-                                              {formatPeriodDate(date)}
+                                              {formatPeriodDate(day.period)}
                                             </th>
                                           ))}
                                         </tr>
                                       </thead>
                                       <tbody>
                                         <tr>
-                                          {generateAllDatesInPeriod().map((date, index) => (
+                                          {displayData.map((day, index) => (
                                             <td key={index} className="day-value-cell">
-                                              <span className={
-                                                getDayStatsForEmployee(employee, date) === '0/0' 
-                                                  ? 'zero-stats' 
-                                                  : ''
-                                              }>
-                                                {getDayStatsForEmployee(employee, date)}
+                                              <span className={day.formatted === '0/0' ? 'zero-stats' : ''}>
+                                                {day.formatted}
                                               </span>
                                             </td>
                                           ))}
