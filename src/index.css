@@ -159,6 +159,20 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Kosko';
+  src: url('./assets/fonts/KoskoBold-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ft83';
+  src: url('./assets/fonts/ofont.ru_ft83.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

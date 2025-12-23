@@ -44,7 +44,9 @@
     "petard": "Хлопушка",
     "halloween": "Хэллоуин",
     "kittens": "Котята",
-    "winter_holidays": "Новый год & Рождество"
+    "winter_holidays": "Новый год & Рождество",
+    "valentine_day": "Валентинов день",
+    "russian_style": "Русский стиль"
   },
   "styles": {
     "default": "Основной стиль",

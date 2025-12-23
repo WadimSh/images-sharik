@@ -5,7 +5,7 @@ import ItemsGrid from "../../components/ItemsGrid";
 import { SelectionImagesModal } from '../../components/SelectionImagesModal';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
-//import { data } from "../../assets/data";
+// import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';

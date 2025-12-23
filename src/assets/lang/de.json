@@ -44,7 +44,9 @@
     "petard": "Knallbonbon",
     "halloween": "Halloween",
     "kittens": "Kätzchen",
-    "winter_holidays": "Neujahr & Weihnachten"
+    "winter_holidays": "Neujahr & Weihnachten",
+    "valentine_day": "Valentinstag",
+    "russian_style": "Russischer Stil"
   },
   "styles": {
     "default": "Klassischer Stil",

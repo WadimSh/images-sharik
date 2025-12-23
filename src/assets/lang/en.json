@@ -44,7 +44,9 @@
     "petard": "Party popper",
     "halloween": "Halloween",
     "kittens": "Kittens",
-    "winter_holidays": "New Year & Christmas"
+    "winter_holidays": "New Year & Christmas",
+    "valentine_day": "Valentine's Day",
+    "russian_style": "Russian style"
   },
   "styles": {
     "default": "Classic Style",

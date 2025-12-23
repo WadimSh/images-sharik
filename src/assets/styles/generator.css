@@ -1667,6 +1667,7 @@
   padding: 16px 24px;
   border-bottom: 1px solid #e5e7eb;
   background: #f8f9fa;
+  flex-wrap: wrap;
 }
 
 .main-category-btn {

@@ -10,19 +10,6 @@
       "subcategories": []
     },
     {
-      "id": "halloween",
-      "name": "category.halloween",
-      "subcategories": [
-        { "id": "default-halloween", "name": "styles.default", "tags": ["default-halloween"] },
-        { "id": "pumpkin", "name": "styles.pumpkin", "tags": ["pumpkin"] },
-        { "id": "bat", "name": "styles.bat", "tags": ["bat"] },
-        { "id": "blood", "name": "styles.blood", "tags": ["blood"] },
-        { "id": "carved", "name": "styles.carved", "tags": ["carved"] },
-        { "id": "monsters", "name": "styles.monsters", "tags": ["monsters"] },
-        { "id": "comics", "name": "styles.comics", "tags": ["comics"]}
-      ]
-    },
-    {
       "id": "belbal",
       "name": "category.belbal",
       "subcategories": []
@@ -46,6 +33,32 @@
         { "id": "brutal", "name": "styles.brutal", "tags": ["brutal"] },
         { "id": "amur1", "name": "styles.amur1", "tags": ["amur1"] },
         { "id": "amur2", "name": "styles.amur2", "tags": ["amur2"] }
+      ]
+    },
+    {
+      "id": "valentine_day",
+      "name": "category.valentine_day",
+      "subcategories": [
+        { "id": "default-valentine", "name": "styles.default", "tags": ["default-valentine"] },
+        { "id": "crimson-valentine", "name": "styles.crimson", "tags": ["crimson-valentine"] }
+      ]
+    },
+    {
+      "id": "russian_style",
+      "name": "category.russian_style",
+      "subcategories": []
+    },
+    {
+      "id": "halloween",
+      "name": "category.halloween",
+      "subcategories": [
+        { "id": "default-halloween", "name": "styles.default", "tags": ["default-halloween"] },
+        { "id": "pumpkin", "name": "styles.pumpkin", "tags": ["pumpkin"] },
+        { "id": "bat", "name": "styles.bat", "tags": ["bat"] },
+        { "id": "blood", "name": "styles.blood", "tags": ["blood"] },
+        { "id": "carved", "name": "styles.carved", "tags": ["carved"] },
+        { "id": "monsters", "name": "styles.monsters", "tags": ["monsters"] },
+        { "id": "comics", "name": "styles.comics", "tags": ["comics"]}
       ]
     },
     {
@@ -1310,8 +1323,136 @@
       "tags": ["winter_holidays", "ice"]
     },
     {
+      "filename": "element-fon_147.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_148.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_149.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_150.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_151.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_152.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_153.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_154.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "element-fon_155.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_156.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_157.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_158.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_159.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_160.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_161.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_162.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_163.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_164.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_165.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_166.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_167.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "element-fon_168.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_169.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_170.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_171.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_172.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_173.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_174.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_175.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_176.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_177.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "element-fon_178.png",
+      "tags": ["russian_style"]
+    },
+    {
       "filename": "logo-gemar.png",
-      "tags": ["gemar","default", "red", "green", "yellow", "crimson"]
+      "tags": ["gemar", "default", "red", "green", "yellow", "crimson"]
     },
     {
       "filename": "logo.webp",
@@ -2552,6 +2693,379 @@
     {
       "filename": "bubbles_11+text_091.png",
       "tags": ["winter_holidays", "minimalistic"]
+    },
+    {
+      "filename": "bubbles_12_001.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_002.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_003.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_004.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_005.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_006.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_007.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_008.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_009.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_010.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_011.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_012.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_013.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_014.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_015.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12_016.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_017.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_018.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_019.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_020.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_021.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_022.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_023.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12_024.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_001.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_002.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_003.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_004.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_005.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_006.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_007.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_008.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_009.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_010.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_011.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_012.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_013.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_014.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_015.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_016.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_017.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_018.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_019.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_020.png",
+      "tags": ["valentine_day", "default-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_021.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_022.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_023.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_024.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_025.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_026.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_027.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_028.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_029.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_030.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_031.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_032.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_033.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_034.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_035.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_036.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_037.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_038.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+    {
+      "filename": "bubbles_12+text_039.png",
+      "tags": ["valentine_day", "crimson-valentine"]
+    },
+
+    {
+      "filename": "bubbles_13_001.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_002.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_003.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_004.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_005.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_006.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_007.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_008.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_009.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_010.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_011.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_012.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_013.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_014.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13_015.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_001.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_002.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_003.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_004.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_005.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_006.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_007.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_008.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_009.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_010.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_011.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_012.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_013.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_014.png",
+      "tags": ["russian_style"]
+    },
+    {
+      "filename": "bubbles_13+text_015.png",
+      "tags": ["russian_style"]
     }
   ]
 } 

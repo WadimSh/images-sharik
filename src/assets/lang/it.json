@@ -44,7 +44,9 @@
     "petard": "Stelle filanti",
     "halloween": "Halloween",
     "kittens": "Gattini",
-    "winter_holidays": "Capodanno & Natale"
+    "winter_holidays": "Capodanno & Natale",
+    "valentine_day": "San Valentino",
+    "russian_style": "Stile russo"
   },
   "styles": {
     "default": "Stile Classico",
