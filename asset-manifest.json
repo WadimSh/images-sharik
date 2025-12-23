@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.bcd9aaf5.css",
-    "main.js": "./static/js/main.05753414.js",
+    "main.css": "./static/css/main.396358f9.css",
+    "main.js": "./static/js/main.b926b249.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
@@ -11,6 +11,7 @@
     "static/media/ofont.ru_FreeSetTT.ttf": "./static/media/ofont.ru_FreeSetTT.52341effa2ac3e51405f.ttf",
     "static/media/ofont.ru_FreeSetBoldTT.ttf": "./static/media/ofont.ru_FreeSetBoldTT.c2839fcf9656ba196bf7.ttf",
     "static/media/Comic_CAT.otf": "./static/media/Comic_CAT.a380a424826d21d30fb7.otf",
+    "static/media/ofont.ru_ft83.ttf": "./static/media/ofont.ru_ft83.328e4368fbaf05a2bc4d.ttf",
     "static/media/rfkrabuler_regular.ttf": "./static/media/rfkrabuler_regular.aed046a69b07153e306e.ttf",
     "static/media/Bosk.otf": "./static/media/Bosk.004744d8a735150b9a68.otf",
     "static/media/MyriadPro-BlackCond.ttf": "./static/media/MyriadPro-BlackCond.6d312e56193f8fdb683c.ttf",
@@ -24,17 +25,18 @@
     "static/media/Helios Cond.ttf": "./static/media/Helios Cond.fb59758c6d04ac4e4ea2.ttf",
     "static/media/DessertScript.otf": "./static/media/DessertScript.429ede4d793747a7d1fd.otf",
     "static/media/VividSans-Regular.ttf": "./static/media/VividSans-Regular.670a4a1b18aa1b0d86a3.ttf",
+    "static/media/KoskoBold-Bold.ttf": "./static/media/KoskoBold-Bold.09694acf5c7096d2015b.ttf",
     "static/media/Zametka_Parletter.otf": "./static/media/Zametka_Parletter.ecbdf7ab6bdb6c1145c0.otf",
     "static/media/roslyngothicmedium-dg-medium.ttf": "./static/media/roslyngothicmedium-dg-medium.de61a1de78c1fd4a9e07.ttf",
     "static/media/aa_badaboom.ttf": "./static/media/aa_badaboom.8f0fd95679075dcc294a.ttf",
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
-    "main.bcd9aaf5.css.map": "./static/css/main.bcd9aaf5.css.map",
-    "main.05753414.js.map": "./static/js/main.05753414.js.map",
+    "main.396358f9.css.map": "./static/css/main.396358f9.css.map",
+    "main.b926b249.js.map": "./static/js/main.b926b249.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.bcd9aaf5.css",
-    "static/js/main.05753414.js"
+    "static/css/main.396358f9.css",
+    "static/js/main.b926b249.js"
   ]
 }
