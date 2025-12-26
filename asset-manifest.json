@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "./static/css/main.396358f9.css",
-    "main.js": "./static/js/main.4b04d63f.js",
+    "main.js": "./static/js/main.cf06501e.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
@@ -32,11 +32,11 @@
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
     "main.396358f9.css.map": "./static/css/main.396358f9.css.map",
-    "main.4b04d63f.js.map": "./static/js/main.4b04d63f.js.map",
+    "main.cf06501e.js.map": "./static/js/main.cf06501e.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.396358f9.css",
-    "static/js/main.4b04d63f.js"
+    "static/js/main.cf06501e.js"
   ]
 }
