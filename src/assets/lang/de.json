@@ -46,7 +46,9 @@
     "kittens": "Kätzchen",
     "winter_holidays": "Neujahr & Weihnachten",
     "valentine_day": "Valentinstag",
-    "russian_style": "Russischer Stil"
+    "russian_style": "Russischer Stil",
+    "ladies_day": "Internationaler Frauentag",
+    "helium": "Helium"
   },
   "styles": {
     "default": "Klassischer Stil",
@@ -70,7 +72,9 @@
     "cake": "Lebkuchen-Stil",
     "kawaii": "Kawaii-Stil",
     "minimalistic": "Minimalistischer Stil",
-    "ice": "Eis-Stil"
+    "ice": "Eis-Stil",
+    "khokhloma": "Chochloma-Stil",
+    "pink": "Pink-Stil"
   },
   "grid": {
     "all": "Alle",

@@ -173,6 +173,21 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Sunday';
+  src: url('./assets/fonts/Sunday-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HeliosCondBlack';
+  src: url('./assets/fonts/helioscondblackc.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

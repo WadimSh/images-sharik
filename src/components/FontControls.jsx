@@ -202,11 +202,14 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
           <option value="Cartonsix NC" style={{ fontFamily: 'Cartonsix NC', fontSize: '18px' }}>Cartonsix 🎄</option>
           <option value="Ice Kingdom" style={{ fontFamily: 'Ice Kingdom', fontSize: '18px' }}>Ice Kingdom ⛄🎄</option>
           <option value="Comic CAT" style={{ fontFamily: 'Comic CAT', fontSize: '18px' }}>Comic 🎄❤️</option>
-          <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas 🎄</option>
+          <option value="Pribambas" style={{ fontFamily: 'Pribambas', fontSize: '18px' }}>Pribambas 🎄🌷</option>
           <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans 🎄</option>
           <option value="Zametka" style={{ fontFamily: 'Zametka', fontSize: '18px' }}>Zametka 🎄</option>
           <option value="Kosko" style={{ fontFamily: 'Kosko', fontSize: '18px' }}>Kosko ❤️</option>
           <option value="ft83" style={{ fontFamily: 'ft83', fontSize: '18px' }}>Русский стиль 🪆</option>
+          <option value="Sunday" style={{ fontFamily: 'Sunday', fontSize: '18px' }}>Русский стиль 2🪆</option>
+          <option value="HeliosCondBlack" style={{ fontFamily: 'HeliosCondBlack', fontSize: '18px' }}>Helios Cond Black 🎈</option>
+          <option value="Arial" style={{ fontFamily: 'Arial', fontSize: '18px' }}>Arial</option>
           <option value="Arial" style={{ fontFamily: 'Arial', fontSize: '18px' }}>Arial</option>
           <option value="Times New Roman" style={{ fontFamily: 'Times New Roman', fontSize: '18px' }}>Times New Roman</option>
           <option value="Verdana" style={{ fontFamily: 'Verdana', fontSize: '18px' }}>Verdana</option>
