@@ -44,9 +44,20 @@
       ]
     },
     {
+      "id": "ladies_day",
+      "name": "category.ladies_day",
+      "subcategories": [
+        { "id": "default-ladies", "name": "styles.default", "tags": ["default-ladies"] },
+        { "id": "pink", "name": "styles.pink", "tags": ["pink"] }
+      ]
+    },
+    {
       "id": "russian_style",
       "name": "category.russian_style",
-      "subcategories": []
+      "subcategories": [
+        { "id": "default-russian", "name": "styles.default", "tags": ["default-russian"] },
+        { "id": "khokhloma", "name": "styles.khokhloma", "tags": ["khokhloma"] }
+      ]
     },
     {
       "id": "halloween",
@@ -77,6 +88,11 @@
     {
       "id": "kittens",
       "name": "category.kittens",
+      "subcategories": []
+    },
+    {
+      "id": "helium",
+      "name": "category.helium",
       "subcategories": []
     },
     {
@@ -1408,47 +1424,239 @@
     },
     {
       "filename": "element-fon_168.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_169.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_170.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_171.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_172.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_173.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_174.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_175.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_176.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_177.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "element-fon_178.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "element-fon_179.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_180.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_181.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_182.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_183.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_184.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_185.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_186.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_187.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_188.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_189.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_190.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_191.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_192.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_193.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_194.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_195.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "element-fon_196.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_197.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_198.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_199.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_200.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_201.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_202.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "element-fon_203.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_204.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_205.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_206.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_207.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_208.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_209.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_210.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_211.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_212.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_213.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_214.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "element-fon_215.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_216.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_217.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_218.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_219.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_220.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_221.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_222.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_223.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_224.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_225.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "element-fon_226.png",
+      "tags": ["ladies_day", "pink"]
     },
     {
       "filename": "logo-gemar.png",
@@ -2949,123 +3157,463 @@
 
     {
       "filename": "bubbles_13_001.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_002.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_003.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_004.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_005.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_006.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_007.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_008.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_009.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_010.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_011.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_012.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_013.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_014.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13_015.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "bubbles_13_016.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_017.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_018.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_019.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_020.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_021.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_022.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_023.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_024.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_025.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13_026.png",
+      "tags": ["russian_style", "khokhloma"]
     },
     {
       "filename": "bubbles_13+text_001.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_002.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_003.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_004.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_005.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_006.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_007.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_008.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_009.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_010.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_011.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_012.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_013.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_014.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
     },
     {
       "filename": "bubbles_13+text_015.png",
-      "tags": ["russian_style"]
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "bubbles_13+text_016.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_017.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_018.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_019.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_020.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_021.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_022.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_023.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_024.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_025.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_026.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_027.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_028.png",
+      "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_14_001.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_002.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_003.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_004.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_005.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_006.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_007.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_008.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14_009.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_001.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_002.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_003.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_004.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_005.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_006.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_007.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_008.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_009.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_010.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_011.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_14+text_012.png",
+      "tags": ["helium"]
+    },
+    {
+      "filename": "bubbles_15_001.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_002.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_003.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_004.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_005.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_006.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_007.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15_008.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_009.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_010.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_011.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_012.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_013.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_014.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15_015.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_001.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_002.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_003.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_004.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_005.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_006.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_007.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_008.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_009.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_010.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_011.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_012.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_013.png",
+      "tags": ["ladies_day", "default-ladies"]
+    },
+    {
+      "filename": "bubbles_15+text_014.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_015.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_016.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_017.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_018.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_019.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_020.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_021.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_022.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_023.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_024.png",
+      "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_15+text_025.png",
+      "tags": ["ladies_day", "pink"]
     }
   ]
 } 
