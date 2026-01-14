@@ -7,6 +7,7 @@ import Home from "../views/Home";
 import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
 import Reports from "../views/Reports";
+import Images from "../views/Images";
 import Template from "../views/Template";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import ProtectedRoute from "./ProtectedRoute";
@@ -35,6 +36,15 @@ const AllRoutes = () => {
             <Gallery />
           </ProtectedRoute>
         } 
+      />
+
+      <Route 
+        path="/media"
+        element={
+          <ProtectedRoute>
+            <Images />
+          </ProtectedRoute>
+        }
       />
 
       <Route 

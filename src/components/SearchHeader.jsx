@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 import { TbReport } from "react-icons/tb";
+import { MdOutlinePermMedia } from "react-icons/md";
 // import { MdCreateNewFolder } from "react-icons/md";
 
 // import PinModal from "../ui/PinModal/PinModal";
@@ -88,6 +89,14 @@ const SearchHeader = ({
       navigate('/reports');
   }
 
+  const handleMediaClick = async () => {
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+      navigate('/media');
+  }
+
   // const handleCreateTamplete = async () => {
   //   if (!isAuthenticated) {
   //     navigate('/sign-in');
@@ -144,6 +153,12 @@ const SearchHeader = ({
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         )*/}
+        {
+          <button onClick={handleMediaClick} className="creat-temp-button">
+            <MdOutlinePermMedia className="creat-temp-icon" />
+            <span>Изображения</span>
+          </button>
+        }
         {isAdmin && (
           <button onClick={handleReportClick} className="creat-temp-button">
             <TbReport className="creat-temp-icon" />
