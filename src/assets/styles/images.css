@@ -1,0 +1,123 @@
+/* Сетка изображений */
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* На десктопах ограничиваем максимум 10 колонок */
+@media (min-width: 1200px) {
+  .images-grid {
+    grid-template-columns: repeat(10, 1fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .images-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .images-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .images-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* Карточка изображения */
+.images_card {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 180px; 
+  min-width: 120px;
+  position: relative;
+  cursor: pointer;
+}
+
+.images_card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Контейнер для изображения с соотношением 4:3 */
+.images-container {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3; 
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5; 
+}
+
+/* Само изображение */
+.image-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: white;
+  background-image: 
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 10px 10px; 
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  transition: transform 0.3s ease;
+}
+
+.images_card:hover .image-thumbnail {
+  transform: scale(1.05);
+}
+
+/* Блок с информацией при наведении */
+.image-info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 8px;
+  background: linear-gradient(to top, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(0, 0, 0, 0.5) 40%, 
+    transparent 100%);
+  color: white;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.images_card:hover .image-info-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Имя файла */
+.image-filename {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  line-height: 1.3;
+}

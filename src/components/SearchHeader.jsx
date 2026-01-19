@@ -271,3 +271,4 @@ const SearchHeader = ({
 };
 
 export default SearchHeader;
+
