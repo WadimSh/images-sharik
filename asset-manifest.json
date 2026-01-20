@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.5e2d827d.css",
-    "main.js": "./static/js/main.56675814.js",
+    "main.css": "./static/css/main.3ebbca8a.css",
+    "main.js": "./static/js/main.763aa613.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
@@ -20,6 +20,7 @@
     "static/media/Swampy Clean.ttf": "./static/media/Swampy Clean.b3fa66c7b596b0c765fe.ttf",
     "static/media/jolly-lodger-cyrillic.otf": "./static/media/jolly-lodger-cyrillic.6a5b3b6d09bb74c6dba2.otf",
     "static/media/Cartonsix NC.ttf": "./static/media/Cartonsix NC.38bd7244689a64f4e9e7.ttf",
+    "static/media/Bebas Neue Cyrillic.ttf": "./static/media/Bebas Neue Cyrillic.f39fe92d35bac3b2fe60.ttf",
     "static/media/a_AlternaNr.ttf": "./static/media/a_AlternaNr.0652bd2e4502b4a19573.ttf",
     "static/media/a_FuturaRound.ttf": "./static/media/a_FuturaRound.6ae219f0c095638700c4.ttf",
     "static/media/a_FuturaRoundDemi.ttf": "./static/media/a_FuturaRoundDemi.dbc8571af00a3fd672b0.ttf",
@@ -33,12 +34,12 @@
     "static/media/helioscondblackc.otf": "./static/media/helioscondblackc.59913481f9583c718a3c.otf",
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
-    "main.5e2d827d.css.map": "./static/css/main.5e2d827d.css.map",
-    "main.56675814.js.map": "./static/js/main.56675814.js.map",
+    "main.3ebbca8a.css.map": "./static/css/main.3ebbca8a.css.map",
+    "main.763aa613.js.map": "./static/js/main.763aa613.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5e2d827d.css",
-    "static/js/main.56675814.js"
+    "static/css/main.3ebbca8a.css",
+    "static/js/main.763aa613.js"
   ]
 }
