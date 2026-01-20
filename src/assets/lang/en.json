@@ -48,7 +48,8 @@
     "valentine_day": "Valentine's Day",
     "russian_style": "Russian style",
     "ladies_day": "International Women's Day",
-    "helium": "Helium"
+    "helium": "Helium",
+    "men_day": "Men's Day"
   },
   "styles": {
     "default": "Classic Style",
@@ -74,7 +75,9 @@
     "minimalistic": "Minimalistic Style",
     "ice": "Ice Style",
     "khokhloma": "Khokhloma Style",
-    "pink": "Pink Style"
+    "pink": "Pink Style",
+    "tricolour": "Tricolour style",
+    "camouflage": "Camouflage style"
   },
   "grid": {
     "all": "All",

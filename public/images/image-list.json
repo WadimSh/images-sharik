@@ -44,6 +44,15 @@
       ]
     },
     {
+      "id": "men_day",
+      "name": "category.men_day",
+      "subcategories": [
+        { "id": "default-men", "name": "styles.default", "tags": ["default-men"] },
+        { "id": "tricolour", "name": "styles.tricolour", "tags": ["tricolour"] },
+        { "id": "camouflage", "name": "styles.camouflage", "tags": ["camouflage"] }
+      ]
+    },
+    {
       "id": "ladies_day",
       "name": "category.ladies_day",
       "subcategories": [
@@ -1659,6 +1668,46 @@
       "tags": ["ladies_day", "pink"]
     },
     {
+      "filename": "element-fon_227.png",
+      "tags": ["men_day", "default-men"]
+    },
+    {
+      "filename": "element-fon_228.png",
+      "tags": ["men_day", "default-men"]
+    },
+    {
+      "filename": "element-fon_229.png",
+      "tags": ["men_day", "default-men"]
+    },
+    {
+      "filename": "element-fon_230.png",
+      "tags": ["men_day", "default-men"]
+    },
+    {
+      "filename": "element-fon_231.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "element-fon_232.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "element-fon_233.png",
+      "tags": ["men_day", "camouflage"]
+    },
+    {
+      "filename": "element-fon_234.png",
+      "tags": ["men_day", "camouflage"]
+    },
+    {
+      "filename": "element-fon_235.png",
+      "tags": ["men_day", "camouflage"]
+    },
+    {
+      "filename": "element-fon_236.png",
+      "tags": ["men_day", "camouflage"]
+    },
+    {
       "filename": "logo-gemar.png",
       "tags": ["gemar", "default", "red", "green", "yellow", "crimson"]
     },
@@ -1913,6 +1962,22 @@
     {
       "filename": "title_24.png",
       "tags": ["winter_holidays", "default-winter"]
+    },
+    {
+      "filename": "title_25.png",
+      "tags": ["men_day", "default-men"]
+    },
+    {
+      "filename": "title_26.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "title_27.png",
+      "tags": ["men_day", "camouflage"]
+    },
+    {
+      "filename": "title_28.png",
+      "tags": ["men_day", "camouflage"]
     },
     {
       "filename": "bubbles_09_001.png",
@@ -3614,6 +3679,38 @@
     {
       "filename": "bubbles_15+text_025.png",
       "tags": ["ladies_day", "pink"]
+    },
+    {
+      "filename": "bubbles_16_001.png",
+      "tags": ["men_day", "default-men", "camouflage"]
+    },
+    {
+      "filename": "bubbles_16_002.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "bubbles_16+text_001.png",
+      "tags": ["men_day", "default-men", "camouflage"]
+    },
+    {
+      "filename": "bubbles_16+text_002.png",
+      "tags": ["men_day", "default-men", "camouflage"]
+    },
+    {
+      "filename": "bubbles_16+text_003.png",
+      "tags": ["men_day", "default-men", "camouflage"]
+    },
+    {
+      "filename": "bubbles_16+text_004.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "bubbles_16+text_005.png",
+      "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "bubbles_16+text_006.png",
+      "tags": ["men_day", "tricolour"]
     }
   ]
 } 
