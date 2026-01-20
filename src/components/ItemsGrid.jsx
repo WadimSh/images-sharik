@@ -977,6 +977,7 @@ const applyStyleToGroup = async (baseCode, styleVariant) => {
     halloween: t('category.halloween'),
     main: t('grid.main'),
     default: t('grid.default'),
+    men_day: t('category.men_day'),
     // bubble: t('grid.bubble'),
     // banners: t('grid.banners'),
     // barAccessories: t('grid.barAccessories'),

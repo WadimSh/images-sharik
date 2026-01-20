@@ -153,12 +153,12 @@ const SearchHeader = ({
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         )*/}
-        {
+        {/*
           <button onClick={handleMediaClick} className="creat-temp-button">
             <MdOutlinePermMedia className="creat-temp-icon" />
             <span>Изображения</span>
           </button>
-        }
+        */}
         {isAdmin && (
           <button onClick={handleReportClick} className="creat-temp-button">
             <TbReport className="creat-temp-icon" />

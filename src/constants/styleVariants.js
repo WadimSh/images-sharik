@@ -1,8 +1,8 @@
 import { TbSquareRoundedFilled, TbBat } from "react-icons/tb";
 import { IoPrism, IoMapSharp } from "react-icons/io5";
 import { IoMdHeart } from "react-icons/io";
-import { GiPumpkinLantern, GiBlood, GiPumpkinMask } from "react-icons/gi";
-import { FaOptinMonster } from "react-icons/fa";
+import { GiPumpkinLantern, GiBlood, GiPumpkinMask, GiTank } from "react-icons/gi";
+import { FaOptinMonster, FaFontAwesomeFlag } from "react-icons/fa";
 import { RiCake3Line } from "react-icons/ri";
 
 export const STYLE_VARIANTS = {
@@ -85,5 +85,15 @@ export const STYLE_VARIANTS = {
     id: 'cake',
     name: 'styles.cake',
     icon: <RiCake3Line size={24} color="#c88b06" />
+  },
+  tricolour: {
+    id: 'tricolour',
+    name: 'styles.tricolour',
+    icon: <FaFontAwesomeFlag size={18} color="#dc3545" />
+  },
+  camouflage: {
+    id: 'camouflage',
+    name: 'styles.camouflage',
+    icon: <GiTank size={20} color="#0056b3" />
   }
 };
