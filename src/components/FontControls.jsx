@@ -206,6 +206,7 @@ export const FontControls = ({ element, onClose, onChange, onChangeMulti, isMult
           <option value="VividSans" style={{ fontFamily: 'VividSans', fontSize: '18px' }}>VividSans 🎄</option>
           <option value="Zametka" style={{ fontFamily: 'Zametka', fontSize: '18px' }}>Zametka 🎄</option>
           <option value="Kosko" style={{ fontFamily: 'Kosko', fontSize: '18px' }}>Kosko ❤️</option>
+          <option value="Bebas Neue Cyrillic" style={{ fontFamily: 'Bebas Neue Cyrillic', fontSize: '18px' }}>Bebas Neue ⚔️</option>
           <option value="ft83" style={{ fontFamily: 'ft83', fontSize: '18px' }}>Русский стиль 🪆</option>
           <option value="Sunday" style={{ fontFamily: 'Sunday', fontSize: '18px' }}>Русский стиль 2🪆</option>
           <option value="HeliosCondBlack" style={{ fontFamily: 'HeliosCondBlack', fontSize: '18px' }}>Helios Cond Black 🎈</option>
