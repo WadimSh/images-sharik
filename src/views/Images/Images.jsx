@@ -1,15 +1,20 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HiOutlineChevronLeft } from "react-icons/hi2";
 
 import { ImageDigitalizationModal } from '../../components/ImageDigitalizationModal/ImageDigitalizationModal';
 import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
-import { HiOutlineChevronLeft } from "react-icons/hi2";
+import FileUploadButton from '../../components/FileUploadButton';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { useAuth } from '../../contexts/AuthContext';
+import { useUpload } from '../../contexts/UploadContext';
 import { apiGetAllImages } from '../../services/mediaService';
 
 export const Images = () => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
+  const { user } = useAuth();
+  const { uploadState } = useUpload(); // Для отслеживания состояния загрузки
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +57,7 @@ export const Images = () => {
     }
   }, [currentPage, itemsPerPage]);
 
+  // Автоматическое обновление при изменении пагинации
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       loadImagesFromBackend();
@@ -59,6 +65,17 @@ export const Images = () => {
     
     return () => clearTimeout(timeoutId);
   }, [currentPage, itemsPerPage, loadImagesFromBackend]);
+
+  useEffect(() => {
+    if (!uploadState.isUploading && uploadState.uploadResults.length > 0) {
+            
+      const timer = setTimeout(() => {
+        loadImagesFromBackend();
+      }, 100); 
+      
+      return () => clearTimeout(timer);
+    }
+  }, [uploadState.isUploading, uploadState.uploadResults.length, loadImagesFromBackend]);
 
   const handleBack = () => {
     navigate(-1);
@@ -91,7 +108,7 @@ export const Images = () => {
     const baseUrl = 'https://mp.sharik.ru';
     return thumbnailUrl.startsWith('http') ? thumbnailUrl : `${baseUrl}${thumbnailUrl}`;
   };
-
+  
   return (
     <div>
       <div className='header-section' style={{ margin: '10px 10px 20px'}}>
@@ -99,6 +116,10 @@ export const Images = () => {
           <HiOutlineChevronLeft /> {t('header.back')}
         </button>
         <h2 style={{ color: '#333'}}>{'Библиотека изображений'}</h2>
+        {user && (<FileUploadButton
+          id={user.company[0].id}
+          buttonText={'Загрузить изображения'}
+        />)}
       </div>
 
       {/* Пагинация */} 
@@ -109,7 +130,7 @@ export const Images = () => {
         onPageChange={handlePageChange}
         onItemsPerPageChange={handleItemsPerPageChange}
         itemsPerPageOptions={[50, 80, 100]}
-        loading={false}
+        loading={loading}
       />
           
       <div className="dashboard-content">
@@ -138,7 +159,6 @@ export const Images = () => {
                         loading="lazy"
                         className="image-thumbnail"
                         onError={(e) => {
-                          // Если миниатюра не загрузилась, попробуем загрузить оригинал
                           e.target.src = getFullImageUrl(image.url);
                         }}
                       />

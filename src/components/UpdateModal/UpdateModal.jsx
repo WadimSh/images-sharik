@@ -84,7 +84,7 @@ export const UpdateModal = ({
         <div className="modal-body update-modal-body">
           {isLoading ? (
             <div className="update-loading">
-              <div className="spinner"></div>
+              <div className="spinners"></div>
               <p>Загрузка информации об обновлениях...</p>
             </div>
           ) : error ? (

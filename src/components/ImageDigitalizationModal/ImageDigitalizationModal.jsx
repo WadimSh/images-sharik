@@ -4,6 +4,32 @@ import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
 import './ImageDigitalizationModal.css';
 
+// Функция для получения цвета тега
+const getTagColor = (tag) => {
+  if (tag === "нет кода") {
+    return 'rgba(244, 67, 54, 0.7)'; // полупрозрачный красный для "нет кода"
+  }
+  
+  // Для других тегов генерируем случайный цвет или используем хеш
+  const colors = [
+    'rgba(66, 133, 244, 0.4)',   // синий
+    'rgba(52, 168, 83, 0.4)',    // зеленый
+    'rgba(251, 188, 4, 0.4)',    // желтый
+    'rgba(171, 71, 188, 0.4)',   // фиолетовый
+    'rgba(0, 150, 136, 0.4)',    // бирюзовый
+    'rgba(255, 152, 0, 0.4)',    // оранжевый
+    'rgba(96, 125, 139, 0.4)',   // серо-голубой
+    'rgba(156, 39, 176, 0.4)',   // фиолетовый
+  ];
+  
+  // Используем хеш тега для детерминированного выбора цвета
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
+
 export const ImageDigitalizationModal = ({
   isOpen, 
   onClose,
@@ -14,6 +40,7 @@ export const ImageDigitalizationModal = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
   const [currentImageData, setCurrentImageData] = useState(imageData);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [tagColors, setTagColors] = useState({});
 
   useEffect(() => {
     if (isOpen) {
@@ -36,6 +63,15 @@ export const ImageDigitalizationModal = ({
     if (images && imageData) {
       const index = images.findIndex(img => img._id === imageData._id);
       setCurrentImageIndex(index >= 0 ? index : currentIndex);
+      
+      // Генерируем цвета для тегов текущего изображения
+      if (imageData.tags && Array.isArray(imageData.tags)) {
+        const colors = {};
+        imageData.tags.forEach(tag => {
+          colors[tag] = getTagColor(tag);
+        });
+        setTagColors(colors);
+      }
     }
   }, [imageData, images, currentIndex]);
 
@@ -50,6 +86,15 @@ export const ImageDigitalizationModal = ({
     const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
     setCurrentImageIndex(newIndex);
     setCurrentImageData(images[newIndex]);
+    
+    // Обновляем цвета тегов для нового изображения
+    if (images[newIndex].tags && Array.isArray(images[newIndex].tags)) {
+      const colors = {};
+      images[newIndex].tags.forEach(tag => {
+        colors[tag] = getTagColor(tag);
+      });
+      setTagColors(colors);
+    }
   };
 
   const handleNextImage = (e) => {
@@ -59,6 +104,15 @@ export const ImageDigitalizationModal = ({
     const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
     setCurrentImageData(images[newIndex]);
+    
+    // Обновляем цвета тегов для нового изображения
+    if (images[newIndex].tags && Array.isArray(images[newIndex].tags)) {
+      const colors = {};
+      images[newIndex].tags.forEach(tag => {
+        colors[tag] = getTagColor(tag);
+      });
+      setTagColors(colors);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -149,6 +203,7 @@ export const ImageDigitalizationModal = ({
 
   const fullImageUrl = `https://mp.sharik.ru${currentImageData.url}`;
   const fullThumbnailUrl = `https://mp.sharik.ru${currentImageData.thumbnailUrl}`;
+  const tags = currentImageData.tags || [];
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
@@ -167,7 +222,7 @@ export const ImageDigitalizationModal = ({
         
         <div className="modal-bodies">
           <div className="image-modal-container">
-            {/* Левая часть - изображение */}
+            {/* Левая часть - изображение с тегами */}
             <div className="image-modal-preview">
               <div className="modal-image-container">
                 <img
@@ -178,6 +233,27 @@ export const ImageDigitalizationModal = ({
                     e.target.src = fullThumbnailUrl;
                   }}
                 />
+                
+                {/* Теги поверх изображения */}
+                {tags.length > 0 && (
+                  <div className="image-tags-overlay">
+                    <div className="tags-container-overlay">
+                      {tags.map((tag, index) => (
+                        <span 
+                          key={index}
+                          className="tag-overlay"
+                          style={{
+                            backgroundColor: tagColors[tag],
+                            transform: `translateX(${index * 5}px)`,
+                            zIndex: tags.length - index
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -224,15 +300,15 @@ export const ImageDigitalizationModal = ({
                 
               </div>
               <div className="info-item" style={{ marginTop: 'auto' }}>
-                    <button 
-                      className="downloads-btn"
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                    >
-                      <HiOutlineDownload size={16} />
-                      <span>{isDownloading ? 'Скачивание...' : 'Скачать'}</span>
-                    </button>
-                  </div>
+                <button 
+                  className="downloads-btn"
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                >
+                  <HiOutlineDownload size={16} />
+                  <span>{isDownloading ? 'Скачивание...' : 'Скачать'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

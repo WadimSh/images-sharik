@@ -52,8 +52,36 @@ export async function apiGetAllImages(params = {}) {
   });
 };
 
-export async function apiGetImage(id) {
-  return fetchDataWithFetch(`/api/files/${id}`, {
-    method: 'GET'
-  });
+export const uploadGraphicFile = async (id, file, signal = null, tags = []) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+  
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Неверный формат файла. Разрешены только изображения (JPEG, PNG, GIF, WebP, SVG)');
+  }
+
+  const maxSize = 100 * 1024 * 1024; 
+  if (file.size > maxSize) {
+    throw new Error(`Файл слишком большой. Максимальный размер: ${(maxSize / 1024 / 1024).toFixed(0)}MB`);
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  if (tags.length > 0) {
+    formData.append('tags', JSON.stringify(tags));
+  }
+
+  try {
+    const response = await fetchDataWithFetch(`/api/upload/${id}`, {
+      method: 'POST',
+      data: formData,
+      timeout: 120000, 
+      signal
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Ошибка загрузки файла:', error);
+    throw error;
+  }
 };

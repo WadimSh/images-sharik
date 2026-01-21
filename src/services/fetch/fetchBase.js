@@ -46,7 +46,7 @@ const createRequestConfig = (options, accessToken, signal) => {
         credentials: 'include',
         signal,
         headers: {
-            'Content-Type': 'application/json',
+            ...(data && !(data instanceof FormData) && { 'Content-Type': 'application/json' }),
             ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
             ...options.headers,
         },
@@ -54,7 +54,7 @@ const createRequestConfig = (options, accessToken, signal) => {
     };
 
     if (data) {
-        config.body = JSON.stringify(data);
+      config.body = data instanceof FormData ? data : JSON.stringify(data);
     }
 
     return config;
@@ -89,7 +89,7 @@ export async function fetchDataWithFetch(url, options = {}) {
         let config = createRequestConfig(originalOptions, accessToken, signal);
 
         // Логируем размер запроса
-        if (config.body) {
+        if (config.body && !(config.body instanceof FormData)) {
             const requestSize = new Blob([config.body]).size;
             console.log(`📦 Размер запроса ${url}: ${(requestSize / 1024 / 1024).toFixed(2)} MB`);
         }

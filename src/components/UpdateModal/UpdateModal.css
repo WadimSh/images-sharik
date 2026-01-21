@@ -64,7 +64,7 @@
   gap: 16px;
 }
 
-.spinner {
+.spinners {
   width: 40px;
   height: 40px;
   border: 3px solid var(--color-border, #e5e7eb);

@@ -1353,7 +1353,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
       ]
     }
   };
-
+  console.log(containerSize)
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -1387,7 +1387,13 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
           />
         )}
 
-        <div style={{ marginLeft: 'auto' }}>
+<div style={{ display: 'flex', flexDirection: containerSize.fileName !== '1416x708' ? 'row' : 'column' }}>
+  
+        <div style={{ 
+            marginLeft: containerSize.fileName !== '1416x708' ? 'auto' : '0',
+            paddingBottom: containerSize.fileName !== '1416x708' ? '0' : '10px',
+          }}
+        >
           {(!isCollageMode && initialMetaDateElement !== null) ? (
             <ProductImagesGrid 
               images={initialMetaDateElement?.images}
@@ -1792,6 +1798,8 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
             containerSize={containerSize}
           />
         </div>
+</div>
+
         <div style={{ height: '100%' }}>
           <CanvasSizeSelector 
             currentSize={containerSize}
