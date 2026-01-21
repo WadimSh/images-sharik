@@ -25,6 +25,27 @@ const UploadProgress = () => {
     });
   };
 
+  // Подсчет файлов с тегом "нет кода"
+  const countFilesWithoutCode = () => {
+    const successfulResults = uploadResults.filter(r => r.status === 'success');
+    return successfulResults.filter(result => 
+      result.tags && result.tags.includes('нет кода')
+    ).length;
+  };
+
+  // Подсчет файлов с артикулами (с настоящими артикулами)
+  const countFilesWithArticles = () => {
+    const successfulResults = uploadResults.filter(r => r.status === 'success');
+    return successfulResults.filter(result => 
+      result.tags && 
+      result.tags.some(tag => tag !== 'нет кода' && /\d{4}-\d{4}/.test(tag))
+    ).length;
+  };
+
+  const filesWithoutCode = countFilesWithoutCode();
+  const filesWithArticles = countFilesWithArticles();
+  const successCount = uploadResults.filter(r => r.status === 'success').length;
+
   if (!isUploading && uploadResults.length === 0) {
     return null;
   }
@@ -33,7 +54,7 @@ const UploadProgress = () => {
   const progressPercentage = totalFilesCount > 0 
     ? Math.round((currentFileIndex / totalFilesCount) * 100) 
     : 0;
-  const successCount = uploadResults.filter(r => r.status === 'success').length;
+  const successCountTotal = uploadResults.filter(r => r.status === 'success').length;
   const failedCount = uploadResults.filter(r => r.status === 'failed').length;
 
   return (
@@ -41,7 +62,7 @@ const UploadProgress = () => {
       position: 'fixed',
       bottom: '20px',
       right: '20px',
-      width: '350px',
+      width: '380px',
       maxWidth: '90vw',
       zIndex: 1000,
       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -170,26 +191,27 @@ const UploadProgress = () => {
             </button>
           </div>
 
+          {/* Основная статистика */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '8px',
-            marginBottom: '15px'
+            marginBottom: '12px'
           }}>
             <div style={{
               textAlign: 'center',
-              padding: '8px',
+              padding: '10px',
               background: '#e8f5e8',
               borderRadius: '6px'
             }}>
               <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#2e7d32' }}>
-                {successCount}
+                {successCountTotal}
               </div>
               <div style={{ fontSize: '11px', color: '#555' }}>Успешно</div>
             </div>
             <div style={{
               textAlign: 'center',
-              padding: '8px',
+              padding: '10px',
               background: '#ffebee',
               borderRadius: '6px'
             }}>
@@ -200,6 +222,68 @@ const UploadProgress = () => {
             </div>
           </div>
 
+          {/* Статистика по тегам */}
+          {successCount > 0 && (
+            <div style={{
+              marginBottom: '15px',
+              padding: '12px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              border: '1px solid #e9ecef'
+            }}>
+                           
+              {/* Файлы без артикулов */}
+              {filesWithoutCode > 0 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px',
+                  backgroundColor: '#f8d7da',
+                  borderRadius: '4px',
+                  borderLeft: '4px solid #dc3545'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      width: '24px',
+                      height: '24px',
+                      backgroundColor: '#dc3545',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
+                    }}>
+                      ⚠️
+                    </span>
+                    <div>
+                      <div style={{ fontWeight: '500', fontSize: '13px', color: '#721c24' }}>
+                        Файлов без артикулов
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#6c757d' }}>
+                        Не найдены артикулы в имени файла
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ 
+                    fontSize: '20px', 
+                    fontWeight: 'bold', 
+                    color: '#721c24',
+                    minWidth: '40px',
+                    textAlign: 'center'
+                  }}>
+                    {filesWithoutCode}
+                  </div>
+                </div>
+              )}
+              
+              
+            </div>
+          )}
+
+          {/* Детали файлов */}
           <details>
             <summary style={{ 
               cursor: 'pointer', 
@@ -207,7 +291,7 @@ const UploadProgress = () => {
               fontWeight: '500',
               fontSize: '14px'
             }}>
-              Детали ({uploadResults.length} файлов)
+              Детали по файлам ({uploadResults.length})
             </summary>
             <div style={{ 
               maxHeight: '150px', 
@@ -219,27 +303,62 @@ const UploadProgress = () => {
               border: '1px solid #ddd',
               fontSize: '12px'
             }}>
-              {uploadResults.slice(0, 5).map((result, index) => (
+              {uploadResults.map((result, index) => (
                 <div key={index} style={{
-                  padding: '6px',
-                  marginBottom: '6px',
-                  borderLeft: `3px solid ${result.status === 'success' ? '#4caf50' : '#f44336'}`,
-                  backgroundColor: result.status === 'success' ? '#f1f8e9' : '#ffebee'
+                  padding: '8px',
+                  marginBottom: '8px',
+                  borderLeft: `3px solid ${result.status === 'success' ? 
+                    (result.tags && result.tags.includes('нет кода') ? '#ff9800' : '#4caf50') : 
+                    '#f44336'}`,
+                  backgroundColor: result.status === 'success' ? 
+                    (result.tags && result.tags.includes('нет кода') ? '#fff3e0' : '#f1f8e9') : 
+                    '#ffebee'
                 }}>
                   <div style={{ 
                     display: 'flex', 
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'flex-start',
+                    marginBottom: '4px'
                   }}>
-                    <span style={{ fontWeight: '500' }}>{result.file}</span>
+                    <div>
+                      <div style={{ fontWeight: '500' }}>{result.file}</div>
+                      {result.tags && result.tags.length > 0 && (
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '6px',
+                          marginTop: '4px',
+                          flexWrap: 'wrap'
+                        }}>
+                          {result.tags.map((tag, tagIndex) => (
+                            <span
+                              key={tagIndex}
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 6px',
+                                borderRadius: '10px',
+                                backgroundColor: tag === 'нет кода' ? '#ffcdd2' : '#e3f2fd',
+                                color: tag === 'нет кода' ? '#c62828' : '#1565c0'
+                              }}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <span style={{
                       fontSize: '11px',
-                      background: result.status === 'success' ? '#4caf50' : '#f44336',
+                      background: result.status === 'success' ? 
+                        (result.tags && result.tags.includes('нет кода') ? '#ff9800' : '#4caf50') : 
+                        '#f44336',
                       color: 'white',
                       padding: '1px 4px',
                       borderRadius: '4px'
                     }}>
-                      {result.status === 'success' ? '✅' : '❌'}
+                      {result.status === 'success' ? 
+                        (result.tags && result.tags.includes('нет кода') ? '⚠️' : '✅') : 
+                        '❌'}
                     </span>
                   </div>
                   {result.status === 'failed' && (
@@ -249,11 +368,6 @@ const UploadProgress = () => {
                   )}
                 </div>
               ))}
-              {uploadResults.length > 5 && (
-                <div style={{ textAlign: 'center', color: '#666', fontSize: '11px', padding: '5px' }}>
-                  ... и еще {uploadResults.length - 5} файлов
-                </div>
-              )}
             </div>
           </details>
         </div>
