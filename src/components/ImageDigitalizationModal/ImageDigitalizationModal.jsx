@@ -261,36 +261,36 @@ export const ImageDigitalizationModal = ({
                 <h4>Основная информация</h4>
                 <div className="info-grid">
                   <div className="info-item">
-                    <span className="info-label">Имя файла:</span>
-                    <span className="info-value" title={currentImageData.fileName}>
+                    <span className="infos-label">Имя файла:</span>
+                    <span className="infos-value" title={currentImageData.fileName}>
                       {currentImageData.fileName}
                     </span>
                   </div>
                   
-                  <div className="info-item">
-                    <span className="info-label">Размер изображения:</span>
-                    <span className="info-value">
+                  <div className="infos-item">
+                    <span className="infos-label">Размер изображения:</span>
+                    <span className="infos-value">
                       {currentImageData.width} × {currentImageData.height} px
                     </span>
                   </div>
                   
                   <div className="info-item">
-                    <span className="info-label">Объем файла:</span>
-                    <span className="info-value">
+                    <span className="infos-label">Объем файла:</span>
+                    <span className="infos-value">
                       {formatFileSize(currentImageData.size)}
                     </span>
                   </div>
                   
                   <div className="info-item">
-                    <span className="info-label">Автор:</span>
-                    <span className="info-value">
+                    <span className="infos-label">Автор:</span>
+                    <span className="infos-value">
                       {currentImageData.uploadedBy?.username || currentImageData.uploadedBy?.email}
                     </span>
                   </div>
                   
                   <div className="info-item">
-                    <span className="info-label">Загружено:</span>
-                    <span className="info-value">
+                    <span className="infos-label">Загружено:</span>
+                    <span className="infos-value">
                       {formatDate(currentImageData.uploadDate)}
                     </span>
                   </div>

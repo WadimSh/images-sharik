@@ -50,20 +50,20 @@ export const Home = () => {
   const UPDATE_CONFIG = {
     admin: {
       version: '2026-01-23-admin',
-      file: '/upload/changelog-files.md',
+      file: '/upload/changelog-admin.md',
       headerImage: 'none',
       key: 'update_modal_shown_admin'
     },
     uploader: {
       version: '2026-01-23-uploader',
-      file: '/upload/changelog-files.md',
+      file: '/upload/changelog-uploader.md',
       headerImage: 'none',
       key: 'update_modal_shown_uploader'
     },
     user: {
       version: '2026-01-20-user',
       file: '/upload/changelog-user.md',
-      headerImage: '/upload/update-header.png',
+      headerImage: 'none',
       key: 'update_modal_shown_user'
     }
   };

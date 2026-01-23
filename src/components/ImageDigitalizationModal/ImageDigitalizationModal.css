@@ -89,12 +89,12 @@
   height: 100%;
 }
 
-.info-item {
+.infos-item {
   display: flex;
   align-items: flex-start;
 }
 
-.info-label {
+.infos-label {
   flex: 0 0 140px;
   font-weight: 500;
   color: #666;
@@ -102,7 +102,7 @@
   padding-right: 12px;
 }
 
-.info-value {
+.infos-value {
   flex: 1;
   color: #333;
   font-size: 14px;
@@ -110,7 +110,7 @@
 }
 
 /* Для длинных имен файлов */
-.info-value[title] {
+.infos-value[title] {
   cursor: help;
 }
 

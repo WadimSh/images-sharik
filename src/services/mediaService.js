@@ -85,3 +85,9 @@ export const uploadGraphicFile = async (id, file, signal = null, tags = []) => {
     throw error;
   }
 };
+
+export const apiDeleteImage = async (id) => {
+  return fetchDataWithFetch(`/api/files/${id}`, {
+    method: 'DELETE'
+  });
+};

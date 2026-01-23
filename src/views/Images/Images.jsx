@@ -1,6 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
+import { FaTimes } from "react-icons/fa";
+import { RiDeleteBin2Line } from "react-icons/ri";
 
 import { ImageDigitalizationModal } from '../../components/ImageDigitalizationModal/ImageDigitalizationModal';
 import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
@@ -8,13 +10,49 @@ import FileUploadButton from '../../components/FileUploadButton';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUpload } from '../../contexts/UploadContext';
-import { apiGetAllImages } from '../../services/mediaService';
-import folder from '../../assets/folder.png'
+import { apiGetAllImages, apiDeleteImage } from '../../services/mediaService';
+import folder from '../../assets/folder.png';
+
+// Компонент модалки подтверждения удаления
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, fileName }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="delete-confirmation-modal">
+      <div className="delete-confirmation-content">
+        <div className="delete-confirmation-header">
+          <RiDeleteBin2Line className="warning-icon" />
+          <h3>Удаление изображения</h3>
+        </div>
+        
+        <div className="delete-confirmation-body">
+          <p>Вы уверены, что хотите удалить изображение <strong>"{fileName}"</strong>?</p>
+          <p className="warning-text">Это действие невозможно отменить. Изображение будет удалено навсегда.</p>
+        </div>
+        
+        <div className="delete-confirmation-footer">
+          <button 
+            className="btn btn-secondary"
+            onClick={onClose}
+          >
+            Отменить
+          </button>
+          <button 
+            className="btn btn-danger"
+            onClick={onConfirm}
+          >
+            Удалить
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const Images = () => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { uploadState } = useUpload(); // Для отслеживания состояния загрузки
 
   const [images, setImages] = useState([]);
@@ -25,6 +63,13 @@ export const Images = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [modalImage, setModalImage] = useState(false);
+  const [hoveredImageId, setHoveredImageId] = useState(null); // Для отслеживания наведения
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    imageId: null,
+    fileName: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadImagesFromBackend = useCallback(async () => {
     try {
@@ -57,6 +102,49 @@ export const Images = () => {
       setLoading(false);
     }
   }, [currentPage, itemsPerPage]);
+
+  // Функция удаления изображения
+  const handleDeleteImage = async () => {
+    if (!deleteModal.imageId) return;
+    
+    try {
+      setIsDeleting(true);
+      await apiDeleteImage(deleteModal.imageId);
+      
+      // Закрываем модалку
+      setDeleteModal({ isOpen: false, imageId: null, fileName: '' });
+      
+      // Перезагружаем изображения
+      await loadImagesFromBackend();
+      
+      // Если удаляемое изображение было выбрано в модалке, закрываем модалку
+      if (selectedImage && selectedImage._id === deleteModal.imageId) {
+        setModalImage(false);
+        setSelectedImage(null);
+      }
+      
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      alert('Произошла ошибка при удалении изображения');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Открытие модалки подтверждения удаления
+  const openDeleteConfirmation = (imageId, fileName, e) => {
+    e.stopPropagation(); // Останавливаем всплытие, чтобы не открывалась модалка просмотра
+    setDeleteModal({
+      isOpen: true,
+      imageId,
+      fileName
+    });
+  };
+
+  // Закрытие модалки подтверждения удаления
+  const closeDeleteConfirmation = () => {
+    setDeleteModal({ isOpen: false, imageId: null, fileName: '' });
+  };
 
   // Автоматическое обновление при изменении пагинации
   useEffect(() => {
@@ -173,7 +261,19 @@ export const Images = () => {
                     key={image._id} 
                     className="images_card"
                     onClick={() => handleImageClick(image)}
+                    onMouseEnter={() => setHoveredImageId(image._id)}
+                    onMouseLeave={() => setHoveredImageId(null)}
                   >
+                    {isAdmin && hoveredImageId === image._id && (
+                      <button 
+                        className="delete-image-btn"
+                        onClick={(e) => openDeleteConfirmation(image._id, image.fileName, e)}
+                        title="Удалить изображение"
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+
                     <div className="images-container">
                       <img
                         src={getFullImageUrl(image.thumbnailUrl)}
@@ -207,6 +307,13 @@ export const Images = () => {
           currentIndex={selectedImageIndex}
         />
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteConfirmation}
+        onConfirm={handleDeleteImage}
+        fileName={deleteModal.fileName}
+      />
     </div>
   );
 };
