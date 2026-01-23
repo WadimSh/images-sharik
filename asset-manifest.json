@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.3ebbca8a.css",
-    "main.js": "./static/js/main.c3536428.js",
+    "main.css": "./static/css/main.ebb117e8.css",
+    "main.js": "./static/js/main.c545ea40.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
@@ -32,14 +32,15 @@
     "static/media/roslyngothicmedium-dg-medium.ttf": "./static/media/roslyngothicmedium-dg-medium.de61a1de78c1fd4a9e07.ttf",
     "static/media/aa_badaboom.ttf": "./static/media/aa_badaboom.8f0fd95679075dcc294a.ttf",
     "static/media/helioscondblackc.otf": "./static/media/helioscondblackc.59913481f9583c718a3c.otf",
+    "static/media/folder.png": "./static/media/folder.73ca94ade226239dd4a7.png",
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
-    "main.3ebbca8a.css.map": "./static/css/main.3ebbca8a.css.map",
-    "main.c3536428.js.map": "./static/js/main.c3536428.js.map",
+    "main.ebb117e8.css.map": "./static/css/main.ebb117e8.css.map",
+    "main.c545ea40.js.map": "./static/js/main.c545ea40.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3ebbca8a.css",
-    "static/js/main.c3536428.js"
+    "static/css/main.ebb117e8.css",
+    "static/js/main.c545ea40.js"
   ]
 }
