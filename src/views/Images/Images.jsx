@@ -9,6 +9,7 @@ import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUpload } from '../../contexts/UploadContext';
 import { apiGetAllImages } from '../../services/mediaService';
+import folder from '../../assets/folder.png'
 
 export const Images = () => {
   const navigate = useNavigate();
@@ -141,8 +142,29 @@ export const Images = () => {
         ) : (
           <div style={{ paddingBottom: '86px' }}>
             {images.length === 0 ? (
-              <div style={{ color: '#333', fontSize: '16px', textAlign: 'center', marginTop: '20px' }}>
-                <span>Пока здесь ничего нет.</span>
+              <div style={{ 
+                color: '#333', 
+                fontSize: '16px', 
+                marginTop: '120px', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px' 
+              }}>
+                <img
+                  src={folder}
+                  style={{ 
+                    width: '300px',
+                    height: '300px',
+                    pointerEvents: 'none',
+                    objectFit: 'cover',
+                    transformOrigin: 'center',
+                  }}
+                />
+                <span style={{ textAlign: 'center', lineHeight: '20px' }}>
+                  Пусто, но полно потенциала.<br/> Добавьте изображения, чтобы наполнить библиотеку.
+                </span>
               </div>
             ) : (
               <div className="images-grids">

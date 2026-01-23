@@ -7,7 +7,7 @@ import { UpdateModal } from '../../components/UpdateModal/UpdateModal';
 import { useAuth } from '../../contexts/AuthContext';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
-import { data } from "../../assets/data";
+//import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';
@@ -19,7 +19,7 @@ export const Home = () => {
     : { query: '', articles: [] };
 
   const { t } = useContext(LanguageContext);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, isUploader } = useAuth();
   const [validArticles, setValidArticles] = useState(initialData.articles);
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
@@ -47,22 +47,50 @@ export const Home = () => {
 
   // модалка информирования об обновлении
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const UPDATE_VERSION = '2026-01-20';
-  const checkForUpdates = () => {
-    const lastShownVersion = localStorage.getItem('update_modal_shown');
-    return lastShownVersion !== UPDATE_VERSION;
+  const UPDATE_CONFIG = {
+    admin: {
+      version: '2026-01-23-admin',
+      file: '/upload/changelog-files.md',
+      headerImage: 'none',
+      key: 'update_modal_shown_admin'
+    },
+    uploader: {
+      version: '2026-01-23-uploader',
+      file: '/upload/changelog-files.md',
+      headerImage: 'none',
+      key: 'update_modal_shown_uploader'
+    },
+    user: {
+      version: '2026-01-20-user',
+      file: '/upload/changelog-user.md',
+      headerImage: '/upload/update-header.png',
+      key: 'update_modal_shown_user'
+    }
   };
+
+  const getConfig = () => {
+    if (isAdmin) return UPDATE_CONFIG.admin;
+    if (isUploader) return UPDATE_CONFIG.uploader;
+    return UPDATE_CONFIG.user;
+  };
+
+  const checkForUpdates = () => {
+    const config = getConfig();
+    const lastShownVersion = localStorage.getItem(config.key);
+    return lastShownVersion !== config.version;
+  };
+  
   useEffect(() => {
     const shouldShow = checkForUpdates();
     
-    if (shouldShow) {
+    if (shouldShow && isAuthenticated) {
       const timer = setTimeout(() => {
         setShowUpdateModal(true);
       }, 5000);
-      
+
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isAuthenticated, isAdmin, isUploader]);
 
   const loadTemplates = useCallback(async () => {
     if (templatesCache.current.loaded && templatesCache.current.data) {
@@ -455,28 +483,28 @@ export const Home = () => {
       const searchQuery = normalizedArticles.join(' ');
       const encodedSearch = encodeURIComponent(searchQuery);
 
-    //  fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
-    //    .then(response => response.json())
-    //    .then(data => {
-    //      if (data.results.length === 0) {
-    //        const message = t('views.homeMissingCode');
-    //        setInfoMessage(message);
-    //        return Promise.reject(message);
-    //      }
-    //    
-    //      const productIds = data.results.map(product => product.id);
-    //      const idsParam = productIds.join(',');
-    //      return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //    })
-    //    .then(response => response?.json())
-    //    .then(detailedData => {
-    //      if (!detailedData) return;
+      fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results.length === 0) {
+            const message = t('views.homeMissingCode');
+            setInfoMessage(message);
+            return Promise.reject(message);
+          }
+        
+          const productIds = data.results.map(product => product.id);
+          const idsParam = productIds.join(',');
+          return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+        })
+        .then(response => response?.json())
+        .then(detailedData => {
+          if (!detailedData) return;
 
         // Обрабатываем полученные данные API
-        const processedResults = processProductsData(data);
-        const processedMetaResults = processProductsMeta(data);
-        //const processedResults = processProductsData(detailedData);
-        //const processedMetaResults = processProductsMeta(detailedData);
+        //const processedResults = processProductsData(data);
+        //const processedMetaResults = processProductsMeta(data);
+        const processedResults = processProductsData(detailedData);
+        const processedMetaResults = processProductsMeta(detailedData);
 
         // Сохраняем в sessionStorage
         processedResults.forEach(item => {
@@ -506,16 +534,16 @@ export const Home = () => {
         }));
 
         return processedResults;
-    //  })
-    //  .catch(error => {
-    //    console.error('Error:', error);
-    //    setError(error.message || "An error occurred");
-    //    setValidArticles([]);
-    //    setIsSearchActive(false);
-    //  })
-    //  .finally(() => {
-    //    setLoading(false);
-    //  });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setError(error.message || "An error occurred");
+        setValidArticles([]);
+        setIsSearchActive(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {
@@ -550,13 +578,19 @@ export const Home = () => {
           ))}
         />
       )}
-      {(showUpdateModal && isAuthenticated) && (
-        <UpdateModal
-          isOpen={showUpdateModal}
-          onClose={() => setShowUpdateModal(false)}
-          data={UPDATE_VERSION}
-        />
-      )}
+      {(showUpdateModal && isAuthenticated) && (() => {
+        const config = getConfig();
+        return (
+          <UpdateModal
+            isOpen={showUpdateModal}
+            onClose={() => setShowUpdateModal(false)}
+            data={config.version}
+            markdownFile={config.file}
+            headerImage={config.headerImage}
+            localStorageKey={config.key}
+          />
+        );
+      })()}
     </div>
   );
 };

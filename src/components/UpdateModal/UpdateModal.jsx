@@ -5,10 +5,10 @@ import './UpdateModal.css';
 export const UpdateModal = ({
   isOpen,
   onClose,
-  markdownFile = '/upload/changelog.md',
-  localStorageKey = 'update_modal_shown',
+  markdownFile,
+  localStorageKey,
   data,
-  headerImage = '/upload/update-header.png' 
+  headerImage 
 }) => {
   const [markdownContent, setMarkdownContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +68,7 @@ export const UpdateModal = ({
         {/* Хедер с картинкой */}
         <div className="update-modal-header-with-image">
           {headerImage && (
-            <div className="header-image-container">
+            <div className="header-image-container" style={headerImage === 'none' ? { height: '160px' } : {}}>
               <img 
                 src={headerImage} 
                 alt="Обновление" 
