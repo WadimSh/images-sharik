@@ -29,7 +29,7 @@ export const ElementToolbar = ({ onAddElement, isBackground }) => {
         <Tooltip 
           key={tool.type}
           content={t(tool.title)}
-          position="bottom"
+          position={tool.type === 'product' ? "bottom-shift-left" : "bottom"}
         >
           <button 
             key={tool.type}

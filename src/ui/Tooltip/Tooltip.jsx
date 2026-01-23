@@ -1,47 +1,52 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './Tooltip.css';
 
-export const Tooltip = ({ children, content, position = 'top' }) => {
-  const triggerRef = useRef(null);
+export const Tooltip = ({ 
+  children, 
+  content, 
+  position = 'top' 
+}) => {
   const [visible, setVisible] = useState(false);
-  const [tooltipStyle, setTooltipStyle] = useState({});
-  const [arrowStyle, setArrowStyle] = useState({});
+  const triggerRef = useRef(null);
+  const tooltipRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const style = {};
-    const arrowPos = {};
-
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    const trigger = triggerRef.current;
-    const triggerRect = trigger.getBoundingClientRect();
-    
-    if (position = "bottom") {
-      const slagRight = viewportWidth - triggerRect.right;
-      if (slagRight < 50) {
-        style.left = '0%';
-        arrowPos.left= '67%'
-      } 
+    if (visible) {
+      // Даём время на применение стилей
+      requestAnimationFrame(() => {
+        setReady(true);
+      });
+    } else {
+      setReady(false);
     }
-    setTooltipStyle(style);
-    setArrowStyle(arrowPos);
-  }, [visible])
+  }, [visible]);
+
+  const handleMouseEnter = () => {
+    setVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setVisible(false);
+  };
 
   return (
     <div className="tooltip-wrapper">
       <div
         ref={triggerRef}
-        className={`tooltip-trigger`}
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
+        className="tooltip-trigger"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {children}
       </div>
       {visible && (
-        <div className={`tooltip ${position}`} style={tooltipStyle}>
+        <div 
+          ref={tooltipRef}
+          className={`tooltip ${position} ${ready ? 'visible' : ''}`}
+        >
           {content}
-          <div className={`tooltip-arrow ${position}`} style={arrowStyle} />
+          <div className={`tooltip-arrow ${position}`} />
         </div>
       )}
     </div>

@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
+import { Tooltip } from "../ui/Tooltip/Tooltip";
 
 const SearchHeader = ({ 
   onSearch, 
@@ -26,7 +27,7 @@ const SearchHeader = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, isUploader } = useAuth();
 
   const headerRightRef = useRef(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
@@ -154,16 +155,36 @@ const SearchHeader = ({
           </button>
         )*/}
         {
-          <button onClick={handleMediaClick} className="creat-temp-button">
-            <MdOutlinePermMedia className="creat-temp-icon" />
-            <span>Изображения</span>
-          </button>
+          <Tooltip
+            content={t('header.gallery')}
+            position='bottom'
+          >
+            <button onClick={handleGalleryClick} className="creat-temp-button">
+              <IoFolderOpen className="creat-temp-icon" />
+            </button>
+          </Tooltip>
         }
+        {(isAdmin || isUploader) && (
+          <Tooltip
+            content={t('header.library')}
+            position='bottom'
+          >
+            <button onClick={handleMediaClick} className="creat-temp-button">
+              <MdOutlinePermMedia className="creat-temp-icon" />
+            </button>
+          </Tooltip>
+          
+        )}
         {isAdmin && (
-          <button onClick={handleReportClick} className="creat-temp-button">
-            <TbReport className="creat-temp-icon" />
-            <span>Отчеты</span>
-          </button>
+          <Tooltip
+            content={t('header.reports')}
+            position='bottom'
+          >
+            <button onClick={handleReportClick} className="creat-temp-button">
+              <TbReport className="creat-temp-icon" />
+            </button>
+          </Tooltip>
+          
         )}
         <LanguageSwitcher />
       </div>
@@ -255,9 +276,6 @@ const SearchHeader = ({
         <MarketplaceSwitcher />
         <button onClick={handleToggleCollage} className="template-button" style={{ background: 'transparent' }}>
           <RiCollageFill /> {t('header.createCollage')}
-        </button>
-        <button onClick={handleGalleryClick} className="template-button" style={{ background: 'transparent' }}>
-          <IoFolderOpen /> {t('header.gallery')}
         </button>
       </div>}
       {/*isPinModalOpen && (

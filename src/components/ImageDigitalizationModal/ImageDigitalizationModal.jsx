@@ -10,7 +10,6 @@ const getTagColor = (tag) => {
     return 'rgba(244, 67, 54, 0.7)'; // полупрозрачный красный для "нет кода"
   }
   
-  // Для других тегов генерируем случайный цвет или используем хеш
   const colors = [
     'rgba(66, 133, 244, 0.4)',   // синий
     'rgba(52, 168, 83, 0.4)',    // зеленый
@@ -22,7 +21,6 @@ const getTagColor = (tag) => {
     'rgba(156, 39, 176, 0.4)',   // фиолетовый
   ];
   
-  // Используем хеш тега для детерминированного выбора цвета
   let hash = 0;
   for (let i = 0; i < tag.length; i++) {
     hash = tag.charCodeAt(i) + ((hash << 5) - hash);
@@ -286,7 +284,7 @@ export const ImageDigitalizationModal = ({
                   <div className="info-item">
                     <span className="info-label">Автор:</span>
                     <span className="info-value">
-                      {currentImageData.uploadedBy?.name || currentImageData.uploadedBy?.email}
+                      {currentImageData.uploadedBy?.username || currentImageData.uploadedBy?.email}
                     </span>
                   </div>
                   
@@ -336,7 +334,6 @@ export const ImageDigitalizationModal = ({
           <button 
             className="modal-nav-btn modal-nav-prev"
             onClick={handlePrevImage}
-            aria-label="Предыдущее изображение"
           >
             <HiOutlineChevronLeft size={28} />
           </button>
@@ -344,7 +341,6 @@ export const ImageDigitalizationModal = ({
           <button 
             className="modal-nav-btn modal-nav-next"
             onClick={handleNextImage}
-            aria-label="Следующее изображение"
           >
             <HiOutlineChevronRight size={28} />
           </button>

@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
+const USER_ROLES = {
+  UPLOADER: "69732b81f7e443bd673e7575",
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-
+  const [isUploader, setIsUploader] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const navigate = useNavigate();
 
   // Функция для проверки, является ли пользователь администратором
@@ -17,7 +22,6 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
 
-    // Получаем ID компании пользователя (предполагаем, что пользователь принадлежит к одной компании)
     const userCompanyId = userData.company?.[0]?.id;
     const userRoleId = userData.roles?.[0]?.id;
 
@@ -25,12 +29,15 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
 
-    // Проверяем, есть ли в adminCompanies запись с совпадающими company и role
     const isAdminUser = userData.adminCompanies.some(adminCompany => 
       adminCompany.company === userCompanyId && adminCompany.role === userRoleId
     );
 
     return isAdminUser;
+  };
+
+  const checkIsUploader = (userData) => {
+    return userData?.roles?.some(role => role.id === USER_ROLES.UPLOADER) || false;
   };
 
   // Проверяем сохраненные данные при инициализации
@@ -44,7 +51,8 @@ export const AuthProvider = ({ children }) => {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
           setIsAuthenticated(true);
-          setIsAdmin(checkIsAdmin(parsedUser))
+          setIsAdmin(checkIsAdmin(parsedUser));
+          setIsUploader(checkIsUploader(parsedUser));
         }
       } catch (error) {
         console.error('Error restoring auth:', error);
@@ -68,11 +76,13 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
 
       const adminStatus = checkIsAdmin(userData);
+      const uploader = checkIsUploader(userData);
       
       // Обновляем контекст
       setUser(userData);
       setIsAuthenticated(true);
       setIsAdmin(adminStatus);
+      setIsUploader(uploader);
       
       return { user: userData, isAdmin: adminStatus };
     } catch (error) {
@@ -91,6 +101,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
+      setIsUploader(false);
       
       // Перенаправляем на страницу входа
       navigate('/sign-in', { replace: true });
@@ -105,6 +116,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
       setIsAdmin(checkIsAdmin(updateUser));
+      setIsUploader(checkIsUploader(updateUser))
     } catch (error) {
       console.error('Error updating user:', error);
     }
@@ -151,6 +163,7 @@ export const AuthProvider = ({ children }) => {
         logout, 
         updateUser,
         isAdmin,
+        isUploader,
         getAdminCompaniesForCurrentUser,
         isAdminOfCompany
       }}

@@ -17,7 +17,14 @@
   white-space: nowrap;
   z-index: 999999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.2s ease-out;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  visibility: hidden;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .tooltip.top {
@@ -31,6 +38,13 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
+  margin-top: 8px;
+}
+
+.tooltip.bottom-shift-left {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-80%);
   margin-top: 8px;
 }
 
@@ -66,6 +80,14 @@
 .tooltip-arrow.bottom {
   top: -4px;
   left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px;
+  border-color: transparent transparent #333;
+}
+
+.tooltip-arrow.bottom-shift-left {
+  top: -4px;
+  left: 80%;
   transform: translateX(-50%);
   border-width: 0 5px 5px;
   border-color: transparent transparent #333;
