@@ -313,10 +313,9 @@ const ImageUploadModal = ({
           {isMobile && step === 1 && (
             <div className="mobile-upload-hint">
               <div className="hint-content">
-                <strong>Подготовьте изображение перед загрузкой:</strong>
                 <span>
-                  Убедитесь в хорошем качестве изображения, обрежьте лишние области вокруг объекта и
-                  проверьте ориентацию (рекомендуется горизонтальная)
+                  <strong>Обратите внимание!</strong> 
+                  Перед загрузкой обработайте фото в галерее вашего телефона: улучшите качество и обрежьте лишнее.
                 </span>
               </div>
             </div>
@@ -427,7 +426,7 @@ const ImageUploadModal = ({
                       disabled={!customTag.trim()}
                       className="image-upload-add-tag-btn"
                     >
-                      <FiPlus />
+                      <FiPlus />  Добавить
                     </button>
                   </div>
 

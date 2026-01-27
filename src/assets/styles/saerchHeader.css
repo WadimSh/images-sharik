@@ -230,7 +230,7 @@ h2 {
     padding: 0; /* Убираем padding */
     
     /* Градиентный фон */
-    background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    background: linear-gradient(135deg, #007bff 0%, #339af0 100%);
     
     /* Тень для выделения */
     box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3),
