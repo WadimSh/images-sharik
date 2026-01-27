@@ -34,6 +34,13 @@
   margin-bottom: 8px;
 }
 
+.tooltip.top-shift-left {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-80%);
+  margin-bottom: 8px;
+}
+
 .tooltip.bottom {
   top: 100%;
   left: 50%;
@@ -72,6 +79,14 @@
 .tooltip-arrow.top {
   bottom: -4px;
   left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0;
+  border-color: #333 transparent transparent;
+}
+
+.tooltip-arrow.top-shift-left {
+  bottom: -4px;
+  left: 80%;
   transform: translateX(-50%);
   border-width: 5px 5px 0;
   border-color: #333 transparent transparent;

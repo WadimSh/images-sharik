@@ -4,6 +4,7 @@ import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 import { TbReport } from "react-icons/tb";
 import { MdOutlinePermMedia } from "react-icons/md";
+import { LuImagePlus } from "react-icons/lu";
 // import { MdCreateNewFolder } from "react-icons/md";
 
 // import PinModal from "../ui/PinModal/PinModal";
@@ -13,6 +14,50 @@ import { productsDB, slidesDB } from "../utils/handleDB";
 import MarketplaceSwitcher from "../ui/MarketplaceSwitcher/MarketplaceSwitcher";
 import LanguageSwitcher from "../ui/LanguageSwitcher/LanguageSwitcher";
 import { Tooltip } from "../ui/Tooltip/Tooltip";
+import { uploadGraphicFile } from '../services/mediaService';
+import ImageUploadModal from '../components/ImageUploadModal/ImageUploadModal';
+
+const transliterateFileName = (filename) => {
+  const translitMap = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
+    'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+    'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+    'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+    'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch',
+    'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '',
+    'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D',
+    'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh', 'З': 'Z', 'И': 'I',
+    'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N',
+    'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T',
+    'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch',
+    'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '',
+    'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+  };
+  
+  let result = filename.replace(/[а-яёА-ЯЁ]/g, char => translitMap[char] || char);
+  
+  result = result.replace(/[^\w\s.-]/g, '_'); 
+  result = result.replace(/\s+/g, '_'); 
+  result = result.replace(/_+/g, '_'); 
+  result = result.replace(/^_+|_+$/g, ''); 
+  
+  return result;
+};
+
+const showUploadNotification = () => {
+    
+  return {
+    success: (data) => {
+      console.log('✅ Загрузка успешна:', data);
+      alert(`✅ ${data.message}`);
+    },
+    error: (data) => {
+      console.log('❌ Ошибка загрузки:', data);
+      alert(`❌ ${data.message}: ${data.error}`);
+    }
+  };
+};
 
 const SearchHeader = ({ 
   onSearch, 
@@ -31,7 +76,22 @@ const SearchHeader = ({
 
   const headerRightRef = useRef(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [originalFileName, setOriginalFileName] = useState('');
   // const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 570);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
   
   const getUserName = () => {
     if (!user) return null;
@@ -80,6 +140,90 @@ const SearchHeader = ({
       return;
     }
       navigate('/gallery');
+  };
+
+  const handleImageClick = () => {
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+    
+    // Создаем скрытый input для выбора файла
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Проверка типа файла
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Разрешены только JPEG, PNG и WebP файлы');
+        return;
+      }
+      
+      // Проверка размера (100MB)
+      const maxSize = 100 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('Файл превышает размер 100MB');
+        return;
+      }
+      
+      setSelectedFile(file);
+      setOriginalFileName(file.name);
+      setIsModalOpen(true);
+    };
+    
+    input.click();
+  };
+
+  const handleUpload = async (newFileName, articles) => {
+    if (!selectedFile) return;
+
+    const uploadNotification = showUploadNotification(selectedFile.name);
+
+    try {
+      // Транслитерация имени файла
+      let finalFileName = transliterateFileName(newFileName);
+
+      // Добавляем расширение, если его нет
+      const originalExtension = selectedFile.name.split('.').pop();
+      if (!finalFileName.includes('.')) {
+        finalFileName = `${finalFileName}.${originalExtension}`;
+      }
+
+      // Создаем новый файл с транслитерированным именем
+      const blob = new Blob([selectedFile], { type: selectedFile.type });
+      const processedFile = new File([blob], finalFileName, {
+        type: selectedFile.type,
+        lastModified: selectedFile.lastModified
+      });
+
+      // Загружаем файл
+      const result = await uploadGraphicFile(
+        user.company[0].id,
+        processedFile,
+        null, 
+        articles 
+      );
+
+      // Показываем успешное уведомление
+      uploadNotification.success({
+        title: `Файл ${newFileName}`,
+        message: "Успешно загружен",
+        error: null // В success ошибки нет
+      });
+
+    } catch (error) {
+      // Показываем уведомление об ошибке
+      uploadNotification.error({
+        title: 'Ошибка',
+        message: `Не удалось загрузить файл "${newFileName}"`,
+        error: error.message
+      });
+    }
   };
 
   const handleReportClick = async () => {
@@ -164,6 +308,16 @@ const SearchHeader = ({
             </button>
           </Tooltip>
         }
+        {<div className="creat-image-wrapper">
+          <Tooltip
+            content={t('Загрузить изображение')}
+            position={isMobile ? 'top-shift-left' : 'bottom'}
+          >
+            <button onClick={handleImageClick} className="creat-image-button">
+              <LuImagePlus className="creat-image-icon" />
+            </button>
+          </Tooltip>
+        </div>}
         {(isAdmin || isUploader) && (
           <Tooltip
             content={t('header.library')}
@@ -284,6 +438,15 @@ const SearchHeader = ({
         onClose={() => setIsPinModalOpen(false)} 
       />
       )*/}
+      <ImageUploadModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedFile(null);
+        }}
+        onUpload={handleUpload}
+        initialFileName={originalFileName}
+      />
     </div>
   );
 };

@@ -46,8 +46,6 @@ const createTransliteratedFile = (originalFile) => {
     lastModified: originalFile.lastModified
   });
   
-  console.log(`📝 Переименование файла: "${originalFile.name}" → "${newFileName}"`);
-  
   return newFile;
 };
 
@@ -125,10 +123,7 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
       for (let i = 0; i < files.length; i++) {
         const originalFile = files[i];
         
-        if (controller.signal.aborted) {
-          console.log('Загрузка прервана пользователем');
-          break;
-        }
+        if (controller.signal.aborted) { break };
 
         updateUploadState({ currentFileIndex: i + 1 });
         
@@ -155,13 +150,6 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
           // Извлекаем артикулы из ОРИГИНАЛЬНОГО имени (чтобы не потерять артикулы)
           const originalFileNameWithoutExt = getFileNameWithoutExtension(originalFile.name);
           const extractedTags = extractArticleNumbers(originalFileNameWithoutExt);
-          
-          console.log(`📤 Загрузка файла:`, {
-            originalName: originalFile.name,
-            processedName: processedFile.name,
-            extractedTags: extractedTags,
-            hasCyrillic: containsCyrillic(originalFile.name)
-          });
           
           // Загружаем ОБРАБОТАННЫЙ файл с тегами из ОРИГИНАЛЬНОГО имени
           const result = await uploadGraphicFile(id, processedFile, controller.signal, extractedTags);
@@ -250,7 +238,7 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
         ref={fileInputRef}
         onChange={handleFileChange}
         style={{ display: 'none' }}
-        accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+        accept="image/jpeg,image/png,image/webp"
         multiple
       />
     </>

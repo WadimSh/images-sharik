@@ -186,3 +186,87 @@ h2 {
   color: #333;
   font-size: 22px;
 }
+
+/* Существующие стили остаются */
+.creat-image-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative; /* Добавляем для позиционирования */
+}
+
+.creat-image-button:hover {
+  background-color: #e8e8e8;
+}
+
+.creat-image-icon {
+  color: #333;
+  font-size: 22px;
+  transition: all 0.3s ease;
+}
+
+/* Стили для экранов меньше 570px */
+@media screen and (max-width: 570px) {
+  .creat-image-wrapper {
+    position: fixed; /* Фиксированное позиционирование */
+    bottom: 20px; /* Отступ от низа */
+    right: 20px; /* Отступ от правого края */
+    z-index: 1000; /* Поверх других элементов */
+  }
+  
+  /* Стили для самой кнопки */
+  .creat-image-button {
+    /* Круглая форма */
+    width: 56px; /* Фиксированная ширина */
+    height: 56px; /* Фиксированная высота */
+    border-radius: 50%; /* Круг */
+    padding: 0; /* Убираем padding */
+    
+    /* Градиентный фон */
+    background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    
+    /* Тень для выделения */
+    box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3),
+                0 8px 24px rgba(0, 0, 0, 0.1);
+    
+    /* Центрирование иконки */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Анимация при hover */
+    transition: all 0.3s ease, transform 0.2s ease;
+  }
+  
+  /* Эффект при наведении на мобилке */
+  .creat-image-button:hover {
+    background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
+    transform: scale(1.05); /* Легкое увеличение */
+    box-shadow: 0 6px 16px rgba(51, 154, 240, 0.4),
+                0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Эффект при нажатии (активном состоянии) */
+  .creat-image-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Стили для иконки на мобилке */
+  .creat-image-icon {
+    color: white; /* Белая иконка */
+    font-size: 24px; /* Чуть больше размер */
+    margin: 0; /* Убираем margin */
+  }
+  
+  /* Скрываем текст, если он есть в кнопке */
+  .creat-image-button span {
+    display: none;
+  }
+}

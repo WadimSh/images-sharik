@@ -32,13 +32,13 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, fileName }) => {
         
         <div className="delete-confirmation-footer">
           <button 
-            className="btn btn-secondary"
+            className="delete-btn delete-btn-secondary"
             onClick={onClose}
           >
             Отменить
           </button>
           <button 
-            className="btn btn-danger"
+            className="delete-btn delete-btn-danger"
             onClick={onConfirm}
           >
             Удалить
@@ -268,7 +268,6 @@ export const Images = () => {
                       <button 
                         className="delete-image-btn"
                         onClick={(e) => openDeleteConfirmation(image._id, image.fileName, e)}
-                        title="Удалить изображение"
                       >
                         <FaTimes />
                       </button>

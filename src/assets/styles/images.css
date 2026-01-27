@@ -219,7 +219,7 @@
 }
 
 /* Стили для кнопок */
-.btn {
+.delete-btn {
   padding: 10px 20px;
   border-radius: 4px;
   border: none;
@@ -230,25 +230,25 @@
   min-width: 100px;
 }
 
-.btn-secondary {
+.delete-btn-secondary {
   background: #6c757d;
   color: white;
 }
 
-.btn-secondary:hover {
+.delete-btn-secondary:hover {
   background: #5a6268;
 }
 
-.btn-danger {
+.delete-btn-danger {
   background: #dc3545;
   color: white;
 }
 
-.btn-danger:hover {
+.delete-btn-danger:hover {
   background: #c82333;
 }
 
-.btn-danger:disabled {
+.delete-btn-danger:disabled {
   background: #e35d6a;
   cursor: not-allowed;
 }

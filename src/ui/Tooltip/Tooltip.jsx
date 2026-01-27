@@ -4,7 +4,7 @@ import './Tooltip.css';
 export const Tooltip = ({ 
   children, 
   content, 
-  position = 'top' 
+  position = 'top'
 }) => {
   const [visible, setVisible] = useState(false);
   const triggerRef = useRef(null);

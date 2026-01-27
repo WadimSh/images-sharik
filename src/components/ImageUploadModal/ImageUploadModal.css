@@ -1,0 +1,313 @@
+.image-upload-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.image-upload-modal-container {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+}
+
+.image-upload-modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-upload-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.image-upload-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.image-upload-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.image-upload-modal-close:hover {
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.image-upload-modal-body {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+}
+
+.image-upload-form-group {
+  margin-bottom: 24px;
+}
+
+.image-upload-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #212529;
+  font-size: 14px;
+  text-align: start;
+}
+
+.image-upload-file-name-input,
+.image-upload-article-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  box-sizing: border-box; /* Важно! */
+}
+
+.image-upload-file-name-input:focus,
+.image-upload-article-input:focus {
+  outline: 0;
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.15);
+}
+
+.image-upload-article-input.error {
+  border-color: #fa5252;
+}
+
+.image-upload-article-input.error:focus {
+  border-color: #fa5252;
+  box-shadow: 0 0 0 3px rgba(250, 82, 82, 0.15);
+}
+
+.image-upload-articles-container {
+  margin-bottom: 12px;
+}
+
+.image-upload-article-input-wrapper {
+  margin-bottom: 12px;
+}
+
+.image-upload-article-input-group {
+  position: relative;
+  width: 100%;
+}
+
+.image-upload-article-input {
+  padding-right: 40px; /* Место для кнопки удаления */
+}
+
+.image-upload-remove-article-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #adb5bd;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.image-upload-remove-article-btn:hover {
+  color: #fa5252;
+  background: #fff5f5;
+}
+
+.image-upload-remove-article-btn span {
+  display: block;
+  line-height: 1;
+}
+
+.image-upload-error-message {
+  color: #fa5252;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  padding-left: 8px;
+  text-align: start;
+}
+
+.image-upload-input-hint {
+  color: #6c757d;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 8px;
+  display: block;
+  text-align: start;
+}
+
+.image-upload-add-article-btn {
+  background: transparent;
+  border: 1px dashed #adb5bd;
+  color: #495057;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  margin-top: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.image-upload-add-article-btn:hover {
+  background: #f8f9fa;
+  border-color: #4dabf7;
+  color: #4dabf7;
+}
+
+.image-upload-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.image-upload-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.image-upload-btn-primary {
+  background: #4dabf7;
+  color: white;
+  border: 1px solid #4dabf7;
+}
+
+.image-upload-btn-primary:hover:not(.disabled) {
+  background: #339af0;
+  border-color: #339af0;
+}
+
+.image-upload-btn-primary.disabled {
+  background: #e9ecef;
+  color: #adb5bd;
+  border-color: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.image-upload-btn-secondary {
+  background: white;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.image-upload-btn-secondary:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+/* Убираем горизонтальный скролл */
+.image-upload-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.image-upload-modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.image-upload-modal-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.image-upload-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+  .image-upload-modal-overlay {
+    padding: 10px;
+  }
+  
+  .image-upload-modal-container {
+    max-width: 100%;
+  }
+  
+  .image-upload-modal-content {
+    border-radius: 8px;
+  }
+  
+  .image-upload-modal-header,
+  .image-upload-modal-body,
+  .image-upload-modal-footer {
+    padding: 16px;
+  }
+  
+  .image-upload-modal-footer {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  
+  .image-upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
