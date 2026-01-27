@@ -187,20 +187,20 @@ const SearchHeader = ({
     try {
       // Транслитерация имени файла
       let finalFileName = transliterateFileName(newFileName);
-
+      
       // Добавляем расширение, если его нет
       const originalExtension = selectedFile.name.split('.').pop();
       if (!finalFileName.includes('.')) {
         finalFileName = `${finalFileName}.${originalExtension}`;
       }
-
+    
       // Создаем новый файл с транслитерированным именем
       const blob = new Blob([selectedFile], { type: selectedFile.type });
       const processedFile = new File([blob], finalFileName, {
         type: selectedFile.type,
         lastModified: selectedFile.lastModified
       });
-
+    
       // Загружаем файл
       const result = await uploadGraphicFile(
         user.company[0].id,
@@ -446,6 +446,8 @@ const SearchHeader = ({
         }}
         onUpload={handleUpload}
         initialFileName={originalFileName}
+        user={user} 
+        selectedFile={selectedFile}
       />
     </div>
   );
