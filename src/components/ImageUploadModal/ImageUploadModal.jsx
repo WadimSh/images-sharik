@@ -1,11 +1,63 @@
-import { useState, useEffect } from 'react';
-import { FiUploadCloud, FiX } from 'react-icons/fi';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { FiUploadCloud, FiX, FiPlus } from 'react-icons/fi';
+import { MdClose } from "react-icons/md";
 import './ImageUploadModal.css';
 
 const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
   const [articles, setArticles] = useState(['']);
   const [fileName, setFileName] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [customTag, setCustomTag] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const [tagColors, setTagColors] = useState({}); // Сохраняем цвета тегов
+  const customTagInputRef = useRef(null);
+
+  // Готовые теги с цветами
+  const predefinedTags = useMemo(() => [
+    { id: 1, name: 'Belbal', color: '#FF6B6B' },
+    { id: 2, name: 'Gemar', color: '#4ECDC4' },
+    { id: 3, name: 'Букет', color: '#FFD166' },
+    { id: 4, name: 'С ребенком', color: '#06D6A0' },
+    { id: 5, name: 'В интерьере', color: '#118AB2' },
+    { id: 6, name: 'На природе', color: '#073B4C' },
+    { id: 7, name: 'Полиграфия', color: '#EF476F' },
+  ], []);
+
+  // Цвета для случайных тегов
+  const randomColors = useMemo(() => [
+    '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0',
+    '#118AB2', '#073B4C', '#EF476F', '#7209B7',
+    '#F15BB5', '#9B5DE5', '#00BBF9', '#00F5D4',
+    '#FF9E00', '#8338EC', '#3A86FF', '#FB5607',
+    '#5A189A', '#4361EE', '#38B000', '#FF006E'
+  ], []);
+
+  // Получить цвет для тега (сохраняем в состоянии)
+  const getTagColor = (tagName) => {
+    // Сначала ищем в предопределенных тегах
+    const predefinedTag = predefinedTags.find(tag => tag.name === tagName);
+    if (predefinedTag) {
+      return predefinedTag.color;
+    }
+    
+    // Если цвет уже сохранен - возвращаем его
+    if (tagColors[tagName]) {
+      return tagColors[tagName];
+    }
+    
+    // Иначе генерируем новый цвет и сохраняем
+    const randomColor = randomColors[
+      Math.floor(Math.random() * randomColors.length)
+    ];
+    
+    // Сохраняем цвет для этого тега
+    setTagColors(prev => ({
+      ...prev,
+      [tagName]: randomColor
+    }));
+    
+    return randomColor;
+  };
 
   // Обновляем состояние fileName когда изменяется initialFileName
   useEffect(() => {
@@ -17,13 +69,14 @@ const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
   // Сбрасываем форму при открытии/закрытии модалки
   useEffect(() => {
     if (!isOpen) {
-      // Сбрасываем состояние при закрытии
       setTimeout(() => {
         setArticles(['']);
         setFileName('');
+        setSelectedTags([]);
+        setCustomTag('');
+        setTagColors({}); // Сбрасываем цвета тоже
       }, 300);
     } else {
-      // Устанавливаем начальное значение при открытии
       if (initialFileName) {
         setFileName(initialFileName);
       }
@@ -64,12 +117,45 @@ const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
     }
   };
 
+  // Обработчики для тегов
+  const handleTagToggle = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleAddCustomTag = () => {
+    const trimmedTag = customTag.trim();
+    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
+      setSelectedTags([...selectedTags, trimmedTag]);
+      setCustomTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddCustomTag();
+    }
+  };
+
   const handleSubmit = () => {
     const filteredArticles = articles.filter(article => article.trim() !== '');
+    const allTags = [...filteredArticles, ...selectedTags];
+    
     onClose();
-    onUpload(fileName, filteredArticles);
+    onUpload(fileName, allTags);
     setArticles(['']);
     setFileName('');
+    setSelectedTags([]);
+    setCustomTag('');
+    setTagColors({});
   };
 
   const handleClose = () => {
@@ -77,6 +163,9 @@ const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
     setTimeout(() => {
       setArticles(['']);
       setFileName('');
+      setSelectedTags([]);
+      setCustomTag('');
+      setTagColors({});
     }, 300);
   };
 
@@ -153,6 +242,83 @@ const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
                 </button>
               )}
             </div>
+
+            {/* Раздел для тегов */}
+            <div className="image-upload-form-group">
+              <label>Теги:</label>
+              
+              {/* Предопределенные теги */}
+              <div className="image-upload-tags-container">
+                {predefinedTags.map(tag => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleTagToggle(tag.name)}
+                    className={`image-upload-tag ${selectedTags.includes(tag.name) ? 'selected' : ''}`}
+                    style={{
+                      '--tag-color': tag.color,
+                      '--tag-color-rgb': hexToRgb(tag.color)
+                    }}
+                  >
+                    {tag.name}
+                    {selectedTags.includes(tag.name) && <span className="tag-check">✓</span>}
+                  </button>
+                ))}
+              </div>
+
+              {/* Пользовательские теги */}
+              <div className="image-upload-custom-tag-container">
+                <input
+                  ref={customTagInputRef}
+                  type="text"
+                  value={customTag}
+                  onChange={(e) => setCustomTag(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Добавить свой тег"
+                  className="image-upload-custom-tag-input"
+                  autoComplete="off"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomTag}
+                  disabled={!customTag.trim()}
+                  className="image-upload-add-tag-btn"
+                >
+                  <FiPlus />
+                </button>
+              </div>
+
+              {/* Выбранные теги */}
+              {selectedTags.length > 0 && (
+                <div className="image-upload-selected-tags">
+                  <div className="selected-tags-label">Выбрано тегов: {selectedTags.length}</div>
+                  <div className="selected-tags-list">
+                    {selectedTags.map(tag => {
+                      const tagColor = getTagColor(tag);
+                      return (
+                        <div 
+                          key={tag} 
+                          className="selected-tag-item"
+                          style={{
+                            '--selected-tag-color': tagColor,
+                            '--selected-tag-color-rgb': hexToRgb(tagColor)
+                          }}
+                        >
+                          <span className="selected-tag-text">{tag}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="selected-tag-remove"
+                          >
+                            <MdClose size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="image-upload-modal-footer">
@@ -171,6 +337,14 @@ const ImageUploadModal = ({ isOpen, onClose, onUpload, initialFileName }) => {
       </div>
     </div>
   );
+};
+
+// Вспомогательная функция для преобразования HEX в RGB
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? 
+    `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` 
+    : '102, 217, 232'; // fallback color
 };
 
 export default ImageUploadModal;
