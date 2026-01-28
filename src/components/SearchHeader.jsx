@@ -179,39 +179,30 @@ const SearchHeader = ({
     input.click();
   };
 
-  const handleUpload = async (newFileName, articles) => {
+  const handleUpload = async (finalFileName, allTags) => {
     if (!selectedFile) return;
 
     const uploadNotification = showUploadNotification(selectedFile.name);
 
     try {
-      // Транслитерация имени файла
-      let finalFileName = transliterateFileName(newFileName);
-      
-      // Добавляем расширение, если его нет
-      const originalExtension = selectedFile.name.split('.').pop();
-      if (!finalFileName.includes('.')) {
-        finalFileName = `${finalFileName}.${originalExtension}`;
-      }
-    
-      // Создаем новый файл с транслитерированным именем
+      // Создаем новый файл с сгенерированным именем
       const blob = new Blob([selectedFile], { type: selectedFile.type });
       const processedFile = new File([blob], finalFileName, {
         type: selectedFile.type,
         lastModified: selectedFile.lastModified
       });
-    
+
       // Загружаем файл
       const result = await uploadGraphicFile(
         user.company[0].id,
         processedFile,
         null, 
-        articles 
+        allTags 
       );
 
       // Показываем успешное уведомление
       uploadNotification.success({
-        title: `Файл ${newFileName}`,
+        title: `Файл ${finalFileName}`,
         message: "Успешно загружен",
         error: null // В success ошибки нет
       });
@@ -220,7 +211,7 @@ const SearchHeader = ({
       // Показываем уведомление об ошибке
       uploadNotification.error({
         title: 'Ошибка',
-        message: `Не удалось загрузить файл "${newFileName}"`,
+        message: `Не удалось загрузить файл "${finalFileName}"`,
         error: error.message
       });
     }
@@ -445,7 +436,6 @@ const SearchHeader = ({
           setSelectedFile(null);
         }}
         onUpload={handleUpload}
-        initialFileName={originalFileName}
         user={user} 
         selectedFile={selectedFile}
       />
