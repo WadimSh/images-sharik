@@ -44,7 +44,7 @@ const SearchHeader = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
-  const { user, isAuthenticated, isAdmin, isUploader } = useAuth();
+  const { user, isAuthenticated, isAdmin, isUploader, isPhotographer } = useAuth();
 
   const headerRightRef = useRef(null);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
@@ -271,13 +271,13 @@ const SearchHeader = ({
             </button>
           </Tooltip>
         }
-        {<div className="creat-image-wrapper">
+        {<div className={isPhotographer ? "creat-image-wrapper-photo" : "creat-image-wrapper"}>
           <Tooltip
             content={t('Загрузить изображение')}
             position={isMobile ? 'top-shift-left' : 'bottom'}
           >
-            <button onClick={handleImageClick} className="creat-image-button">
-              <LuImagePlus className="creat-image-icon" />
+            <button onClick={handleImageClick} className={isPhotographer ? "creat-image-button-photo" : "creat-image-button"}>
+              <LuImagePlus className={isPhotographer ? "creat-image-icon-photo" : "creat-image-icon"} />
             </button>
           </Tooltip>
         </div>}
@@ -311,12 +311,13 @@ const SearchHeader = ({
           <>
             <h2 style={{
               paddingBottom: '12px',
-              margin: 0
+              margin: 0,
+              fontSize: 'min(32px, max(24px, 4.5vw))'
             }}>
               {t('header.title')}
             </h2>
             <p style={{
-              fontSize: '20px',
+              fontSize: 'min(20px, max(18px, 4.5vw))',
               color: 'rgba(0,0,0,0.8)',
               margin: '0px',
               paddingBottom: '18px'
@@ -329,7 +330,8 @@ const SearchHeader = ({
           <>
             <h2 style={{
               paddingBottom: '12px',
-              margin: 0
+              margin: 0,
+              fontSize: 'min(32px, max(24px, 4.5vw))'
             }}>
               {userName 
                 ? `${t('header.titleNext')}, ${userName}!` 
@@ -337,7 +339,7 @@ const SearchHeader = ({
               }
             </h2>
             <p style={{
-              fontSize: '20px',
+              fontSize: 'min(20px, max(16px, 4.5vw))',
               color: 'rgba(0,0,0,0.8)',
               margin: '0px',
               paddingBottom: '18px'
@@ -347,7 +349,7 @@ const SearchHeader = ({
           </>
         )}
       </div>
-      <div className="search-wrapper">
+      {!isPhotographer && <div className="search-wrapper">
         <div className="input-container">
           <input
             type="text"
@@ -372,7 +374,7 @@ const SearchHeader = ({
         >
           {t('header.searchButton')}
         </button>
-      </div>
+      </div>}
       {(loading || infoMessage || error) && <div className="status-messages">
         {loading && (
           <div className="message loading">

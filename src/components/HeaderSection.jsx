@@ -19,6 +19,7 @@ import {
 } from '../services/templatesService';
 import { LanguageContext } from '../contexts/contextLanguage';
 import { apiCreateHistory } from '../services/historiesService';
+import { uploadGraphicFile } from '../services/mediaService';
 import { useAuth } from '../contexts/AuthContext';
 
 export const HeaderSection = ({
@@ -310,6 +311,7 @@ export const HeaderSection = ({
       let articlesForHistory;
       let marketplaceForHistory;
       let slideTypeForHistory;
+      let companyId = user?.company?.[0]?.id;
       
       if (customFileName) {
         // Используем кастомное имя файла
@@ -358,7 +360,7 @@ export const HeaderSection = ({
           const historyData = {
             name: historyKey,
             data: parsedDesignData,
-            company: user.company[0].id,
+            company: companyId,
             articles: articlesForHistory,
             marketplace: marketplaceForHistory || marketplace,
             type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
@@ -402,8 +404,33 @@ export const HeaderSection = ({
       );
 
       const blob = new Blob([pngBuffer], { type: 'image/png' });
+
+      const imageFile = new File([blob], fileName, { type: 'image/png' });
+      const getMarketplaceFullName = (marketplaceCode) => {
+        const marketplaceMap = {
+          'WB': 'Wildberries',
+          'OZ': 'Ozon',
+          'AM': 'Amazon'
+        };
+        return marketplaceMap[marketplaceCode] || marketplaceCode;
+      };
+    
+      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
+      const tags = [...(articlesForHistory || [])];
+    
+      if (marketplaceTag) { tags.push(marketplaceTag) };
+
+      if (companyId) {
+        try {
+          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
+          console.log('Файл успешно загружен на сервер:', uploadResult);
+        } catch (uploadError) {
+          console.warn('Ошибка загрузки файла на сервер:', uploadError);
+          // Не прерываем скачивание локально, только логируем ошибку
+        }
+      }
+
       const url = URL.createObjectURL(blob);
-  
       const link = document.createElement('a');
       link.download = fileName;
       link.href = url;

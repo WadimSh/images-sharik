@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 const USER_ROLES = {
   UPLOADER: "69732b81f7e443bd673e7575",
+  PHOTOGRAPHER: "6980852dcccd311b57bc98c3",
 };
 
 export const AuthProvider = ({ children }) => {
@@ -12,6 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUploader, setIsUploader] = useState(false);
+  const [isPhotographer, setIsPhotographer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
   const navigate = useNavigate();
@@ -40,6 +42,10 @@ export const AuthProvider = ({ children }) => {
     return userData?.roles?.some(role => role.id === USER_ROLES.UPLOADER) || false;
   };
 
+  const checkIsPhotographer = (userData) => {
+    return userData?.roles?.some(role => role.id === USER_ROLES.PHOTOGRAPHER) || false;
+  };
+
   // Проверяем сохраненные данные при инициализации
   useEffect(() => {
     const checkAuth = () => {
@@ -53,6 +59,7 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
           setIsAdmin(checkIsAdmin(parsedUser));
           setIsUploader(checkIsUploader(parsedUser));
+          setIsPhotographer(checkIsPhotographer(parsedUser));
         }
       } catch (error) {
         console.error('Error restoring auth:', error);
@@ -77,12 +84,14 @@ export const AuthProvider = ({ children }) => {
 
       const adminStatus = checkIsAdmin(userData);
       const uploader = checkIsUploader(userData);
+      const photographer = checkIsPhotographer(userData);
       
       // Обновляем контекст
       setUser(userData);
       setIsAuthenticated(true);
       setIsAdmin(adminStatus);
       setIsUploader(uploader);
+      setIsPhotographer(photographer);
       
       return { user: userData, isAdmin: adminStatus };
     } catch (error) {
@@ -102,6 +111,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
       setIsAdmin(false);
       setIsUploader(false);
+      setIsPhotographer(false);
       
       // Перенаправляем на страницу входа
       navigate('/sign-in', { replace: true });
@@ -113,10 +123,12 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (updates) => {
     try {
       const updatedUser = { ...user, ...updates };
+      
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
       setIsAdmin(checkIsAdmin(updateUser));
-      setIsUploader(checkIsUploader(updateUser))
+      setIsUploader(checkIsUploader(updateUser));
+      setIsPhotographer(checkIsPhotographer(updateUser));
     } catch (error) {
       console.error('Error updating user:', error);
     }
@@ -164,6 +176,7 @@ export const AuthProvider = ({ children }) => {
         updateUser,
         isAdmin,
         isUploader,
+        isPhotographer,
         getAdminCompaniesForCurrentUser,
         isAdminOfCompany
       }}

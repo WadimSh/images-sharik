@@ -1055,7 +1055,7 @@ export const ElementsList = ({
                         ))}
                       </div>
 
-                      <button
+                      {/*<button
                         onClick={(e) => {
                           e.stopPropagation();
                           setCurrentBackgroundId(element.id);
@@ -1064,7 +1064,7 @@ export const ElementsList = ({
                         className="remove-bg-button"
                       >
                         <><LuImagePlus /> {t('ui.addImage')}</>
-                      </button>
+                      </button>*/}
 
                       <button
                         onClick={(e) => {

@@ -220,32 +220,47 @@ h2 {
     right: 20px; /* Отступ от правого края */
     z-index: 1000; /* Поверх других элементов */
   }
+
+  .creat-image-wrapper-photo {
+    position: fixed; /* Фиксированное позиционирование */
+    bottom: 30%; /* Отступ от низа */
+    right: 35%; /* Отступ от правого края */
+    z-index: 1000; /* Поверх других элементов */
+  }
   
   /* Стили для самой кнопки */
   .creat-image-button {
-    /* Круглая форма */
-    width: 56px; /* Фиксированная ширина */
-    height: 56px; /* Фиксированная высота */
-    border-radius: 50%; /* Круг */
-    padding: 0; /* Убираем padding */
-    
-    /* Градиентный фон */
+    width: 56px; 
+    height: 56px; 
+    border-radius: 50%; 
+    padding: 0; 
     background: linear-gradient(135deg, #007bff 0%, #339af0 100%);
-    
-    /* Тень для выделения */
     box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3),
                 0 8px 24px rgba(0, 0, 0, 0.1);
-    
-    /* Центрирование иконки */
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Анимация при hover */
+    transition: all 0.3s ease, transform 0.2s ease;
+  }
+
+  .creat-image-button-photo {
+    width: 136px; 
+    height: 136px; 
+    border-radius: 50%; 
+    padding: 0; 
+    background: linear-gradient(135deg, #007bff 0%, #339af0 100%);
+    box-shadow: 0 4px 12px rgba(51, 154, 240, 0.3),
+                0 8px 24px rgba(0, 0, 0, 0.1);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.3s ease, transform 0.2s ease;
   }
   
   /* Эффект при наведении на мобилке */
+  .creat-image-button-photo:hover,
   .creat-image-button:hover {
     background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
     transform: scale(1.05); /* Легкое увеличение */
@@ -254,6 +269,7 @@ h2 {
   }
   
   /* Эффект при нажатии (активном состоянии) */
+  .creat-image-button-photo:active,
   .creat-image-button:active {
     transform: scale(0.95);
   }
@@ -262,6 +278,12 @@ h2 {
   .creat-image-icon {
     color: white; /* Белая иконка */
     font-size: 24px; /* Чуть больше размер */
+    margin: 0; /* Убираем margin */
+  }
+
+  .creat-image-icon-photo {
+    color: white; /* Белая иконка */
+    font-size: 54px; /* Чуть больше размер */
     margin: 0; /* Убираем margin */
   }
   
