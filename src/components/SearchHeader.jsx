@@ -261,7 +261,7 @@ const SearchHeader = ({
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         )*/}
-        {
+        {!isPhotographer && (
           <Tooltip
             content={t('header.gallery')}
             position='bottom'
@@ -270,7 +270,7 @@ const SearchHeader = ({
               <IoFolderOpen className="creat-temp-icon" />
             </button>
           </Tooltip>
-        }
+        )}
         {<div className={isPhotographer ? "creat-image-wrapper-photo" : "creat-image-wrapper"}>
           <Tooltip
             content={t('Загрузить изображение')}
@@ -344,7 +344,7 @@ const SearchHeader = ({
               margin: '0px',
               paddingBottom: '18px'
             }}>
-              {t('header.descriptionNext')}
+              {!isPhotographer ? t('header.descriptionNext') : t('header.descriptionPhoto')}
             </p>
           </>
         )}
