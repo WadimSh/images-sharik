@@ -405,30 +405,30 @@ export const HeaderSection = ({
 
       const blob = new Blob([pngBuffer], { type: 'image/png' });
 
-      const imageFile = new File([blob], fileName, { type: 'image/png' });
-      const getMarketplaceFullName = (marketplaceCode) => {
-        const marketplaceMap = {
-          'WB': 'Wildberries',
-          'OZ': 'Ozon',
-          'AM': 'Amazon'
-        };
-        return marketplaceMap[marketplaceCode] || marketplaceCode;
-      };
-    
-      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
-      const tags = [...(articlesForHistory || [])];
-    
-      if (marketplaceTag) { tags.push(marketplaceTag) };
-
-      if (companyId) {
-        try {
-          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
-          console.log('Файл успешно загружен на сервер:', uploadResult);
-        } catch (uploadError) {
-          console.warn('Ошибка загрузки файла на сервер:', uploadError);
-          // Не прерываем скачивание локально, только логируем ошибку
-        }
-      }
+//      const imageFile = new File([blob], fileName, { type: 'image/png' });
+//      const getMarketplaceFullName = (marketplaceCode) => {
+//        const marketplaceMap = {
+//          'WB': 'Wildberries',
+//          'OZ': 'Ozon',
+//          'AM': 'Amazon'
+//        };
+//        return marketplaceMap[marketplaceCode] || marketplaceCode;
+//      };
+//    
+//      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
+//      const tags = [...(articlesForHistory || [])];
+//    
+//      if (marketplaceTag) { tags.push(marketplaceTag) };
+//
+//      if (companyId) {
+//        try {
+//          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
+//          console.log('Файл успешно загружен на сервер:', uploadResult);
+//        } catch (uploadError) {
+//          console.warn('Ошибка загрузки файла на сервер:', uploadError);
+//          // Не прерываем скачивание локально, только логируем ошибку
+//        }
+//      }
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
