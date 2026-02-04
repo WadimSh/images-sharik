@@ -426,7 +426,7 @@ const ImageUploadModal = ({
                     ))}
                   </div>
                   
-                  {articles.length < 5 && (
+                  {articles.length < 10 && (
                     <button 
                       type="button" 
                       onClick={addArticleField}

@@ -240,16 +240,16 @@
   top: 5px;
   left: 5px;
   z-index: 10;
-  max-width: 80%;
+  max-width: 90%;
 }
 
 .tags-container-overlay {
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
   max-width: 100%;
+  justify-content: flex-start;
+  align-content: flex-start;
 }
 
 .tag-overlay {

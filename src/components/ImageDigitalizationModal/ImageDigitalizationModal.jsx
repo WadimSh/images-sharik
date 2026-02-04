@@ -11,14 +11,14 @@ const getTagColor = (tag) => {
   }
   
   const colors = [
-    'rgba(66, 133, 244, 0.4)',   // синий
-    'rgba(52, 168, 83, 0.4)',    // зеленый
-    'rgba(251, 188, 4, 0.4)',    // желтый
-    'rgba(171, 71, 188, 0.4)',   // фиолетовый
-    'rgba(0, 150, 136, 0.4)',    // бирюзовый
-    'rgba(255, 152, 0, 0.4)',    // оранжевый
-    'rgba(96, 125, 139, 0.4)',   // серо-голубой
-    'rgba(156, 39, 176, 0.4)',   // фиолетовый
+    'rgba(66, 133, 244, 0.6)',   // синий
+    'rgba(52, 168, 83, 0.6)',    // зеленый
+    'rgba(251, 188, 4, 0.6)',    // желтый
+    'rgba(171, 71, 188, 0.6)',   // фиолетовый
+    'rgba(0, 150, 136, 0.6)',    // бирюзовый
+    'rgba(255, 152, 0, 0.6)',    // оранжевый
+    'rgba(96, 125, 139, 0.6)',   // серо-голубой
+    'rgba(156, 39, 176, 0.6)',   // фиолетовый
   ];
   
   let hash = 0;
@@ -205,10 +205,10 @@ export const ImageDigitalizationModal = ({
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" style={{ minWidth: '60vw', maxWidth: '1000px', maxHeight: '700px' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" style={{ minWidth: '60vw', maxWidth: '1000px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h3>{currentImageData.fileName}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '0' }}>
+            <h3 style={{ margin: '0', fontSize: '20px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: '1', minWidth: '0' }}>{currentImageData.fileName}</h3>
           </div>
           <button 
             className="modal-close-btn"
@@ -242,7 +242,6 @@ export const ImageDigitalizationModal = ({
                           className="tag-overlay"
                           style={{
                             backgroundColor: tagColors[tag],
-                            transform: `translateX(${index * 5}px)`,
                             zIndex: tags.length - index
                           }}
                         >

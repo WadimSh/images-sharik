@@ -274,7 +274,7 @@ const SearchHeader = ({
         {<div className={isPhotographer ? "creat-image-wrapper-photo" : "creat-image-wrapper"}>
           <Tooltip
             content={t('Загрузить изображение')}
-            position={isMobile ? 'top-shift-left' : 'bottom'}
+            position={isMobile ? 'top-shift-left' : isPhotographer ? '' : 'bottom'}
           >
             <button onClick={handleImageClick} className={isPhotographer ? "creat-image-button-photo" : "creat-image-button"}>
               <LuImagePlus className={isPhotographer ? "creat-image-icon-photo" : "creat-image-icon"} />

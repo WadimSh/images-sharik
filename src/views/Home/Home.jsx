@@ -7,7 +7,7 @@ import { UpdateModal } from '../../components/UpdateModal/UpdateModal';
 import { useAuth } from '../../contexts/AuthContext';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
-import { data } from "../../assets/data";
+//import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';
@@ -19,7 +19,7 @@ export const Home = () => {
     : { query: '', articles: [] };
 
   const { t } = useContext(LanguageContext);
-  const { isAuthenticated, isAdmin, isUploader } = useAuth();
+  const { isAuthenticated, isAdmin, isUploader, isPhotographer } = useAuth();
   const [validArticles, setValidArticles] = useState(initialData.articles);
   const [searchQuery, setSearchQuery] = useState(initialData.query);
   const [isSearchActive, setIsSearchActive] = useState(initialData.articles.length > 0);
@@ -483,28 +483,28 @@ export const Home = () => {
       const searchQuery = normalizedArticles.join(' ');
       const encodedSearch = encodeURIComponent(searchQuery);
 
-      //fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
-      //  .then(response => response.json())
-      //  .then(data => {
-      //    if (data.results.length === 0) {
-      //      const message = t('views.homeMissingCode');
-      //      setInfoMessage(message);
-      //      return Promise.reject(message);
-      //    }
-      //  
-      //    const productIds = data.results.map(product => product.id);
-      //    const idsParam = productIds.join(',');
-      //    return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-      //  })
-      //  .then(response => response?.json())
-      //  .then(detailedData => {
-      //    if (!detailedData) return;
+      fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results.length === 0) {
+            const message = t('views.homeMissingCode');
+            setInfoMessage(message);
+            return Promise.reject(message);
+          }
+        
+          const productIds = data.results.map(product => product.id);
+          const idsParam = productIds.join(',');
+          return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
+        })
+        .then(response => response?.json())
+        .then(detailedData => {
+          if (!detailedData) return;
 
         // Обрабатываем полученные данные API
-        const processedResults = processProductsData(data);
-        const processedMetaResults = processProductsMeta(data);
-        //const processedResults = processProductsData(detailedData);
-        //const processedMetaResults = processProductsMeta(detailedData);
+        //const processedResults = processProductsData(data);
+        //const processedMetaResults = processProductsMeta(data);
+        const processedResults = processProductsData(detailedData);
+        const processedMetaResults = processProductsMeta(detailedData);
 
         // Сохраняем в sessionStorage
         processedResults.forEach(item => {
@@ -534,16 +534,16 @@ export const Home = () => {
         }));
 
         return processedResults;
-    //  })
-    //  .catch(error => {
-    //    console.error('Error:', error);
-    //    setError(error.message || "An error occurred");
-    //    setValidArticles([]);
-    //    setIsSearchActive(false);
-    //  })
-    //  .finally(() => {
-    //    setLoading(false);
-    //  });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setError(error.message || "An error occurred");
+        setValidArticles([]);
+        setIsSearchActive(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {
@@ -578,7 +578,7 @@ export const Home = () => {
           ))}
         />
       )}
-      {(showUpdateModal && isAuthenticated) && (() => {
+      {(showUpdateModal && isAuthenticated && !isPhotographer) && (() => {
         const config = getConfig();
         return (
           <UpdateModal
