@@ -1,0 +1,16 @@
+export const PREDEFINED_TAGS = [
+  { id: 13, name: 'Фон', color: '#f500f1' },
+  { id: 14, name: 'Элемент', color: '#f50045' },
+  { id: 1, name: 'Belbal', color: '#FF6B6B' },
+  { id: 2, name: 'Gemar', color: '#4ECDC4' },
+  { id: 3, name: 'Букет', color: '#FFD166' },
+  { id: 4, name: 'С ребенком', color: '#06D6A0' },
+  { id: 5, name: 'В интерьере', color: '#118AB2' },
+  { id: 6, name: 'На природе', color: '#073B4C' },
+  { id: 7, name: 'Полиграфия', color: '#EF476F' },
+  { id: 8, name: 'Производство', color: '#7209B7' },
+  { id: 9, name: 'Фестиваль', color: '#F15BB5' },
+  { id: 10, name: 'Семинар', color: '#9B5DE5' },
+  { id: 11, name: 'Выставка', color: '#00BBF9' },
+  { id: 12, name: 'Студия', color: '#00F5D4' },
+];

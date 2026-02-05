@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { uploadGraphicFile } from "../services/mediaService";
+import { PREDEFINED_TAGS } from "../constants/tags";
 
 export const DragDropUploadModal = ({ 
   isOpen, 
@@ -11,24 +12,6 @@ export const DragDropUploadModal = ({
   const [selectedTags, setSelectedTags] = useState([]);
   const [customTag, setCustomTag] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  
-  // Предопределенные теги
-  const predefinedTags = [
-    { id: 13, name: 'Фон', color: '#f500f1' },
-    { id: 14, name: 'Элемент', color: '#f50045' },
-    { id: 1, name: 'Belbal', color: '#FF6B6B' },
-    { id: 2, name: 'Gemar', color: '#4ECDC4' },
-    { id: 3, name: 'Букет', color: '#FFD166' },
-    { id: 4, name: 'С ребенком', color: '#06D6A0' },
-    { id: 5, name: 'В интерьере', color: '#118AB2' },
-    { id: 6, name: 'На природе', color: '#073B4C' },
-    { id: 7, name: 'Полиграфия', color: '#EF476F' },
-    { id: 8, name: 'Производство', color: '#7209B7' },
-    { id: 9, name: 'Фестиваль', color: '#F15BB5' },
-    { id: 10, name: 'Семинар', color: '#9B5DE5' },
-    { id: 11, name: 'Выставка', color: '#00BBF9' },
-    { id: 12, name: 'Студия', color: '#00F5D4' },
-  ];
   
   // Извлечение артикулов из имени файла
   const extractArticleCodesFromFileName = (fileName) => {
@@ -47,14 +30,14 @@ export const DragDropUploadModal = ({
   // Проверка пользовательского тега
   const isUserTag = (tag) => {
     const isArticle = validateArticle(tag);
-    const isPredefined = predefinedTags.some(predefinedTag => predefinedTag.name === tag);
+    const isPredefined = PREDEFINED_TAGS.some(predefinedTag => predefinedTag.name === tag);
     return !isArticle && !isPredefined;
   };
   
   const canUpload = () => {
     const userTags = selectedTags.filter(tag => isUserTag(tag));
     const hasPredefinedTags = selectedTags.some(tag => 
-      predefinedTags.some(predefinedTag => predefinedTag.name === tag)
+      PREDEFINED_TAGS.some(predefinedTag => predefinedTag.name === tag)
     );
     return userTags.length > 0 || hasPredefinedTags;
   };
@@ -192,7 +175,7 @@ export const DragDropUploadModal = ({
   const displayedTags = selectedTags.filter(tag => !validateArticle(tag));
   const userTagsCount = selectedTags.filter(tag => isUserTag(tag)).length;
   const predefinedTagsCount = selectedTags.filter(tag => 
-    predefinedTags.some(predefinedTag => predefinedTag.name === tag)
+    PREDEFINED_TAGS.some(predefinedTag => predefinedTag.name === tag)
   ).length;
   
   return (
@@ -238,7 +221,7 @@ export const DragDropUploadModal = ({
               </div>
               
               <div className="tags-grid">
-                {predefinedTags.map(tag => (
+                {PREDEFINED_TAGS.map(tag => (
                   <button
                     key={tag.id}
                     type="button"

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { FiX, FiPlus, FiArrowLeft, FiUser, FiCheck } from 'react-icons/fi';
 import { MdClose } from "react-icons/md";
+
+import { PREDEFINED_TAGS } from '../../constants/tags';
 import './ImageUploadModal.css';
 
 const ImageUploadModal = ({ 
@@ -52,22 +54,6 @@ const ImageUploadModal = ({
     }
   }, [selectedFile]);
 
-  // Готовые теги с цветами
-  const predefinedTags = useMemo(() => [
-    { id: 1, name: 'Belbal', color: '#FF6B6B' },
-    { id: 2, name: 'Gemar', color: '#4ECDC4' },
-    { id: 3, name: 'Букет', color: '#FFD166' },
-    { id: 4, name: 'С ребенком', color: '#06D6A0' },
-    { id: 5, name: 'В интерьере', color: '#118AB2' },
-    { id: 6, name: 'На природе', color: '#073B4C' },
-    { id: 7, name: 'Полиграфия', color: '#EF476F' },
-    { id: 8, name: 'Производство', color: '#7209B7' },
-    { id: 9, name: 'Фестиваль', color: '#F15BB5' },
-    { id: 10, name: 'Семинар', color: '#9B5DE5' },
-    { id: 11, name: 'Выставка', color: '#00BBF9' },
-    { id: 12, name: 'Студия', color: '#00F5D4' },
-  ], []);
-
   // Цвета для случайных тегов
   const randomColors = useMemo(() => [
     '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0',
@@ -79,7 +65,7 @@ const ImageUploadModal = ({
 
   // Получить цвет для тега
   const getTagColor = (tagName) => {
-    const predefinedTag = predefinedTags.find(tag => tag.name === tagName);
+    const predefinedTag = PREDEFINED_TAGS.find(tag => tag.name === tagName);
     if (predefinedTag) {
       return predefinedTag.color;
     }
@@ -443,7 +429,7 @@ const ImageUploadModal = ({
                   
                   {/* Предопределенные теги */}
                   <div className="image-upload-tags-container">
-                    {predefinedTags.map(tag => (
+                    {PREDEFINED_TAGS.map(tag => (
                       <button
                         key={tag.id}
                         type="button"
