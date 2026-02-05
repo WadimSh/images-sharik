@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom';
-import { VscPreview } from "react-icons/vsc";
 
 import { HeaderSection } from '../../components/HeaderSection';
 import { TemplateModal } from '../../components/TemplateModal';
@@ -23,10 +22,11 @@ import { BlindZones } from '../../components/BlindZones';
 import { CanvasSizeSelector } from '../../components/CanvasSizeSelector';
 import { ElementToolbar } from '../../ui/ElementToolbar';
 import { useElementToolbar } from '../../ui/ElementToolbar/useElementToolbar';
-import { handleFileUpload } from '../../ui/ElementToolbar/utils';
 import { ZoomControls } from '../../ui/ZoomControls/ZoomControls';
 import { PreviewDesign } from '../../components/PreviewDesign';
-
+import { LibraryMediaModal } from '../../components/LibraryMediaModal/LibraryMediaModal';
+import { DragDropUploadModal } from '../../components/DragDropUploadModal';
+import { useAuth } from '../../contexts/AuthContext';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
 import { slidesDB } from '../../utils/handleDB';
@@ -36,6 +36,7 @@ import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarket
 export const Generator = () => {
   const { id } = useParams();
   const { t } = useContext(LanguageContext);
+  const { user } = useAuth(); 
   const getCode = useGetCode();
   const isCollageMode = id === 'collage';
   const [baseId, slideNumber] = isCollageMode || !id ? ['', ''] : id.split('_');
@@ -87,7 +88,6 @@ export const Generator = () => {
   const captureRef = useRef(null);
   const contextMenuRef = useRef(null);
   const colorInputRef = useRef(null);
-  const fileInputRef = useRef(null);
   const borderColorInputRef = useRef(null);
 
   const [currentBorderElementId, setCurrentBorderElementId] = useState(null);
@@ -124,6 +124,16 @@ export const Generator = () => {
   const [isDragging, setIsDragging] = useState(false);
   // Добавили состояние для модалки выбора изображений для элементов
   const [isImageLibraryOpen, setIsImageLibraryOpen] = useState(false);
+  // Добавляем состояние для модалки выбора изображения из библиотеки
+  const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
+  const [dragDropFile, setDragDropFile] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [dragDropFileInfo, setDragDropFileInfo] = useState({
+    file: null,
+    originalFileName: '',
+    imagePreview: null,
+    dimensions: { width: 0, height: 0 }
+  });
   // Добавили состояние для модалки добавления дополнительного товара
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   // Добавили состояние для окрытия меню редактирования шрифта для контекстного меню
@@ -234,8 +244,8 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
   
   const { handleAddElement } = useElementToolbar(
     setElements,
-    fileInputRef,
     setIsImageLibraryOpen,
+    setIsLibraryModalOpen,
     setIsProductModalOpen
   );
 
@@ -1240,6 +1250,121 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
     );
   }, [selectedElementId, selectedElementIds, elements]);
 
+  const handleDragDropUpload = async (file) => {
+    try {
+      // Проверка типа файла
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Разрешены только JPEG, PNG и WebP файлы');
+        return;
+      }
+
+      // Проверка размера
+      const maxSize = 100 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('Файл превышает размер 100MB');
+        return;
+      }
+
+      // Создаем превью
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = e.target.result;
+
+        // Получаем размеры изображения
+        const img = new Image();
+        img.onload = () => {
+          setDragDropFileInfo({
+            file,
+            originalFileName: file.name,
+            imagePreview: preview,
+            dimensions: { width: img.width, height: img.height }
+          });
+
+          // Показываем модалку для выбора тегов
+          setShowUploadModal(true);
+        };
+        img.src = preview;
+      };
+      reader.readAsDataURL(file);
+
+    } catch (error) {
+      console.error('Error processing drag-drop file:', error);
+      alert('Ошибка при обработке файла');
+    }
+  };
+
+  const handleUploadComplete = async (uploadData) => {
+    try {
+      const { url, thumbnailUrl, fileName, dimensions } = uploadData;
+
+      // Получаем полный URL
+      const getFullImageUrl = (imageUrl) => {
+        const baseUrl = 'https://mp.sharik.ru';
+        return imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
+      };
+
+      const fullImageUrl = getFullImageUrl(url);
+      const fullThumbnailUrl = getFullImageUrl(thumbnailUrl || url);
+
+      // Загружаем изображение для получения размеров
+      const img = new Image();
+      img.src = fullImageUrl;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const containerWidth = 450;
+      const containerHeight = 600;
+
+      const scale = Math.min(
+        containerWidth / img.naturalWidth,
+        containerHeight / img.naturalHeight,
+        1
+      );
+
+      const newWidth = img.naturalWidth * scale;
+      const newHeight = img.naturalHeight * scale;
+
+      const position = {
+        x: (containerWidth - newWidth) / 2,
+        y: (containerHeight - newHeight) / 2
+      };
+
+      // Создаем элемент
+      const newElement = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        type: 'image',
+        position,
+        image: fullImageUrl,
+        width: newWidth,
+        height: newHeight,
+        originalWidth: img.naturalWidth,
+        originalHeight: img.naturalHeight,
+        isFlipped: false,
+        rotation: 0
+      };
+
+      // Добавляем элемент
+      setElements(prev => [...prev, newElement]);
+
+      // Закрываем модалку
+      setShowUploadModal(false);
+      setDragDropFileInfo({
+        file: null,
+        originalFileName: '',
+        imagePreview: null,
+        dimensions: { width: 0, height: 0 }
+      });
+
+    } catch (error) {
+      console.error('Error creating element:', error);
+      alert('Ошибка при создании элемента');
+    }
+  };
+
   useEffect(() => {
     // Найти индекс активного изображения
     const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
@@ -1353,7 +1478,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
       ]
     }
   };
-  console.log(containerSize)
+  
   return (
     <div className="generator-container">
       <HeaderSection 
@@ -1454,7 +1579,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
                 const imageFile = files.find(file => file.type.startsWith('image/'));
 
                 if (imageFile) {
-                  handleFileUpload(imageFile, setElements);
+                  handleDragDropUpload(imageFile);
                 }
               }}
             >
@@ -1851,13 +1976,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
           /> 
         </div>     
       </div>  
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => handleFileUpload(e.target.files[0], setElements)}
-        ref={fileInputRef}
-        className="hidden-input"
-      />
+      
       {/* Панель настроек шрифта вне цикла элементов */}
       {selectedTextEdit && captureRef.current && (() => {
         const containerRect = captureRef.current.getBoundingClientRect();
@@ -1914,6 +2033,29 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
           onSelectImage={handleSelectImageProduct}
         />
       )}
+      {isLibraryModalOpen && (
+        <LibraryMediaModal
+          isOpen={isLibraryModalOpen}
+          onClose={() => setIsLibraryModalOpen(false)}
+          setElements={setElements}
+        />
+      )}
+      {/* Модалка для drag'n'drop загрузки */}
+      <DragDropUploadModal
+        isOpen={showUploadModal}
+        onClose={() => {
+          setShowUploadModal(false);
+          setDragDropFileInfo({
+            file: null,
+            originalFileName: '',
+            imagePreview: null,
+            dimensions: { width: 0, height: 0 }
+          });
+        }}
+        fileInfo={dragDropFileInfo}
+        user={user}
+        onUploadComplete={handleUploadComplete}
+      />
   </div>
   );
 };

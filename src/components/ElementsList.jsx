@@ -1,11 +1,10 @@
-import { useEffect, useRef, useContext, useState } from 'react';
-import imageCompression from 'browser-image-compression';
+import { useEffect, useRef, useContext } from 'react';
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
-import { LuImageOff, LuImagePlus } from "react-icons/lu";
+import { LuImageOff } from "react-icons/lu";
 import { BsBorderWidth, BsLockFill, BsUnlockFill } from "react-icons/bs";
 import { RxBorderWidth } from "react-icons/rx";
 import { MdOpacity } from "react-icons/md";
@@ -65,10 +64,7 @@ export const ElementsList = ({
   const elementRefs = useRef(new Map());
   // Создаем Map для хранения refs меню элементов
   const menuRefs = useRef(new Map());
-  // Ref для input загрузки файла для компонента Фон
-  const fileInputRef = useRef();
-  const [currentBackgroundId, setCurrentBackgroundId] = useState(null);
-
+  
   const { t } = useContext(LanguageContext);
 
   // Функция для извлечения числового значения из строки направления
@@ -122,61 +118,6 @@ export const ElementsList = ({
         }
         return el;
       }));
-  
-    } catch (error) {
-      console.error('Error loading background image:', error);
-      alert('Could not set background image');
-    }
-  };
-
-  const handleBackgroundUpload = async (file, setElements, backgroundElementId) => {
-    if (!file) return;
-  
-    try {
-      // Настройки компрессии (оптимизированы для фонов)
-      const options = {
-        maxSizeMB: 1.5, // Чуть больше для фонов
-        maxWidthOrHeight: 2000, // Большее разрешение для фона
-        useWebWorker: true,
-        fileType: file.type.includes('png') ? 'image/png' : 'image/jpeg',
-        initialQuality: 0.7 // Лучшее качество для фона
-      };
-  
-      // Сжимаем изображение
-      const compressedFile = await imageCompression(file, options);
-      
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const containerHeight = 600; // Фиксированная высота контейнера
-          
-          // Рассчитываем масштаб только по высоте
-          const scale = containerHeight / img.height;
-          
-          // Новые размеры с сохранением пропорций
-          const newHeight = containerHeight;
-          const newWidth = img.width * scale;
-  
-          setElements(prev => prev.map(el => {
-            if (el.id === backgroundElementId) {
-              return {
-                ...el,
-                backgroundImage: event.target.result,
-                originalImageWidth: img.width,
-                originalImageHeight: img.height,
-                imageScale: scale,
-                width: newWidth, // Обновляем ширину элемента
-                height: newHeight
-              };
-            }
-            return el;
-          }));
-        };
-        img.onerror = () => alert('Background image loading error');
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(compressedFile);
   
     } catch (error) {
       console.error('Error loading background image:', error);
@@ -1055,17 +996,6 @@ export const ElementsList = ({
                         ))}
                       </div>
 
-                      {/*<button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentBackgroundId(element.id);
-                          fileInputRef.current.click();
-                        }}
-                        className="remove-bg-button"
-                      >
-                        <><LuImagePlus /> {t('ui.addImage')}</>
-                      </button>*/}
-
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1470,17 +1400,7 @@ export const ElementsList = ({
           width: 0
         }}
       />
-      <input 
-        type="file" 
-        ref={fileInputRef}
-        onChange={(e) => handleBackgroundUpload(
-          e.target.files[0], 
-          setElements, 
-          currentBackgroundId
-        )} 
-        accept="image/*"
-        style={{ display: 'none' }}
-      />
+      
     </div>
   );
 };

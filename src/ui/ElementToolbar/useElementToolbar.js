@@ -1,7 +1,7 @@
 export const useElementToolbar = (
   setElements,
-  fileInputRef,
   setIsImageLibraryOpen,
+  setIsLibraryModalOpen,
   setIsProductModalOpen
 ) => {
   const handleAddElement = (type) => {
@@ -18,7 +18,7 @@ export const useElementToolbar = (
         setElements(prev => [newBackgroundElement, ...prev]);
         break;
       case 'image':
-        fileInputRef.current.click();
+        setIsLibraryModalOpen(true);
         break;
       case 'text':
         const newTextElement = {
