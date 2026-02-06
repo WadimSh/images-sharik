@@ -50,7 +50,7 @@ export async function apiToggleLikeHistory(id) {
 export async function apiBulkDeactivateHistories(ids) {
   return fetchDataWithFetch('/api/histories', {
     method: 'PATCH',
-    body: JSON.stringify({ ids })
+    data: { ids }
   });
 }
 

@@ -355,23 +355,27 @@ export const HeaderSection = ({
         const historyKey = fileName.replace('.png', '');
         const parsedDesignData = JSON.parse(designData);
 
-        try {
-          // Формируем данные для бэкенда с учетом кастомных значений
-          const historyData = {
-            name: historyKey,
-            data: parsedDesignData,
-            company: companyId,
-            articles: articlesForHistory,
-            marketplace: marketplaceForHistory || marketplace,
-            type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
-            size: sizeLabel
-          };
-        
-          await apiCreateHistory(historyData);
-          console.log('История успешно отправлена на сервер:', historyKey);
-        } catch (backendError) {
-          console.warn('Ошибка отправки истории на сервер:', backendError);
-          alert(`Ошибка отправки истории на сервер: ${backendError}`);
+        if (marketplaceForHistory !== 'AM') {
+          try {
+            // Формируем данные для бэкенда с учетом кастомных значений
+            const historyData = {
+              name: historyKey,
+              data: parsedDesignData,
+              company: companyId,
+              articles: articlesForHistory,
+              marketplace: marketplaceForHistory || marketplace,
+              type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
+              size: sizeLabel
+            };
+          
+            await apiCreateHistory(historyData);
+            console.log('История успешно отправлена на сервер:', historyKey);
+          } catch (backendError) {
+            console.warn('Ошибка отправки истории на сервер:', backendError);
+            alert(`Ошибка отправки истории на сервер: ${backendError}`);
+          }
+        } else {
+          console.log('Сохранение истории пропущено для marketplace AM');
         }
       }
 

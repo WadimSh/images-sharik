@@ -9,6 +9,40 @@ import Pagination from "../../ui/Pagination/Pagination";
 import { PREDEFINED_TAGS } from "../../constants/tags";
 import './LibraryMediaModal.css';
 
+export const transliterateText = (text) => {
+  const translitMap = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
+    'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+    'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+    'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+    'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch',
+    'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '',
+    'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D',
+    'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh', 'З': 'Z', 'И': 'I',
+    'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N',
+    'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T',
+    'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch',
+    'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '',
+    'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+  };
+  
+  let result = text.replace(/[а-яёА-ЯЁ]/g, char => translitMap[char] || char);
+  
+  result = result.replace(/[^\w\s.-]/g, '_'); 
+  result = result.replace(/\s+/g, '_'); 
+  result = result.replace(/_+/g, '_'); 
+  result = result.replace(/^_+|_+$/g, ''); 
+  
+  return result;
+};
+
+export const formatFileName = (fileName) => {
+  const cleaned = fileName.trim();
+  const transliterated = transliterateText(cleaned);
+  return transliterated.toLowerCase();
+};
+
 export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const { t } = useContext(LanguageContext);
   const { user } = useAuth(); 
@@ -183,7 +217,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     input.click();
   };
 
-  // Извлечение ВСЕХ артикулов из имени файла (подкапотом)
+  // Извлечение ВСЕХ артикулов из имени файла
   const extractArticleCodesFromFileName = (fileName) => {
     const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
     const articlePattern = /\d{4}-\d{4}/g;
@@ -249,7 +283,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   // Умная генерация имени файла с поддержкой нескольких артикулов
   const generateFileName = () => {
     const fileNameWithoutExt = originalFileName.replace(/\.[^/.]+$/, "");
-    const extension = originalFileName.split('.').pop();
+    const extension = originalFileName.split('.').pop().toLowerCase();
     
     const now = new Date();
     const datePart = now.toLocaleDateString('ru-RU', {
@@ -260,23 +294,46 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     
     // Находим все артикулы в оригинальном имени
     const originalArticles = extractArticleCodesFromFileName(originalFileName);
-    let baseName = fileNameWithoutExt;
+    
+    // Транслитерируем имя (кириллица -> латиница)
+    let cleanedName = formatFileName(fileNameWithoutExt);
+    
+    // Убираем старые размеры и даты если есть
+    cleanedName = cleanedName.replace(/_\d+x\d+_\d{8}/g, '');
+    cleanedName = cleanedName.replace(/_\d{8}_\d{6}/g, '');
+    cleanedName = cleanedName.replace(/_\d{6}/g, '');
+    cleanedName = cleanedName.replace(/_+$/, '');
+    
+    // Убираем артикулы из cleanedName чтобы не дублировать
+    if (originalArticles.length > 0) {
+      originalArticles.forEach(article => {
+        cleanedName = cleanedName.replace(new RegExp(`_?${article}_?`, 'g'), '');
+      });
+    }
+    
+    // Убираем 9999-9999 если случайно есть
+    cleanedName = cleanedName.replace(/^9999-9999_/, '');
+    cleanedName = cleanedName.replace(/_9999-9999_/g, '_');
+    cleanedName = cleanedName.replace(/_9999-9999$/, '');
+    
+    // Очищаем от лишних подчеркиваний
+    cleanedName = cleanedName.replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+    
+    let finalName;
     
     if (originalArticles.length > 0) {
-      // Если в имени уже есть артикулы, оставляем их
-      baseName = baseName.replace(/_\d+x\d+_\d{8}/g, '');
-      baseName = baseName.replace(/_\d{8}$/g, '');
-      baseName = baseName.replace(/_+$/, '');
-      
-      return `${baseName}_${imageDimensions.width}x${imageDimensions.height}_${datePart}.${extension}`;
+      // Если в имени есть артикулы, используем первый найденный
+      const mainArticle = originalArticles[0];
+      finalName = `${mainArticle}_${cleanedName || 'image'}_${imageDimensions.width}x${imageDimensions.height}_${datePart}.${extension}`;
     } else {
-      // Если артикулов нет в оригинальном имени, используем очищенное имя
-      baseName = baseName.replace(/_\d+x\d+_\d{8}/g, '');
-      baseName = baseName.replace(/_\d{8}$/g, '');
-      baseName = baseName.replace(/_+$/, '');
-      
-      return `${baseName}_${imageDimensions.width}x${imageDimensions.height}_${datePart}.${extension}`;
+      // Если артикулов нет, добавляем 9999-9999 в начало
+      finalName = `9999-9999_${cleanedName || 'image'}_${imageDimensions.width}x${imageDimensions.height}_${datePart}.${extension}`;
     }
+    
+    // Фикс для двойных подчеркиваний
+    finalName = finalName.replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+    
+    return finalName;
   };
 
   // Функция для загрузки изображения на сервер
@@ -302,7 +359,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
         lastModified: selectedFile.lastModified
       });
       
-      // Извлекаем артикулы из имени файла (подкапотом)
+      // Извлекаем артикулы из имени файла
       const extractedArticles = extractArticleCodesFromFileName(originalFileName);
       
       // Если нет артикулов в имени файла, добавляем 9999-9999
@@ -332,15 +389,13 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
       }
       
       const imageUrl = uploadedFile.url || uploadedFile.fileUrl;
-      const thumbnailUrl = uploadedFile.thumbnailUrl || uploadedFile.previewUrl || imageUrl;
-      
+            
       if (!imageUrl) {
         throw new Error('Нет URL изображения в ответе сервера');
       }
       
       const fullImageUrl = getFullImageUrl(imageUrl);
-      const fullThumbnailUrl = getFullImageUrl(thumbnailUrl);
-      
+            
       const img = new Image();
       img.src = fullImageUrl;
       
