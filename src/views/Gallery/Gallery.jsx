@@ -777,7 +777,7 @@ export const Gallery = () => {
         <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
           <HiOutlineChevronLeft /> {t('header.back')}
         </button>
-        <h2 style={{ color: '#333'}}>{t('header.subtitle')}</h2>
+        <h2 style={{ color: '#333'}}>{t('header.gallery')}</h2>
       </div>
 
       {/* Панель фильтров */}
