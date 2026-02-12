@@ -2,7 +2,8 @@ import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
-import { FaCopy } from "react-icons/fa6";
+import { BiSolidEdit } from "react-icons/bi";
+import { FaCopy, FaFileArrowDown } from "react-icons/fa6";
 
 import PaginationPanel from '../../ui/PaginationPanel/PaginationPanel';
 import GalleryFilters from '../../components/GalleryFilters/GalleryFilters';
@@ -387,6 +388,126 @@ export const Gallery = () => {
     navigate(-1);
   };
 
+  // Функция для подсчета реально скачиваемых файлов
+  const getDownloadableCount = useCallback(() => {
+    if (selectedItems.size === 0) return 0;
+
+    let count = 0;
+    selectedItems.forEach(key => {
+      const design = designs.find(item => item.key === key || item.id === key);
+      if (design && design.url) {
+        count++;
+      }
+    });
+    return count;
+  }, [selectedItems, designs]);
+
+  // Функция для подсчета реально удаляемых файлов (только свои)
+  const getDeletableCount = useCallback(() => {
+    if (selectedItems.size === 0 || !user) return 0;
+
+    let count = 0;
+    selectedItems.forEach(key => {
+      const design = designs.find(item => item.key === key || item.id === key);
+      if (design && isDesignBelongsToUser(design)) {
+        count++;
+      }
+    });
+    return count;
+  }, [selectedItems, designs, user]);
+
+  // Функция скачивания графического файла из библиотеки 
+  const downloadFileFromUrl = async (imageData) => {
+    try {
+      const fullImageUrl = `https://mp.sharik.ru${imageData}`;
+
+      const fileName = imageData.split('/').pop();
+      
+      const response = await fetch(fullImageUrl);
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTP: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.style.display = 'none';
+
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+
+      return true;
+    } catch (error) {
+      console.error('Ошибка при скачивании файла:', error);
+      alert(`Не удалось скачать файл. Попробуйте еще раз.`);
+      window.open(`https://mp.sharik.ru${imageData}`, '_blank');
+      return false;
+    }
+  };
+
+  const handleBulkDownload = async () => {
+    if (selectedItems.size === 0) return;
+
+    const downloadableCount = getDownloadableCount();
+    
+    if (downloadableCount === 0) {
+      alert('Нет выбранных дизайнов с файлами для скачивания');
+      return;
+    }
+
+    if (downloadableCount > 100) {
+      alert(`Можно скачать не более 100 файлов за раз. Выбрано файлов для скачивания: ${downloadableCount}`);
+      return;
+    }
+
+    // Собираем только дизайны с url
+    const designsWithUrl = [];
+    selectedItems.forEach(key => {
+      const design = designs.find(item => item.key === key || item.id === key);
+      if (design && design.url) {
+        designsWithUrl.push(design);
+      }
+    });
+
+    const confirmMessage = `Скачать ${downloadableCount} выбранных файлов?`;
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const design of designsWithUrl) {
+        try {
+          await downloadFileFromUrl(design.url);
+          successCount++;
+          // Небольшая задержка между скачиваниями
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error(`Failed to download ${design.id}:`, error);
+          failCount++;
+        }
+      }
+
+      if (failCount > 0) {
+        alert(`Скачано: ${successCount}, не удалось: ${failCount}`);
+      }
+    } catch (error) {
+      console.error('Bulk download error:', error);
+      alert('Ошибка при массовом скачивании');
+    }
+  };
+
   // Функция для удаления дизайна
   const handleDelete = async (key) => {
     try {
@@ -450,13 +571,23 @@ export const Gallery = () => {
   // Функция для массового удаления выбранных дизайнов
   const handleBulkDelete = async () => {
     if (selectedItems.size === 0) return;
-  
-    if (selectedItems.size > 100) {
-      alert(`Можно удалить не более 100 дизайнов за раз. Вы выбрали: ${selectedItems.size}`);
+
+    const deletableCount = getDeletableCount();
+    
+    if (deletableCount === 0) {
+      alert('Нет выбранных дизайнов, которые можно удалить');
       return;
     }
 
-    if (!window.confirm(`Вы уверены, что хотите удалить ${selectedItems.size} выбранных дизайнов?`)) {
+    if (deletableCount > 100) {
+      alert(`Можно удалить не более 100 дизайнов за раз. Вы выбрали: ${deletableCount}`);
+      return;
+    }
+
+    const skippedCount = selectedItems.size - deletableCount;
+    const confirmMessage = `Вы уверены, что хотите удалить ${deletableCount} выбранных дизайнов?`;
+
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
@@ -466,6 +597,7 @@ export const Gallery = () => {
 
       selectedItems.forEach(key => {
         const design = designs.find(item => item.key === key || item.id === key);
+        // Удаляем только свои дизайны
         if (design && design.id && isDesignBelongsToUser(design)) {
           if (/^[0-9a-fA-F]{24}$/.test(design.id)) {
             idsToDelete.push(design.id);
@@ -484,21 +616,28 @@ export const Gallery = () => {
         !validDesigns.some(d => d.id === design.id)
       ));
 
-      setSelectedItems(new Set());
-      setIsSelectionMode(false);
+      // Удаляем только ID удаленных дизайнов из выделения
+      setSelectedItems(prev => {
+        const newSet = new Set(prev);
+        validDesigns.forEach(design => {
+          newSet.delete(design.id);
+          newSet.delete(design.key);
+        });
+        return newSet;
+      });
 
       await apiBulkDeactivateHistories(idsToDelete);
       console.log(`Bulk deletion successful: ${idsToDelete.length} items`);
 
+      // Если после удаления не осталось выбранных, выходим из режима выделения
+      if (selectedItems.size === 0) {
+        setIsSelectionMode(false);
+      }
+
     } catch (error) {
       console.error('Bulk deletion error:', error);
-
       loadDesignsFromBackend(filters);
-      setSelectedItems(new Set());
-      setIsSelectionMode(false);
-
-      const errorMsg = error.response?.data?.message || 'Ошибка при удалении дизайнов';
-      alert(errorMsg);
+      alert('Ошибка при удалении дизайнов');
     }
   };
 
@@ -664,11 +803,18 @@ export const Gallery = () => {
             {t('modals.cancel')}
           </button>
           <button 
+            className="bulk-download-button"
+            onClick={handleBulkDownload}
+            disabled={selectedItems.size === 0}
+          >
+            {t('modals.download')} ({getDownloadableCount()})
+          </button>
+          <button 
             className="bulk-delete-button"
             onClick={handleBulkDelete}
             disabled={selectedItems.size === 0}
           >
-            {t('modals.delete')} ({selectedItems.size})
+            {t('modals.delete')} ({getDeletableCount()})
           </button>
         </div>
       </div>
@@ -705,7 +851,7 @@ export const Gallery = () => {
                 const isHovered = hoveredItem === design.id;
                 const isLiking = likingItem === design.id;
                 const belongsToUser = isDesignBelongsToUser(design);
-                
+                console.log(design)
                 return (
                   <div 
                     key={design.id} 
@@ -719,14 +865,63 @@ export const Gallery = () => {
                       onClick={(e) => {
                         if (isSelectionMode) {
                           toggleItemSelection(design.id, e);
-                        } else {
-                          marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
-                          handleItemClick(design);
-                        }
+                        } 
                       }}
                       role="button"
                       tabIndex={0}
                     >
+                      {design.url && (
+                        <button
+                          className="like-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadFileFromUrl(design.url);
+                          }}
+                          style={{
+                            position: 'absolute',
+                            bottom: '145px',
+                            right: '10px',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '38px',
+                            height: '38px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            zIndex: 5,
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                          }}
+                        >
+                          <FaFileArrowDown size={18} />
+                        </button>
+                      )}
+                      
+                      <button
+                        className="like-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          marketplace !== info.marketplace && toggleMarketplace(info.marketplace);
+                          handleItemClick(design);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          bottom: '100px',
+                          right: '10px',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '38px',
+                          height: '38px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          zIndex: 5,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        <BiSolidEdit size={20} />
+                      </button>
 
                       {design.type !== 'collage' && (
                         <button
@@ -734,7 +929,7 @@ export const Gallery = () => {
                           onClick={(e) => handleCopyClick(design, e)}
                           style={{
                             position: 'absolute',
-                            bottom: '60px',
+                            bottom: '55px',
                             right: '10px',
                             border: 'none',
                             borderRadius: '50%',
@@ -831,7 +1026,7 @@ export const Gallery = () => {
                         </button>
                       )}
                                       
-                      {(isHovered || isSelected) && belongsToUser && (
+                      {(isHovered || isSelected || isSelectionMode) && (
                         <div 
                           className="selection-checkbox-container"
                           onClick={(e) => {
@@ -859,9 +1054,21 @@ export const Gallery = () => {
                         </div>
                       )}
                     
-                      <div className="item-content">
+                      <div className="item-content" style={{ cursor: 'auto' }}>
+                        {(design.url && design.thumbnailUrl) ? (
+                          <img 
+                            src={`https://mp.sharik.ru${design.thumbnailUrl}`}
+                            alt={design.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: 'inherit'
+                            }}
+                          />
+                        ) : (
                         <PreviewDesign elements={design.data} size={design.size} />
-                    
+                        )}
                         {loadingItemKey === design.id && 
                           <div className="loader-container-gallery">
                             <div className="loader"></div>
