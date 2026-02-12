@@ -234,64 +234,6 @@ export const HeaderSection = ({
     URL.revokeObjectURL(url);
   };
 
-  // Парсит код истории для извлечения articles, marketplace, type, size
-  const parseHistoryCode = (code) => {
-    const parts = code.split('_');
-
-    if (parts.length < 6) {
-      return {
-        articles: [],
-        marketplace: '',
-        type: 'unknown',
-        size: ''
-      };
-    }
-
-    // Определяем индекс типа (collage, main, slideX)
-    let typeIndex = -1;
-    let type = 'unknown';
-
-    // Ищем тип дизайна
-    if (parts.includes('collage')) {
-      typeIndex = parts.indexOf('collage');
-      type = 'collage';
-    } else if (parts.includes('main')) {
-      typeIndex = parts.indexOf('main');
-      type = 'main';
-    } else {
-      // Ищем любой слайд (slideX)
-      for (let i = 0; i < parts.length; i++) {
-        if (parts[i].startsWith('slide')) {
-          typeIndex = i;
-          type = parts[i];
-          break;
-        }
-      }
-    }
-
-    // Если не нашли тип, возвращаем значения по умолчанию
-    if (typeIndex === -1) {
-      return {
-        articles: [],
-        marketplace: '',
-        type: 'unknown',
-        size: ''
-      };
-    }
-
-    // Артикулы - это все части ДО marketplace
-    const articles = parts.slice(0, typeIndex - 1);
-    const marketplace = parts[typeIndex - 1] || '';
-    const size = parts[typeIndex + 1] || '';
-
-    return {
-      articles,
-      marketplace,
-      type,
-      size
-    };
-  };
-
   // Основная функция скачивания
   const handleDownload = async (customFileName = null, customArticles = null, customMarketplace = null) => {
     try {
@@ -350,35 +292,6 @@ export const HeaderSection = ({
         ? localStorage.getItem(sessionKey) 
         : sessionStorage.getItem(sessionKey);
 
-      // Если данные есть и fileName определён - сохраняем в историю
-      if (designData && fileName) {
-        const historyKey = fileName.replace('.png', '');
-        const parsedDesignData = JSON.parse(designData);
-
-        if (marketplaceForHistory !== 'AM') {
-          try {
-            // Формируем данные для бэкенда с учетом кастомных значений
-            const historyData = {
-              name: historyKey,
-              data: parsedDesignData,
-              company: companyId,
-              articles: articlesForHistory,
-              marketplace: marketplaceForHistory || marketplace,
-              type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
-              size: sizeLabel
-            };
-          
-            await apiCreateHistory(historyData);
-            console.log('История успешно отправлена на сервер:', historyKey);
-          } catch (backendError) {
-            console.warn('Ошибка отправки истории на сервер:', backendError);
-            alert(`Ошибка отправки истории на сервер: ${backendError}`);
-          }
-        } else {
-          console.log('Сохранение истории пропущено для marketplace AM');
-        }
-      }
-
       // Генерация изображения
       const canvas = await html2canvas(element, {
         width: width,
@@ -408,31 +321,76 @@ export const HeaderSection = ({
       );
 
       const blob = new Blob([pngBuffer], { type: 'image/png' });
+      const imageFile = new File([blob], fileName, { type: 'image/png' });
 
-//      const imageFile = new File([blob], fileName, { type: 'image/png' });
-//      const getMarketplaceFullName = (marketplaceCode) => {
-//        const marketplaceMap = {
-//          'WB': 'Wildberries',
-//          'OZ': 'Ozon',
-//          'AM': 'Amazon'
-//        };
-//        return marketplaceMap[marketplaceCode] || marketplaceCode;
-//      };
-//    
-//      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
-//      const tags = [...(articlesForHistory || [])];
-//    
-//      if (marketplaceTag) { tags.push(marketplaceTag) };
-//
-//      if (companyId) {
-//        try {
-//          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
-//          console.log('Файл успешно загружен на сервер:', uploadResult);
-//        } catch (uploadError) {
-//          console.warn('Ошибка загрузки файла на сервер:', uploadError);
-//          // Не прерываем скачивание локально, только логируем ошибку
-//        }
-//      }
+      let uploadedFileData = null;
+      const getMarketplaceFullName = (marketplaceCode) => {
+        const marketplaceMap = {
+          'WB': 'Wildberries',
+          'OZ': 'Ozon',
+          'AM': 'Amazon'
+        };
+        return marketplaceMap[marketplaceCode] || marketplaceCode;
+      };
+    
+      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
+      const tags = [...(articlesForHistory || [])];
+    
+      if (marketplaceTag) { tags.push(marketplaceTag) };
+
+      if (companyId && marketplaceForHistory !== 'AM') {
+        try {
+          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
+          console.log('Файл успешно загружен на сервер:', uploadResult);
+
+          if (uploadResult?.success && uploadResult?.data) {
+            uploadedFileData = {
+              fileId: uploadResult.data._id,
+              url: uploadResult.data.url,
+              thumbnailUrl: uploadResult.data.thumbnailUrl
+            };
+          }
+
+        } catch (uploadError) {
+          console.warn('Ошибка загрузки файла на сервер:', uploadError);
+          // Не прерываем скачивание локально, только логируем ошибку
+        }
+      }
+
+      // Если данные есть и fileName определён - сохраняем в историю
+      if (designData && fileName) {
+        const historyKey = fileName.replace('.png', '');
+        const parsedDesignData = JSON.parse(designData);
+
+        if (marketplaceForHistory !== 'AM') {
+          try {
+            // Формируем данные для бэкенда с учетом кастомных значений
+            const historyData = {
+              name: historyKey,
+              data: parsedDesignData,
+              company: companyId,
+              articles: articlesForHistory,
+              marketplace: marketplaceForHistory || marketplace,
+              type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
+              size: sizeLabel
+            };
+
+            if (uploadedFileData) {
+              historyData.fileId = uploadedFileData.fileId;
+              historyData.url = uploadedFileData.url;
+              historyData.thumbnailUrl = uploadedFileData.thumbnailUrl;
+            };
+          
+            await apiCreateHistory(historyData);
+            console.log('История успешно отправлена на сервер:', historyKey);
+          } catch (backendError) {
+            console.warn('Ошибка отправки истории на сервер:', backendError);
+            alert(`Ошибка отправки истории на сервер: ${backendError}`);
+          }
+        } else {
+          console.log('Сохранение истории пропущено для marketplace AM');
+        }
+      }
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');

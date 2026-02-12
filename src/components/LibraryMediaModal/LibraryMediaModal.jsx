@@ -3,7 +3,7 @@ import { LuImagePlus } from "react-icons/lu";
 import { FiArrowLeft } from 'react-icons/fi';
 
 import { useAuth } from "../../contexts/AuthContext"; 
-import { apiGetAllImages, uploadGraphicFile } from "../../services/mediaService";
+import { apiGetImagesExcludingMarketplaces, uploadGraphicFile } from "../../services/mediaService";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import Pagination from "../../ui/Pagination/Pagination";
 import { PREDEFINED_TAGS } from "../../constants/tags";
@@ -78,7 +78,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
             limit: itemsPerPage
           };
           
-          const result = await apiGetAllImages(params);
+          const result = await apiGetImagesExcludingMarketplaces(params);
           
           if (result && result.files) {
             setImages(result.files);
