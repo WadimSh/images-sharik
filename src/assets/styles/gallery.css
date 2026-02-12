@@ -98,12 +98,11 @@
   font-size: 14px;
 }
 
+.bulk-download-button:disabled,
 .bulk-delete-button:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
-
-
 
 .selection-checkbox {
   width: 24px;

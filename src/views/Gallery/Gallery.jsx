@@ -575,7 +575,7 @@ export const Gallery = () => {
     const deletableCount = getDeletableCount();
     
     if (deletableCount === 0) {
-      alert('Нет выбранных дизайнов, которые можно удалить');
+      alert('Вы не можете удалить выбранные дизайны.');
       return;
     }
 
@@ -584,7 +584,6 @@ export const Gallery = () => {
       return;
     }
 
-    const skippedCount = selectedItems.size - deletableCount;
     const confirmMessage = `Вы уверены, что хотите удалить ${deletableCount} выбранных дизайнов?`;
 
     if (!window.confirm(confirmMessage)) {
@@ -805,14 +804,14 @@ export const Gallery = () => {
           <button 
             className="bulk-download-button"
             onClick={handleBulkDownload}
-            disabled={selectedItems.size === 0}
+            disabled={getDownloadableCount() === 0}
           >
             {t('modals.download')} ({getDownloadableCount()})
           </button>
           <button 
             className="bulk-delete-button"
             onClick={handleBulkDelete}
-            disabled={selectedItems.size === 0}
+            disabled={getDeletableCount() === 0}
           >
             {t('modals.delete')} ({getDeletableCount()})
           </button>
