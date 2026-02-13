@@ -1,7 +1,9 @@
 import { useEffect, useState, useContext } from "react";
 import { LuImagePlus } from "react-icons/lu";
 import { FiArrowLeft } from 'react-icons/fi';
+import { IoMdImages } from "react-icons/io";
 
+import { TagsFilterComponent } from "../TagsFilterComponent/TagsFilterComponent";
 import { useAuth } from "../../contexts/AuthContext"; 
 import { apiGetImagesExcludingMarketplaces, uploadGraphicFile } from "../../services/mediaService";
 import { LanguageContext } from "../../contexts/contextLanguage";
@@ -54,6 +56,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const [itemsPerPage, setItemsPerPage] = useState(18);
   const [totalCount, setTotalCount] = useState(0);
 
+  const [selectedFilterTags, setSelectedFilterTags] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [originalFileName, setOriginalFileName] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
@@ -61,6 +64,20 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [customTag, setCustomTag] = useState('');
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+
+  const handleFilterTagToggle = (tag) => {
+    setSelectedFilterTags(prev => {
+      if (prev.includes(tag)) {
+        return prev.filter(t => t !== tag);
+      } else {
+        return [...prev, tag];
+      }
+    });
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedFilterTags([]);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,6 +94,10 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
             page: currentPage,
             limit: itemsPerPage
           };
+
+          if (selectedFilterTags.length > 0) {
+            params.tags = selectedFilterTags;
+          }
           
           const result = await apiGetImagesExcludingMarketplaces(params);
           
@@ -102,7 +123,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
         clearTimeout(timeoutId);
       };
     }
-  }, [isOpen, currentPage, itemsPerPage, step]);
+  }, [isOpen, currentPage, itemsPerPage, step, selectedFilterTags]);
 
   // Создаем превью изображения
   useEffect(() => {
@@ -583,49 +604,76 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     return (
       <>
         <div className="main-categories">
-          <button onClick={handleImageClick} className="template-button" style={{ background: 'transparent', marginLeft: 'auto' }}>
-            <LuImagePlus /> {t('Загрузить изображение')}
+          <TagsFilterComponent 
+            selectedFilterTags={selectedFilterTags}
+            onTagToggle={handleFilterTagToggle}
+            onClearAll={handleClearAllFilters}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+
+          <button onClick={handleImageClick} className="upload-file-button" style={{ marginLeft: 'auto' }}>
+            <LuImagePlus size={18} /> {t('Загрузить изображение')}
           </button>
         </div>
 
-        <div className="modals-content">
-          <div className="images-grids">
-          {isLoading ? (
-            <>
-              {[...Array(24)].map((_, index) => (
-                <div key={index} className="skeleton-item" />
-              ))}
-            </>
-          ) : (
-            <>
-              {images.map((image) => (
-                <div 
-                  key={image._id} 
-                  className="images_card"
-                  onClick={() => handleSelectImage(getFullImageUrl(image.url))}
-                >
-                  <div className="images-container">
-                    <img
-                      src={getFullImageUrl(image.thumbnailUrl)}
-                      alt={image.fileName}
-                      loading="lazy"
-                      className="image-thumbnail"
-                      onError={(e) => {
-                        e.target.src = getFullImageUrl(image.url);
-                      }}
-                    />
-                  </div>
-                  <div className="image-info-overlay">
-                    <div className="image-filename" title={image.fileName}>
-                      {image.fileName}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
+<div className="modals-content">
+  <div className="images-grids">
+    {isLoading ? (
+      [...Array(24)].map((_, index) => (
+        <div key={index} className="skeleton-item" />
+      ))
+    ) : images.length === 0 ? (
+      <div className="no-images-found">
+        <div className="no-images-icon">
+          <IoMdImages size={74}/>
+        </div>
+        <div className="no-images-title">Ничего не найдено</div>
+        <div className="no-images-text">
+          {selectedFilterTags.length > 0 
+            ? 'По выбранным фильтрам изображений нет. Попробуйте изменить критерии поиска.'
+            : 'В библиотеке пока нет изображений. Нажмите "Загрузить изображение", чтобы добавить первое фото.'}
+        </div>
+        {selectedFilterTags.length > 0 && (
+          <button 
+            className="clear-filters-btn-large"
+            onClick={() => {
+              handleClearAllFilters();
+              setCurrentPage(1);
+            }}
+          >
+            ✕ Очистить фильтры
+          </button>
+        )}
+      </div>
+    ) : (
+      images.map((image) => (
+        <div 
+          key={image._id} 
+          className="images_card"
+          onClick={() => handleSelectImage(getFullImageUrl(image.url))}
+        >
+          <div className="images-container">
+            <img
+              src={getFullImageUrl(image.thumbnailUrl)}
+              alt={image.fileName}
+              loading="lazy"
+              className="image-thumbnail"
+              onError={(e) => {
+                e.target.src = getFullImageUrl(image.url);
+              }}
+            />
+          </div>
+          <div className="image-info-overlay">
+            <div className="image-filename" title={image.fileName}>
+              {image.fileName}
+            </div>
           </div>
         </div>
+      ))
+    )}
+  </div>
+</div>
 
         <div className="modals-footer">
           <Pagination
@@ -642,7 +690,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
 
   return (
     <div className="modals-overlay" onClick={onClose}>
-      <div className="modals-container" onClick={e => e.stopPropagation()}>
+      <div className="modals-container" onClick={e => e.stopPropagation()} style={{ height: '90vh' }}>
         <div className="modals-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {step === 'upload' && (

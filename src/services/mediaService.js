@@ -60,15 +60,22 @@ export async function apiGetImagesExcludingMarketplaces(params = {}) {
   if (params.limit) queryParams.append('limit', params.limit);
 
   // Фильтрация - теги как множественные параметры
-  if (params.tags && Array.isArray(params.tags)) {
-    params.tags
-      .filter(tag => tag && typeof tag === 'string')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0)
-      .forEach(tag => {
-        queryParams.append('tags', tag);
-      });
+  if (params.tags && Array.isArray(params.tags) && params.tags.length > 0) {
+  const validTags = params.tags
+    .filter(tag => tag && typeof tag === 'string')
+    .map(tag => tag.trim())
+    .filter(tag => tag.length > 0);
+  
+  if (validTags.length === 1) {
+    queryParams.append('tags', validTags[0]);
+    queryParams.append('tags', validTags[0]);
+  } else {
+    // Для нескольких тегов - добавляем каждый
+    validTags.forEach(tag => {
+      queryParams.append('tags', tag);
+    });
   }
+}
   
   // Добавляем параметры фильтрации
   if (params.search) queryParams.append('search', params.search);
@@ -97,7 +104,7 @@ export async function apiGetImagesExcludingMarketplaces(params = {}) {
   if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
   
   const queryString = queryParams.toString();
-  const url = queryString ? `/api/files/exclude?${queryString}` : '/api/files/exclude';
+  const url = queryString ? `/api/files/exclude?${queryString}` : '/api/files';
   
   return fetchDataWithFetch(url, {
     method: 'GET'
