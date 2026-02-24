@@ -522,10 +522,13 @@
 }
 
 .images-grid {
-  padding-right: 8px;
+  margin-right: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 100%; /* или нужная вам высота */
+  overflow-y: auto; /* вертикальный скролл */
+  overflow-x: hidden; /* скрываем горизонтальный скролл */
 }
 
 .image-item {
@@ -537,6 +540,7 @@
   transition: all 0.2s;
   cursor: pointer;
   position: relative;
+  flex-shrink: 0;
 }
 
 .image-item:hover {
@@ -1472,7 +1476,7 @@
   padding: 15px;
 }
 
-.product-images-grid .images-container {
+.product-images-grid .images-grid-container {
   max-height: calc(80vh - 60px);
   overflow-y: auto;
   display: grid;

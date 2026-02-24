@@ -170,7 +170,7 @@ export const ProductModal = ({ isOpen, onClose, onSelectImage }) => {
           </div>
         ) : productImages.length > 0 && (
           <div className="product-images-grid">
-            <div className="images-container">
+            <div className="images-grid-container">
               {productImages.map((imgUrl, index) => (
                 <div key={index} className="image-item">
                   <img 

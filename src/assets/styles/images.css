@@ -10,26 +10,26 @@
 
 /* На десктопах ограничиваем максимум 10 колонок */
 @media (min-width: 1200px) {
-  .images-grid {
+  .images-grids {
     grid-template-columns: repeat(10, 1fr);
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
-  .images-grid {
+  .images-grids {
     grid-template-columns: repeat(5, 1fr);
   }
 }
 
 @media (max-width: 767px) {
-  .images-grid {
+  .images-grids {
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .images-grid {
+  .images-grids {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }

@@ -1512,7 +1512,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
           />
         )}
 
-<div style={{ display: 'flex', flexDirection: containerSize.fileName !== '1416x708' ? 'row' : 'column' }}>
+<div style={{ display: 'flex', flexDirection: containerSize.fileName !== '1416x708' ? 'row' : 'column', marginLeft: isCollageMode ? 'auto': 'none', marginRight: isCollageMode ? 'auto' : 'none' }}>
   
         <div style={{ 
             marginLeft: containerSize.fileName !== '1416x708' ? 'auto' : '0',
