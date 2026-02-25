@@ -255,7 +255,7 @@ export const Images = () => {
                 </span>
               </div>
             ) : (
-              <div className="images-grids">
+              <div className="image-grids">
                 {images.map((image) => (
                   <div 
                     key={image._id} 

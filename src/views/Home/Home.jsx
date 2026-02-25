@@ -11,6 +11,7 @@ import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';
+import { apiGetImagesExcludingMarketplaces } from '../../services/mediaService';
 
 export const Home = () => {
   const savedData = sessionStorage.getItem('searchData');
@@ -159,88 +160,152 @@ export const Home = () => {
     }
   }, [searchQuery, validArticles]);
   
-  const processProductsMeta = (productsData) => {
-    if (!Array.isArray(productsData)) {
-      console.error('Invalid data for processing:', productsData);
-      return [];
+const processProductsMeta = (productsData, externalImagesMap) => {
+  if (!Array.isArray(productsData)) {
+    console.error('Invalid data for processing:', productsData);
+    return [];
+  }
+
+  return productsData.map(item => {
+    if (!item || !item.images || !Array.isArray(item.images)) {
+      console.warn('Invalid product item:', item);
+      return null;
     }
-  
-    return productsData.map(item => {
-      if (!item || !item.images || !Array.isArray(item.images)) {
-        console.warn('Invalid product item:', item);
-        return null;
-      }
-  
-      const properties = item.properties || [];
-      const originProperties = item.origin_properties || [];
-  
-      // Формируем массив ссылок на изображения
-      const images = item.images.map(image => 
-        `https://new.sharik.ru${image.image}`
-      );
 
-      const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
-      const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
+    const properties = item.properties || [];
+    const originProperties = item.origin_properties || [];
 
-      // Добавляем определение типа шаблона
-      const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
-      const brand = brandProperty ? brandProperty.value : '';
-      
-      const properProperty = propertiesList.find(p => p.name === 'Товарная номенклатура');
-      const proper = properProperty ? properProperty.value : '';
+    // Формируем массив ссылок на базовые изображения
+    const baseImages = item.images.map(image => 
+      `https://new.sharik.ru${image.image}`
+    );
 
-      const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : brand.toLowerCase() === 'belbal' ? 'belbal' : proper.toLowerCase() === 'хлопушка' ? 'petard' : 'main';
-  
-      return {
-        code: item.code,
-        name: item.name,
-        multiplicity: item.multiplicity,
-        link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
-        images: images, // Массив ссылок на все изображения товара
-        properties: propertiesList,
-        originProperties: originPropertiesList,
-        styleVariant: 'default',
-        templateType: templateType, // Добавлено новое поле
-      };
-    }); // Фильтруем некорректные элементы
-  };
+    // Получаем внешние изображения из Map
+    const externalImages = externalImagesMap.get(item.code) || [];
+
+    // Объединяем все изображения
+    const allImages = [...baseImages, ...externalImages];
+
+    const propertiesList = properties.map(prop => ({ name: prop.name, value: prop.value }));
+    const originPropertiesList = originProperties.map(prop => ({ name: prop.name, value: prop.value }));
+
+    // Добавляем определение типа шаблона
+    const brandProperty = originPropertiesList.find(p => p.name === 'Торговая марка');
+    const brand = brandProperty ? brandProperty.value : '';
+    
+    const properProperty = propertiesList.find(p => p.name === 'Товарная номенклатура');
+    const proper = properProperty ? properProperty.value : '';
+
+    const templateType = brand.toLowerCase() === 'gemar' ? 'gemar' : 
+                        brand.toLowerCase() === 'belbal' ? 'belbal' : 
+                        proper.toLowerCase() === 'хлопушка' ? 'petard' : 'main';
+
+    return {
+      code: item.code,
+      name: item.name,
+      multiplicity: item.multiplicity,
+      link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
+      images: allImages, // Теперь включает и базовые, и внешние изображения
+      properties: propertiesList,
+      originProperties: originPropertiesList,
+      styleVariant: 'default',
+      templateType: templateType,
+    };
+  }).filter(item => item !== null); // Фильтруем null элементы
+};
 
   // Выносим функцию обработки данных в отдельную утилиту
-  const processProductsData = (productsData) => {
-    if (!Array.isArray(productsData)) {
-      console.error('Invalid data for processing:', productsData);
+  //const processProductsData = (productsData) => {
+  //  if (!Array.isArray(productsData)) {
+  //    console.error('Invalid data for processing:', productsData);
+  //    return [];
+  //  }
+  //
+  //  return productsData.flatMap(item => {
+  //    if (!item || !item.images || !Array.isArray(item.images)) {
+  //      console.warn('Invalid product item:', item);
+  //      return [];
+  //    }
+  //
+  //    const properties = item.properties || [];
+  //    const originProperties = item.origin_properties || [];
+  //
+  //    const getPropertyValue = (propName) => 
+  //      properties.find(p => p.name === propName)?.value || '';
+  //
+  //    const getOriginPropertyValue = (propName) => 
+  //      originProperties.find(p => p.name === propName)?.value || '';
+  //
+  //    return item.images.map((image, imgIndex) => ({
+  //      code: `${item.code}_${imgIndex + 1}`,
+  //      multiplicity: item.multiplicity,
+  //      size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
+  //      title: getPropertyValue('Событие'),
+  //      image: `https://new.sharik.ru${image.image}`,
+  //      category: getPropertyValue('Тип латексных шаров'),
+  //      brand: getOriginPropertyValue('Торговая марка'),
+  //      properties: getPropertyValue('Товарная номенклатура'),
+  //      viewMaterial: getPropertyValue('Вид материала'),
+  //      groupMaterial: getPropertyValue('Группа материала'),
+  //    }));
+  //  });
+  //};
+
+const processProductsData = (detailedData, externalImagesMap = new Map()) => {
+  if (!Array.isArray(detailedData)) {
+    console.error('Invalid data for processing:', detailedData);
+    return [];
+  }
+
+  return detailedData.flatMap(item => {
+    if (!item || !item.images || !Array.isArray(item.images)) {
+      console.warn('Invalid product item:', item);
       return [];
     }
-  
-    return productsData.flatMap(item => {
-      if (!item || !item.images || !Array.isArray(item.images)) {
-        console.warn('Invalid product item:', item);
-        return [];
-      }
-  
-      const properties = item.properties || [];
-      const originProperties = item.origin_properties || [];
-  
-      const getPropertyValue = (propName) => 
-        properties.find(p => p.name === propName)?.value || '';
-  
-      const getOriginPropertyValue = (propName) => 
-        originProperties.find(p => p.name === propName)?.value || '';
-  
-      return item.images.map((image, imgIndex) => ({
-        code: `${item.code}_${imgIndex + 1}`,
-        multiplicity: item.multiplicity,
-        size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
-        title: getPropertyValue('Событие'),
-        image: `https://new.sharik.ru${image.image}`,
-        category: getPropertyValue('Тип латексных шаров'),
-        brand: getOriginPropertyValue('Торговая марка'),
-        properties: getPropertyValue('Товарная номенклатура'),
-        viewMaterial: getPropertyValue('Вид материала'),
-        groupMaterial: getPropertyValue('Группа материала'),
-      }));
-    });
-  };
+
+    const properties = item.properties || [];
+    const originProperties = item.origin_properties || [];
+
+    const getPropertyValue = (propName) => 
+      properties.find(p => p.name === propName)?.value || '';
+
+    const getOriginPropertyValue = (propName) => 
+      originProperties.find(p => p.name === propName)?.value || '';
+
+    // Базовые результаты из оригинальных изображений
+    const baseResults = item.images.map((image, imgIndex) => ({
+      code: `${item.code}_${imgIndex + 1}`,
+      multiplicity: item.multiplicity,
+      size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
+      title: getPropertyValue('Событие'),
+      image: `https://new.sharik.ru${image.image}`,
+      category: getPropertyValue('Тип латексных шаров'),
+      brand: getOriginPropertyValue('Торговая марка'),
+      properties: getPropertyValue('Товарная номенклатура'),
+      viewMaterial: getPropertyValue('Вид материала'),
+      groupMaterial: getPropertyValue('Группа материала'),
+    }));
+
+    // Получаем внешние изображения из Map (если есть)
+    const externalImages = externalImagesMap.get(item.code) || [];
+    
+    const externalResults = externalImages.map((externalImage, extIndex) => ({
+      code: `${item.code}_${item.images.length + extIndex + 1}`,
+      multiplicity: item.multiplicity,
+      size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
+      title: getPropertyValue('Событие'),
+      image: externalImage,
+      category: getPropertyValue('Тип латексных шаров'),
+      brand: getOriginPropertyValue('Торговая марка'),
+      properties: getPropertyValue('Товарная номенклатура'),
+      viewMaterial: getPropertyValue('Вид материала'),
+      groupMaterial: getPropertyValue('Группа материала'),
+    }));
+
+    return [...baseResults, ...externalResults];
+  });
+};
+
 
   // Функция для фильтрации элементов по видимости в стиле
   const filterElementsByVisibility = (elements, variant) => {
@@ -461,6 +526,37 @@ export const Home = () => {
     }
   }, [templates]);
 
+  // Функция для загрузки внешних изображений по кодам
+  const loadExternalImagesForCodes = async (codes) => {
+    const imagesMap = new Map();
+
+    await Promise.all(codes.map(async (code) => {
+      try {
+        const params = {
+          page: 1,
+          limit: 100,
+          tags: [code]
+        };
+
+        const result = await apiGetImagesExcludingMarketplaces(params);
+
+        if (result && result.files && Array.isArray(result.files)) {
+          const images = result.files.map(file => 
+            `https://mp.sharik.ru${file.url}`
+          );
+          imagesMap.set(code, images);
+        } else {
+          imagesMap.set(code, []);
+        }
+      } catch (error) {
+        console.error(`Error fetching images for code ${code}:`, error);
+        imagesMap.set(code, []);
+      }
+    }));
+
+    return imagesMap;
+  };
+
   // В компоненте Home обновляем handleSearch
   const handleSearch = useCallback(async (normalizedArticles) => {
     setError(null);
@@ -483,28 +579,34 @@ export const Home = () => {
       const searchQuery = normalizedArticles.join(' ');
       const encodedSearch = encodeURIComponent(searchQuery);
 
-    //  fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
-    //    .then(response => response.json())
-    //    .then(data => {
-    //      if (data.results.length === 0) {
-    //        const message = t('views.homeMissingCode');
-    //        setInfoMessage(message);
-    //        return Promise.reject(message);
-    //      }
-    //    
-    //      const productIds = data.results.map(product => product.id);
-    //      const idsParam = productIds.join(',');
-    //      return fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`);
-    //    })
-    //    .then(response => response?.json())
-    //    .then(detailedData => {
-    //      if (!detailedData) return;
+      fetch(`https://new.sharik.ru/api/rest/v1/products_lite/?page_size=100&search=${encodedSearch}&ordering=relevance&supplier_category__isnull=False`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results.length === 0) {
+            const message = t('views.homeMissingCode');
+            setInfoMessage(message);
+            return Promise.reject(message);
+          }
+        
+          const productIds = data.results.map(product => product.id);
+          const idsParam = productIds.join(',');
+            // Запускаем два запроса параллельно
+          const detailedPromise = fetch(`https://new.sharik.ru/api/rest/v1/products_detailed/get_many/?ids=${idsParam}`).then(r => r.json());
+
+          // Создаем промис для загрузки внешних изображений
+          const codes = data.results.map(product => product.code);
+          const externalImagesPromise = loadExternalImagesForCodes(codes);
+
+          return Promise.all([detailedPromise, externalImagesPromise]);
+        })
+        .then(([detailedData, externalImagesMap]) => {
+        if (!detailedData) return;
 
         // Обрабатываем полученные данные API
-        const processedResults = processProductsData(data);
-        const processedMetaResults = processProductsMeta(data);
-        //const processedResults = processProductsData(detailedData);
-        //const processedMetaResults = processProductsMeta(detailedData);
+        //const processedResults = processProductsData(data);
+        //const processedMetaResults = processProductsMeta(data);
+        const processedResults = processProductsData(detailedData, externalImagesMap);
+        const processedMetaResults = processProductsMeta(detailedData, externalImagesMap);
 
         // Сохраняем в sessionStorage
         processedResults.forEach(item => {
@@ -534,16 +636,16 @@ export const Home = () => {
         }));
 
         return processedResults;
-  //    })
-  //    .catch(error => {
-  //      console.error('Error:', error);
-  //      setError(error.message || "An error occurred");
-  //      setValidArticles([]);
-  //      setIsSearchActive(false);
-  //    })
-  //    .finally(() => {
-  //      setLoading(false);
-  //    });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setError(error.message || "An error occurred");
+        setValidArticles([]);
+        setIsSearchActive(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [generateDesignData, isToggled]);
 
   const handleItemsUpdate = (newItems) => {

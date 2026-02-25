@@ -14,7 +14,6 @@ const EditFileNameModal = ({
   const { marketplace: globalMarketplace } = useMarketplace();
   const modalRef = useRef(null);
 
-  // Используем локальное состояние которое не зависит от initialFileData
   const [articles, setArticles] = useState('');
   const [selectedMarketplace, setSelectedMarketplace] = useState('');
   const [error, setError] = useState('');

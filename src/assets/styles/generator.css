@@ -526,7 +526,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 100%; /* или нужная вам высота */
+  max-height: 82vh; /* или нужная вам высота */
+  width: 106px;
   overflow-y: auto; /* вертикальный скролл */
   overflow-x: hidden; /* скрываем горизонтальный скролл */
 }
@@ -544,7 +545,7 @@
 }
 
 .image-item:hover {
-  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(0,123,255,0.3);
 }
 
 .image-item.active {

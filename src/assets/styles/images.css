@@ -1,5 +1,5 @@
 /* Сетка изображений */
-.images-grids {
+.image-grids {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 16px;
@@ -10,26 +10,26 @@
 
 /* На десктопах ограничиваем максимум 10 колонок */
 @media (min-width: 1200px) {
-  .images-grids {
+  .image-grids {
     grid-template-columns: repeat(10, 1fr);
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
-  .images-grids {
+  .image-grids {
     grid-template-columns: repeat(5, 1fr);
   }
 }
 
 @media (max-width: 767px) {
-  .images-grids {
+  .image-grids {
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .images-grids {
+  .image-grids {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
