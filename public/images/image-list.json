@@ -65,7 +65,8 @@
       "name": "category.russian_style",
       "subcategories": [
         { "id": "default-russian", "name": "styles.default", "tags": ["default-russian"] },
-        { "id": "khokhloma", "name": "styles.khokhloma", "tags": ["khokhloma"] }
+        { "id": "khokhloma", "name": "styles.khokhloma", "tags": ["khokhloma"] },
+        { "id": "easter", "name": "styles.easter", "tags": ["easter"] }
       ]
     },
     {
@@ -93,6 +94,10 @@
         { "id": "minimalistic", "name": "styles.minimalistic", "tags": ["minimalistic"] },
         { "id": "ice", "name": "styles.ice", "tags": ["ice"] }
       ]
+    },
+    {
+      "id": "prostokvashino",
+      "name": "category.prostokvashino"
     },
     {
       "id": "kittens",
@@ -1980,6 +1985,30 @@
       "tags": ["men_day", "camouflage"]
     },
     {
+      "filename": "title_29.png",
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "title_30.png",
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "title_31.png",
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "title_32.png",
+      "tags": ["russian_style", "default-russian"]
+    },
+    {
+      "filename": "title_33.png",
+      "tags": ["russian_style", "easter"]
+    },
+    {
+      "filename": "title_34.png",
+      "tags": ["prostokvashino"]
+    },
+    {
       "filename": "bubbles_09_001.png",
       "tags": ["halloween", "default-halloween", "carved"]
     },
@@ -3325,6 +3354,10 @@
       "tags": ["russian_style", "khokhloma"]
     },
     {
+      "filename": "bubbles_13_027.png",
+      "tags": ["russian_style", "easter"]
+    },
+    {
       "filename": "bubbles_13+text_001.png",
       "tags": ["russian_style", "default-russian"]
     },
@@ -3435,6 +3468,22 @@
     {
       "filename": "bubbles_13+text_028.png",
       "tags": ["russian_style", "khokhloma"]
+    },
+    {
+      "filename": "bubbles_13+text_029.png",
+      "tags": ["russian_style", "easter"]
+    },
+    {
+      "filename": "bubbles_13+text_030.png",
+      "tags": ["russian_style", "easter"]
+    },
+    {
+      "filename": "bubbles_13+text_031.png",
+      "tags": ["russian_style", "easter"]
+    },
+    {
+      "filename": "bubbles_13+text_032.png",
+      "tags": ["russian_style", "easter"]
     },
     {
       "filename": "bubbles_14_001.png",
@@ -3711,6 +3760,94 @@
     {
       "filename": "bubbles_16+text_006.png",
       "tags": ["men_day", "tricolour"]
+    },
+    {
+      "filename": "bubbles_17_001.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_002.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_003.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_004.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_005.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_006.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_007.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_008.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17_009.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_001.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_002.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_003.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_004.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_005.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_006.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_007.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_008.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_009.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_010.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_011.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_012.png",
+      "tags": ["prostokvashino"]
+    },
+    {
+      "filename": "bubbles_17+text_013.png",
+      "tags": ["prostokvashino"]
     }
   ]
 } 

@@ -52,7 +52,8 @@
     "russian_style": "Russischer Stil",
     "ladies_day": "Internationaler Frauentag",
     "helium": "Helium",
-    "men_day": "Männertag"
+    "men_day": "Männertag",
+    "prostokvashino": "Prostokvashino"
   },
   "styles": {
     "default": "Klassischer Stil",
@@ -80,7 +81,8 @@
     "khokhloma": "Chochloma-Stil",
     "pink": "Pink-Stil",
     "tricolour": "Trikot-Stil",
-    "camouflage": "Tarnstil"
+    "camouflage": "Tarnstil",
+    "easter": "Osterstil"
   },
   "grid": {
     "all": "Alle",

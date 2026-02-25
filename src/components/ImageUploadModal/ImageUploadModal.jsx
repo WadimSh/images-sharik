@@ -506,15 +506,12 @@ const ImageUploadModal = ({
                 {/* Изображение */}
                 <div className="image-preview-container">
                   {imagePreview && (
-                    <div className="image-preview-wrapper">
+                    <div className="image-previews-wrapper">
                       <img 
                         src={imagePreview} 
                         alt="Предпросмотр" 
                         className="image-preview"
                       />
-                      <div className="image-overlay">
-                        <div className="image-badge">Загружаемое изображение</div>
-                      </div>
                     </div>
                   )}
                 </div>

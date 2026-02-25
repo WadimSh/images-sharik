@@ -31,5 +31,14 @@ export const BRAND_IMAGES = [
   '/images/fon-05-10.png',
   '/images/fon-06-01.png',
   '/images/fon-06-02.png',
-  '/images/fon-06-03.png'
+  '/images/fon-06-03.png',
+  '/images/fon-07-01.jpg',
+  '/images/fon-07-02.jpg',
+  '/images/fon-07-03.jpg',
+  '/images/fon-07-04.jpg',
+  '/images/fon-07-05.jpg',
+  '/images/fon-07-06.jpg',
+  '/images/fon-08-01.jpg',
+  '/images/fon-08-02.jpg',
+  '/images/fon-08-03.jpg'
 ];

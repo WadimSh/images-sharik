@@ -13,4 +13,5 @@ export const PREDEFINED_TAGS = [
   { id: 10, name: 'Семинар', color: '#9B5DE5' },
   { id: 11, name: 'Выставка', color: '#00BBF9' },
   { id: 12, name: 'Студия', color: '#00F5D4' },
+  { id: 15, name: 'Пример', color: '#83a2ca' }
 ];

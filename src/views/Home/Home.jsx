@@ -7,7 +7,7 @@ import { UpdateModal } from '../../components/UpdateModal/UpdateModal';
 import { useAuth } from '../../contexts/AuthContext';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
-import { data } from "../../assets/data";
+//import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';
@@ -50,21 +50,21 @@ export const Home = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const UPDATE_CONFIG = {
     admin: {
-      version: '2026-02-12-admin',
+      version: '2026-02-25-admin',
       file: '/upload/changelog-user.md',
-      headerImage: 'none',
+      headerImage: '/upload/update-header.png',
       key: 'update_modal_shown_admin'
     },
     uploader: {
-      version: '2026-02-12-uploader',
+      version: '2026-02-25-uploader',
       file: '/upload/changelog-user.md',
-      headerImage: 'none',
+      headerImage: '/upload/update-header.png',
       key: 'update_modal_shown_uploader'
     },
     user: {
-      version: '2026-02-12-user',
+      version: '2026-02-25-user',
       file: '/upload/changelog-user.md',
-      headerImage: 'none',
+      headerImage: '/upload/update-header.png',
       key: 'update_modal_shown_user'
     }
   };
@@ -215,42 +215,6 @@ const processProductsMeta = (productsData, externalImagesMap) => {
 };
 
   // Выносим функцию обработки данных в отдельную утилиту
-  //const processProductsData = (productsData) => {
-  //  if (!Array.isArray(productsData)) {
-  //    console.error('Invalid data for processing:', productsData);
-  //    return [];
-  //  }
-  //
-  //  return productsData.flatMap(item => {
-  //    if (!item || !item.images || !Array.isArray(item.images)) {
-  //      console.warn('Invalid product item:', item);
-  //      return [];
-  //    }
-  //
-  //    const properties = item.properties || [];
-  //    const originProperties = item.origin_properties || [];
-  //
-  //    const getPropertyValue = (propName) => 
-  //      properties.find(p => p.name === propName)?.value || '';
-  //
-  //    const getOriginPropertyValue = (propName) => 
-  //      originProperties.find(p => p.name === propName)?.value || '';
-  //
-  //    return item.images.map((image, imgIndex) => ({
-  //      code: `${item.code}_${imgIndex + 1}`,
-  //      multiplicity: item.multiplicity,
-  //      size: getPropertyValue('Размер').split("/")[0]?.trim() || '',
-  //      title: getPropertyValue('Событие'),
-  //      image: `https://new.sharik.ru${image.image}`,
-  //      category: getPropertyValue('Тип латексных шаров'),
-  //      brand: getOriginPropertyValue('Торговая марка'),
-  //      properties: getPropertyValue('Товарная номенклатура'),
-  //      viewMaterial: getPropertyValue('Вид материала'),
-  //      groupMaterial: getPropertyValue('Группа материала'),
-  //    }));
-  //  });
-  //};
-
 const processProductsData = (detailedData, externalImagesMap = new Map()) => {
   if (!Array.isArray(detailedData)) {
     console.error('Invalid data for processing:', detailedData);
