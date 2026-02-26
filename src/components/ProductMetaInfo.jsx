@@ -1,19 +1,20 @@
-import { Tooltip } from "../ui/Tooltip/Tooltip";
-
 export const ProductMetaInfo = ({ 
   initialMetaDateElement 
 }) => (
   <div className="meta-info">
-    <Tooltip 
-      content={'Это текст тултипа'}
-          position="bottom"
-        >
-    <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
+   {initialMetaDateElement.link !== '#' ? (
+      <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
+        <h3 className='meta-title'>
+          {initialMetaDateElement.code}
+          <span className="meta-subtitle"> {initialMetaDateElement.name}</span>
+        </h3>
+      </a>
+    ) : (
       <h3 className='meta-title'>
         {initialMetaDateElement.code}
         <span className="meta-subtitle"> {initialMetaDateElement.name}</span>
       </h3>
-    </a></Tooltip>
+    )}
     {initialMetaDateElement.originProperties.map((item, index) => (
       <div className="meta-row" key={index}>
         <div className="meta-col">

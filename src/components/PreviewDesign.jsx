@@ -134,7 +134,7 @@ export const PreviewDesign = ({ elements, size }) => {
                   src={element.image === "{{ITEM_IMAGE}}" ? img : element.image} 
                   style={{
                     ...style,
-                    objectFit: 'cover',
+                    objectFit: 'contain',
                   }} 
                   className="preview-element" 
                 />

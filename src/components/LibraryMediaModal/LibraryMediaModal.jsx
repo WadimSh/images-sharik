@@ -53,7 +53,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(18);
+  const [itemsPerPage, setItemsPerPage] = useState(21);
   const [totalCount, setTotalCount] = useState(0);
 
   const [selectedFilterTags, setSelectedFilterTags] = useState([]);

@@ -92,7 +92,7 @@ export const ImageElement = ({
           width: `${width}px`,
           height: `${height}px`,
           pointerEvents: 'none',
-          objectFit: 'cover',
+          objectFit: 'contain',
           transform: `scaleX(${isFlipped ? -1 : 1})`,
           transformOrigin: 'center',
         }}

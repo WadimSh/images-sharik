@@ -270,6 +270,57 @@ const processProductsData = (detailedData, externalImagesMap = new Map()) => {
   });
 };
 
+// Функция для создания структуры данных из внешних изображений
+const processExternalImagesData = (articlesFromQuery, externalImagesMap) => {
+  const results = [];
+  
+  articlesFromQuery.forEach(code => {
+    const images = externalImagesMap.get(code) || [];
+    
+    if (images && images.length > 0) {
+      images.forEach((image, index) => {
+        results.push({
+          code: `${code}_${index + 1}`,
+          multiplicity: 1,
+          size: '',
+          title: '',
+          image: image,
+          category: '',
+          brand: '',
+          properties: '',
+          viewMaterial: '',
+          groupMaterial: '',
+        });
+      });
+    }
+  });
+ 
+  return results;
+};
+
+const processExternalProductsMeta = (articlesFromQuery, externalImagesMap) => {
+  const results = [];
+  
+  articlesFromQuery.forEach(code => {
+    const images = externalImagesMap.get(code) || [];
+    
+    if (images && images.length > 0) {
+      results.push({
+        code: code,
+        name: 'Техническая позиция',
+        multiplicity: 1,
+        link: '#',
+        images: images, 
+        properties: [],          
+        originProperties: [],
+        styleVariant: 'default',
+        templateType: 'main', 
+      });
+    }
+  });
+  
+  return results;
+};
 
   // Функция для фильтрации элементов по видимости в стиле
   const filterElementsByVisibility = (elements, variant) => {
@@ -521,6 +572,25 @@ const processProductsData = (detailedData, externalImagesMap = new Map()) => {
     return imagesMap;
   };
 
+  // Функция для проверки, является ли строка артикулом в формате XXXX-XXXX
+const isArticleFormat = (str) => {
+  return /^\d{4}-\d{4}$/.test(str);
+};
+
+  // Функция для парсинга строки запроса на артикулы
+const parseArticlesFromQuery = (query) => {
+  if (!query || typeof query !== 'string') return [];
+  
+  // Разделяем по возможным разделителям: запятая, пробел, +, _
+  const separators = /[\s,+_]+/;
+  const parts = query.split(separators).filter(part => part.trim() !== '');
+  
+  // Фильтруем только те части, которые соответствуют формату артикула
+  const articles = parts.filter(part => isArticleFormat(part));
+  
+  return articles;
+};
+
   // В компоненте Home обновляем handleSearch
   const handleSearch = useCallback(async (normalizedArticles) => {
     setError(null);
@@ -547,10 +617,71 @@ const processProductsData = (detailedData, externalImagesMap = new Map()) => {
         .then(response => response.json())
         .then(data => {
           if (data.results.length === 0) {
-            const message = t('views.homeMissingCode');
-            setInfoMessage(message);
-            return Promise.reject(message);
-          }
+            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
+        if (articlesFromQuery.length > 0) {
+          loadExternalImagesForCodes(articlesFromQuery)
+            .then(externalImagesMap => {
+              let hasImages = false;
+              externalImagesMap.forEach((images) => {
+                if (images && images.length > 0) hasImages = true;
+              });
+
+              if (hasImages) {
+                const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
+                const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
+
+                processedResults.forEach(item => {
+                  const designData = generateDesignData(item);
+                  slidesDB.add({
+                    code: `design-${item.code}`, 
+                    data: designData
+                  });
+                });
+              
+                processedMetaResults.forEach(item => {
+                  productsDB.add({
+                    code: `product-${item.code}`, 
+                    data: item   
+                  });
+                });
+                
+                const codes = processedResults.map(item => item.code);
+                setValidArticles(codes);
+                setIsSearchActive(codes.length > 0);
+                
+                sessionStorage.setItem('searchData', JSON.stringify({
+                  query: searchQuery,
+                  articles: codes
+                }));
+                
+                // Убираем сообщение об ошибке, если все хорошо
+                setInfoMessage(null);
+              } else {
+                // Если изображений нет, показываем сообщение
+                const message = t('views.homeMissingCode');
+                setInfoMessage(message);
+                setValidArticles([]);
+                setIsSearchActive(false);
+              }
+            })
+            .catch(error => {
+              console.error('Error loading external images:', error);
+              setError(error.message || "An error occurred");
+              setValidArticles([]);
+              setIsSearchActive(false);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        } else {
+          const message = t('views.homeMissingCode');
+          setInfoMessage(message);
+          setValidArticles([]);
+          setIsSearchActive(false);
+          setLoading(false);
+        }
+        return [null, new Map()];
+      }
         
           const productIds = data.results.map(product => product.id);
           const idsParam = productIds.join(',');
