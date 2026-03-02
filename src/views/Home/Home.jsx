@@ -767,8 +767,10 @@ const parseArticlesFromQuery = (query) => {
 //                      articles: codes
 //                    }));
 //
+//                    // Убираем сообщение об ошибке, если все хорошо
 //                    setInfoMessage(null);
 //                  } else {
+//                    // Если изображений нет, показываем сообщение
 //                    const message = t('views.homeMissingCode');
 //                    setInfoMessage(message);
 //                    setValidArticles([]);

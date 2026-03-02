@@ -267,6 +267,17 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       }
     }
     
+    // Сохраняем оригинальные стили фона
+    const originalBackground = element.style.background;
+    const originalBackgroundImage = element.style.backgroundImage;
+    const originalBackgroundSize = element.style.backgroundSize;
+    const originalBackgroundColor = element.style.backgroundColor;
+    
+    // Убираем градиент и устанавливаем белый фон
+    element.style.background = '#FFFFFF';
+    element.style.backgroundImage = 'none';
+    element.style.backgroundColor = '#FFFFFF';
+    
     // Используем dom-to-image для генерации
     const dataUrl = await domtoimage.toPng(element, {
       width: width,
@@ -278,6 +289,12 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
         'transform-origin': '0 0'
       }
     });
+    
+    // Восстанавливаем оригинальные стили фона
+    element.style.background = originalBackground;
+    element.style.backgroundImage = originalBackgroundImage;
+    element.style.backgroundSize = originalBackgroundSize;
+    element.style.backgroundColor = originalBackgroundColor;
     
     // Восстанавливаем оригинальные src
     originalSrcs.forEach(item => {
