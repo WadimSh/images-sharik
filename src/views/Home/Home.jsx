@@ -7,7 +7,6 @@ import { UpdateModal } from '../../components/UpdateModal/UpdateModal';
 import { useAuth } from '../../contexts/AuthContext';
 
 import { replacePlaceholders } from '../../utils/replacePlaceholders';
-//import { data } from "../../assets/data";
 import { productsDB, slidesDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { apiGetAllLayouts } from '../../services/layoutsService';
@@ -618,70 +617,70 @@ const parseArticlesFromQuery = (query) => {
         .then(data => {
           if (data.results.length === 0) {
             const articlesFromQuery = parseArticlesFromQuery(searchQuery);
-        if (articlesFromQuery.length > 0) {
-          loadExternalImagesForCodes(articlesFromQuery)
-            .then(externalImagesMap => {
-              let hasImages = false;
-              externalImagesMap.forEach((images) => {
-                if (images && images.length > 0) hasImages = true;
-              });
-
-              if (hasImages) {
-                const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
-                const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
-
-                processedResults.forEach(item => {
-                  const designData = generateDesignData(item);
-                  slidesDB.add({
-                    code: `design-${item.code}`, 
-                    data: designData
+            if (articlesFromQuery.length > 0) {
+              loadExternalImagesForCodes(articlesFromQuery)
+                .then(externalImagesMap => {
+                  let hasImages = false;
+                  externalImagesMap.forEach((images) => {
+                    if (images && images.length > 0) hasImages = true;
                   });
+
+                  if (hasImages) {
+                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
+                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
+
+                    processedResults.forEach(item => {
+                      const designData = generateDesignData(item);
+                      slidesDB.add({
+                        code: `design-${item.code}`, 
+                        data: designData
+                      });
+                    });
+                  
+                    processedMetaResults.forEach(item => {
+                      productsDB.add({
+                        code: `product-${item.code}`, 
+                        data: item   
+                      });
+                    });
+
+                    const codes = processedResults.map(item => item.code);
+                    setValidArticles(codes);
+                    setIsSearchActive(codes.length > 0);
+
+                    sessionStorage.setItem('searchData', JSON.stringify({
+                      query: searchQuery,
+                      articles: codes
+                    }));
+
+                    // Убираем сообщение об ошибке, если все хорошо
+                    setInfoMessage(null);
+                  } else {
+                    // Если изображений нет, показываем сообщение
+                    const message = t('views.homeMissingCode');
+                    setInfoMessage(message);
+                    setValidArticles([]);
+                    setIsSearchActive(false);
+                  }
+                })
+                .catch(error => {
+                  console.error('Error loading external images:', error);
+                  setError(error.message || "An error occurred");
+                  setValidArticles([]);
+                  setIsSearchActive(false);
+                })
+                .finally(() => {
+                  setLoading(false);
                 });
-              
-                processedMetaResults.forEach(item => {
-                  productsDB.add({
-                    code: `product-${item.code}`, 
-                    data: item   
-                  });
-                });
-                
-                const codes = processedResults.map(item => item.code);
-                setValidArticles(codes);
-                setIsSearchActive(codes.length > 0);
-                
-                sessionStorage.setItem('searchData', JSON.stringify({
-                  query: searchQuery,
-                  articles: codes
-                }));
-                
-                // Убираем сообщение об ошибке, если все хорошо
-                setInfoMessage(null);
-              } else {
-                // Если изображений нет, показываем сообщение
-                const message = t('views.homeMissingCode');
-                setInfoMessage(message);
-                setValidArticles([]);
-                setIsSearchActive(false);
-              }
-            })
-            .catch(error => {
-              console.error('Error loading external images:', error);
-              setError(error.message || "An error occurred");
+            } else {
+              const message = t('views.homeMissingCode');
+              setInfoMessage(message);
               setValidArticles([]);
               setIsSearchActive(false);
-            })
-            .finally(() => {
               setLoading(false);
-            });
-        } else {
-          const message = t('views.homeMissingCode');
-          setInfoMessage(message);
-          setValidArticles([]);
-          setIsSearchActive(false);
-          setLoading(false);
-        }
-        return [null, new Map()];
-      }
+            }
+            return [null, new Map()];
+          }
         
           const productIds = data.results.map(product => product.id);
           const idsParam = productIds.join(',');
@@ -698,8 +697,6 @@ const parseArticlesFromQuery = (query) => {
         if (!detailedData) return;
 
         // Обрабатываем полученные данные API
-        //const processedResults = processProductsData(data);
-        //const processedMetaResults = processProductsMeta(data);
         const processedResults = processProductsData(detailedData, externalImagesMap);
         const processedMetaResults = processProductsMeta(detailedData, externalImagesMap);
 
@@ -733,6 +730,53 @@ const parseArticlesFromQuery = (query) => {
         return processedResults;
       })
       .catch(error => {
+//            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
+//            if (articlesFromQuery.length > 0) {
+//              loadExternalImagesForCodes(articlesFromQuery)
+//                .then(externalImagesMap => {
+//                  let hasImages = false;
+//                  externalImagesMap.forEach((images) => {
+//                    if (images && images.length > 0) hasImages = true;
+//                  });
+//
+//                  if (hasImages) {
+//                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
+//                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
+//
+//                    processedResults.forEach(item => {
+//                      const designData = generateDesignData(item);
+//                      slidesDB.add({
+//                        code: `design-${item.code}`, 
+//                        data: designData
+//                      });
+//                    });
+//                  
+//                    processedMetaResults.forEach(item => {
+//                      productsDB.add({
+//                        code: `product-${item.code}`, 
+//                        data: item   
+//                      });
+//                    });
+//
+//                    const codes = processedResults.map(item => item.code);
+//                    setValidArticles(codes);
+//                    setIsSearchActive(codes.length > 0);
+//
+//                    sessionStorage.setItem('searchData', JSON.stringify({
+//                      query: searchQuery,
+//                      articles: codes
+//                    }));
+//
+//                    setInfoMessage(null);
+//                  } else {
+//                    const message = t('views.homeMissingCode');
+//                    setInfoMessage(message);
+//                    setValidArticles([]);
+//                    setIsSearchActive(false);
+//                  }
+//                })}
+
+
         console.error('Error:', error);
         setError(error.message || "An error occurred");
         setValidArticles([]);

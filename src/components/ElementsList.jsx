@@ -489,6 +489,37 @@ export const ElementsList = ({
 
                   {element.type === 'background' && (
                     <div className="element-controls">
+                      <span>{t('elements.labelImage')}</span>
+                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
+                        {BRAND_IMAGES.map((img, index) => (
+                          <div 
+                            key={index}
+                            className="images-brand"
+                            onClick={() => handleSelectBackground(img)}
+                          >
+                            <img 
+                              src={img} 
+                              alt={`Decoration ${index + 1}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveBackgroundImage(element.id, setElements);
+                        }}
+                        className="remove-button"
+                        disabled={!element.backgroundImage}
+                      >
+                        <><LuImageOff /> {t('ui.removeImage')}</>
+                      </button>
+                    </div>
+                  )}
+
+                  {element.type === 'background' && (
+                    <div className="element-controls line">
                       <span>{t('elements.subtitleColor')}</span>
                       <div className="color-control" style={{ flexWrap: 'wrap' }}>
                         {BRAND_COLORS.map(brand => (
@@ -975,37 +1006,6 @@ export const ElementsList = ({
                           <span>{(element.gradient?.opacity?.[2] || 1).toFixed(1)}</span>
                         </div>}
                       </div>
-                    </div>
-                  )}
-
-                  {element.type === 'background' && (
-                    <div className="element-controls line">
-                      <span>{t('elements.labelImage')}</span>
-                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
-                        {BRAND_IMAGES.map((img, index) => (
-                          <div 
-                            key={index}
-                            className="images-brand"
-                            onClick={() => handleSelectBackground(img)}
-                          >
-                            <img 
-                              src={img} 
-                              alt={`Decoration ${index + 1}`}
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveBackgroundImage(element.id, setElements);
-                        }}
-                        className="remove-button"
-                        disabled={!element.backgroundImage}
-                      >
-                        <><LuImageOff /> {t('ui.removeImage')}</>
-                      </button>
                     </div>
                   )}
 
