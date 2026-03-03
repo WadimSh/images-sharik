@@ -36,7 +36,7 @@ export const TextElement = ({
     fontStyle: element.fontStyle || 'normal',
     textDecoration: element.textDecoration || 'none',
     textAlign: element.textAlign || 'left',
-    lineHeight: 1.1,
+    lineHeight: element.fontFamily === 'Lemon Tuesday' ? 1.8 : 1.1,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
     overflow: 'hidden',

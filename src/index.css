@@ -189,8 +189,43 @@
 
 @font-face {
   font-family: 'Bebas Neue Cyrillic';
-  src: url('./assets//fonts/Bebas\ Neue\ Cyrillic.ttf') format('truetype');
+  src: url('./assets/fonts/Bebas\ Neue\ Cyrillic.ttf') format('truetype');
   font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'Magnolia-Script';
+	src: url('./assets/fonts/magnolia-script.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'Lemon Tuesday';
+	src: url('./assets/fonts/lemon_tuesday.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'UniNeueLight';
+	src: url('./assets/fonts/unineuelight.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'UniNeueHeavy-Italic';
+	src: url('./assets/fonts/unineueheavy-italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'NautilusPompilius';
+	src: url('./assets/fonts/nautiluspompilius.ttf') format('truetype');
+    font-weight: normal;
   font-style: normal;
 }
 
