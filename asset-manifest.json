@@ -1,17 +1,22 @@
 {
   "files": {
-    "main.css": "./static/css/main.5a23f7f4.css",
-    "main.js": "./static/js/main.3e635448.js",
+    "main.css": "./static/css/main.adf361db.css",
+    "main.js": "./static/js/main.1f01cfdd.js",
     "static/js/453.12c0891f.chunk.js": "./static/js/453.12c0891f.chunk.js",
     "static/media/icekingdomfrozencyrillic_bold.ttf": "./static/media/icekingdomfrozencyrillic_bold.4d5b9ac96ec1a117a0ff.ttf",
     "static/media/fallback.png": "./static/media/fallback.d660bf7ad2c412bec286.png",
     "static/media/9887.otf": "./static/media/9887.c8cdb23bf53b66746cc7.otf",
     "static/media/Troubleside.ttf": "./static/media/Troubleside.9879b07310972fc2997b.ttf",
+    "static/media/lemon_tuesday.ttf": "./static/media/lemon_tuesday.2032f43e69a02baf92f6.ttf",
     "static/media/AlegreyaSans-Medium.ttf": "./static/media/AlegreyaSans-Medium.c04ff1518dd65acbf9ee.ttf",
     "static/media/ofont.ru_FreeSetTT.ttf": "./static/media/ofont.ru_FreeSetTT.52341effa2ac3e51405f.ttf",
     "static/media/ofont.ru_FreeSetBoldTT.ttf": "./static/media/ofont.ru_FreeSetBoldTT.c2839fcf9656ba196bf7.ttf",
     "static/media/Comic_CAT.otf": "./static/media/Comic_CAT.a380a424826d21d30fb7.otf",
+    "static/media/magnolia-script.ttf": "./static/media/magnolia-script.e441564c78410ed53a5c.ttf",
     "static/media/ofont.ru_ft83.ttf": "./static/media/ofont.ru_ft83.328e4368fbaf05a2bc4d.ttf",
+    "static/media/unineueheavy-italic.ttf": "./static/media/unineueheavy-italic.40c68f50bcd38e382c00.ttf",
+    "static/media/unineuelight.ttf": "./static/media/unineuelight.2c5305af36ab9297bd74.ttf",
+    "static/media/nautiluspompilius.ttf": "./static/media/nautiluspompilius.4679dd777b9908dbe096.ttf",
     "static/media/rfkrabuler_regular.ttf": "./static/media/rfkrabuler_regular.aed046a69b07153e306e.ttf",
     "static/media/Bosk.otf": "./static/media/Bosk.004744d8a735150b9a68.otf",
     "static/media/Sunday-Regular.ttf": "./static/media/Sunday-Regular.95ff464626f46422bc95.ttf",
@@ -35,12 +40,12 @@
     "static/media/folder.png": "./static/media/folder.73ca94ade226239dd4a7.png",
     "static/media/illustrations.png": "./static/media/illustrations.3d3938fbc33987695c4e.png",
     "index.html": "./index.html",
-    "main.5a23f7f4.css.map": "./static/css/main.5a23f7f4.css.map",
-    "main.3e635448.js.map": "./static/js/main.3e635448.js.map",
+    "main.adf361db.css.map": "./static/css/main.adf361db.css.map",
+    "main.1f01cfdd.js.map": "./static/js/main.1f01cfdd.js.map",
     "453.12c0891f.chunk.js.map": "./static/js/453.12c0891f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5a23f7f4.css",
-    "static/js/main.3e635448.js"
+    "static/css/main.adf361db.css",
+    "static/js/main.1f01cfdd.js"
   ]
 }
