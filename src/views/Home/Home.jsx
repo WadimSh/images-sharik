@@ -49,21 +49,21 @@ export const Home = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const UPDATE_CONFIG = {
     admin: {
-      version: '2026-03-03-admin',
+      version: '2026-03-04-admin',
       file: '/upload/changelog-user.md',
-      headerImage: '/upload/update-header.png',
+      headerImage: 'none',
       key: 'update_modal_shown_admin'
     },
     uploader: {
-      version: '2026-03-03-uploader',
+      version: '2026-03-04-uploader',
       file: '/upload/changelog-user.md',
-      headerImage: '/upload/update-header.png',
+      headerImage: 'none',
       key: 'update_modal_shown_uploader'
     },
     user: {
-      version: '2026-03-03-user',
+      version: '2026-03-04-user',
       file: '/upload/changelog-user.md',
-      headerImage: '/upload/update-header.png',
+      headerImage: 'none',
       key: 'update_modal_shown_user'
     }
   };

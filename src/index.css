@@ -229,6 +229,69 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Airfool';
+  src: url('./assets/fonts/Airfool.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Borsok';
+  src: url('./assets/fonts/boorsok.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'Fantazyor';
+	src: url('./assets/fonts/Fantazyor.ttf') format('truetype');
+    font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'GoodVibesCyr';
+	src: url('./assets/fonts/GoodVibesCyr.ttf') format('truetype');
+    font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'PotraCyr';
+	src: url('./assets/fonts/Potra_cyr.ttf') format('truetype');
+    font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TildaNonConnect';
+  src: url('./assets/fonts/tilda-script-non-connect-regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Tilda';
+  src: url('./assets/fonts/tildascript-regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+	font-family: 'TMVinograd-Filled';
+	src: url('./assets/fonts/TMVinograd-Filled.ttf') format('truetype');
+    font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TMVinograd-Regular';
+  src: url('./assets/fonts/TMVinograd-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

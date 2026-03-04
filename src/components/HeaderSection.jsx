@@ -247,7 +247,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     overlay.style.left = '0';
     overlay.style.right = '0';
     overlay.style.bottom = '0';
-    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.97)';
     overlay.style.zIndex = '999999';
     overlay.style.display = 'flex';
     overlay.style.flexDirection = 'column';
