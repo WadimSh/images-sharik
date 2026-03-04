@@ -239,11 +239,65 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     setLoading(true);
     setShowBlindZones(false);
     setZoom(prev => ({ ...prev, level: 1 }));
-    await new Promise(resolve => setTimeout(resolve, 500));
-
+    
+    // 🔥 СОЗДАЕМ ВИЗУАЛЬНЫЙ ЩИТ (ОВЕРЛЕЙ)
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    overlay.style.zIndex = '999999';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.backdropFilter = 'blur(4px)';
+    
+    // Спиннер
+    const spinner = document.createElement('div');
+    spinner.style.width = '50px';
+    spinner.style.height = '50px';
+    spinner.style.border = '5px solid #f3f3f3';
+    spinner.style.borderTop = '5px solid #3498db';
+    spinner.style.borderRadius = '50%';
+    spinner.style.animation = 'spin 1s linear infinite';
+    
+    // Текст
+    const text = document.createElement('div');
+    text.style.marginTop = '20px';
+    text.style.fontSize = '18px';
+    text.style.fontWeight = 'bold';
+    text.style.color = '#333';
+    text.innerText = 'Генерируем изображение...';
+    
+    // Добавляем анимацию spin
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    overlay.appendChild(spinner);
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+    
+    // Даем время на отрисовку оверлея
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Получаем элемент для рендеринга
     const element = captureRef.current;
     const width = Math.floor(element.offsetWidth);
     const height = Math.floor(element.offsetHeight);
+    
+    // Коэффициент увеличения (2x)
+    const scale = 2;
+    const targetWidth = width * scale;
+    const targetHeight = height * scale;
     
     // Сохраняем оригинальные src для восстановления
     const images = element.getElementsByTagName('img');
@@ -267,11 +321,19 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       }
     }
     
-    // Сохраняем оригинальные стили фона
+    // Сохраняем оригинальные стили
     const originalBackground = element.style.background;
     const originalBackgroundImage = element.style.backgroundImage;
     const originalBackgroundSize = element.style.backgroundSize;
     const originalBackgroundColor = element.style.backgroundColor;
+    const originalTransform = element.style.transform;
+    const originalTransformOrigin = element.style.transformOrigin;
+    const originalTransition = element.style.transition;
+    
+    // Временно масштабируем элемент
+    element.style.transition = 'none'; // Без transition под оверлеем
+    element.style.transform = `scale(${scale})`;
+    element.style.transformOrigin = '0 0';
     
     // Убираем градиент и устанавливаем белый фон
     element.style.background = '#FFFFFF';
@@ -280,50 +342,32 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     
     // Используем dom-to-image для генерации
     const dataUrl = await domtoimage.toPng(element, {
-      width: width,
-      height: height,
+      width: targetWidth,
+      height: targetHeight,
       bgcolor: '#FFFFFF',
       quality: 1,
       style: {
-        'transform': 'scale(1)',
+        'transform': `scale(${scale})`,
         'transform-origin': '0 0'
       }
     });
     
-    // Восстанавливаем оригинальные стили фона
+    // Возвращаем все как было
+    element.style.transform = originalTransform;
+    element.style.transition = originalTransition;
     element.style.background = originalBackground;
     element.style.backgroundImage = originalBackgroundImage;
     element.style.backgroundSize = originalBackgroundSize;
     element.style.backgroundColor = originalBackgroundColor;
+    element.style.transformOrigin = originalTransformOrigin;
     
     // Восстанавливаем оригинальные src
     originalSrcs.forEach(item => {
       item.img.src = item.src;
     });
     
-    // Создаем изображение из dataUrl
-    const img = new Image();
-    img.src = dataUrl;
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-    });
-    
-    // Создаем canvas в 2 раза больше
-    const canvas = document.createElement('canvas');
-    canvas.width = width * 2;
-    canvas.height = height * 2;
-    const ctx = canvas.getContext('2d');
-    
-    // Рисуем изображение с увеличением (используем сглаживание для лучшего качества)
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-    // Конвертируем canvas в blob
-    const blob = await new Promise(resolve => {
-      canvas.toBlob(resolve, 'image/png', 1);
-    });
+    // Конвертируем dataUrl в blob
+    const blob = await (await fetch(dataUrl)).blob();
     
     // Определяем параметры для сохранения
     let fileName;
@@ -430,6 +474,10 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       }
     }
     
+    // 🔥 УБИРАЕМ ВИЗУАЛЬНЫЙ ЩИТ
+    document.body.removeChild(overlay);
+    document.head.removeChild(style);
+    
     // Скачиваем файл
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -446,6 +494,16 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     console.error('Generation error:', error);
     alert('Error during image generation!');
     setLoading(false);
+    
+    // В случае ошибки тоже убираем оверлей
+    const overlay = document.querySelector('div[style*="z-index: 999999"]');
+    if (overlay) {
+      document.body.removeChild(overlay);
+    }
+    const style = document.querySelector('style[text-content*="spin"]');
+    if (style) {
+      document.head.removeChild(style);
+    }
   }
 };
   
