@@ -218,7 +218,9 @@
     "removeImage": "Bild entfernen",
     "searchPlaceholder": "Suche...",
     "selectedMessage": "Auswählen...",
-    "noResults": "Keine Ergebnisse gefunden"
+    "noResults": "Keine Ergebnisse gefunden",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
   },
   "elements": {
     "title": "Design-Komponenten",

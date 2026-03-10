@@ -1,4 +1,4 @@
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext, useState } from 'react';
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } from "react-icons/fa6";
 import { RiDeleteBin2Line } from "react-icons/ri";
@@ -122,7 +122,10 @@ export const ElementsList = ({
   const elementRefs = useRef(new Map());
   // Создаем Map для хранения refs меню элементов
   const menuRefs = useRef(new Map());
-  
+  // Создаем ref для хранения таймера
+  const timerRef = useRef(null);
+  const [visibleCount, setVisibleCount] = useState(48);
+    
   const { t } = useContext(LanguageContext);
 
   // Функция для извлечения числового значения из строки направления
@@ -545,36 +548,150 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {element.type === 'background' && (
-                    <div className="element-controls">
-                      <span>{t('elements.labelImage')}</span>
-                      <div className="color-control" style={{ flexWrap: 'wrap' }}>
-                        {BRAND_IMAGES.map((img, index) => (
-                          <div 
-                            key={index}
-                            className="images-brand"
-                            onClick={() => handleSelectBackground(img)}
-                          >
-                            <img 
-                              src={img} 
-                              alt={`Decoration ${index + 1}`}
-                            />
-                          </div>
-                        ))}
-                      </div>
+{element.type === 'background' && (
+  <div className="element-controls">
+    <span>{t('elements.labelImage')}</span>
+    
+    {/* Добавляем состояние для количества отображаемых изображений */}
+    {(() => {
+       // 8 строк * 6 картинок = 48
+      const totalImages = BRAND_IMAGES.length;
+      const hasMore = visibleCount < totalImages;
+      
+      return (
+        <>
+          <div 
+            className="color-control" 
+            style={{ flexWrap: 'wrap' }}
+            onMouseLeave={() => {
+              setElements(prev => prev.map(el => {
+                if (el.id === element.id) {
+                  const { previewBackgroundImage, ...rest } = el;
+                  return {
+                    ...rest,
+                    backgroundImage: el.originalBackgroundImage || null,
+                  };
+                }
+                return el;
+              }));
+            }}
+          >
+            {BRAND_IMAGES.slice(0, visibleCount).map((img, index) => {
+              const handleMouseEnter = () => {
+                if (timerRef.current) {
+                  clearTimeout(timerRef.current);
+                }
+                
+                setElements(prev => prev.map(el => {
+                  if (el.id === element.id) {
+                    return {
+                      ...el,
+                      previewBackgroundImage: img,
+                      backgroundImage: img,
+                    };
+                  }
+                  return el;
+                }));
+              };
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveBackgroundImage(element.id, setElements);
-                        }}
-                        className="remove-button"
-                        disabled={!element.backgroundImage}
-                      >
-                        <><LuImageOff /> {t('ui.removeImage')}</>
-                      </button>
-                    </div>
-                  )}
+              const handleMouseLeave = () => {
+                if (timerRef.current) {
+                  clearTimeout(timerRef.current);
+                  timerRef.current = null;
+                }
+              };
+
+              return (
+                <div 
+                  key={index}
+                  className="images-brand"
+                  onClick={() => {
+                    if (timerRef.current) {
+                      clearTimeout(timerRef.current);
+                      timerRef.current = null;
+                    }
+                    
+                    handleSelectBackground(img);
+                    setElements(prev => prev.map(el => {
+                      if (el.id === element.id) {
+                        return {
+                          ...el,
+                          originalBackgroundImage: img,
+                          backgroundImage: img,
+                        };
+                      }
+                      return el;
+                    }));
+                  }}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <img 
+                    src={img} 
+                    alt={`Decoration ${index + 1}`}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Кнопка "Показать еще" */}
+          {hasMore && (
+            <button
+              onClick={() => setVisibleCount(prev => Math.min(prev + 48, totalImages))}
+              className="remove-bg-button"
+            >
+              {t('ui.showMore') || 'Показать еще'} ({totalImages - visibleCount})
+            </button>
+          )}
+          
+          {/* Кнопка "Скрыть" (показывается, если показано больше 48) */}
+          {visibleCount > 48 && (
+            <button
+              onClick={() => setVisibleCount(48)}
+              className="remove-bg-button"
+            >
+              {t('ui.showLess') || 'Скрыть'}
+            </button>
+          )}
+        </>
+      );
+    })()}
+
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemoveBackgroundImage(element.id, setElements);
+        setElements(prev => prev.map(el => {
+          if (el.id === element.id) {
+            const { originalBackgroundImage, ...rest } = el;
+            return rest;
+          }
+          return el;
+        }));
+      }}
+      className="remove-button"
+      disabled={!element.backgroundImage}
+    >
+      <><LuImageOff /> {t('ui.removeImage')}</>
+    </button>
+    <span style={{
+      display: 'block',
+      marginTop: '12px',
+      marginBottom: '8px',
+      padding: '8px 12px',
+      background: '#f8f9fa',
+      borderLeft: '3px solid #007bff',
+      borderRadius: '4px',
+      fontSize: '13px',
+      fontWeight: '400',
+      color: '#495057',
+      lineHeight: '1.5'
+    }}>
+      Найдите еще больше интересных и красивых картинок для фона в нашей Библиотеке изображений, используя тег «Фон».
+    </span>
+  </div>
+)}
 
                   {element.type === 'background' && (
                     <div className="element-controls line">

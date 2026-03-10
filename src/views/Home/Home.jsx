@@ -730,53 +730,53 @@ const parseArticlesFromQuery = (query) => {
         return processedResults;
       })
       .catch(error => {
-            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
-            if (articlesFromQuery.length > 0) {
-              loadExternalImagesForCodes(articlesFromQuery)
-                .then(externalImagesMap => {
-                  let hasImages = false;
-                  externalImagesMap.forEach((images) => {
-                    if (images && images.length > 0) hasImages = true;
-                  });
-
-                  if (hasImages) {
-                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
-                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
-
-                    processedResults.forEach(item => {
-                      const designData = generateDesignData(item);
-                      slidesDB.add({
-                        code: `design-${item.code}`, 
-                        data: designData
-                      });
-                    });
-                  
-                    processedMetaResults.forEach(item => {
-                      productsDB.add({
-                        code: `product-${item.code}`, 
-                        data: item   
-                      });
-                    });
-
-                    const codes = processedResults.map(item => item.code);
-                    setValidArticles(codes);
-                    setIsSearchActive(codes.length > 0);
-
-                    sessionStorage.setItem('searchData', JSON.stringify({
-                      query: searchQuery,
-                      articles: codes
-                    }));
-
-                    // Убираем сообщение об ошибке, если все хорошо
-                    setInfoMessage(null);
-                  } else {
-                    // Если изображений нет, показываем сообщение
-                    const message = t('views.homeMissingCode');
-                    setInfoMessage(message);
-                    setValidArticles([]);
-                    setIsSearchActive(false);
-                  }
-                })}
+//            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
+//            if (articlesFromQuery.length > 0) {
+//              loadExternalImagesForCodes(articlesFromQuery)
+//                .then(externalImagesMap => {
+//                  let hasImages = false;
+//                  externalImagesMap.forEach((images) => {
+//                    if (images && images.length > 0) hasImages = true;
+//                  });
+//
+//                  if (hasImages) {
+//                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
+//                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
+//
+//                    processedResults.forEach(item => {
+//                      const designData = generateDesignData(item);
+//                      slidesDB.add({
+//                        code: `design-${item.code}`, 
+//                        data: designData
+//                      });
+//                    });
+//                  
+//                    processedMetaResults.forEach(item => {
+//                      productsDB.add({
+//                        code: `product-${item.code}`, 
+//                        data: item   
+//                      });
+//                    });
+//
+//                    const codes = processedResults.map(item => item.code);
+//                    setValidArticles(codes);
+//                    setIsSearchActive(codes.length > 0);
+//
+//                    sessionStorage.setItem('searchData', JSON.stringify({
+//                      query: searchQuery,
+//                      articles: codes
+//                    }));
+//
+//                    // Убираем сообщение об ошибке, если все хорошо
+//                    setInfoMessage(null);
+//                  } else {
+//                    // Если изображений нет, показываем сообщение
+//                    const message = t('views.homeMissingCode');
+//                    setInfoMessage(message);
+//                    setValidArticles([]);
+//                    setIsSearchActive(false);
+//                  }
+//                })}
 
 
         console.error('Error:', error);

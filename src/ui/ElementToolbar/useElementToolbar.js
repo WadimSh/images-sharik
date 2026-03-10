@@ -13,7 +13,7 @@ export const useElementToolbar = (
           position: { x: 0, y: 0 },
           width: '100%',
           height: '100%',
-          color: '#ccddea'
+          color: '#ffffff'
         };
         setElements(prev => [newBackgroundElement, ...prev]);
         break;

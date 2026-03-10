@@ -218,7 +218,9 @@
     "removeImage": "Удалить изображение",
     "searchPlaceholder": "Поиск...",
     "selectedMessage": "Выберите...",
-    "noResults": "Ничего не найдено"
+    "noResults": "Ничего не найдено",
+    "showMore": "Показать еще",
+    "showLess": "Скрыть"
   },
   "elements": {
     "title": "Компоненты дизайна",

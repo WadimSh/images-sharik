@@ -1,4 +1,7 @@
 export const BRAND_IMAGES = [
+  '/images/fon-09-10.jpg',
+  '/images/fon-09-11.png',
+  '/images/fon-09-12.png',
   '/images/fon-09-01.jpg',
   '/images/fon-09-02.jpg',
   '/images/fon-09-03.png',

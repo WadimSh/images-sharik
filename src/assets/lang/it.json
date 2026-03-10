@@ -218,7 +218,9 @@
     "removeImage": "Rimuovi immagine",
     "searchPlaceholder": "Cerca...",
     "selectedMessage": "Seleziona...",
-    "noResults": "Nessun risultato trovato"
+    "noResults": "Nessun risultato trovato",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra meno"
   },
   "elements": {
     "title": "Componenti di design",
