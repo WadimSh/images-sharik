@@ -1,0 +1,583 @@
+/* components/SidebarFilters/SidebarFilters.css - оптимизированная версия */
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.sidebar-filters-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.sidebar-filters {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 360px; /* Уменьшил ширину */
+  background: white;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+  z-index: 10000;
+}
+
+.sidebar-filters-header {
+  padding: 16px 20px; /* Уменьшил отступы */
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.filter-icon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--gray-400);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.sidebar-filters-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Запрещаем горизонтальный скролл */
+  padding: 4px 0;
+}
+
+/* Секции фильтров */
+.filter-section {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.section-header {
+  padding: 12px 20px; /* Уменьшил отступы */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: white;
+  transition: background 0.2s;
+}
+
+.section-header:hover {
+  background: var(--gray-50);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--gray-700);
+}
+
+.section-icon {
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+.chevron-icon {
+  color: var(--gray-400);
+  font-size: 12px;
+}
+
+.section-content {
+  padding: 0 20px 16px 20px; /* Уменьшил отступы */
+}
+
+/* Поля ввода - ИСПРАВЛЕНО: теперь не выходят за границы */
+.filter-input,
+.search-input,
+.tag-search-input,
+.custom-tag-input,
+.sort-select {
+  width: 100%;
+  padding: 8px 12px; /* Уменьшил padding */
+  border: 1px solid var(--gray-200);
+  border-radius: 8px; /* Уменьшил скругление */
+  font-size: 13px; /* Уменьшил шрифт */
+  transition: all 0.2s;
+  background: var(--gray-50);
+  color: var(--gray-700);
+  box-sizing: border-box; /* Важно! Учитывает padding в ширине */
+}
+
+.article-input {
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.filter-input:focus,
+.search-input:focus,
+.tag-search-input:focus,
+.custom-tag-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background: white;
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.input-hint {
+  display: block;
+  margin-top: 4px; /* Уменьшил отступ */
+  font-size: 11px; /* Уменьшил шрифт */
+  color: var(--gray-400);
+}
+
+/* Поиск по тегам */
+.tag-search-wrapper {
+  position: relative;
+  margin-bottom: 12px; /* Уменьшил отступ */
+}
+
+.tag-search-icon {
+  position: absolute;
+  left: 10px; /* Уменьшил */
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 12px; /* Уменьшил */
+}
+
+.tag-search-input {
+  padding-left: 32px; /* Уменьшил для иконки */
+}
+
+/* Выбранные теги */
+.selected-tags-section {
+  margin-bottom: 16px; /* Уменьшил */
+  padding-bottom: 12px; /* Уменьшил */
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.selected-tags-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px; /* Уменьшил */
+}
+
+.selected-tags-count {
+  font-size: 12px; /* Уменьшил */
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+.clear-tags-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 11px; /* Уменьшил */
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.clear-tags-btn:hover {
+  background: var(--primary-light);
+}
+
+.selected-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Уменьшил */
+}
+
+.selected-tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 10px; /* Уменьшил */
+  background: var(--gray-100);
+  border-radius: 16px;
+  font-size: 11px; /* Уменьшил */
+  transition: all 0.2s;
+}
+
+.selected-tag-text {
+  max-width: 120px; /* Уменьшил */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.selected-tag-remove {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--gray-400);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.selected-tag-remove:hover {
+  color: var(--primary-color);
+  background: white;
+}
+
+/* Предопределенные теги */
+.predefined-tags-section {
+  margin-bottom: 16px; /* Уменьшил */
+}
+
+.section-subtitle {
+  font-size: 12px; /* Уменьшил */
+  color: var(--gray-500);
+  margin-bottom: 8px; /* Уменьшил */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Уменьшил */
+}
+
+.tag-btn {
+  padding: 5px 12px; /* Уменьшил */
+  border: 1px solid;
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px; /* Уменьшил */
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tag-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.tag-btn.active {
+  color: white;
+  border-color: transparent;
+}
+
+/* Кастомные теги */
+.custom-tag-section {
+  margin-top: 12px; /* Уменьшил */
+  padding-top: 12px; /* Уменьшил */
+  border-top: 1px solid var(--gray-100);
+}
+
+.custom-tag-input-group {
+  display: flex;
+  gap: 6px; /* Уменьшил */
+}
+
+.custom-tag-input {
+  flex: 1;
+  min-width: 0; /* Важно для flex-детей */
+}
+
+.add-tag-btn {
+  padding: 8px 16px; /* Уменьшил */
+  background: var(--primary-color);
+  border: none;
+  border-radius: 8px; /* Уменьшил */
+  color: white;
+  font-size: 12px; /* Уменьшил */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.add-tag-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.add-tag-btn:disabled {
+  background: var(--gray-200);
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+/* Сортировка */
+.sort-select {
+  margin-bottom: 12px; /* Уменьшил */
+}
+
+.sort-order {
+  display: flex;
+  gap: 16px; /* Уменьшил */
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Уменьшил */
+  cursor: pointer;
+  font-size: 12px; /* Уменьшил */
+  color: var(--gray-600);
+}
+
+.radio-label input[type="radio"] {
+  cursor: pointer;
+  accent-color: var(--primary-color);
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+/* Футер */
+.sidebar-filters-footer {
+  padding: 16px 20px; /* Уменьшил */
+  border-top: 1px solid var(--gray-200);
+  background: white;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.filter-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Уменьшил */
+  margin-bottom: 12px; /* Уменьшил */
+  padding: 8px 12px; /* Уменьшил */
+  background: var(--gray-50);
+  border-radius: 8px; /* Уменьшил */
+  font-size: 12px; /* Уменьшил */
+  color: var(--gray-600);
+}
+
+.stats-icon {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.filter-stats strong {
+  color: var(--primary-color);
+  font-size: 14px; /* Уменьшил */
+  font-weight: 600;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px; /* Уменьшил */
+}
+
+.reset-btn,
+.apply-btn {
+  flex: 1;
+  padding: 10px; /* Уменьшил */
+  border: none;
+  border-radius: 8px; /* Уменьшил */
+  font-size: 13px; /* Уменьшил */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.reset-btn:hover {
+  background: var(--gray-200);
+  color: var(--gray-700);
+}
+
+.apply-btn {
+  background: var(--primary-color);
+  color: white;
+}
+
+.apply-btn:hover {
+  background: var(--primary-hover);
+}
+
+/* Скроллбар */
+.sidebar-filters-content::-webkit-scrollbar {
+  width: 4px; /* Уменьшил */
+}
+
+.sidebar-filters-content::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+.sidebar-filters-content::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 2px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.2s;
+  background: var(--gray-50);
+  color: var(--gray-700);
+  box-sizing: border-box;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background: white;
+  box-shadow: 0 0 0 3px var(--primary-light);
+  padding-right: 32px; /* Место для кнопки очистки */
+}
+
+/* Стиль для инпута с кнопкой очистки */
+.input-wrapper .filter-input {
+  padding-right: 32px;
+}
+
+.clear-input-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+.clear-input-btn:hover {
+  color: var(--gray-600);
+  background: var(--gray-200);
+}
+
+/* Стиль для инпута в фокусе с кнопкой */
+.filter-input:focus + .clear-input-btn {
+  color: var(--gray-500);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 640px) {
+  .sidebar-filters {
+    width: 100%;
+  }
+  
+  .selected-tag-text {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-filters-header,
+  .section-header,
+  .section-content,
+  .sidebar-filters-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .custom-tag-input-group {
+    flex-direction: column;
+  }
+  
+  .add-tag-btn {
+    width: 100%;
+  }
+  
+  .sort-order {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

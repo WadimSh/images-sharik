@@ -269,3 +269,217 @@
     transform: translateY(0);
   }
 }
+
+/* --- */
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin: 10px;
+}
+
+.header-section h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+/* Стили для кнопки фильтров в стиле FileUploadButton */
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.filter-btn:hover {
+  background: var(--gray-200);
+  border-color: var(--gray-300);
+  transform: translateY(-1px);
+}
+
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  margin-left: 4px;
+}
+
+/* Активные фильтры */
+.active-filters {
+  background: var(--gray-50);
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin: 0 10px 20px 10px;
+  border: 1px solid var(--gray-200);
+}
+
+.active-filters-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 30px;
+  font-size: 13px;
+  color: var(--gray-700);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.filter-tag:hover {
+  border-color: var(--gray-300);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-tag-label {
+  color: var(--gray-500);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.filter-tag button {
+  background: none;
+  border: none;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--gray-400);
+  font-size: 12px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  margin-left: 4px;
+}
+
+.filter-tag button:hover {
+  color: var(--danger-color);
+  background: var(--gray-100);
+}
+
+/* Кнопка назад */
+.button-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--gray-700);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button-back:hover {
+  transform: scale(1.05);
+}
+
+/* Пустое состояние */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state-image {
+  width: 240px;
+  height: 240px;
+  opacity: 0.7;
+  object-fit: cover;
+}
+
+.empty-state-text {
+  font-size: 15px;
+  color: var(--gray-500);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.image-tags {
+  font-size: 10px;
+  opacity: 0.9;
+  text-align: center;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  font-weight: 400;
+  max-width: 100%;
+  padding: 0 4px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .header-section h2 {
+    text-align: center;
+  }
+  
+  .button-back,
+  .filter-btn,
+  .file-upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .active-filters-list {
+    flex-direction: column;
+  }
+  
+  .filter-tag {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

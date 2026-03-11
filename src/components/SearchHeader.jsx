@@ -281,7 +281,7 @@ const SearchHeader = ({
             </button>
           </Tooltip>
         </div>}
-        {(isAdmin || isUploader) && (
+        {
           <Tooltip
             content={t('header.library')}
             position='bottom'
@@ -291,7 +291,7 @@ const SearchHeader = ({
             </button>
           </Tooltip>
           
-        )}
+        }
         {isAdmin && (
           <Tooltip
             content={t('header.reports')}
