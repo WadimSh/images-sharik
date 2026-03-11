@@ -298,3 +298,17 @@
   font-weight: 600;
   backdrop-filter: blur(5px);
 }
+
+@media (max-width: 768px) {
+  .image-modal-container {
+    flex-direction: column;
+  }
+
+  .image-modal-preview {
+    width: 100%;
+  }
+
+  .image-modal-info {
+    width: 100%;
+  }
+}

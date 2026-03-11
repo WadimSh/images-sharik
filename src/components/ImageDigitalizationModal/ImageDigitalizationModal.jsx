@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PiCopySimpleBold } from "react-icons/pi";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
+import { useAuth } from "../../contexts/AuthContext";
 import './ImageDigitalizationModal.css';
 
 // Функция для получения цвета тега
@@ -35,6 +36,7 @@ export const ImageDigitalizationModal = ({
   imageData, 
   currentIndex = 0 
 }) => {
+  const { isPhotographer } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
   const [currentImageData, setCurrentImageData] = useState(imageData);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -296,7 +298,7 @@ export const ImageDigitalizationModal = ({
                 </div>
                 
               </div>
-              <div className="info-item" style={{ marginTop: 'auto' }}>
+              {!isPhotographer && (<div className="info-item" style={{ marginTop: 'auto' }}>
                 <button 
                   className="downloads-btn"
                   onClick={handleDownload}
@@ -305,12 +307,12 @@ export const ImageDigitalizationModal = ({
                   <HiOutlineDownload size={16} />
                   <span>{isDownloading ? 'Скачивание...' : 'Скачать'}</span>
                 </button>
-              </div>
+              </div>)}
             </div>
           </div>
         </div>
         
-        <div className="modal-buttons" style={{ justifyContent: 'space-between' }}>
+        {!isPhotographer && (<div className="modal-buttons" style={{ justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <h4 style={{ margin: '0', fontWeight: '600', fontSize: '16px', color: '#333' }}>Ссылка:</h4>
             <code style={{ fontSize: '12px', paddingTop: '4px' }}>{fullImageUrl}</code>
@@ -324,7 +326,7 @@ export const ImageDigitalizationModal = ({
           >
             <PiCopySimpleBold size={18} />
           </button>
-        </div>
+        </div>)}
       </div>
       
       {/* Кнопки навигации по краям модалки */}

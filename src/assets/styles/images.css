@@ -457,11 +457,6 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .header-section {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
   
   .header-section h2 {
     text-align: center;
@@ -470,7 +465,7 @@
   .button-back,
   .filter-btn,
   .file-upload-btn {
-    width: 100%;
+    
     justify-content: center;
   }
   
