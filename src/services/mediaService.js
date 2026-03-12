@@ -150,3 +150,17 @@ export const apiDeleteImage = async (id) => {
     method: 'DELETE'
   });
 };
+
+export const apiAddTagToFile = async (id, tag) => {
+  return fetchDataWithFetch(`/api/files/${id}/tags`, {
+    method: 'POST',
+    data: { tag }
+  });
+};
+
+export const apiRemoveTagFromFile = async (fileId, tag) => {
+  const encodedTag = encodeURIComponent(tag);
+  return fetchDataWithFetch(`/api/files/${fileId}/tags/${encodedTag}`, {
+    method: 'DELETE'
+  });
+};

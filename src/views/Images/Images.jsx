@@ -1,4 +1,3 @@
-// Images.js (обновленная версия)
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
@@ -105,6 +104,10 @@ export const Images = () => {
         params.search = filters.search;
       }
 
+      if (filters.author) {
+        params.author = filters.author;
+      }
+
       // Подготовка тегов с дублированием для бэкенда
       if (filters.tags && filters.tags.length > 0) {
         if (filters.tags.length === 1) {
@@ -127,10 +130,6 @@ export const Images = () => {
         }
       }
 
-      if (filters.author) {
-        params.searchAuthor = filters.author;
-      }
-
       Object.keys(params).forEach(key => {
         if (params[key] === '' || params[key] === undefined || 
             (Array.isArray(params[key]) && params[key].length === 0)) {
@@ -142,17 +141,7 @@ export const Images = () => {
         ? await apiGetAllImages(params)
         : await apiGetImagesExcludingMarketplaces(params);
 
-      let files = result?.files || [];
-      
-      if (filters.author && files.length > 0) {
-        const authorRegex = new RegExp(filters.author, 'i');
-        files = files.filter(file => 
-          file.uploadedBy?.username?.match(authorRegex) || 
-          file.uploadedBy?.email?.match(authorRegex)
-        );
-      }
-
-      setImages(files);
+      setImages(result?.files || []);
       setTotalCount(result?.pagination?.total || 0);
     } catch (error) {
       console.error('Error loading images from backend:', error);
@@ -161,7 +150,7 @@ export const Images = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, itemsPerPage, filters]);
+  }, [currentPage, itemsPerPage, filters, isAdmin, isUploader]);
 
   const handleDeleteImage = async () => {
     if (!deleteModal.imageId) return;
@@ -293,16 +282,15 @@ export const Images = () => {
   };
 
   // Функция для проверки, является ли тег артикулом
-const isArticleTag = (tag) => {
-  // Артикул имеет формат XXXX-XXXX, где X - цифры
-  return /^\d{4}-\d{4}$/.test(tag);
-};
+  const isArticleTag = (tag) => {
+    return /^\d{4}-\d{4}$/.test(tag);
+  };
 
-// В компоненте Images.js перед return добавьте функцию фильтрации:
-const getVisibleTags = (tags) => {
-  if (!tags || tags.length === 0) return [];
-  return tags.filter(tag => tag && !isArticleTag(tag)); // Убираем все артикулы
-};
+  // Функция фильтрации тегов для отображения
+  const getVisibleTags = (tags) => {
+    if (!tags || tags.length === 0) return [];
+    return tags.filter(tag => tag && !isArticleTag(tag));
+  };
   
   return (
     <div>
@@ -313,18 +301,16 @@ const getVisibleTags = (tags) => {
         <h2 style={{ color: '#333'}}>{'Библиотека изображений'}</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
-          
-        style={{ 
-          background: 'transparent',
-          cursor: 'pointer',
-          width: '140px'
-        }}
-            className="template-button "
+            style={{ 
+              background: 'transparent',
+              cursor: 'pointer',
+              width: '140px'
+            }}
+            className="template-button"
             onClick={() => setShowFilters(true)}
           >
             <FaFilter />
             <span>Фильтры</span>
-            
           </button>
           {user && (isAdmin || isUploader) && (
             <FileUploadButton

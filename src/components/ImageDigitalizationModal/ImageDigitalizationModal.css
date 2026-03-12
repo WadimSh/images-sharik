@@ -39,6 +39,7 @@
   background-size: 10px 10px;
   background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
   overflow: hidden;
+  position: relative;
 }
 
 .modal-image-thumbnail {
@@ -60,7 +61,7 @@
   width: 60%;
   padding: 24px;
   overflow-y: auto;
-  max-height: calc(85vh - 80px); /* Высота минус заголовок */
+  max-height: calc(85vh - 80px);
   display: flex;
   flex-direction: column;
 }
@@ -89,7 +90,7 @@
   height: 100%;
 }
 
-.infos-item {
+.info-item {
   display: flex;
   align-items: flex-start;
 }
@@ -252,8 +253,16 @@
   align-content: flex-start;
 }
 
+/* Обертка для тега с крестиком */
+.tag-overlay-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 2px;
+}
+
 .tag-overlay {
-  padding: 6px 12px;
+  padding: 6px 24px 6px 12px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
@@ -268,6 +277,254 @@
   cursor: default;
 }
 
+.tag-remove-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
+  padding: 2px;
+  border-radius: 2px;
+  z-index: 11;
+}
+
+.tag-remove-btn:hover:not(:disabled) {
+  color: #dc3545;
+}
+
+.tag-remove-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Кнопка тегов в шапке */
+.modal-tags-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.modal-tags-btn:hover:not(:disabled) {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-tags-btn.active {
+  color: #007bff;
+  background: #e3f2fd;
+}
+
+.modal-tags-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Поповер */
+.tag-popover {
+  position: absolute;
+  top: 60px;
+  right: 80px;
+  width: 320px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1100;
+  animation: slideDown 0.2s ease;
+}
+
+.tag-popover-arrow {
+  position: absolute;
+  top: -6px;
+  right: 24px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.tag-popover-content {
+  padding: 16px;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.tag-popover-content h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Поиск в поповере */
+.tag-popover-search {
+  margin-bottom: 12px;
+}
+
+.tag-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.tag-search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Предустановленные теги в поповере */
+.tag-popover-predefined {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.predefined-tag-btn {
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.predefined-tag-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.predefined-tag-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tag-check {
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+.no-tags-found {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  width: 100%;
+}
+
+/* Разделитель */
+.tag-popover-divider {
+  position: relative;
+  text-align: center;
+  margin: 16px 0;
+}
+
+.tag-popover-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #eee;
+}
+
+.tag-popover-divider span {
+  position: relative;
+  background: white;
+  padding: 0 10px;
+  color: #999;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+/* Свой тег в поповере */
+.tag-popover-custom {
+  margin-top: 8px;
+}
+
+.custom-tag-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-tag-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.custom-tag-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.add-custom-tags-btn {
+  width: 36px;
+  height: 36px;
+  background: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.add-custom-tags-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.add-custom-tags-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Анимации */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Дополнительные стили для модального контейнера */
 .modal-image-container {
@@ -299,6 +556,7 @@
   backdrop-filter: blur(5px);
 }
 
+/* Медиа-запросы */
 @media (max-width: 768px) {
   .image-modal-container {
     flex-direction: column;
@@ -310,5 +568,10 @@
 
   .image-modal-info {
     width: 100%;
+  }
+  
+  .tag-popover {
+    right: 20px;
+    width: 280px;
   }
 }
