@@ -20,6 +20,7 @@ export async function apiGetAllImages(params = {}) {
   
   // Добавляем параметры фильтрации
   if (params.search) queryParams.append('search', params.search);
+  if (params.author) queryParams.append('author', params.author);
   if (params.mimeTypes) queryParams.append('mimeTypes', params.mimeTypes);
   if (params.minSize) queryParams.append('minSize', params.minSize);
   if (params.maxSize) queryParams.append('maxSize', params.maxSize);
@@ -79,6 +80,7 @@ export async function apiGetImagesExcludingMarketplaces(params = {}) {
   
   // Добавляем параметры фильтрации
   if (params.search) queryParams.append('search', params.search);
+  if (params.author) queryParams.append('author', params.author);
   if (params.mimeTypes) queryParams.append('mimeTypes', params.mimeTypes);
   if (params.minSize) queryParams.append('minSize', params.minSize);
   if (params.maxSize) queryParams.append('maxSize', params.maxSize);

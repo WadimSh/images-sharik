@@ -11,7 +11,7 @@ import SidebarFilters from '../../components/SidebarFilters/SidebarFilters';
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUpload } from '../../contexts/UploadContext';
-import { apiGetAllImages, apiDeleteImage, apiGetImagesExcludingMarketplaces } from '../../services/mediaService';
+import { apiGetAllImages, apiDeleteImage, apiGetImagesExcludingMarketplaces, apiAddTagToFile, apiRemoveTagFromFile } from '../../services/mediaService';
 import folder from '../../assets/folder.png';
 
 // Компонент модалки подтверждения удаления
@@ -151,6 +151,40 @@ export const Images = () => {
       setLoading(false);
     }
   }, [currentPage, itemsPerPage, filters, isAdmin, isUploader]);
+
+  const handleAddTag = async (fileId, tag) => {
+    try {
+      await apiAddTagToFile(fileId, tag);
+      // Обновляем локальное состояние images
+      setImages(prevImages => 
+        prevImages.map(img => 
+          img._id === fileId 
+            ? { ...img, tags: [...(img.tags || []), tag] }
+            : img
+        )
+      );
+    } catch (error) {
+      console.error('Ошибка при добавлении тега:', error);
+      alert('Не удалось добавить тег');
+    }
+  };
+
+  const handleRemoveTag = async (fileId, tagToRemove) => {
+    try {
+      await apiRemoveTagFromFile(fileId, tagToRemove);
+      // Обновляем локальное состояние images
+      setImages(prevImages => 
+        prevImages.map(img => 
+          img._id === fileId 
+            ? { ...img, tags: img.tags.filter(t => t !== tagToRemove) }
+            : img
+        )
+      );
+    } catch (error) {
+      console.error('Ошибка при удалении тега:', error);
+      alert('Не удалось удалить тег');
+    }
+  };
 
   const handleDeleteImage = async () => {
     if (!deleteModal.imageId) return;
@@ -449,6 +483,8 @@ export const Images = () => {
           images={images}
           imageData={selectedImage}
           currentIndex={selectedImageIndex}
+          onAddTag={handleAddTag}
+          onRemoveTag={handleRemoveTag}
         />
       )}
 

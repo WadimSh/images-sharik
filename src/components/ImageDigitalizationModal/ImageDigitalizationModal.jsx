@@ -4,7 +4,6 @@ import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
 import { FaTimes, FaTags, FaPlus } from "react-icons/fa";
 import { Tooltip } from "../../ui/Tooltip/Tooltip";
-import { apiAddTagToFile, apiRemoveTagFromFile } from "../../services/mediaService";
 import { PREDEFINED_TAGS } from "../../constants/tags";
 import './ImageDigitalizationModal.css';
 
@@ -45,14 +44,15 @@ export const ImageDigitalizationModal = ({
   onClose,
   images, 
   imageData, 
-  currentIndex = 0 
+  currentIndex = 0,
+  onAddTag,
+  onRemoveTag
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
   const [currentImageData, setCurrentImageData] = useState(imageData);
   const [isDownloading, setIsDownloading] = useState(false);
   const [tagColors, setTagColors] = useState({});
   const [showTagPopover, setShowTagPopover] = useState(false);
-  const [selectedTag, setSelectedTag] = useState('');
   const [customTag, setCustomTag] = useState('');
   const [isTagOperationLoading, setIsTagOperationLoading] = useState(false);
   const [tagSearchTerm, setTagSearchTerm] = useState('');
@@ -83,7 +83,6 @@ export const ImageDigitalizationModal = ({
           tagButtonRef.current && !tagButtonRef.current.contains(event.target)) {
         setShowTagPopover(false);
         setCustomTag('');
-        setSelectedTag('');
         setTagSearchTerm('');
       }
     };
@@ -94,14 +93,20 @@ export const ImageDigitalizationModal = ({
     };
   }, []);
 
+  // Синхронизация с пропсами
   useEffect(() => {
-    setCurrentImageData(imageData);
+    if (imageData) {
+      setCurrentImageData(imageData);
+      updateTagColors(imageData.tags);
+    }
+  }, [imageData]);
+
+  useEffect(() => {
     if (images && imageData) {
       const index = images.findIndex(img => img._id === imageData._id);
       setCurrentImageIndex(index >= 0 ? index : currentIndex);
-      updateTagColors(imageData.tags);
     }
-  }, [imageData, images, currentIndex]);
+  }, [images, imageData, currentIndex]);
 
   const updateTagColors = (tags) => {
     if (tags && Array.isArray(tags)) {
@@ -123,10 +128,11 @@ export const ImageDigitalizationModal = ({
     if (!images || images.length === 0) return;
     
     const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+    const newImage = images[newIndex];
     setCurrentImageIndex(newIndex);
-    setCurrentImageData(images[newIndex]);
+    setCurrentImageData(newImage);
     setShowTagPopover(false);
-    updateTagColors(images[newIndex].tags);
+    updateTagColors(newImage.tags);
   };
 
   const handleNextImage = (e) => {
@@ -134,10 +140,11 @@ export const ImageDigitalizationModal = ({
     if (!images || images.length === 0) return;
     
     const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+    const newImage = images[newIndex];
     setCurrentImageIndex(newIndex);
-    setCurrentImageData(images[newIndex]);
+    setCurrentImageData(newImage);
     setShowTagPopover(false);
-    updateTagColors(images[newIndex].tags);
+    updateTagColors(newImage.tags);
   };
 
   const handleKeyDown = (e) => {
@@ -205,60 +212,46 @@ export const ImageDigitalizationModal = ({
   const handleRemoveTag = async (tagToRemove, e) => {
     e.stopPropagation();
     
-    // Запрещаем удаление защищенных тегов
     if (PROTECTED_TAGS.includes(tagToRemove)) {
       alert(`Тег "${tagToRemove}" является системным и не может быть удален`);
       return;
     }
     
-    if (!currentImageData || isTagOperationLoading) return;
+    if (!currentImageData || isTagOperationLoading || !onRemoveTag) return;
     
     setIsTagOperationLoading(true);
     try {
-      await apiRemoveTagFromFile(currentImageData._id, tagToRemove);
-      
+      await onRemoveTag(currentImageData._id, tagToRemove);
+      // Обновляем локальное состояние
       const updatedTags = currentImageData.tags.filter(t => t !== tagToRemove);
       const updatedImageData = { ...currentImageData, tags: updatedTags };
       setCurrentImageData(updatedImageData);
-      
-      if (images) {
-        const updatedImages = [...images];
-        updatedImages[currentImageIndex] = updatedImageData;
-      }
-      
       updateTagColors(updatedTags);
     } catch (error) {
       console.error('Ошибка при удалении тега:', error);
-      alert('Не удалось удалить тег');
     } finally {
       setIsTagOperationLoading(false);
     }
   };
 
   const handleAddTag = async (tagToAdd) => {
-    if (!tagToAdd || !currentImageData || isTagOperationLoading) return;
+    if (!tagToAdd || !currentImageData || isTagOperationLoading || !onAddTag) return;
     
     setIsTagOperationLoading(true);
     try {
-      await apiAddTagToFile(currentImageData._id, tagToAdd);
+      await onAddTag(currentImageData._id, tagToAdd);
       
+      // Обновляем локальное состояние
       const updatedTags = [...(currentImageData.tags || []), tagToAdd];
       const updatedImageData = { ...currentImageData, tags: updatedTags };
       setCurrentImageData(updatedImageData);
-      
-      if (images) {
-        const updatedImages = [...images];
-        updatedImages[currentImageIndex] = updatedImageData;
-      }
-      
       updateTagColors(updatedTags);
-      setSelectedTag('');
+      
       setCustomTag('');
       setTagSearchTerm('');
       setShowTagPopover(false);
     } catch (error) {
       console.error('Ошибка при добавлении тега:', error);
-      alert('Не удалось добавить тег');
     } finally {
       setIsTagOperationLoading(false);
     }
