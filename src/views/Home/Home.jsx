@@ -49,19 +49,19 @@ export const Home = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const UPDATE_CONFIG = {
     admin: {
-      version: '2026-03-04-admin',
-      file: '/upload/changelog-user.md',
+      version: '2026-03-13-admin',
+      file: '/upload/changelog-admin.md',
       headerImage: 'none',
       key: 'update_modal_shown_admin'
     },
     uploader: {
-      version: '2026-03-04-uploader',
-      file: '/upload/changelog-user.md',
+      version: '2026-03-12-uploader',
+      file: '/upload/changelog-admin.md',
       headerImage: 'none',
       key: 'update_modal_shown_uploader'
     },
     user: {
-      version: '2026-03-04-user',
+      version: '2026-03-13-user',
       file: '/upload/changelog-user.md',
       headerImage: 'none',
       key: 'update_modal_shown_user'
@@ -730,53 +730,53 @@ const parseArticlesFromQuery = (query) => {
         return processedResults;
       })
       .catch(error => {
-            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
-            if (articlesFromQuery.length > 0) {
-              loadExternalImagesForCodes(articlesFromQuery)
-                .then(externalImagesMap => {
-                  let hasImages = false;
-                  externalImagesMap.forEach((images) => {
-                    if (images && images.length > 0) hasImages = true;
-                  });
-
-                  if (hasImages) {
-                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
-                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
-
-                    processedResults.forEach(item => {
-                      const designData = generateDesignData(item);
-                      slidesDB.add({
-                        code: `design-${item.code}`, 
-                        data: designData
-                      });
-                    });
-                  
-                    processedMetaResults.forEach(item => {
-                      productsDB.add({
-                        code: `product-${item.code}`, 
-                        data: item   
-                      });
-                    });
-
-                    const codes = processedResults.map(item => item.code);
-                    setValidArticles(codes);
-                    setIsSearchActive(codes.length > 0);
-
-                    sessionStorage.setItem('searchData', JSON.stringify({
-                      query: searchQuery,
-                      articles: codes
-                    }));
-
-                    // Убираем сообщение об ошибке, если все хорошо
-                    setInfoMessage(null);
-                  } else {
-                    // Если изображений нет, показываем сообщение
-                    const message = t('views.homeMissingCode');
-                    setInfoMessage(message);
-                    setValidArticles([]);
-                    setIsSearchActive(false);
-                  }
-                })}
+//            const articlesFromQuery = parseArticlesFromQuery(searchQuery);
+//            if (articlesFromQuery.length > 0) {
+//              loadExternalImagesForCodes(articlesFromQuery)
+//                .then(externalImagesMap => {
+//                  let hasImages = false;
+//                  externalImagesMap.forEach((images) => {
+//                    if (images && images.length > 0) hasImages = true;
+//                  });
+//
+//                  if (hasImages) {
+//                    const processedResults = processExternalImagesData(articlesFromQuery, externalImagesMap);
+//                    const processedMetaResults = processExternalProductsMeta(articlesFromQuery, externalImagesMap);
+//
+//                    processedResults.forEach(item => {
+//                      const designData = generateDesignData(item);
+//                      slidesDB.add({
+//                        code: `design-${item.code}`, 
+//                        data: designData
+//                      });
+//                    });
+//                  
+//                    processedMetaResults.forEach(item => {
+//                      productsDB.add({
+//                        code: `product-${item.code}`, 
+//                        data: item   
+//                      });
+//                    });
+//
+//                    const codes = processedResults.map(item => item.code);
+//                    setValidArticles(codes);
+//                    setIsSearchActive(codes.length > 0);
+//
+//                    sessionStorage.setItem('searchData', JSON.stringify({
+//                      query: searchQuery,
+//                      articles: codes
+//                    }));
+//
+//                    // Убираем сообщение об ошибке, если все хорошо
+//                    setInfoMessage(null);
+//                  } else {
+//                    // Если изображений нет, показываем сообщение
+//                    const message = t('views.homeMissingCode');
+//                    setInfoMessage(message);
+//                    setValidArticles([]);
+//                    setIsSearchActive(false);
+//                  }
+//                })}
 
 
         console.error('Error:', error);

@@ -11,22 +11,22 @@ import './ImageDigitalizationModal.css';
 const getTagColor = (tag) => {
   const predefinedTag = PREDEFINED_TAGS.find(t => t.name === tag);
   if (predefinedTag) {
-    return predefinedTag.color + '80';
+    return predefinedTag.color;
   }
   
   if (tag === "нет кода") {
-    return 'rgba(244, 67, 54, 0.8)';
+    return 'rgb(244, 67, 54)';
   }
   
   const colors = [
-    'rgba(66, 133, 244, 0.8)',
-    'rgba(52, 168, 83, 0.8)',
-    'rgba(251, 188, 4, 0.8)',
-    'rgba(171, 71, 188, 0.8)',
-    'rgba(0, 150, 136, 0.8)',
-    'rgba(255, 152, 0, 0.8)',
-    'rgba(96, 125, 139, 0.8)',
-    'rgba(156, 39, 176, 0.8)',
+    'rgb(91, 154, 255)',
+    'rgb(80, 197, 111)',
+    'rgb(255, 208, 67)',
+    'rgb(207, 89, 227)',
+    'rgb(29, 183, 168)',
+    'rgb(255, 171, 45)',
+    'rgb(197, 90, 255)',
+    'rgb(255, 52, 130)',
   ];
   
   let hash = 0;
@@ -37,7 +37,7 @@ const getTagColor = (tag) => {
 };
 
 // Список защищенных тегов (неудаляемые)
-const PROTECTED_TAGS = ['Wildberries', 'Ozon'];
+const PROTECTED_TAGS = ['Wildberries', 'Ozon', '9999-9999'];
 
 export const ImageDigitalizationModal = ({
   isOpen, 
