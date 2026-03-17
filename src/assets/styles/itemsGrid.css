@@ -540,36 +540,46 @@
   }
 }
 
-/* Стили для модального окна с слайдером */
+/* Стили для основного слайдера */
 .slider-main {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  background: white;
+  border-radius: 8px;
+  height: 400px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .slider-main-image {
-  max-width: 300px;
-  max-height: 400px;
+  width: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .slider-image {
   max-width: 100%;
   max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
+  display: block;
 }
 
+/* Стрелки навигации для основного изображения */
 .slider-arrow {
   background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -579,93 +589,256 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
+  transition: all 0.2s ease;
 }
 
 .slider-arrow-prev {
-  left: 0px;
-  padding-right: 10px;
+  left: 16px;
 }
 
 .slider-arrow-next {
-  right: 0px;
-  padding-left: 10px;
+  right: 16px;
 }
 
 .slider-arrow:hover {
   background: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.1);
 }
 
+/* Контейнер для превью с кнопками */
+.slider-thumbnails-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 0 40px; /* Увеличиваем отступы для кнопок */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Область с превью */
 .slider-thumbnails {
   display: flex;
   gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 0;
+  flex: 1;
+  flex-wrap: nowrap;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  width: 100%;
 }
 
+/* Скрываем скроллбар */
+.slider-thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
+/* Центрирование когда мало изображений */
+.slider-thumbnails:not(.needs-scroll) {
+  justify-content: center;
+}
+
+/* Стили для превью */
 .thumbnail {
+  flex: 0 0 auto;
   width: 60px;
   height: 80px;
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
   border: 2px solid #e0e0e0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .thumbnail.active {
   border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
 }
 
 .thumbnail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .thumbnail:hover {
   border-color: #007bff;
-  opacity: 0.8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Кнопки скролла для превью */
+.thumbnails-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20; /* Увеличиваем z-index */
+  transition: all 0.2s ease;
+  color: #666;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  outline: none;
+}
+
+.thumbnails-scroll-btn:hover {
+  background: #f0f0f0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transform: translateY(-50%) scale(1.1);
+  color: #333;
+}
+
+.thumbnails-scroll-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.thumbnails-scroll-left {
+  left: 5px; /* Размещаем внутри контейнера */
+}
+
+.thumbnails-scroll-right {
+  right: 5px; /* Размещаем внутри контейнера */
+}
+
+/* Затемнение по краям */
+.slider-thumbnails-container::before,
+.slider-thumbnails-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.slider-thumbnails-container::before {
+  left: 35px;
+  background: linear-gradient(to right, #fafafa, transparent);
+}
+
+.slider-thumbnails-container::after {
+  right: 35px;
+  background: linear-gradient(to left, #fafafa, transparent);
+}
+
+/* Футер */
+.modals-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+  background: white;
+  flex-shrink: 0;
 }
 
 .slider-counter {
   text-align: center;
   font-size: 14px;
   color: #666;
-  margin-top: 10px;
-}
-
-.gallery-button {
-  background-color: #669fdc;
-}
-
-.gallery-button:hover {
-  background-color: #007bff;
+  font-weight: 500;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .slider-arrow-prev {
-    left: 10px;
+  .modals-container {
+    width: 90%;
   }
   
-  .slider-arrow-next {
-    right: 10px;
+  .slider-main {
+    min-height: 300px;
   }
   
   .slider-arrow {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 36px;
+    height: 36px;
   }
   
-  .slider-main-image {
-    max-width: 100%;
-    max-height: 300px;
+  .slider-arrow-prev {
+    left: 8px;
+  }
+  
+  .slider-arrow-next {
+    right: 8px;
+  }
+  
+  .thumbnail {
+    width: 50px;
+    height: 67px;
+  }
+  
+  .slider-thumbnails-container {
+    padding: 0 35px;
+  }
+  
+  .thumbnails-scroll-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .thumbnails-scroll-left {
+    left: 3px;
+  }
+  
+  .thumbnails-scroll-right {
+    right: 3px;
+  }
+  
+  .slider-thumbnails-container::before {
+    left: 30px;
+  }
+  
+  .slider-thumbnails-container::after {
+    right: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modals-header h2 {
+    font-size: 16px;
+    max-width: 70%;
   }
   
   .thumbnail {
     width: 40px;
     height: 53px;
+  }
+  
+  .slider-thumbnails-container {
+    padding: 0 30px;
+  }
+  
+  .thumbnails-scroll-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .thumbnails-scroll-left {
+    left: 2px;
+  }
+  
+  .thumbnails-scroll-right {
+    right: 2px;
+  }
+  
+  .slider-thumbnails-container::before {
+    left: 25px;
+  }
+  
+  .slider-thumbnails-container::after {
+    right: 25px;
   }
 }

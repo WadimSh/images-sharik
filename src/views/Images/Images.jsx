@@ -333,7 +333,7 @@ export const Images = () => {
           <HiOutlineChevronLeft /> {t('header.back')}
         </button>
         <h2 style={{ color: '#333'}}>{'Библиотека изображений'}</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
           <button 
             style={{ 
               background: 'transparent',

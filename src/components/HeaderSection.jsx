@@ -577,8 +577,8 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
   
   return (
     <>
-    <div className={`header-section ${marketplace}`}>
-      <button onClick={handleBack} className='button-back'>
+    <div className={`header-sections ${marketplace}`}>
+      <button onClick={handleBack} className='button-backs'>
         <HiOutlineChevronLeft /> {t('header.back')}
       </button>
       <h2>{getHeaderTitle()}</h2>

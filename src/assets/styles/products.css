@@ -1,0 +1,38 @@
+.products-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  padding: 10px;
+  gap: 10px;
+}
+
+.empty-sidebar {
+  width: 320px;
+  background: #f0f6fd;
+  border-radius: 2px;
+  border: 1px solid #d4e6fb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  min-height: 500px;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .empty-sidebar {
+    width: 100%;
+    min-height: 100px;
+  }
+}

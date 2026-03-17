@@ -9,24 +9,24 @@
 }
 
 /* --- */
-.header-section {
-  padding: 15px 30px;
+.header-sections {
+  padding: 12px 20px;
   background: #f5f5f5;
   display: flex;
   align-items: center;
   gap: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  
+  border-radius: 12px;  
 }
 
-.header-section h2 {
+.header-sections h2 {
   color: #f5f5f5;
   font-size: 24px;
   margin: 0;
   flex-grow: 1;
 }
 
-.button-back {
+.button-backs {
   background: none;
   border: none;
   color: #f5f5f5;
