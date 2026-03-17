@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { PiCopySimpleBold } from "react-icons/pi";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
 import { FaTimes, FaTags, FaPlus } from "react-icons/fa";
+
+import { useAuth } from "../../contexts/AuthContext";
 import { Tooltip } from "../../ui/Tooltip/Tooltip";
 import { PREDEFINED_TAGS } from "../../constants/tags";
 import './ImageDigitalizationModal.css';
@@ -48,6 +51,9 @@ export const ImageDigitalizationModal = ({
   onAddTag,
   onRemoveTag
 }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();  
+
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
   const [currentImageData, setCurrentImageData] = useState(imageData);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -292,6 +298,30 @@ export const ImageDigitalizationModal = ({
     });
   };
 
+  // Функция для проверки, является ли тег артикулом (формат XXXX-XXXX, где X - цифра)
+  const isArticleTag = (tag) => {
+    const articleRegex = /^\d{4}-\d{4}$/;
+    return articleRegex.test(tag);
+  };
+
+  // Функция для обработки клика по артикулу
+  const handleArticleClick = (article, e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+
+    if (article === '9999-9999') return;
+        
+    navigate(`/products/${article}`);
+  };
+
+  // Получаем все теги, которые являются артикулами (кроме 9999-9999)
+  const articleTags = (currentImageData?.tags || []).filter(tag => 
+    isArticleTag(tag) && tag !== '9999-9999'
+  );
+
   if (!isOpen || !currentImageData) {
     return null;
   }
@@ -484,6 +514,24 @@ export const ImageDigitalizationModal = ({
                   </div>
                 </div>
               </div>
+
+              {/* Секция с артикулами */}
+              {articleTags.length > 0 && (
+                <div className="image-info-section">
+                  <h4>Артикулы</h4>
+                  <div className="articles-container">
+                    {articleTags.map((article, index) => (
+                      <button
+                        key={index}
+                        className="article-btn"
+                        onClick={(e) => handleArticleClick(article, e)}
+                      >
+                        {article}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="info-item" style={{ marginTop: 'auto' }}>
                 <button 

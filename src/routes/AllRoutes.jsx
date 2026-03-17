@@ -8,6 +8,7 @@ import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
 import Reports from "../views/Reports";
 import Images from "../views/Images";
+import Products from "../views/Products";
 import Template from "../views/Template";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import ProtectedRoute from "./ProtectedRoute";
@@ -43,6 +44,15 @@ const AllRoutes = () => {
         element={
           <ProtectedRoute>
             <Images />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/products/:article?"
+        element={
+          <ProtectedRoute>
+            <Products />
           </ProtectedRoute>
         }
       />
