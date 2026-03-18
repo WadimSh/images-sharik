@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineChevronLeft } from "react-icons/hi2";
 import { FaTimes, FaFilter } from "react-icons/fa";
@@ -83,15 +83,36 @@ export const Images = () => {
     sortOrder: 'desc'
   });
 
+  // Добавляем ref для отслеживания загрузки и предотвращения множественных запросов
+  const isLoadingRef = useRef(false);
+  const requestTimeoutRef = useRef(null);
+  const pendingFiltersRef = useRef(null);
+
   // Преобразование артикула в тег для поиска
   const articleToTag = (article) => {
     if (!article || !article.match(/^\d{4}-\d{4}$/)) return null;
     return article;
   };
 
-  const loadImagesFromBackend = useCallback(async () => {
+  const loadImagesFromBackend = useCallback(async (skipLoadingState = false) => {
+    // Предотвращаем множественные запросы
+    if (isLoadingRef.current) {
+      console.log('Запрос уже выполняется, пропускаем');
+      return;
+    }
+
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+      requestTimeoutRef.current = null;
+    }
+
+    isLoadingRef.current = true;
+    
     try {
-      setLoading(true);
+      if (!skipLoadingState) {
+        setLoading(true);
+      }
 
       const params = {
         page: currentPage,
@@ -148,7 +169,10 @@ export const Images = () => {
       setImages([]);
       setTotalCount(0);
     } finally {
-      setLoading(false);
+      isLoadingRef.current = false;
+      if (!skipLoadingState) {
+        setLoading(false);
+      }
     }
   }, [currentPage, itemsPerPage, filters, isAdmin, isUploader]);
 
@@ -224,12 +248,35 @@ export const Images = () => {
 
   const handleApplyFilters = () => {
     setCurrentPage(1);
-    loadImagesFromBackend();
-    setShowFilters(false);
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+    }
+    // Запускаем загрузку
+    requestTimeoutRef.current = setTimeout(() => {
+      loadImagesFromBackend();
+      setShowFilters(false);
+    }, 50);
   };
 
   const handleResetFilters = () => {
     setCurrentPage(1);
+    setFilters({
+      search: '',
+      tags: [],
+      article: '',
+      author: '',
+      sortBy: 'uploadDate',
+      sortOrder: 'desc'
+    });
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+    }
+    // Запускаем загрузку
+    requestTimeoutRef.current = setTimeout(() => {
+      loadImagesFromBackend();
+    }, 50);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -237,37 +284,69 @@ export const Images = () => {
   };
 
   const removeFilter = (type, value) => {
-    if (type === 'tag') {
-      setFilters(prev => ({
-        ...prev,
-        tags: prev.tags.filter(t => t !== value)
-      }));
-    } else {
-      setFilters(prev => ({
-        ...prev,
-        [type]: ''
-      }));
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
     }
-    // После удаления фильтра сразу применяем его
-    setTimeout(() => {
+
+    if (type === 'tag') {
+      setFilters(prev => {
+        const newFilters = {
+          ...prev,
+          tags: prev.tags.filter(t => t !== value)
+        };
+        // Сохраняем новые фильтры для запроса
+        pendingFiltersRef.current = newFilters;
+        return newFilters;
+      });
+    } else {
+      setFilters(prev => {
+        const newFilters = {
+          ...prev,
+          [type]: ''
+        };
+        pendingFiltersRef.current = newFilters;
+        return newFilters;
+      });
+    }
+
+    // Делаем один запрос после обновления фильтров
+    requestTimeoutRef.current = setTimeout(() => {
       setCurrentPage(1);
       loadImagesFromBackend();
-    }, 0);
+    }, 100);
   };
 
+  // Единый эффект для загрузки при изменении параметров
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+    }
+
+    // Запускаем загрузку с небольшой задержкой
+    requestTimeoutRef.current = setTimeout(() => {
       loadImagesFromBackend();
     }, 100);
-    
-    return () => clearTimeout(timeoutId);
+
+    return () => {
+      if (requestTimeoutRef.current) {
+        clearTimeout(requestTimeoutRef.current);
+      }
+    };
   }, [currentPage, itemsPerPage, loadImagesFromBackend]);
 
+  // Эффект для обновления после загрузки
   useEffect(() => {
     if (!uploadState.isUploading && uploadState.uploadResults.length > 0) {
+      // Очищаем предыдущий таймаут
+      if (requestTimeoutRef.current) {
+        clearTimeout(requestTimeoutRef.current);
+      }
+      
       const timer = setTimeout(() => {
         loadImagesFromBackend();
-      }, 100);
+      }, 300);
       
       return () => clearTimeout(timer);
     }
@@ -485,6 +564,24 @@ export const Images = () => {
           currentIndex={selectedImageIndex}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
+          onTagClick={(tag) => {
+            handleCloseModal();
+            if (requestTimeoutRef.current) {
+              clearTimeout(requestTimeoutRef.current);
+            }
+
+            setCurrentPage(1);
+            
+            setFilters(prev => ({
+              ...prev,
+              tags: prev.tags.includes(tag) ? prev.tags : [...prev.tags, tag]
+            }));
+            
+            requestTimeoutRef.current = setTimeout(() => {
+              setCurrentPage(1);
+              loadImagesFromBackend();
+            }, 100);
+          }}
         />
       )}
 

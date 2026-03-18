@@ -540,6 +540,14 @@
   }
 }
 
+.gallery-button {
+  background-color: #669fdc;
+}
+
+.gallery-button:hover {
+  background-color: #007bff;
+}
+
 /* Стили для основного слайдера */
 .slider-main {
   display: flex;

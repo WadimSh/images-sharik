@@ -49,7 +49,8 @@ export const ImageDigitalizationModal = ({
   imageData, 
   currentIndex = 0,
   onAddTag,
-  onRemoveTag
+  onRemoveTag,
+  onTagClick
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();  
@@ -224,6 +225,13 @@ export const ImageDigitalizationModal = ({
     }
     
     if (!currentImageData || isTagOperationLoading || !onRemoveTag) return;
+
+    // Запрашиваем подтверждение перед удалением
+    const confirmDelete = window.confirm(`Вы уверены, что хотите удалить тег "${tagToRemove}"?`);
+  
+    if (!confirmDelete) {
+      return; // Если пользователь отменил, выходим из функции
+    }
     
     setIsTagOperationLoading(true);
     try {
@@ -267,6 +275,12 @@ export const ImageDigitalizationModal = ({
     if (customTag.trim()) {
       handleAddTag(customTag.trim());
     }
+  };
+
+  // Обработчик клика по тегу
+  const handleTagClick = (tag, e) => {
+    e.stopPropagation();
+    onTagClick(tag);
   };
 
   // Фильтрация предопределенных тегов
@@ -314,7 +328,7 @@ export const ImageDigitalizationModal = ({
 
     if (article === '9999-9999') return;
         
-    navigate(`/products/${article}`);
+    window.open(`/#/products/${article}`, '_blank');
   };
 
   // Получаем все теги, которые являются артикулами (кроме 9999-9999)
@@ -447,8 +461,10 @@ export const ImageDigitalizationModal = ({
                             className="tag-overlay"
                             style={{
                               backgroundColor: tagColors[tag],
-                              zIndex: tags.length - index
+                              zIndex: tags.length - index,
+                              cursor: 'pointer' // Добавляем указатель
                             }}
+                            onClick={(e) => handleTagClick(tag, e)}
                           >
                             {tag}
                           </span>

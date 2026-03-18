@@ -4,11 +4,13 @@
   min-height: 100vh;
 }
 
-.content-wrapper {
+.contents-wrapper {
   display: flex;
   flex: 1;
   padding: 10px;
   gap: 10px;
+  height: calc(100vh - 80px); /* Фиксированная высота с учетом шапки */
+  overflow: hidden;
 }
 
 .empty-sidebar {
@@ -19,15 +21,44 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
   min-height: 500px;
+  padding: 8px 8px 3px 8px;
 }
+
+.empty-sidebar > div:last-child {
+  flex: 1;
+  overflow-y: auto;
+}
+
 
 .main-content {
   flex: 1;
   min-width: 0;
+  height: 100%; /* Занимает всю высоту родителя */
+  overflow-y: auto; /* Скролл только здесь */
+  padding-right: 5px;
+}
+
+/* Скрываем скроллбар для WebKit браузеров (опционально) */
+.main-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 @media (max-width: 768px) {
-  .content-wrapper {
+  .contents-wrapper {
     flex-direction: column;
   }
   

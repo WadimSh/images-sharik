@@ -1,11 +1,523 @@
 import { useContext, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { HiOutlineChevronLeft } from "react-icons/hi2";
+import { useParams } from 'react-router-dom';
+
 import { LanguageContext } from '../../contexts/contextLanguage';
-import { useAuth } from '../../contexts/AuthContext';
 import { useGetCode } from '../../hooks/useGetCode';
-import { apiGetAllImages, apiGetImagesExcludingMarketplaces } from '../../services/mediaService';
+import { apiGetAllImages } from '../../services/mediaService';
 import { ImageSliderModal } from '../../components/ImageSliderModal';
+
+const ifo = {
+  "measure_units_properties": [
+    [
+      "Размер",
+      [
+        "24.0x23.5x0.1 см",
+        "24.0x23.5x9.929 см"
+      ]
+    ],
+    [
+      "Вес брутто",
+      [
+        "28.0 Г",
+        "2810.0 Г(брутто)"
+      ]
+    ],
+    [
+      "Объем",
+      [
+        "0.056 дм3",
+        "5.6 дм3"
+      ]
+    ],
+    [
+      "Баз. ед.",
+      [
+        "1 шт",
+        "100 шт"
+      ]
+    ],
+    [
+      "Штрих код. ед.",
+      [
+        "4690390246445",
+        "4690390246452"
+      ]
+    ]
+  ],
+  "rating": 0,
+  "code": "1207-3040",
+  "units_counts": [
+    [
+      "кор",
+      "100 шт"
+    ]
+  ],
+  "seo_header": "",
+  "updated_at": "2026-03-18T04:11:34.790202",
+  "rest": 4769,
+  "in_favorite": false,
+  "product_files": [],
+  "category_detail": [
+    {
+      "meta_description": "Оптовая продажа фольгированных фигурных шаров в Москве. Покупайте фольгированные фигурные шары оптом с доставкой у проверенного поставщика!",
+      "meta_title": "",
+      "code": "SHARIK_RU_2_6//01",
+      "name": "Шары фигурные, букеты",
+      "image": "/media/cache/4f/b7/4fb7e477fd7ea317011d2a44df1d60a0.jpg",
+      "seo_header": "",
+      "slug": "shary-figurnye-bukety",
+      "meta_keywords": "",
+      "seo_caption": "",
+      "seo_text": "Ассортимент больших фигурных фольгированных шаров отличается огромным разнообразием простых и сложных форм. Предлагаются фольгированные шары в форме предметов, животных, сказочных героев, персонажей мультфильмов и т.д. Их тематика подойдет к любому событию и на каждый день ребенку и взрослому. Кроме того, есть наборы фольгированных шаров (так называемые «букеты»),  которые включают 5 шаров различным форм и размеров, выполненные в  одном дизайне: без затрат времени на поиски можно получить готовую композицию.  ",
+      "id": 8685,
+      "extra_info": ""
+    },
+    {
+      "meta_description": "",
+      "meta_title": "",
+      "code": "SHARIK_RU_C1_14_4//01",
+      "name": "9 мая",
+      "image": null,
+      "seo_header": "",
+      "slug": "9-maia",
+      "meta_keywords": "",
+      "seo_caption": "",
+      "seo_text": "",
+      "id": 9562,
+      "extra_info": ""
+    },
+    {
+      "meta_description": "",
+      "meta_title": "",
+      "code": "SHARIK_RU_C1_14_2//01",
+      "name": "23 февраля",
+      "image": null,
+      "seo_header": "",
+      "slug": "23-fevralia",
+      "meta_keywords": "",
+      "seo_caption": "",
+      "seo_text": "",
+      "id": 9571,
+      "extra_info": ""
+    }
+  ],
+  "images": [
+    {
+      "image": "/media/products/77653/8c047e04-59c4-47bb-aa28-c1c58a1e1f4b.jpg",
+      "thumb": {
+        "product_small": "/media/cache/89/36/8936024a82740a346433a020b6bddd12.jpg",
+        "zoom_medium": "/media/cache/ec/c5/ecc54d4d73e3db9a7d677bc6d5e3d4e7.jpg",
+        "zoom_large": "/media/cache/12/f4/12f4185ed83f9b38b447e2bbfd8962f8.jpg",
+        "medium": "/media/cache/56/54/565427cc0a36484540aaaa99e391bbcf.jpg"
+      },
+      "id": 105551,
+      "is_base": true
+    }
+  ],
+  "document_images": [],
+  "stickers": [
+    13
+  ],
+  "id": 98907,
+  "extra_info": "",
+  "category": 8685,
+  "slug": "tank-special-eut-2-1207-3040",
+  "seo_text": "",
+  "meta_keywords": "",
+  "seo_caption": "",
+  "measure_units_names": [
+    "Штука",
+    "Коробка"
+  ],
+  "meta_description": "",
+  "meta_title": "",
+  "description": "Сложная, объемная фигура указанной формы. При надувании используется только гелий. Имеет встроенный клапан - что упрощает надувание. Тонкая миларовая (фольга на полиэтиленовой основе) пленка позволяет шарам не сдуваться от недели до одного месяца.",
+  "measure_unit": {
+    "name": "шт",
+    "weight": 28,
+    "height": 0.1,
+    "volume": 0.056,
+    "width": 23.5,
+    "length": 24,
+    "common": {
+      "name": "шт",
+      "full_name": "Штука"
+    },
+    "full_name": "Штука",
+    "id": 256418
+  },
+  "properties": [
+    {
+      "name": "Индивидуальная упаковка",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Нет",
+      "unimportant": false,
+      "value_id": 50187,
+      "id": 24029843
+    },
+    {
+      "name": "Наличие клапана",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Да",
+      "unimportant": false,
+      "value_id": 70956,
+      "id": 24029847
+    },
+    {
+      "name": "Вид материала",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Шары фигурные большие",
+      "unimportant": true,
+      "value_id": 28367,
+      "id": 24020647
+    },
+    {
+      "name": "Группа материала",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Фигура Flexmetal",
+      "unimportant": true,
+      "value_id": 28053,
+      "id": 24020648
+    },
+    {
+      "name": "Код ТНВЭД",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "9503 00 9909",
+      "unimportant": true,
+      "value_id": 29485,
+      "id": 24020644
+    },
+    {
+      "name": "Количество порций гелия",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "10",
+      "unimportant": false,
+      "value_id": 69533,
+      "id": 24029846
+    },
+    {
+      "name": "Коллекция",
+      "image": "/media/property_value/%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F_%D0%92%D0%BF%D0%B5%D1%80%D0%B5%D0%B4.png",
+      "value": "Россия, вперед!",
+      "unimportant": false,
+      "value_id": 27231,
+      "id": 24029835
+    },
+    {
+      "name": "Наличие рисунка",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Шар с рисунком",
+      "unimportant": false,
+      "value_id": 27796,
+      "id": 24029838
+    },
+    {
+      "name": "Наш дизайн",
+      "image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
+      "value": "Наш дизайн",
+      "unimportant": false,
+      "value_id": 27750,
+      "id": 24029840
+    },
+    {
+      "name": "Отрасль",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "2Шары фольгированные",
+      "unimportant": true,
+      "value_id": 28414,
+      "id": 24020649
+    },
+    {
+      "name": "Признак продажи надутым",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Надуть гелием (10 порций)",
+      "unimportant": false,
+      "value_id": 70610,
+      "id": 24029845
+    },
+    {
+      "name": "Размер",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "70см/28\" - 100см/40\"",
+      "unimportant": false,
+      "value_id": 27774,
+      "id": 24029839
+    },
+    {
+      "name": "Размер фольга",
+      "image": "/media/property_value/32.png",
+      "value": "32\"",
+      "unimportant": false,
+      "value_id": 28260,
+      "id": 24029828
+    },
+    {
+      "name": "Размеры\\Габариты",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "80CM.H*75CM.H",
+      "unimportant": false,
+      "value_id": 34024,
+      "id": 24020645
+    },
+    {
+      "name": "Событие",
+      "image": "/media/property_value/%D0%9D%D0%9821_%D0%94%D0%B5%D0%BD%D1%8C_%D0%9F%D0%BE%D0%B1%D0%B5%D0%B4%D1%8B.png",
+      "value": "День Победы",
+      "unimportant": false,
+      "value_id": 28434,
+      "id": 24029831
+    },
+    {
+      "name": "Способ выкладки",
+      "image": "/media/property_value/%D0%BF%D0%BE%D0%BB%D0%BA%D0%B0.png",
+      "value": "Полка",
+      "unimportant": false,
+      "value_id": 64567,
+      "id": 24029844
+    },
+    {
+      "name": "Статус мелкий опт",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Базовый ассортимент",
+      "unimportant": false,
+      "value_id": 27733,
+      "id": 24029841
+    },
+    {
+      "name": "Статус товара",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Базовый ассортимент",
+      "unimportant": false,
+      "value_id": 28422,
+      "id": 24029832
+    },
+    {
+      "name": "Статус Франшиза",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "Базовый ассортимент",
+      "unimportant": true,
+      "value_id": 27724,
+      "id": 24029842
+    },
+    {
+      "name": "Товарная номенклатура",
+      "image": "/media/property_value/%D0%A8._%D0%B8%D0%B7_%D1%84%D0%BE%D0%BB%D1%8C%D0%B3%D0%B8.png",
+      "value": "Шарики из фольги",
+      "unimportant": false,
+      "value_id": 51733,
+      "id": 24029837
+    },
+    {
+      "name": "Форма фольга",
+      "image": "/media/property_value/%D0%A4%D0%A4_%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0_60.png",
+      "value": "Фигура",
+      "unimportant": false,
+      "value_id": 29144,
+      "id": 24029830
+    },
+    {
+      "name": "Цвет фольга",
+      "image": "/media/property_value/%D0%97%D0%B5%D0%BB%D0%B5%D0%BD%D1%8B%D0%B9.png",
+      "value": "Зеленый/Green",
+      "unimportant": true,
+      "value_id": 29242,
+      "id": 24029829
+    }
+  ],
+  "promotions": [],
+  "name": "Ф ФИГУРА РУС Танк",
+  "rests": [
+    {
+      "warehouse": {
+        "city": 1,
+        "name": "Садовод-Салют, склад-магазин",
+        "is_visible": true,
+        "country": 1,
+        "coordinates": "",
+        "address": "ул. Верхние Поля, 56, стр. 11, Садовод, ТЦ “Салют” Вход №1, 3 этаж, павильон № 20",
+        "id": 24
+      },
+      "date_of_new_arrival": null,
+      "new_arrival": null,
+      "id": 126560,
+      "rest": 14
+    },
+    {
+      "warehouse": {
+        "city": 1,
+        "name": "РЦ, Зеленоград",
+        "is_visible": true,
+        "country": 1,
+        "coordinates": "",
+        "address": "Зеленоград, ул.Заводская, д.18, стр.9",
+        "id": 25
+      },
+      "date_of_new_arrival": null,
+      "new_arrival": 5278,
+      "id": 126539,
+      "rest": 4523
+    },
+    {
+      "warehouse": {
+        "city": 1,
+        "name": "Фуд Сити, склад-магазин",
+        "is_visible": true,
+        "country": 1,
+        "coordinates": "",
+        "address": "Москва, п. Сосненское, 22-й км Калужского шоссе, здание №10",
+        "id": 27
+      },
+      "date_of_new_arrival": null,
+      "new_arrival": null,
+      "id": 183835,
+      "rest": 40
+    },
+    {
+      "warehouse": {
+        "city": 1,
+        "name": "Сокол, склад-магазин",
+        "is_visible": true,
+        "country": 1,
+        "coordinates": "",
+        "address": "ул.Дубосековская, д 4 (МАИ ГУП)",
+        "id": 22
+      },
+      "date_of_new_arrival": null,
+      "new_arrival": 100,
+      "id": 126546,
+      "rest": 115
+    },
+    {
+      "warehouse": {
+        "city": 1,
+        "name": "Нагорный, склад-магазин",
+        "is_visible": true,
+        "country": 1,
+        "coordinates": "",
+        "address": "Нагорный проезд, дом 7, Институт вакуумной техники имени С. А. Векшинского, м.Нагатинская",
+        "id": 21
+      },
+      "date_of_new_arrival": null,
+      "new_arrival": null,
+      "id": 126553,
+      "rest": 77
+    }
+  ],
+  "multiplicity": 1,
+  "default_price": {
+    "is_rrc": false,
+    "is_visible": false,
+    "price_type": "PR00//ALL//1000",
+    "currency_price": 147,
+    "is_default": false,
+    "currency": "RUB",
+    "original_currency_price": 147,
+    "position": 1
+  },
+  "popularity": 689,
+  "multiplicity_measure_unit": "шт",
+  "icons_property_value": [
+    {
+      "value__image": "/media/property_value/32.png",
+      "value__property__name": "Размер фольга",
+      "value__name": "32\"",
+      "value__property__value_icon_position": 4
+    },
+    {
+      "value__image": "/media/property_value/spain_glossy_wave_icon_60.png",
+      "value__property__name": "Страна",
+      "value__name": "Испания",
+      "value__property__value_icon_position": 1
+    },
+    {
+      "value__image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
+      "value__property__name": "Наш дизайн",
+      "value__name": "Наш дизайн",
+      "value__property__value_icon_position": 0
+    }
+  ],
+  "dist_markets": "",
+  "origin_properties": [
+    {
+      "name": "Артикул производителя",
+      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
+      "value": "P911506",
+      "unimportant": false,
+      "value_id": 48680,
+      "id": 24020646
+    },
+    {
+      "name": "Торговая марка",
+      "image": "/media/property_value/FLEXMETAL.png",
+      "value": "Flex Metal",
+      "unimportant": false,
+      "value_id": 27920,
+      "id": 24020650
+    },
+    {
+      "name": "Страна",
+      "image": "/media/property_value/spain_glossy_wave_icon_60.png",
+      "value": "Испания",
+      "unimportant": false,
+      "value_id": 27858,
+      "id": 24029836
+    }
+  ],
+  "measure_prices": [
+    {
+      "measure_unit": {
+        "name": "шт",
+        "weight": 28,
+        "height": 0.1,
+        "volume": 0.056,
+        "width": 23.5,
+        "length": 24,
+        "common": {
+          "name": "шт",
+          "full_name": "Штука"
+        },
+        "full_name": "Штука",
+        "id": 256418
+      },
+      "price": {
+        "is_rrc": false,
+        "is_visible": false,
+        "price_type": "PR00//ALL//1000",
+        "currency_price": 147,
+        "is_default": false,
+        "currency": "RUB",
+        "original_currency_price": 147,
+        "position": 1
+      }
+    },
+    {
+      "measure_unit": {
+        "name": "кор",
+        "weight": 2810,
+        "height": 9.929,
+        "volume": 5.6,
+        "width": 23.5,
+        "length": 24,
+        "common": {
+          "name": "кор",
+          "full_name": "Коробка"
+        },
+        "full_name": "Коробка",
+        "id": 256419
+      },
+      "price": {
+        "is_rrc": false,
+        "is_visible": false,
+        "price_type": "PR00//ALL//1000",
+        "currency_price": 14700,
+        "is_default": false,
+        "currency": "RUB",
+        "original_currency_price": 14700,
+        "position": 1
+      }
+    }
+  ]
+}
 
 // Функция преобразования артикула в тег
 const articleToTag = (article) => {
@@ -14,10 +526,8 @@ const articleToTag = (article) => {
 };
 
 export const Products = () => {  
-  const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
   const { article } = useParams();
-  const { isAdmin, isUploader } = useAuth();
   const getCode = useGetCode();
   
   const [productInfo, setProductInfo] = useState(null);
@@ -29,6 +539,8 @@ export const Products = () => {
     storage: null
   });
 
+  const [activeTab, setActiveTab] = useState('characteristics');
+
   // Состояния для слайдера
   const [sliderConfig, setSliderConfig] = useState({
     isOpen: false,
@@ -36,10 +548,6 @@ export const Products = () => {
     currentIndex: 0,
     source: null // 'portal' или 'storage'
   });
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   // Функция открытия слайдера для портала
   const openPortalSlider = (index) => {
@@ -135,6 +643,7 @@ export const Products = () => {
             setErrors(prev => ({ ...prev, portal: `Ошибка поиска: ${searchResponse.status}` }));
           }
         } catch (portalError) {
+          setProductInfo(ifo)
           console.warn('Ошибка при запросе к порталу:', portalError);
           setErrors(prev => ({ ...prev, portal: 'Не удалось подключиться к порталу' }));
         }
@@ -169,9 +678,7 @@ export const Products = () => {
             console.log('Параметры запроса к хранилищу:', params);
 
             // Выбираем нужный API метод в зависимости от прав
-            const storageResponse = (isAdmin || isUploader) 
-              ? await apiGetAllImages(params)
-              : await apiGetImagesExcludingMarketplaces(params);
+            const storageResponse = await apiGetAllImages(params);
 
             console.log('Ответ от хранилища:', storageResponse);
 
@@ -201,7 +708,7 @@ export const Products = () => {
     };
 
     fetchProductData();
-  }, [article, isAdmin, isUploader]);
+  }, [article]);
 
   // Выводим в консоль при изменении состояний
   useEffect(() => {
@@ -233,11 +740,9 @@ export const Products = () => {
     <div className="products-container">
       {/* Шапка */}
       <div className='header-section' style={{ margin: '10px 10px 0px'}}>
-        <button onClick={handleBack} className='button-back' style={{ color: '#333'}}>
-          <HiOutlineChevronLeft /> {t('header.back')}
-        </button>
         <h2 style={{ color: '#333'}}>
           {article ? article : 'Неизвестный товар'}
+          {productInfo?.name && <span style={{ marginLeft: '10px', fontWeight: '400', fontSize: '18px', color: '#666' }}>{productInfo.name}</span>}
         </h2>
         
         {/* Блок с информацией о маркетплейсах */}
@@ -317,17 +822,337 @@ export const Products = () => {
       </div>
 
       {/* Контейнер с панелью слева и контентом */}
-      <div className="content-wrapper">
-        {/* Пустая панель слева */}
-        <div className="empty-sidebar">
-          <div style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
-            <h4 style={{ margin: '0' }}>Информация о товаре:</h4>
-              
+      <div className="contents-wrapper">
+
+{/* Левая панель с информацией о товаре */}
+<div className="empty-sidebar">
+  
+  {/* Табы */}
+  <div style={{ 
+    display: 'flex', 
+    borderBottom: '1px solid #d4e6fb',
+    background: '#f0f6fd',
+    width: '100%'
+  }}>
+    <div 
+      style={{ 
+        flex: 1,
+        padding: '12px 16px',
+        cursor: 'pointer',
+        textAlign: 'center',
+        borderBottom: activeTab === 'characteristics' ? '2px solid #1a5a9c' : 'none',
+        color: activeTab === 'characteristics' ? '#1a5a9c' : '#666',
+        fontWeight: activeTab === 'characteristics' ? '600' : '400',
+        transition: 'all 0.2s ease'
+      }}
+      onClick={() => setActiveTab('characteristics')}
+    >
+      Характеристики
+    </div>
+    <div 
+      style={{ 
+        flex: 1,
+        padding: '12px 16px',
+        cursor: 'pointer',
+        textAlign: 'center',
+        borderBottom: activeTab === 'availability' ? '2px solid #1a5a9c' : 'none',
+        color: activeTab === 'availability' ? '#1a5a9c' : '#666',
+        fontWeight: activeTab === 'availability' ? '600' : '400',
+        transition: 'all 0.2s ease'
+      }}
+      onClick={() => setActiveTab('availability')}
+    >
+      Наличие
+    </div>
+  </div>
+
+  {/* Контент табов */}
+  <div style={{ padding: '10px 10px 5px 10px' }}>
+    {/* Таб Характеристики */}
+    {activeTab === 'characteristics' && (
+      <>
+               
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '10px', color: '#666' }}>
+            Загрузка свойств...
           </div>
+        )}
+        
+        {productInfo?.properties && productInfo.properties.length > 0 ? (
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '4px',
+            maxHeight: 'calc(100vh - 180px)',
+            overflowY: 'auto',
+            paddingRight: '10px', 
+            marginRight: '-10px',
+          }}>
+
+            {/* Цена товара */}
+            {productInfo.default_price && (
+              <div 
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '4px 6px 4px 6px',
+                  fontSize: '14px',
+                  marginBottom: '4px',
+                }}
+              >
+                <span style={{ 
+                  color: '#1a5a9c',
+                  fontWeight: '700',
+                  maxWidth: '50%'
+                }}>
+                  Цена
+                </span>
+                <span style={{ 
+                  color: '#1a3a5c',
+                  fontWeight: '700',
+                  textAlign: 'right',
+                  maxWidth: '50%',
+                  fontSize: '16px'
+                }}>
+                  {productInfo.default_price.currency_price} ₽
+                </span>
+              </div>
+            )}
+
+        {/* Минимальная партия поставки */}
+        <div 
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '4px 6px 4px 6px',
+            fontSize: '13px',
+            marginBottom: '4px'
+          }}
+        >
+          <span style={{ 
+            color: '#1a5a9c',
+            fontWeight: '600',
+            maxWidth: '50%'
+          }}>
+            Минимальная партия поставки
+          </span>
+          <span style={{ 
+            color: '#1a3a5c',
+            fontWeight: '600',
+            textAlign: 'right',
+            maxWidth: '50%'
+          }}>
+            {productInfo.multiplicity || '0'} {productInfo.multiplicity_measure_unit || 'шт'}
+          </span>
         </div>
+
+            {/* Торговая марка из origin_properties */}
+            {productInfo.origin_properties?.map(prop => {
+              if (prop.name === 'Торговая марка') {
+                return (
+                  <div 
+                    key={prop.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '4px 6px 4px 6px',
+                      fontSize: '13px',
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#1a5a9c',
+                      fontWeight: '600',
+                      maxWidth: '50%'
+                    }}>
+                      {prop.name}
+                    </span>
+                    <span style={{ 
+                      color: '#1a3a5c',
+                      fontWeight: '500',
+                      textAlign: 'right',
+                      maxWidth: '50%'
+                    }}>
+                      {prop.value}
+                    </span>
+                  </div>
+                );
+              }
+              return null;
+            })}
+
+            {/* Страна из origin_properties */}
+            {productInfo.origin_properties?.map(prop => {
+              if (prop.name === 'Страна') {
+                return (
+                  <div 
+                    key={prop.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '4px 6px 24px 6px',
+                      fontSize: '13px',
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#1a5a9c',
+                      fontWeight: '600',
+                      maxWidth: '50%'
+                    }}>
+                      {prop.name}
+                    </span>
+                    <span style={{ 
+                      color: '#1a3a5c',
+                      fontWeight: '500',
+                      textAlign: 'right',
+                      maxWidth: '50%'
+                    }}>
+                      {prop.value}
+                    </span>
+                  </div>
+                );
+              }
+              return null;
+            })}
+
+            <h4 style={{ margin: '0 0 10px 0', color: '#1a5a9c' }}>Информация о товаре:</h4>
+
+            {productInfo.properties.map((prop, index) => (
+              <div 
+                key={index}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0px 6px 6px 6px',
+                  fontSize: '13px'
+                }}
+              >
+                <span style={{ 
+                  color: '#2c5f9a',
+                  fontWeight: '500',
+                  whiteSpace: 'wrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '50%'
+                }}>
+                  {prop.name}
+                </span>
+                <span style={{ 
+                  color: '#1a3a5c',
+                  fontWeight: '400',
+                  textAlign: 'right',
+                  whiteSpace: 'wrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '50%'
+                }}>
+                  {prop.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          !loading && (
+            <div style={{ 
+              padding: '20px', 
+              textAlign: 'center', 
+              color: '#999',
+              fontStyle: 'italic'
+            }}>
+              Нет данных о свойствах товара
+            </div>
+          )
+        )}
+      </>
+    )}
+
+    {/* Таб Наличие */}
+    {activeTab === 'availability' && (
+      <>
+                
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '10px', color: '#666' }}>
+            Загрузка информации о наличии...
+          </div>
+        )}
+        
+        {productInfo?.rests && productInfo.rests.length > 0 ? (
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '4px',
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            paddingRight: '5px'
+          }}>
+            {productInfo.rests.map((rest, index) => (
+              <div 
+                key={index}
+                style={{
+                  padding: '8px',
+                  borderBottom: '1px dashed #d4e6fb'
+                }}
+              >
+                <div style={{ 
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '4px',
+                  fontSize: '14px'
+                }}>
+                  <span style={{ 
+                    color: '#2c5f9a',
+                    fontWeight: '600',
+                  }}>
+                    {rest.warehouse.name}
+                  </span>
+                  <span style={{ 
+                    color: '#1a3a5c',
+                    fontWeight: '400',
+                  }}>
+                    {rest.rest} {productInfo.multiplicity_measure_unit || 'шт'}
+                  </span>
+                </div>
+                <div style={{ 
+          fontSize: '11px',
+          minHeight: '18px', 
+          color: rest.new_arrival ? '#8a8a8a' : 'transparent', // Прозрачный текст если нет данных
+          marginTop: '2px',
+          visibility: rest.new_arrival ? 'visible' : 'hidden' 
+        }}>
+          {rest.new_arrival ? `Ожидается поступление: ${rest.new_arrival} ${productInfo.multiplicity_measure_unit || 'шт'}` : ' '} {/* Неразрывный пробел для сохранения высоты */}
+        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          !loading && (
+            <div style={{ 
+              padding: '20px', 
+              textAlign: 'center', 
+              color: '#999',
+              fontStyle: 'italic'
+            }}>
+              Нет информации о наличии
+            </div>
+          )
+        )}
+      </>
+    )}
+  </div>
+</div>
         
         {/* Основной контент */}
-        <div className="main-content">
+        <div className="main-content" style={{ 
+          height: 'calc(80vh - 120px)', // Фиксированная высота с учетом шапки
+          overflowX: 'hidden', 
+          overflowY: 'auto', // Скролл только для правой части
+          paddingRight: '5px'
+        }}>
           {loading && <div style={{ padding: '20px' }}>Загрузка...</div>}
           
           {/* Отображаем ошибки, но не блокируем отображение других данных */}
@@ -343,20 +1168,15 @@ export const Products = () => {
             </div>
           )}
 
-          {/* Визуализация данных для отладки */}
-          {productInfo && (
-            <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-              <h3>Информация о товаре:</h3>
-              <pre style={{ background: '#f5f5f5', padding: '10px', borderRadius: '4px' }}>
-                {JSON.stringify(productInfo, null, 2)}
-              </pre>
-            </div>
-          )}
-
           {/* Секция с изображениями с портала */}
           {productImages.length > 0 && (
-            <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-              <h3>Изображения с портала ({productImages.length}):</h3>
+            <div style={{ 
+              padding: '20px', 
+              borderBottom: '1px solid #eee', 
+              boxShadow: '0 4px 6px -4px rgba(0, 0, 0, 0.1)', 
+              marginBottom: '2px', backgroundColor: 'white' 
+            }}>
+              <h3  style={{ margin: '0' }}>Изображения с портала ({productImages.length}):</h3>
               <div className="image-grids">
                 {productImages.map((img, index) => (
                   <div 
@@ -372,12 +1192,12 @@ export const Products = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} 
 
           {/* Секция с изображениями из хранилища */}
           {storageImages.length > 0 && (
             <div style={{ padding: '20px' }}>
-              <h3>Изображения из хранилища ({storageImages.length}):</h3>
+              <h3  style={{ margin: '0' }}>Изображения из хранилища ({storageImages.length}):</h3>
               <div className="image-grids">
                 {storageImages.map((img, index) => (
                   <div 

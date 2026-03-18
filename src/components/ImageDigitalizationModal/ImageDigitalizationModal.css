@@ -277,6 +277,10 @@
   cursor: default;
 }
 
+.tag-overlay:hover {
+  color: #0056b3;
+}
+
 .tag-remove-btn {
   position: absolute;
   right: 4px;
