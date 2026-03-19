@@ -103,7 +103,7 @@ export const HeaderSection = ({
       String(now.getSeconds()).padStart(2, '0')
     ].join('');
     
-    return `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.png`;
+    return `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.webp`;
   };
 
   // Функция для подготовки скачивания
@@ -340,8 +340,8 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     element.style.backgroundImage = 'none';
     element.style.backgroundColor = '#FFFFFF';
     
-    // Используем dom-to-image для генерации
-    const dataUrl = await domtoimage.toPng(element, {
+    // 🔥 ПОЛУЧАЕМ PNG ДЛЯ ПРОМЕЖУТОЧНОЙ ОБРАБОТКИ
+    const pngDataUrl = await domtoimage.toPng(element, {
       width: targetWidth,
       height: targetHeight,
       bgcolor: '#FFFFFF',
@@ -366,11 +366,34 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       item.img.src = item.src;
     });
     
-    // Конвертируем dataUrl в blob
-    const blob = await (await fetch(dataUrl)).blob();
+    // 🔥 КОНВЕРТИРУЕМ PNG В WEBP
+    const pngBlob = await (await fetch(pngDataUrl)).blob();
+    
+    // Создаем Image элемент для конвертации
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    
+    // Конвертируем в WEBP
+    const webpBlob = await new Promise((resolve) => {
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Конвертируем в WEBP с качеством 0.92 (отличный баланс размера и качества)
+        canvas.toBlob(
+          (blob) => resolve(blob),
+          'image/webp',
+          0.92
+        );
+      };
+      img.src = URL.createObjectURL(pngBlob);
+    });
     
     // Определяем параметры для сохранения
     let fileName;
+    let webpFileName;
     let articlesForHistory;
     let marketplaceForHistory;
     let slideTypeForHistory;
@@ -380,6 +403,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     
     if (customFileName) {
       fileName = customFileName;
+      webpFileName = customFileName.replace('.png', '.webp');
       const parts = customFileName.replace('.png', '').split('_');
       if (parts.length >= 6) {
         articlesForHistory = parts.slice(0, parts.length - 5);
@@ -390,6 +414,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       const articles = JSON.parse(localStorage.getItem('collage-articles')) || [];
       const baseCode = articles.length > 0 ? articles.join('_') : 'collage';
       fileName = generateDefaultFileName(baseCode, 'collage');
+      webpFileName = fileName.replace('.png', '.webp');
       articlesForHistory = articles;
       marketplaceForHistory = marketplace;
       slideTypeForHistory = 'collage';
@@ -397,6 +422,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       [baseCode, slideNumberPart] = id.split('_');
       slideType = slideNumberPart === '1' ? 'main' : `slide${slideNumberPart}`;
       fileName = generateDefaultFileName(baseCode, slideType);
+      webpFileName = fileName.replace('.png', '.webp');
       articlesForHistory = baseCode.split('_');
       marketplaceForHistory = marketplace;
       slideTypeForHistory = slideType;
@@ -407,7 +433,8 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       ? localStorage.getItem(sessionKey) 
       : sessionStorage.getItem(sessionKey);
     
-    const imageFile = new File([blob], fileName, { type: 'image/png' });
+    // 🔥 СОЗДАЕМ ФАЙЛ WEBP ДЛЯ ЗАГРУЗКИ
+    const webpImageFile = new File([webpBlob], webpFileName, { type: 'image/webp' });
     
     let uploadedFileData = null;
     const getMarketplaceFullName = (marketplaceCode) => {
@@ -426,8 +453,9 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     
     if (companyId && marketplaceForHistory !== 'AM') {
       try {
-        const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
-        console.log('Файл успешно загружен на сервер:', uploadResult);
+        // 🔥 ЗАГРУЖАЕМ WEBP В ХРАНИЛИЩЕ
+        const uploadResult = await uploadGraphicFile(companyId, webpImageFile, null, tags);
+        console.log('Файл WEBP успешно загружен на сервер:', uploadResult);
         
         if (uploadResult?.success && uploadResult?.data) {
           uploadedFileData = {
@@ -437,7 +465,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
           };
         }
       } catch (uploadError) {
-        console.warn('Ошибка загрузки файла на сервер:', uploadError);
+        console.warn('Ошибка загрузки WEBP файла на сервер:', uploadError);
       }
     }
     
@@ -478,16 +506,17 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     document.body.removeChild(overlay);
     document.head.removeChild(style);
     
-    // Скачиваем файл
-    const url = URL.createObjectURL(blob);
+    // 🔥 СКАЧИВАЕМ WEBP ФАЙЛ
+    const url = URL.createObjectURL(webpBlob);
     const link = document.createElement('a');
-    link.download = fileName;
+    link.download = webpFileName;
     link.href = url;
     document.body.appendChild(link);
     link.click();
     
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    URL.revokeObjectURL(img.src); // Очищаем временный URL
     
     setLoading(false);
   } catch (error) {

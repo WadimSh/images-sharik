@@ -57,6 +57,25 @@
   background: #555;
 }
 
+.images_cards {
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 160px; 
+  min-width: 120px;
+  position: relative;
+  cursor: pointer;
+}
+
+.images_cards:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 @media (max-width: 768px) {
   .contents-wrapper {
     flex-direction: column;

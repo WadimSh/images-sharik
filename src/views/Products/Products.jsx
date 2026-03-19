@@ -6,520 +6,6 @@ import { useGetCode } from '../../hooks/useGetCode';
 import { apiGetAllImages } from '../../services/mediaService';
 import { ImageSliderModal } from '../../components/ImageSliderModal';
 
-const ifo = {
-  "measure_units_properties": [
-    [
-      "Размер",
-      [
-        "24.0x23.5x0.1 см",
-        "24.0x23.5x9.929 см"
-      ]
-    ],
-    [
-      "Вес брутто",
-      [
-        "28.0 Г",
-        "2810.0 Г(брутто)"
-      ]
-    ],
-    [
-      "Объем",
-      [
-        "0.056 дм3",
-        "5.6 дм3"
-      ]
-    ],
-    [
-      "Баз. ед.",
-      [
-        "1 шт",
-        "100 шт"
-      ]
-    ],
-    [
-      "Штрих код. ед.",
-      [
-        "4690390246445",
-        "4690390246452"
-      ]
-    ]
-  ],
-  "rating": 0,
-  "code": "1207-3040",
-  "units_counts": [
-    [
-      "кор",
-      "100 шт"
-    ]
-  ],
-  "seo_header": "",
-  "updated_at": "2026-03-18T04:11:34.790202",
-  "rest": 4769,
-  "in_favorite": false,
-  "product_files": [],
-  "category_detail": [
-    {
-      "meta_description": "Оптовая продажа фольгированных фигурных шаров в Москве. Покупайте фольгированные фигурные шары оптом с доставкой у проверенного поставщика!",
-      "meta_title": "",
-      "code": "SHARIK_RU_2_6//01",
-      "name": "Шары фигурные, букеты",
-      "image": "/media/cache/4f/b7/4fb7e477fd7ea317011d2a44df1d60a0.jpg",
-      "seo_header": "",
-      "slug": "shary-figurnye-bukety",
-      "meta_keywords": "",
-      "seo_caption": "",
-      "seo_text": "Ассортимент больших фигурных фольгированных шаров отличается огромным разнообразием простых и сложных форм. Предлагаются фольгированные шары в форме предметов, животных, сказочных героев, персонажей мультфильмов и т.д. Их тематика подойдет к любому событию и на каждый день ребенку и взрослому. Кроме того, есть наборы фольгированных шаров (так называемые «букеты»),  которые включают 5 шаров различным форм и размеров, выполненные в  одном дизайне: без затрат времени на поиски можно получить готовую композицию.  ",
-      "id": 8685,
-      "extra_info": ""
-    },
-    {
-      "meta_description": "",
-      "meta_title": "",
-      "code": "SHARIK_RU_C1_14_4//01",
-      "name": "9 мая",
-      "image": null,
-      "seo_header": "",
-      "slug": "9-maia",
-      "meta_keywords": "",
-      "seo_caption": "",
-      "seo_text": "",
-      "id": 9562,
-      "extra_info": ""
-    },
-    {
-      "meta_description": "",
-      "meta_title": "",
-      "code": "SHARIK_RU_C1_14_2//01",
-      "name": "23 февраля",
-      "image": null,
-      "seo_header": "",
-      "slug": "23-fevralia",
-      "meta_keywords": "",
-      "seo_caption": "",
-      "seo_text": "",
-      "id": 9571,
-      "extra_info": ""
-    }
-  ],
-  "images": [
-    {
-      "image": "/media/products/77653/8c047e04-59c4-47bb-aa28-c1c58a1e1f4b.jpg",
-      "thumb": {
-        "product_small": "/media/cache/89/36/8936024a82740a346433a020b6bddd12.jpg",
-        "zoom_medium": "/media/cache/ec/c5/ecc54d4d73e3db9a7d677bc6d5e3d4e7.jpg",
-        "zoom_large": "/media/cache/12/f4/12f4185ed83f9b38b447e2bbfd8962f8.jpg",
-        "medium": "/media/cache/56/54/565427cc0a36484540aaaa99e391bbcf.jpg"
-      },
-      "id": 105551,
-      "is_base": true
-    }
-  ],
-  "document_images": [],
-  "stickers": [
-    13
-  ],
-  "id": 98907,
-  "extra_info": "",
-  "category": 8685,
-  "slug": "tank-special-eut-2-1207-3040",
-  "seo_text": "",
-  "meta_keywords": "",
-  "seo_caption": "",
-  "measure_units_names": [
-    "Штука",
-    "Коробка"
-  ],
-  "meta_description": "",
-  "meta_title": "",
-  "description": "Сложная, объемная фигура указанной формы. При надувании используется только гелий. Имеет встроенный клапан - что упрощает надувание. Тонкая миларовая (фольга на полиэтиленовой основе) пленка позволяет шарам не сдуваться от недели до одного месяца.",
-  "measure_unit": {
-    "name": "шт",
-    "weight": 28,
-    "height": 0.1,
-    "volume": 0.056,
-    "width": 23.5,
-    "length": 24,
-    "common": {
-      "name": "шт",
-      "full_name": "Штука"
-    },
-    "full_name": "Штука",
-    "id": 256418
-  },
-  "properties": [
-    {
-      "name": "Индивидуальная упаковка",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Нет",
-      "unimportant": false,
-      "value_id": 50187,
-      "id": 24029843
-    },
-    {
-      "name": "Наличие клапана",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Да",
-      "unimportant": false,
-      "value_id": 70956,
-      "id": 24029847
-    },
-    {
-      "name": "Вид материала",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Шары фигурные большие",
-      "unimportant": true,
-      "value_id": 28367,
-      "id": 24020647
-    },
-    {
-      "name": "Группа материала",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Фигура Flexmetal",
-      "unimportant": true,
-      "value_id": 28053,
-      "id": 24020648
-    },
-    {
-      "name": "Код ТНВЭД",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "9503 00 9909",
-      "unimportant": true,
-      "value_id": 29485,
-      "id": 24020644
-    },
-    {
-      "name": "Количество порций гелия",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "10",
-      "unimportant": false,
-      "value_id": 69533,
-      "id": 24029846
-    },
-    {
-      "name": "Коллекция",
-      "image": "/media/property_value/%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F_%D0%92%D0%BF%D0%B5%D1%80%D0%B5%D0%B4.png",
-      "value": "Россия, вперед!",
-      "unimportant": false,
-      "value_id": 27231,
-      "id": 24029835
-    },
-    {
-      "name": "Наличие рисунка",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Шар с рисунком",
-      "unimportant": false,
-      "value_id": 27796,
-      "id": 24029838
-    },
-    {
-      "name": "Наш дизайн",
-      "image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
-      "value": "Наш дизайн",
-      "unimportant": false,
-      "value_id": 27750,
-      "id": 24029840
-    },
-    {
-      "name": "Отрасль",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "2Шары фольгированные",
-      "unimportant": true,
-      "value_id": 28414,
-      "id": 24020649
-    },
-    {
-      "name": "Признак продажи надутым",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Надуть гелием (10 порций)",
-      "unimportant": false,
-      "value_id": 70610,
-      "id": 24029845
-    },
-    {
-      "name": "Размер",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "70см/28\" - 100см/40\"",
-      "unimportant": false,
-      "value_id": 27774,
-      "id": 24029839
-    },
-    {
-      "name": "Размер фольга",
-      "image": "/media/property_value/32.png",
-      "value": "32\"",
-      "unimportant": false,
-      "value_id": 28260,
-      "id": 24029828
-    },
-    {
-      "name": "Размеры\\Габариты",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "80CM.H*75CM.H",
-      "unimportant": false,
-      "value_id": 34024,
-      "id": 24020645
-    },
-    {
-      "name": "Событие",
-      "image": "/media/property_value/%D0%9D%D0%9821_%D0%94%D0%B5%D0%BD%D1%8C_%D0%9F%D0%BE%D0%B1%D0%B5%D0%B4%D1%8B.png",
-      "value": "День Победы",
-      "unimportant": false,
-      "value_id": 28434,
-      "id": 24029831
-    },
-    {
-      "name": "Способ выкладки",
-      "image": "/media/property_value/%D0%BF%D0%BE%D0%BB%D0%BA%D0%B0.png",
-      "value": "Полка",
-      "unimportant": false,
-      "value_id": 64567,
-      "id": 24029844
-    },
-    {
-      "name": "Статус мелкий опт",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Базовый ассортимент",
-      "unimportant": false,
-      "value_id": 27733,
-      "id": 24029841
-    },
-    {
-      "name": "Статус товара",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Базовый ассортимент",
-      "unimportant": false,
-      "value_id": 28422,
-      "id": 24029832
-    },
-    {
-      "name": "Статус Франшиза",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "Базовый ассортимент",
-      "unimportant": true,
-      "value_id": 27724,
-      "id": 24029842
-    },
-    {
-      "name": "Товарная номенклатура",
-      "image": "/media/property_value/%D0%A8._%D0%B8%D0%B7_%D1%84%D0%BE%D0%BB%D1%8C%D0%B3%D0%B8.png",
-      "value": "Шарики из фольги",
-      "unimportant": false,
-      "value_id": 51733,
-      "id": 24029837
-    },
-    {
-      "name": "Форма фольга",
-      "image": "/media/property_value/%D0%A4%D0%A4_%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0_60.png",
-      "value": "Фигура",
-      "unimportant": false,
-      "value_id": 29144,
-      "id": 24029830
-    },
-    {
-      "name": "Цвет фольга",
-      "image": "/media/property_value/%D0%97%D0%B5%D0%BB%D0%B5%D0%BD%D1%8B%D0%B9.png",
-      "value": "Зеленый/Green",
-      "unimportant": true,
-      "value_id": 29242,
-      "id": 24029829
-    }
-  ],
-  "promotions": [],
-  "name": "Ф ФИГУРА РУС Танк",
-  "rests": [
-    {
-      "warehouse": {
-        "city": 1,
-        "name": "Садовод-Салют, склад-магазин",
-        "is_visible": true,
-        "country": 1,
-        "coordinates": "",
-        "address": "ул. Верхние Поля, 56, стр. 11, Садовод, ТЦ “Салют” Вход №1, 3 этаж, павильон № 20",
-        "id": 24
-      },
-      "date_of_new_arrival": null,
-      "new_arrival": null,
-      "id": 126560,
-      "rest": 14
-    },
-    {
-      "warehouse": {
-        "city": 1,
-        "name": "РЦ, Зеленоград",
-        "is_visible": true,
-        "country": 1,
-        "coordinates": "",
-        "address": "Зеленоград, ул.Заводская, д.18, стр.9",
-        "id": 25
-      },
-      "date_of_new_arrival": null,
-      "new_arrival": 5278,
-      "id": 126539,
-      "rest": 4523
-    },
-    {
-      "warehouse": {
-        "city": 1,
-        "name": "Фуд Сити, склад-магазин",
-        "is_visible": true,
-        "country": 1,
-        "coordinates": "",
-        "address": "Москва, п. Сосненское, 22-й км Калужского шоссе, здание №10",
-        "id": 27
-      },
-      "date_of_new_arrival": null,
-      "new_arrival": null,
-      "id": 183835,
-      "rest": 40
-    },
-    {
-      "warehouse": {
-        "city": 1,
-        "name": "Сокол, склад-магазин",
-        "is_visible": true,
-        "country": 1,
-        "coordinates": "",
-        "address": "ул.Дубосековская, д 4 (МАИ ГУП)",
-        "id": 22
-      },
-      "date_of_new_arrival": null,
-      "new_arrival": 100,
-      "id": 126546,
-      "rest": 115
-    },
-    {
-      "warehouse": {
-        "city": 1,
-        "name": "Нагорный, склад-магазин",
-        "is_visible": true,
-        "country": 1,
-        "coordinates": "",
-        "address": "Нагорный проезд, дом 7, Институт вакуумной техники имени С. А. Векшинского, м.Нагатинская",
-        "id": 21
-      },
-      "date_of_new_arrival": null,
-      "new_arrival": null,
-      "id": 126553,
-      "rest": 77
-    }
-  ],
-  "multiplicity": 1,
-  "default_price": {
-    "is_rrc": false,
-    "is_visible": false,
-    "price_type": "PR00//ALL//1000",
-    "currency_price": 147,
-    "is_default": false,
-    "currency": "RUB",
-    "original_currency_price": 147,
-    "position": 1
-  },
-  "popularity": 689,
-  "multiplicity_measure_unit": "шт",
-  "icons_property_value": [
-    {
-      "value__image": "/media/property_value/32.png",
-      "value__property__name": "Размер фольга",
-      "value__name": "32\"",
-      "value__property__value_icon_position": 4
-    },
-    {
-      "value__image": "/media/property_value/spain_glossy_wave_icon_60.png",
-      "value__property__name": "Страна",
-      "value__name": "Испания",
-      "value__property__value_icon_position": 1
-    },
-    {
-      "value__image": "/media/property_value/%D0%BD%D0%B0%D1%88.png",
-      "value__property__name": "Наш дизайн",
-      "value__name": "Наш дизайн",
-      "value__property__value_icon_position": 0
-    }
-  ],
-  "dist_markets": "",
-  "origin_properties": [
-    {
-      "name": "Артикул производителя",
-      "image": "https://new.sharik.ru/static/images/nophoto_white_square.png",
-      "value": "P911506",
-      "unimportant": false,
-      "value_id": 48680,
-      "id": 24020646
-    },
-    {
-      "name": "Торговая марка",
-      "image": "/media/property_value/FLEXMETAL.png",
-      "value": "Flex Metal",
-      "unimportant": false,
-      "value_id": 27920,
-      "id": 24020650
-    },
-    {
-      "name": "Страна",
-      "image": "/media/property_value/spain_glossy_wave_icon_60.png",
-      "value": "Испания",
-      "unimportant": false,
-      "value_id": 27858,
-      "id": 24029836
-    }
-  ],
-  "measure_prices": [
-    {
-      "measure_unit": {
-        "name": "шт",
-        "weight": 28,
-        "height": 0.1,
-        "volume": 0.056,
-        "width": 23.5,
-        "length": 24,
-        "common": {
-          "name": "шт",
-          "full_name": "Штука"
-        },
-        "full_name": "Штука",
-        "id": 256418
-      },
-      "price": {
-        "is_rrc": false,
-        "is_visible": false,
-        "price_type": "PR00//ALL//1000",
-        "currency_price": 147,
-        "is_default": false,
-        "currency": "RUB",
-        "original_currency_price": 147,
-        "position": 1
-      }
-    },
-    {
-      "measure_unit": {
-        "name": "кор",
-        "weight": 2810,
-        "height": 9.929,
-        "volume": 5.6,
-        "width": 23.5,
-        "length": 24,
-        "common": {
-          "name": "кор",
-          "full_name": "Коробка"
-        },
-        "full_name": "Коробка",
-        "id": 256419
-      },
-      "price": {
-        "is_rrc": false,
-        "is_visible": false,
-        "price_type": "PR00//ALL//1000",
-        "currency_price": 14700,
-        "is_default": false,
-        "currency": "RUB",
-        "original_currency_price": 14700,
-        "position": 1
-      }
-    }
-  ]
-}
-
-// Функция преобразования артикула в тег
 const articleToTag = (article) => {
   if (!article) return null;
   return article.trim();
@@ -602,8 +88,7 @@ export const Products = () => {
           
           if (searchResponse.ok) {
             const searchData = await searchResponse.json();
-            console.log('Результаты поиска товара:', searchData);
-
+            
             if (searchData.results && searchData.results.length > 0) {
               // Берем первый найденный товар
               const productId = searchData.results[0].id;
@@ -615,7 +100,6 @@ export const Products = () => {
                 if (detailedResponse.ok) {
                   const detailedData = await detailedResponse.json();
                   
-                  console.log('Детальная информация о товаре:', detailedData);
                   setProductInfo(detailedData);
 
                   // Формируем массив ссылок на изображения из портала
@@ -623,28 +107,21 @@ export const Products = () => {
                     const portalImages = detailedData.images.map(img => 
                       `https://new.sharik.ru${img.image}`
                     );
-                    console.log('Изображения с портала:', portalImages);
                     setProductImages(portalImages);
                   }
                 } else {
-                  console.warn('Не удалось получить детальную информацию о товаре');
                   setErrors(prev => ({ ...prev, portal: 'Детальная информация не загрузилась' }));
                 }
               } catch (detailError) {
-                console.warn('Ошибка при запросе детальной информации:', detailError);
                 setErrors(prev => ({ ...prev, portal: 'Ошибка загрузки детальной информации' }));
               }
             } else {
-              console.log('Товар с артикулом', article, 'не найден на портале');
               setErrors(prev => ({ ...prev, portal: 'Товар не найден на портале' }));
             }
           } else {
-            console.warn('Ошибка при поиске товара:', searchResponse.status);
             setErrors(prev => ({ ...prev, portal: `Ошибка поиска: ${searchResponse.status}` }));
           }
         } catch (portalError) {
-          setProductInfo(ifo)
-          console.warn('Ошибка при запросе к порталу:', portalError);
           setErrors(prev => ({ ...prev, portal: 'Не удалось подключиться к порталу' }));
         }
 
@@ -675,29 +152,21 @@ export const Products = () => {
               }
             });
 
-            console.log('Параметры запроса к хранилищу:', params);
-
             // Выбираем нужный API метод в зависимости от прав
             const storageResponse = await apiGetAllImages(params);
 
-            console.log('Ответ от хранилища:', storageResponse);
-
             if (storageResponse && storageResponse.files && Array.isArray(storageResponse.files)) {
               const storageImageUrls = storageResponse.files.map(file => 
-                `https://mp.sharik.ru${file.thumbnailUrl}`
+                `https://mp.sharik.ru${file.url}`
               );
-              console.log('Изображения из хранилища:', storageImageUrls);
               setStorageImages(storageImageUrls);
             } else {
-              console.warn('Хранилище вернуло пустой ответ или неверный формат');
               setErrors(prev => ({ ...prev, storage: 'Нет изображений в хранилище' }));
             }
           } else {
-            console.warn('Не удалось преобразовать артикул в тег');
             setErrors(prev => ({ ...prev, storage: 'Неверный формат артикула' }));
           }
         } catch (storageError) {
-          console.warn('Ошибка при запросе к хранилищу:', storageError);
           setErrors(prev => ({ ...prev, storage: 'Не удалось подключиться к хранилищу' }));
           setStorageImages([]);
         }
@@ -709,25 +178,6 @@ export const Products = () => {
 
     fetchProductData();
   }, [article]);
-
-  // Выводим в консоль при изменении состояний
-  useEffect(() => {
-    if (productInfo) {
-      console.log('Стейт productInfo обновлен:', productInfo);
-    }
-  }, [productInfo]);
-
-  useEffect(() => {
-    if (productImages.length > 0) {
-      console.log('Стейт productImages обновлен:', productImages);
-    }
-  }, [productImages]);
-
-  useEffect(() => {
-    if (storageImages.length > 0) {
-      console.log('Стейт storageImages обновлен:', storageImages);
-    }
-  }, [storageImages]);
 
   // Получаем коды для маркетплейсов
   const wbCode = article ? getCode(article, "WB") : null;
@@ -1120,7 +570,7 @@ export const Products = () => {
                 <div style={{ 
           fontSize: '11px',
           minHeight: '18px', 
-          color: rest.new_arrival ? '#8a8a8a' : 'transparent', // Прозрачный текст если нет данных
+          color: rest.new_arrival ? '#8a8a8a' : 'transparent', 
           marginTop: '2px',
           visibility: rest.new_arrival ? 'visible' : 'hidden' 
         }}>
@@ -1148,12 +598,78 @@ export const Products = () => {
         
         {/* Основной контент */}
         <div className="main-content" style={{ 
-          height: 'calc(80vh - 120px)', // Фиксированная высота с учетом шапки
+          height: 'calc(100vh - 86px)', 
           overflowX: 'hidden', 
-          overflowY: 'auto', // Скролл только для правой части
+          overflowY: 'auto', 
           paddingRight: '5px'
         }}>
           {loading && <div style={{ padding: '20px' }}>Загрузка...</div>}
+
+  {/* НОВЫЙ БЛОК: Описание товара и категории */}
+  {productInfo && (productInfo.description || (productInfo.category_detail && productInfo.category_detail.length > 0)) && (
+    <div style={{ 
+      padding: '20px', 
+      borderBottom: '1px solid #eee', 
+      boxShadow: '0 4px 6px -4px rgba(0, 0, 0, 0.1)', 
+      marginBottom: '6px', 
+      backgroundColor: 'white' 
+    }}>
+      
+      {/* Описание товара */}
+      {productInfo.description && (
+        <div style={{ marginBottom: productInfo.category_detail && productInfo.category_detail.length > 0 ? '20px' : '0' }}>
+          <h3 style={{ margin: '0 0 12px 0', color: '#1a5a9c', fontSize: '18px' }}>Описание товара:</h3>
+          <p style={{ 
+            margin: '0', 
+            lineHeight: '1.6', 
+            color: '#333',
+            fontSize: '14px',
+            whiteSpace: 'pre-wrap', 
+            wordBreak: 'break-word' 
+          }}>
+            {productInfo.description}
+          </p>
+        </div>
+      )}
+
+      {/* Товар встречается в следующих разделах */}
+      {productInfo.category_detail && productInfo.category_detail.length > 0 && (
+        <div>
+          <h3 style={{ 
+            margin: productInfo.description ? '20px 0 12px 0' : '0 0 12px 0', 
+            color: '#1a5a9c', 
+            fontSize: '18px' 
+          }}>
+            Товар встречается в следующих разделах:
+          </h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {productInfo.category_detail.map((category, index) => (
+              <span
+                key={index}
+                style={{
+                  display: 'inline-block',
+                  padding: '4px 12px',
+                  backgroundColor: '#f0f6fd',
+                  border: '1px solid #d4e6fb',
+                  borderRadius: '16px',
+                  color: '#1a5a9c',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'default',
+                  transition: 'all 0.2s ease',
+                  ':hover': {
+                    backgroundColor: '#e1efff'
+                  }
+                }}
+              >
+                {category.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
           
           {/* Отображаем ошибки, но не блокируем отображение других данных */}
           {errors.portal && (
@@ -1176,12 +692,12 @@ export const Products = () => {
               boxShadow: '0 4px 6px -4px rgba(0, 0, 0, 0.1)', 
               marginBottom: '2px', backgroundColor: 'white' 
             }}>
-              <h3  style={{ margin: '0' }}>Изображения с портала ({productImages.length}):</h3>
+              <h3  style={{ margin: '0' }}>Изображения с портала new.sharik ({productImages.length}):</h3>
               <div className="image-grids">
                 {productImages.map((img, index) => (
                   <div 
                     key={index} 
-                    className="images_card"
+                    className="images_cards"
                     onClick={() => openPortalSlider(index)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -1197,12 +713,12 @@ export const Products = () => {
           {/* Секция с изображениями из хранилища */}
           {storageImages.length > 0 && (
             <div style={{ padding: '20px' }}>
-              <h3  style={{ margin: '0' }}>Изображения из хранилища ({storageImages.length}):</h3>
+              <h3  style={{ margin: '0' }}>Изображения из библиотеки doctest.sharik ({storageImages.length}):</h3>
               <div className="image-grids">
                 {storageImages.map((img, index) => (
                   <div 
                     key={index} 
-                    className="images_card"
+                    className="images_cards"
                     onClick={() => openStorageSlider(index)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -1218,7 +734,9 @@ export const Products = () => {
           {/* Модалка слайдера */}
           {sliderConfig.isOpen && (
             <ImageSliderModal
-              baseCode={sliderConfig.source === 'portal' ? `${article} (портал)` : `${article} (хранилище)`}
+              baseCode={sliderConfig.source === 'portal' 
+                ? `${article} - ${productInfo?.name || ''} (портал)` 
+                : `${article} - ${productInfo?.name || ''} (библиотека)`}
               images={sliderConfig.images}
               currentIndex={sliderConfig.currentIndex}
               onClose={closeSlider}

@@ -24,7 +24,7 @@ const EditFileNameModal = ({
   useEffect(() => {
     if (isOpen && initialFileName) {
       const parseFileName = (fileName) => {
-        const parts = fileName.replace('.png', '').split('_');
+        const parts = fileName.replace('.webp', '').split('_');
         
         if (parts.length < 6) {
           return {
@@ -144,7 +144,7 @@ const EditFileNameModal = ({
     
     if (!parsedData) return;
     
-    const newFileName = `${articles}_${selectedMarketplace}_${parsedData.slideType}_${parsedData.size}_${parsedData.date}_${parsedData.time}.png`;
+    const newFileName = `${articles}_${selectedMarketplace}_${parsedData.slideType}_${parsedData.size}_${parsedData.date}_${parsedData.time}.webp`;
     onConfirm(newFileName, articles, selectedMarketplace);
     onClose();
   };
@@ -198,7 +198,7 @@ const EditFileNameModal = ({
           <label>{t('header.newFileName')}</label>
           <div className="preview-box">
             <code>
-              {articles}_{selectedMarketplace}_{parsedData.slideType}_{parsedData.size}_{parsedData.date}_{parsedData.time}.png
+              {articles}_{selectedMarketplace}_{parsedData.slideType}_{parsedData.size}_{parsedData.date}_{parsedData.time}.webp
             </code>
           </div>
         </div>
