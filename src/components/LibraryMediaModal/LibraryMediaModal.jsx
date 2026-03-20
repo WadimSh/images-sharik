@@ -359,112 +359,176 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
 
   // Функция для загрузки изображения на сервер
   const handleUploadImage = async () => {
-    try {
-      if (!selectedFile || !user || !user.company || user.company.length === 0) {
-        alert('Ошибка: нет данных пользователя или компании');
-        return;
-      }
-      
-      // Проверяем, что выбран хотя бы один не-артикульный тег
-      if (!canUpload()) {
-        alert('Пожалуйста, выберите хотя бы один тег (не артикул)');
-        return;
-      }
-      
-      setIsUploading(true);
-      
-      const finalFileName = generateFileName();
-      const blob = new Blob([selectedFile], { type: selectedFile.type });
-      const processedFile = new File([blob], finalFileName, {
-        type: selectedFile.type,
+  try {
+    if (!selectedFile || !user || !user.company || user.company.length === 0) {
+      alert('Ошибка: нет данных пользователя или компании');
+      return;
+    }
+    
+    // Проверяем, что выбран хотя бы один не-артикульный тег
+    if (!canUpload()) {
+      alert('Пожалуйста, выберите хотя бы один тег (не артикул)');
+      return;
+    }
+    
+    setIsUploading(true);
+    
+    // 🔥 КОНВЕРТИРУЕМ В WEBP
+    let processedFile;
+    const finalFileName = generateFileName().replace(/\.(png|jpg|jpeg)$/i, '.webp');
+    
+    // Если файл уже WEBP, используем как есть
+    if (selectedFile.type === 'image/webp') {
+      const blob = new Blob([selectedFile], { type: 'image/webp' });
+      processedFile = new File([blob], finalFileName, {
+        type: 'image/webp',
         lastModified: selectedFile.lastModified
       });
-      
-      // Извлекаем артикулы из имени файла
-      const extractedArticles = extractArticleCodesFromFileName(originalFileName);
-      
-      // Если нет артикулов в имени файла, добавляем 9999-9999
-      const articleTags = extractedArticles.length > 0 
-        ? extractedArticles 
-        : ['9999-9999'];
-      
-      // Объединяем все теги: артикулы (из имени или 9999-9999) + выбранные пользователем теги
-      const allTags = [...articleTags, ...selectedTags];
+    } else {
+      // Конвертируем в WEBP
+      try {
+        // Создаем Image элемент для загрузки исходного файла
+        const img = new Image();
+        const imageUrl = URL.createObjectURL(selectedFile);
+        
+        const webpBlob = await new Promise((resolve, reject) => {
+          img.onload = () => {
+            // Создаем canvas с размерами изображения
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
             
-      const companyId = user.company[0].id;
-      const uploadResult = await uploadGraphicFile(
-        companyId,
-        processedFile,
-        null,
-        allTags 
-      );
-      
-      if (!uploadResult || !uploadResult.success) {
-        throw new Error(uploadResult?.message || 'Не удалось загрузить файл на сервер');
-      }
-      
-      const uploadedFile = uploadResult.data || uploadResult.file;
-      
-      if (!uploadedFile) {
-        throw new Error('Нет данных о загруженном файле в ответе сервера');
-      }
-      
-      const imageUrl = uploadedFile.url || uploadedFile.fileUrl;
+            // Рисуем изображение на canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
             
-      if (!imageUrl) {
-        throw new Error('Нет URL изображения в ответе сервера');
+            // Конвертируем в WEBP с качеством 0.92
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error('Не удалось конвертировать изображение в WEBP'));
+                }
+              },
+              'image/webp',
+              0.92
+            );
+          };
+          
+          img.onerror = () => {
+            reject(new Error('Не удалось загрузить изображение для конвертации'));
+          };
+          
+          img.src = imageUrl;
+        });
+        
+        // Создаем File объект из WEBP blob
+        processedFile = new File([webpBlob], finalFileName, {
+          type: 'image/webp',
+          lastModified: selectedFile.lastModified
+        });
+        
+        // Очищаем временный URL
+        URL.revokeObjectURL(imageUrl);
+        
+      } catch (conversionError) {
+        console.warn('Ошибка конвертации в WEBP, используем исходный файл:', conversionError);
+        
+        // Если конвертация не удалась, используем исходный файл
+        const blob = new Blob([selectedFile], { type: selectedFile.type });
+        processedFile = new File([blob], finalFileName, {
+          type: selectedFile.type,
+          lastModified: selectedFile.lastModified
+        });
       }
-      
-      const fullImageUrl = getFullImageUrl(imageUrl);
-            
-      const img = new Image();
-      img.src = fullImageUrl;
-      
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-  
-      const containerWidth = 450;
-      const containerHeight = 600;
-      
-      const scale = Math.min(
-        containerWidth / img.naturalWidth,
-        containerHeight / img.naturalHeight,
-        1
-      );
-      
-      const newWidth = img.naturalWidth * scale;
-      const newHeight = img.naturalHeight * scale;
-      
-      const position = {
-        x: (containerWidth - newWidth) / 2,
-        y: (containerHeight - newHeight) / 2
-      };
-  
-      const newElement = {
-        id: generateUniqueId(),
-        type: 'image',
-        position,
-        image: fullImageUrl,
-        width: newWidth,
-        height: newHeight,
-        originalWidth: img.naturalWidth,
-        originalHeight: img.naturalHeight,
-        isFlipped: false,
-        rotation: 0        
-      };
-      
-      setElements(prev => [...prev, newElement]);
-      onClose();
-      
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Ошибка при загрузке изображения на сервер: ' + (error.message || 'Неизвестная ошибка'));
-    } finally {
-      setIsUploading(false);
     }
-  };
+    
+    // Извлекаем артикулы из имени файла
+    const extractedArticles = extractArticleCodesFromFileName(originalFileName);
+    
+    // Если нет артикулов в имени файла, добавляем 9999-9999
+    const articleTags = extractedArticles.length > 0 
+      ? extractedArticles 
+      : ['9999-9999'];
+    
+    // Объединяем все теги: артикулы (из имени или 9999-9999) + выбранные пользователем теги
+    const allTags = [...articleTags, ...selectedTags];
+          
+    const companyId = user.company[0].id;
+    const uploadResult = await uploadGraphicFile(
+      companyId,
+      processedFile,
+      null,
+      allTags 
+    );
+    
+    if (!uploadResult || !uploadResult.success) {
+      throw new Error(uploadResult?.message || 'Не удалось загрузить файл на сервер');
+    }
+    
+    const uploadedFile = uploadResult.data || uploadResult.file;
+    
+    if (!uploadedFile) {
+      throw new Error('Нет данных о загруженном файле в ответе сервера');
+    }
+    
+    const imageUrl = uploadedFile.url || uploadedFile.fileUrl;
+          
+    if (!imageUrl) {
+      throw new Error('Нет URL изображения в ответе сервера');
+    }
+    
+    const fullImageUrl = getFullImageUrl(imageUrl);
+          
+    const img = new Image();
+    img.src = fullImageUrl;
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    const containerWidth = 450;
+    const containerHeight = 600;
+    
+    const scale = Math.min(
+      containerWidth / img.naturalWidth,
+      containerHeight / img.naturalHeight,
+      1
+    );
+    
+    const newWidth = img.naturalWidth * scale;
+    const newHeight = img.naturalHeight * scale;
+    
+    const position = {
+      x: (containerWidth - newWidth) / 2,
+      y: (containerHeight - newHeight) / 2
+    };
+
+    const newElement = {
+      id: generateUniqueId(),
+      type: 'image',
+      position,
+      image: fullImageUrl,
+      width: newWidth,
+      height: newHeight,
+      originalWidth: img.naturalWidth,
+      originalHeight: img.naturalHeight,
+      isFlipped: false,
+      rotation: 0        
+    };
+    
+    setElements(prev => [...prev, newElement]);
+    onClose();
+    
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    alert('Ошибка при загрузке изображения на сервер: ' + (error.message || 'Неизвестная ошибка'));
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const handleBackToLibrary = () => {
     setStep('library');
