@@ -32,6 +32,65 @@ const transliterateFileName = (filename) => {
   return result;
 };
 
+// 🔥 НОВАЯ ФУНКЦИЯ: Конвертация изображения в WEBP
+const convertToWebP = (file) => {
+  return new Promise((resolve, reject) => {
+    // Если файл уже WEBP, возвращаем как есть
+    if (file.type === 'image/webp') {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        // Создаем canvas с размерами изображения
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Рисуем изображение на canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Конвертируем в WEBP с качеством 0.92
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              // Создаем новый файл с тем же именем, но расширением .webp
+              const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.webp';
+              const webpFile = new File([blob], newFileName, {
+                type: 'image/webp',
+                lastModified: file.lastModified
+              });
+              resolve(webpFile);
+            } else {
+              reject(new Error('Не удалось конвертировать изображение в WEBP'));
+            }
+          },
+          'image/webp',
+          0.92
+        );
+      };
+      
+      img.onerror = () => {
+        reject(new Error('Не удалось загрузить изображение для конвертации'));
+      };
+      
+      img.src = e.target.result;
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Не удалось прочитать файл'));
+    };
+    
+    reader.readAsDataURL(file);
+  });
+};
+
 // Функция для создания нового File объекта с транслитерированным именем
 const createTransliteratedFile = (originalFile) => {
   const newFileName = transliterateFileName(originalFile.name);
@@ -86,11 +145,11 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
     }
 
     // 2. Проверяем типы файлов
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
     
     if (invalidFiles.length > 0) {
-      alert(`Недопустимые форматы файлов: ${invalidFiles.map(f => f.name).join(', ')}\nРазрешены: JPEG, PNG, GIF, WebP, SVG`);
+      alert(`Недопустимые форматы файлов: ${invalidFiles.map(f => f.name).join(', ')}\nРазрешены: JPEG, PNG, WebP`);
       event.target.value = '';
       return;
     }
@@ -136,14 +195,33 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
         }));
 
         try {
-          // Создаем транслитерированный файл
-          const processedFile = createTransliteratedFile(originalFile);
+          // 🔥 ШАГ 1: Сначала транслитерируем имя файла
+          const transliteratedFile = createTransliteratedFile(originalFile);
+          
+          // 🔥 ШАГ 2: Конвертируем в WEBP (если это изображение и не SVG)
+          let processedFile = transliteratedFile;
+          let wasConverted = false;
+          
+          if (transliteratedFile.type.startsWith('image/') && 
+              transliteratedFile.type !== 'image/webp') {
+            
+            try {
+              processedFile = await convertToWebP(transliteratedFile);
+              wasConverted = true;
+              console.log(`✅ Файл ${originalFile.name} сконвертирован в WEBP`);
+            } catch (convError) {
+              console.warn(`⚠️ Не удалось конвертировать ${originalFile.name} в WEBP:`, convError);
+              // Если конвертация не удалась, используем оригинал
+              processedFile = transliteratedFile;
+            }
+          }
           
           // Сохраняем информацию о переименовании
           if (processedFile.name !== originalFile.name) {
             renamedFiles.push({
               original: originalFile.name,
-              renamed: processedFile.name
+              renamed: processedFile.name,
+              converted: wasConverted
             });
           }
           
@@ -161,7 +239,8 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
               [originalFile.name]: { 
                 status: 'completed', 
                 progress: 100,
-                renamedTo: processedFile.name !== originalFile.name ? processedFile.name : undefined
+                renamedTo: processedFile.name !== originalFile.name ? processedFile.name : undefined,
+                convertedToWebp: wasConverted
               }
             }
           }));
@@ -172,9 +251,11 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
             status: 'success',
             result,
             size: (originalFile.size / 1024 / 1024).toFixed(2) + ' MB',
+            webpSize: wasConverted ? (processedFile.size / 1024 / 1024).toFixed(2) + ' MB' : undefined,
             tags: extractedTags,
             tagsCount: extractedTags.length,
             wasRenamed: processedFile.name !== originalFile.name,
+            wasConvertedToWebp: wasConverted,
             hasCyrillic: containsCyrillic(originalFile.name)
           });
           
@@ -202,6 +283,13 @@ const FileUploadButton = ({ id, buttonText, className = '', maxFiles = 100 }) =>
       }
 
       updateUploadState({ uploadResults: results });
+      
+      // Показываем сводку о конвертированных файлах
+      const convertedCount = results.filter(r => r.wasConvertedToWebp).length;
+      if (convertedCount > 0) {
+        console.log(`🖼️ ${convertedCount} файлов конвертировано в WEBP формат`);
+      }
+      
     } catch (error) {
       console.error('Общая ошибка при загрузке файлов:', error);
       

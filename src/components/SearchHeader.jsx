@@ -151,43 +151,116 @@ const SearchHeader = ({
     input.click();
   };
 
-  const handleUpload = async (finalFileName, allTags) => {
-    if (!selectedFile) return;
+const handleUpload = async (finalFileName, allTags) => {
+  if (!selectedFile) return;
 
-    const uploadNotification = showUploadNotification(selectedFile.name);
+  const uploadNotification = showUploadNotification(selectedFile.name);
 
-    try {
-      // Создаем новый файл с сгенерированным именем
-      const blob = new Blob([selectedFile], { type: selectedFile.type });
-      const processedFile = new File([blob], finalFileName, {
-        type: selectedFile.type,
+  try {
+    // Определяем, нужно ли конвертировать в WEBP
+    const shouldConvertToWebp = selectedFile.type.startsWith('image/') && 
+                               selectedFile.type !== 'image/webp';
+    
+    let fileToUpload;
+    let finalFileNameWithExt = finalFileName;
+
+    if (shouldConvertToWebp) {
+      // Конвертируем изображение в WEBP
+      const webpBlob = await convertToWebP(selectedFile);
+      
+      // Меняем расширение файла на .webp если нужно
+      if (!finalFileName.toLowerCase().endsWith('.webp')) {
+        finalFileNameWithExt = finalFileName.replace(/\.[^/.]+$/, '') + '.webp';
+      }
+      
+      fileToUpload = new File([webpBlob], finalFileNameWithExt, {
+        type: 'image/webp',
         lastModified: selectedFile.lastModified
       });
-
-      // Загружаем файл
-      const result = await uploadGraphicFile(
-        user.company[0].id,
-        processedFile,
-        null, 
-        allTags 
+      
+    } else {
+      // Если это уже WEBP или не изображение, используем оригинал
+      fileToUpload = new File(
+        [new Blob([selectedFile], { type: selectedFile.type })], 
+        finalFileName, 
+        {
+          type: selectedFile.type,
+          lastModified: selectedFile.lastModified
+        }
       );
-
-      // Показываем успешное уведомление
-      uploadNotification.success({
-        title: `Файл ${finalFileName}`,
-        message: "Успешно загружен",
-        error: null // В success ошибки нет
-      });
-
-    } catch (error) {
-      // Показываем уведомление об ошибке
-      uploadNotification.error({
-        title: 'Ошибка',
-        message: `Не удалось загрузить файл "${finalFileName}"`,
-        error: error.message
-      });
     }
-  };
+
+    // Загружаем файл
+    const result = await uploadGraphicFile(
+      user.company[0].id,
+      fileToUpload,
+      null, 
+      allTags 
+    );
+
+    // Показываем успешное уведомление
+    uploadNotification.success({
+      title: `Файл ${finalFileNameWithExt}`,
+      message: "Успешно загружен",
+      error: null
+    });
+
+  } catch (error) {
+    // Показываем уведомление об ошибке
+    uploadNotification.error({
+      title: 'Ошибка',
+      message: `Не удалось загрузить файл "${finalFileName}"`,
+      error: error.message
+    });
+  }
+};
+
+// Вспомогательная функция для конвертации в WEBP
+const convertToWebP = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        // Создаем canvas с размерами изображения
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Рисуем изображение на canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        // Конвертируем в WEBP с качеством 0.92
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Не удалось конвертировать изображение в WEBP'));
+            }
+          },
+          'image/webp',
+          0.92
+        );
+      };
+      
+      img.onerror = () => {
+        reject(new Error('Не удалось загрузить изображение для конвертации'));
+      };
+      
+      img.src = e.target.result;
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Не удалось прочитать файл'));
+    };
+    
+    reader.readAsDataURL(file);
+  });
+};
 
   const handleReportClick = async () => {
     if (!isAuthenticated) {
