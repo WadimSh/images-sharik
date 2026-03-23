@@ -67,7 +67,7 @@
   flex-direction: column;
   height: 100%;
   min-height: 160px; 
-  min-width: 120px;
+  width: 120px;
   position: relative;
   cursor: pointer;
 }
