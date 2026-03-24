@@ -4,7 +4,9 @@ import { PiCopySimpleBold } from "react-icons/pi";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
 import { FaTimes, FaTags, FaPlus } from "react-icons/fa";
+import { RiImageEditLine } from "react-icons/ri";
 
+import ImageEditor from "../ImageEditor/ImageEditor";
 import { useAuth } from "../../contexts/AuthContext";
 import { Tooltip } from "../../ui/Tooltip/Tooltip";
 import { PREDEFINED_TAGS } from "../../constants/tags";
@@ -63,6 +65,7 @@ export const ImageDigitalizationModal = ({
   const [customTag, setCustomTag] = useState('');
   const [isTagOperationLoading, setIsTagOperationLoading] = useState(false);
   const [tagSearchTerm, setTagSearchTerm] = useState('');
+  const [showEditor, setShowEditor] = useState(false);
   
   const tagButtonRef = useRef(null);
   const popoverRef = useRef(null);
@@ -331,6 +334,16 @@ export const ImageDigitalizationModal = ({
     window.open(`/#/products/${article}`, '_blank');
   };
 
+  const handleEdit = () => {
+    setShowEditor(true);
+  };
+
+  const handleSaveEdited = async (blob) => {
+    // Здесь будет API для сохранения
+    console.log('Saved blob:', blob);
+    setShowEditor(false);
+  };
+
   // Получаем все теги, которые являются артикулами (кроме 9999-9999)
   const articleTags = (currentImageData?.tags || []).filter(tag => 
     isArticleTag(tag) && tag !== '9999-9999'
@@ -552,6 +565,15 @@ export const ImageDigitalizationModal = ({
               <div className="info-item" style={{ marginTop: 'auto' }}>
                 <button 
                   className="downloads-btn"
+                  onClick={handleEdit}
+                  disabled={isDownloading}
+                >
+                  <RiImageEditLine size={16} />
+                  <span>Изменить</span>
+                </button>
+
+                <button 
+                  className="downloads-btn"
                   onClick={handleDownload}
                   disabled={isDownloading}
                 >
@@ -598,6 +620,12 @@ export const ImageDigitalizationModal = ({
           </button>
         </>
       )}
+
+      <ImageEditor
+        isOpen={showEditor}
+        imageUrl={fullImageUrl}
+        onClose={() => setShowEditor(false)}
+      />
     </div>
   );
 };
