@@ -13,7 +13,7 @@ import styles from './ImageEditor.module.css';
 const ImageEditor = ({ 
   isOpen, 
   imageUrl, 
-  onClose
+  onClose  
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -313,8 +313,10 @@ const ImageEditor = ({
     if (!ctx) return;
 
     const container = containerRef.current;
-    const canvasWidth = container?.clientWidth || 500;
-    const canvasHeight = container?.clientHeight || 500;
+    if (!container) return;
+    
+    const canvasWidth = container.clientWidth;
+    const canvasHeight = container.clientHeight;
     
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -330,64 +332,54 @@ const ImageEditor = ({
     ctx.restore();
   };
 
-  const drawCropOverlayOnly = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !cropMode || cropRect.w === 0 || cropRect.h === 0) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.save();
-    ctx.strokeStyle = '#0a84ff';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
-    
-    ctx.fillStyle = '#0a84ff';
-    const markerSize = 8;
-    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
-    ctx.restore();
-  };
-
-  useEffect(() => {
-    if (image) {
-      drawImageBase(image);
-      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-        drawCropOverlayOnly();
-      }
-    }
-  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, panOffset]);
-
+  // ==================== ФУНКЦИИ ОБРЕЗКИ ====================
+  
   const getCorner = (x, y) => {
     const margin = 8;
+    
     if (Math.abs(x - cropRect.x) < margin && Math.abs(y - cropRect.y) < margin) return 'tl';
     if (Math.abs(x - (cropRect.x + cropRect.w)) < margin && Math.abs(y - cropRect.y) < margin) return 'tr';
     if (Math.abs(x - cropRect.x) < margin && Math.abs(y - (cropRect.y + cropRect.h)) < margin) return 'bl';
     if (Math.abs(x - (cropRect.x + cropRect.w)) < margin && Math.abs(y - (cropRect.y + cropRect.h)) < margin) return 'br';
+    
+    if (cropRect.w > 0 && cropRect.h > 0) {
+      if (Math.abs(x - (cropRect.x + cropRect.w/2)) < margin && Math.abs(y - cropRect.y) < margin) return 'tm';
+      if (Math.abs(x - (cropRect.x + cropRect.w/2)) < margin && Math.abs(y - (cropRect.y + cropRect.h)) < margin) return 'bm';
+      if (Math.abs(x - cropRect.x) < margin && Math.abs(y - (cropRect.y + cropRect.h/2)) < margin) return 'lm';
+      if (Math.abs(x - (cropRect.x + cropRect.w)) < margin && Math.abs(y - (cropRect.y + cropRect.h/2)) < margin) return 'rm';
+    }
+    
     return null;
   };
 
   const handleCropMouseDown = (e) => {
     if (!cropMode) return;
     
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    const scaleX = canvasRef.current.width / rect.width;
-    const scaleY = canvasRef.current.height / rect.height;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
     
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     
-    const corner = getCorner(x, y);
-    if (corner && cropRect.w > 0 && cropRect.h > 0) {
-      setIsResizing(true);
-      setResizeCorner(corner);
-      setDragStart({ x, y });
-      return;
+    if (cropRect.w > 0 && cropRect.h > 0) {
+      const corner = getCorner(x, y);
+      if (corner) {
+        setIsResizing(true);
+        setResizeCorner(corner);
+        setDragStart({ x, y });
+        return;
+      }
+      
+      if (x >= cropRect.x && x <= cropRect.x + cropRect.w && 
+          y >= cropRect.y && y <= cropRect.y + cropRect.h) {
+        setIsDragging(true);
+        setDragStart({ x, y });
+        return;
+      }
     }
     
     setIsDragging(true);
@@ -398,52 +390,95 @@ const ImageEditor = ({
   const handleCropMouseMove = (e) => {
     if (!cropMode) return;
     
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    const scaleX = canvasRef.current.width / rect.width;
-    const scaleY = canvasRef.current.height / rect.height;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
     
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     
     if (isResizing && resizeCorner) {
       let newRect = { ...cropRect };
+      const minSize = 20;
+      
       switch (resizeCorner) {
         case 'tl':
           newRect = {
-            x: Math.min(x, cropRect.x + cropRect.w),
-            y: Math.min(y, cropRect.y + cropRect.h),
-            w: Math.abs(cropRect.x + cropRect.w - x),
-            h: Math.abs(cropRect.y + cropRect.h - y)
+            x: Math.min(x, cropRect.x + cropRect.w - minSize),
+            y: Math.min(y, cropRect.y + cropRect.h - minSize),
+            w: Math.max(minSize, Math.abs(cropRect.x + cropRect.w - x)),
+            h: Math.max(minSize, Math.abs(cropRect.y + cropRect.h - y))
           };
           break;
         case 'tr':
           newRect = {
             x: cropRect.x,
-            y: Math.min(y, cropRect.y + cropRect.h),
-            w: Math.abs(x - cropRect.x),
-            h: Math.abs(cropRect.y + cropRect.h - y)
+            y: Math.min(y, cropRect.y + cropRect.h - minSize),
+            w: Math.max(minSize, Math.abs(x - cropRect.x)),
+            h: Math.max(minSize, Math.abs(cropRect.y + cropRect.h - y))
           };
           break;
         case 'bl':
           newRect = {
-            x: Math.min(x, cropRect.x + cropRect.w),
+            x: Math.min(x, cropRect.x + cropRect.w - minSize),
             y: cropRect.y,
-            w: Math.abs(cropRect.x + cropRect.w - x),
-            h: Math.abs(y - cropRect.y)
+            w: Math.max(minSize, Math.abs(cropRect.x + cropRect.w - x)),
+            h: Math.max(minSize, Math.abs(y - cropRect.y))
           };
           break;
         case 'br':
           newRect = {
             x: cropRect.x,
             y: cropRect.y,
-            w: Math.abs(x - cropRect.x),
-            h: Math.abs(y - cropRect.y)
+            w: Math.max(minSize, Math.abs(x - cropRect.x)),
+            h: Math.max(minSize, Math.abs(y - cropRect.y))
           };
           break;
+        case 'tm':
+          newRect = {
+            x: cropRect.x,
+            y: Math.min(y, cropRect.y + cropRect.h - minSize),
+            w: cropRect.w,
+            h: Math.max(minSize, Math.abs(cropRect.y + cropRect.h - y))
+          };
+          break;
+        case 'bm':
+          newRect = {
+            x: cropRect.x,
+            y: cropRect.y,
+            w: cropRect.w,
+            h: Math.max(minSize, Math.abs(y - cropRect.y))
+          };
+          break;
+        case 'lm':
+          newRect = {
+            x: Math.min(x, cropRect.x + cropRect.w - minSize),
+            y: cropRect.y,
+            w: Math.max(minSize, Math.abs(cropRect.x + cropRect.w - x)),
+            h: cropRect.h
+          };
+          break;
+        case 'rm':
+          newRect = {
+            x: cropRect.x,
+            y: cropRect.y,
+            w: Math.max(minSize, Math.abs(x - cropRect.x)),
+            h: cropRect.h
+          };
+          break;
+        default:
+          return;
       }
-      if (newRect.w > 5 && newRect.h > 5) {
+      
+      newRect.x = Math.max(0, Math.min(newRect.x, canvas.width - minSize));
+      newRect.y = Math.max(0, Math.min(newRect.y, canvas.height - minSize));
+      newRect.w = Math.min(newRect.w, canvas.width - newRect.x);
+      newRect.h = Math.min(newRect.h, canvas.height - newRect.y);
+      
+      if (newRect.w >= minSize && newRect.h >= minSize) {
         setCropRect(newRect);
       }
     } else if (isDragging) {
@@ -460,6 +495,56 @@ const ImageEditor = ({
     setIsDragging(false);
     setIsResizing(false);
     setResizeCorner(null);
+  };
+
+  const drawCropOverlayOnly = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !cropMode || cropRect.w === 0 || cropRect.h === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.save();
+    
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    
+    if (cropRect.y > 0) {
+      ctx.fillRect(0, 0, canvas.width, cropRect.y);
+    }
+    
+    if (cropRect.y + cropRect.h < canvas.height) {
+      ctx.fillRect(0, cropRect.y + cropRect.h, canvas.width, canvas.height - (cropRect.y + cropRect.h));
+    }
+    
+    if (cropRect.x > 0) {
+      ctx.fillRect(0, cropRect.y, cropRect.x, cropRect.h);
+    }
+    
+    if (cropRect.x + cropRect.w < canvas.width) {
+      ctx.fillRect(cropRect.x + cropRect.w, cropRect.y, canvas.width - (cropRect.x + cropRect.w), cropRect.h);
+    }
+    
+    ctx.strokeStyle = '#0a84ff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
+    
+    ctx.fillStyle = '#0a84ff';
+    const markerSize = 8;
+    
+    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+    
+    if (cropRect.w > 30 && cropRect.h > 30) {
+      ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+      ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+      ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
+      ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
+    }
+    
+    ctx.restore();
   };
 
   const applyCrop = () => {
@@ -489,30 +574,91 @@ const ImageEditor = ({
       0, 0, cropRect.w, cropRect.h
     );
 
-    setCropMode(wasCropMode);
-    drawCropOverlayOnly();
-
     const croppedImage = new Image();
     croppedImage.onload = () => {
       setCropMode(false);
       setCropRect({ x: 0, y: 0, w: 0, h: 0 });
       setImage(croppedImage);
+      
       setPanOffset({ x: 0, y: 0 });
       
-      setTimeout(() => {
-        const canvas = canvasRef.current;
-        if (canvas && croppedImage) {
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const container = containerRef.current;
+      if (container) {
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        const fitZoom = calculateFitZoom(
+          croppedImage.width, croppedImage.height,
+          containerWidth, containerHeight
+        );
+        
+        setBaseZoom(fitZoom);
+        setZoom(fitZoom);
+        
+        setTimeout(() => {
+          if (canvasRef.current && croppedImage) {
             drawImageBase(croppedImage);
           }
-        }
-        saveToHistory();
-      }, 50);
+        }, 0);
+      }
+      
+      saveToHistory();
     };
     croppedImage.src = tempCanvas.toDataURL();
   };
+
+  // ==================== ОБРАБОТЧИКИ МЫШИ ====================
+  
+  const handleCanvasMouseDown = (e) => {
+    if (cropMode) {
+      e.stopPropagation();
+      handleCropMouseDown(e);
+    }
+  };
+
+  const handleCanvasMouseMove = (e) => {
+    if (cropMode) {
+      e.stopPropagation();
+      handleCropMouseMove(e);
+    }
+  };
+
+  const handleCanvasMouseUp = (e) => {
+    if (cropMode) {
+      e.stopPropagation();
+      handleCropMouseUp();
+    }
+  };
+
+  const handleContainerMouseDown = (e) => {
+    if (cropMode) return;
+    
+    if (e.button === 0) {
+      e.preventDefault();
+      setIsPanning(true);
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleContainerMouseMove = (e) => {
+    if (cropMode) return;
+    
+    if (isPanning) {
+      const deltaX = e.clientX - panStart.x;
+      const deltaY = e.clientY - panStart.y;
+      setPanOffset(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }));
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleContainerMouseUp = () => {
+    setIsPanning(false);
+  };
+
+  // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
 
   const saveToHistory = useCallback(() => {
     const canvas = canvasRef.current;
@@ -607,7 +753,7 @@ const ImageEditor = ({
     setPanOffset({ x: 0, y: 0 });
     
     if (imageUrl) {
-      fetch(imageUrl, { credentials: 'include' })
+      fetch(imageUrl)
         .then(res => res.blob())
         .then(blob => {
           const url = URL.createObjectURL(blob);
@@ -637,28 +783,48 @@ const ImageEditor = ({
     }
   };
 
-  // Создание Blob для сохранения
+  // Создание Blob для сохранения в исходном размере
   const createImageBlob = (format, quality) => {
     return new Promise((resolve) => {
       if (!image) return;
-      
-      const canvas = canvasRef.current;
-      if (!canvas) return;
       
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       if (!tempCtx) return;
       
-      tempCanvas.width = canvas.width;
-      tempCanvas.height = canvas.height;
+      tempCanvas.width = image.width;
+      tempCanvas.height = image.height;
       
       tempCtx.save();
       tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
       tempCtx.rotate((rotation * Math.PI) / 180);
-      tempCtx.scale(flipX ? -zoom : zoom, flipY ? -zoom : zoom);
+      tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
       tempCtx.filter = getFilters();
       tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
       tempCtx.restore();
+      
+      let finalCanvas = tempCanvas;
+      
+      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+        const originalCrop = getCropRectForOriginalSize();
+        
+        if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+          const croppedCanvas = document.createElement('canvas');
+          const croppedCtx = croppedCanvas.getContext('2d');
+          if (!croppedCtx) return;
+          
+          croppedCanvas.width = originalCrop.w;
+          croppedCanvas.height = originalCrop.h;
+          
+          croppedCtx.drawImage(
+            tempCanvas,
+            originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
+            0, 0, originalCrop.w, originalCrop.h
+          );
+          
+          finalCanvas = croppedCanvas;
+        }
+      }
       
       let mimeType;
       switch (format) {
@@ -675,7 +841,7 @@ const ImageEditor = ({
           mimeType = 'image/png';
       }
       
-      tempCanvas.toBlob((blob) => {
+      finalCanvas.toBlob((blob) => {
         if (blob) {
           resolve(blob);
         }
@@ -683,24 +849,95 @@ const ImageEditor = ({
     });
   };
 
-  // Скачать на компьютер (открыть модалку выбора формата)
+  const getCropRectForOriginalSize = () => {
+    if (!image || !cropMode || cropRect.w === 0 || cropRect.h === 0) return null;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const imgWidth = image.width;
+    const imgHeight = image.height;
+    
+    const fitScale = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
+    const currentZoom = zoom;
+    const displayScale = fitScale * currentZoom;
+    
+    const baseOffsetX = (canvasWidth - imgWidth * displayScale) / 2;
+    const baseOffsetY = (canvasHeight - imgHeight * displayScale) / 2;
+    const offsetX = baseOffsetX + panOffset.x;
+    const offsetY = baseOffsetY + panOffset.y;
+    
+    let originalX = (cropRect.x - offsetX) / displayScale;
+    let originalY = (cropRect.y - offsetY) / displayScale;
+    let originalW = cropRect.w / displayScale;
+    let originalH = cropRect.h / displayScale;
+    
+    if (rotation !== 0) {
+      const centerX = imgWidth / 2;
+      const centerY = imgHeight / 2;
+      const angle = (rotation * Math.PI) / 180;
+      
+      const rotatePoint = (x, y, centerX, centerY, angle) => {
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const rotatedX = centerX + dx * Math.cos(angle) - dy * Math.sin(angle);
+        const rotatedY = centerY + dx * Math.sin(angle) + dy * Math.cos(angle);
+        return { x: rotatedX, y: rotatedY };
+      };
+      
+      const corners = [
+        { x: originalX, y: originalY },
+        { x: originalX + originalW, y: originalY },
+        { x: originalX, y: originalY + originalH },
+        { x: originalX + originalW, y: originalY + originalH }
+      ];
+      
+      const rotatedCorners = corners.map(corner => 
+        rotatePoint(corner.x, corner.y, centerX, centerY, -angle)
+      );
+      
+      const minX = Math.min(...rotatedCorners.map(c => c.x));
+      const maxX = Math.max(...rotatedCorners.map(c => c.x));
+      const minY = Math.min(...rotatedCorners.map(c => c.y));
+      const maxY = Math.max(...rotatedCorners.map(c => c.y));
+      
+      originalX = minX;
+      originalY = minY;
+      originalW = maxX - minX;
+      originalH = maxY - minY;
+    }
+    
+    if (flipX) {
+      originalX = imgWidth - originalX - originalW;
+    }
+    if (flipY) {
+      originalY = imgHeight - originalY - originalH;
+    }
+    
+    return {
+      x: Math.max(0, Math.min(originalX, imgWidth)),
+      y: Math.max(0, Math.min(originalY, imgHeight)),
+      w: Math.min(originalW, imgWidth - Math.max(0, originalX)),
+      h: Math.min(originalH, imgHeight - Math.max(0, originalY))
+    };
+  };
+
   const handleDownloadClick = () => {
     setSaveAction('download');
     setShowFormatModal(true);
   };
 
-  // Сохранить как (на сервер) - открыть модалку выбора формата
   const handleSaveAsClick = () => {
     setSaveAction('saveToServer');
     setShowFormatModal(true);
   };
 
-  // Сохранить (заглушка)
   const handleSave = () => {
     alert('Функционал сохранения в разработке');
   };
 
-  // Подтверждение действия после выбора формата
   const confirmSave = async () => {
     setIsSaving(true);
     
@@ -710,7 +947,6 @@ const ImageEditor = ({
       const fileName = getSaveFileName();
       
       if (saveAction === 'download') {
-        // Скачиваем на компьютер
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -719,10 +955,7 @@ const ImageEditor = ({
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
-        alert('Изображение скачано');
       } else {
-        // Сохраняем на сервер
         const mimeType = saveFormat === 'png' ? 'image/png' : saveFormat === 'jpg' ? 'image/jpeg' : 'image/webp';
         const fileToUpload = new File([blob], fileName, { type: mimeType });
         
@@ -738,6 +971,49 @@ const ImageEditor = ({
     } finally {
       setIsSaving(false);
       setShowFormatModal(false);
+    }
+  };
+
+  useEffect(() => {
+    if (image) {
+      drawImageBase(image);
+      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+        drawCropOverlayOnly();
+      }
+    }
+  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, panOffset]);
+
+  useEffect(() => {
+    setPanOffset({ x: 0, y: 0 });
+  }, [image, zoom, rotation, flipX, flipY, baseZoom]);
+
+  useEffect(() => {
+    if (image && containerRef.current) {
+      const container = containerRef.current;
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      
+      const fitZoom = calculateFitZoom(
+        image.width, image.height,
+        containerWidth, containerHeight
+      );
+      
+      setBaseZoom(fitZoom);
+      setZoom(fitZoom);
+      setPanOffset({ x: 0, y: 0 });
+    }
+  }, [image]);
+
+  const fitToContainer = () => {
+    if (image && containerRef.current) {
+      const container = containerRef.current;
+      const fitZoom = calculateFitZoom(
+        image.width, image.height,
+        container.clientWidth, container.clientHeight
+      );
+      setBaseZoom(fitZoom);
+      setZoom(fitZoom);
+      setPanOffset({ x: 0, y: 0 });
     }
   };
 
@@ -768,7 +1044,7 @@ const ImageEditor = ({
             style={{
               width: `${Math.abs(value) / max * 50}%`,
               left: value > 0 ? '50%' : `calc(50% - ${Math.abs(value) / max * 50}%)`,
-              backgroundColor: value > 0 ? 'var(--color-text-accent, #0a84ff)' : 'var(--color-text-accent, #0a84ff)'
+              backgroundColor: value > 0 ? '#3b82f6' : '#3b82f6'
             }}
           />
           <input
@@ -844,61 +1120,6 @@ const ImageEditor = ({
         return '';
     }
   };
-
-  const fitToContainer = () => {
-    if (image && containerRef.current) {
-      const container = containerRef.current;
-      const fitZoom = calculateFitZoom(
-        image.width, image.height,
-        container.clientWidth, container.clientHeight
-      );
-      setBaseZoom(fitZoom);
-      setZoom(fitZoom);
-      setPanOffset({ x: 0, y: 0 });
-    }
-  };
-
-  const handleMouseDown = (e) => {
-    if (!cropMode && e.button === 0) {
-      e.preventDefault();
-      setIsPanning(true);
-      setPanStart({ x: e.clientX, y: e.clientY });
-      return;
-    }
-
-    if (cropMode) {
-      handleCropMouseDown(e);
-      return;
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (isPanning) {
-      const deltaX = e.clientX - panStart.x;
-      const deltaY = e.clientY - panStart.y;
-      setPanOffset(prev => ({
-        x: prev.x + deltaX,
-        y: prev.y + deltaY
-      }));
-      setPanStart({ x: e.clientX, y: e.clientY });
-      return;
-    }
-
-    if (cropMode) {
-      handleCropMouseMove(e);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsPanning(false);
-    if (cropMode) {
-      handleCropMouseUp();
-    }
-  };
-
-  useEffect(() => {
-    setPanOffset({ x: 0, y: 0 });
-  }, [image, zoom, rotation, flipX, flipY, baseZoom]);
 
   if (!isOpen || !mounted) return null;
 
@@ -1010,7 +1231,6 @@ const ImageEditor = ({
             </div>
 
             <div className={styles.editorHeaderRight}>
-              {/* Составная кнопка */}
               <div className={styles.compositeButton} ref={dropdownRef}>
                 <button
                   className={styles.saveButton}
@@ -1075,10 +1295,10 @@ const ImageEditor = ({
             <div 
               ref={containerRef} 
               className={styles.canvasContainer}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+              onMouseDown={handleContainerMouseDown}
+              onMouseMove={handleContainerMouseMove}
+              onMouseUp={handleContainerMouseUp}
+              onMouseLeave={handleContainerMouseUp}
               style={{ 
                 cursor: cropMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab')
               }}
@@ -1089,6 +1309,9 @@ const ImageEditor = ({
                 <canvas
                   ref={canvasRef}
                   className={styles.canvas}
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
                 />
               )}
             </div>
@@ -1180,9 +1403,11 @@ const ImageEditor = ({
         </div>
       </div>
 
-      {/* Модалка выбора формата */}
       {showFormatModal && (
-        <div className={styles.formatModalOverlay} onClick={() => setShowFormatModal(false)}>
+        <div 
+          className={styles.formatModalOverlay} 
+          onClick={() => setShowFormatModal(false)}
+        >
           <div className={styles.formatModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.formatModalHeader}>
               <h3 className={styles.formatModalTitle}>
