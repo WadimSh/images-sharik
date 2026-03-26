@@ -176,6 +176,18 @@ export const Images = () => {
     }
   }, [currentPage, itemsPerPage, filters, isAdmin, isUploader]);
 
+  const refreshImages = useCallback(async () => {
+    // Очищаем предыдущий таймаут
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+    }
+    
+    // Загружаем изображения с текущими параметрами (сохраняем страницу, фильтры)
+    requestTimeoutRef.current = setTimeout(() => {
+      loadImagesFromBackend();
+    }, 100);
+  }, [loadImagesFromBackend]);
+
   const handleAddTag = async (fileId, tag) => {
     try {
       await apiAddTagToFile(fileId, tag);
@@ -245,6 +257,11 @@ export const Images = () => {
   const closeDeleteConfirmation = () => {
     setDeleteModal({ isOpen: false, imageId: null, fileName: '' });
   };
+
+  const handleEditorClose = useCallback(() => {
+    // Просто обновляем список с сохранением текущих параметров
+    refreshImages();
+  }, [refreshImages]);
 
   const handleApplyFilters = () => {
     setCurrentPage(1);
@@ -582,6 +599,7 @@ export const Images = () => {
               loadImagesFromBackend();
             }, 100);
           }}
+          onEditorClose={handleEditorClose}
         />
       )}
 

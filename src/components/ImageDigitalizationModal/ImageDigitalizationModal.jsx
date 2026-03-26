@@ -52,7 +52,8 @@ export const ImageDigitalizationModal = ({
   currentIndex = 0,
   onAddTag,
   onRemoveTag,
-  onTagClick
+  onTagClick,
+  onEditorClose
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();  
@@ -69,7 +70,7 @@ export const ImageDigitalizationModal = ({
   
   const tagButtonRef = useRef(null);
   const popoverRef = useRef(null);
-
+ 
   useEffect(() => {
     if (isOpen) {
       const handleEscKey = (e) => {
@@ -338,10 +339,11 @@ export const ImageDigitalizationModal = ({
     setShowEditor(true);
   };
 
-  const handleSaveEdited = async (blob) => {
-    // Здесь будет API для сохранения
-    console.log('Saved blob:', blob);
+  const handleEditorClose = () => {
     setShowEditor(false);
+    if (onEditorClose) {
+      onEditorClose(); // Вызываем обновление списка
+    }
   };
 
   // Получаем все теги, которые являются артикулами (кроме 9999-9999)
@@ -624,7 +626,8 @@ export const ImageDigitalizationModal = ({
       <ImageEditor
         isOpen={showEditor}
         imageUrl={fullImageUrl}
-        onClose={() => setShowEditor(false)}
+        imageData={currentImageData}
+        onClose={handleEditorClose}
       />
     </div>
   );

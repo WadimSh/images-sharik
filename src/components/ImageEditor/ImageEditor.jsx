@@ -1,29 +1,56 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  FiRotateCw, FiCrop, FiThermometer,
-  FiSun, FiDroplet,
+  FiRotateCw, FiCrop, FiThermometer, FiSun, FiDroplet,
   FiSliders, FiRotateCcw, FiCheck, FiZoomIn, FiZoomOut, FiMaximize,
   FiChevronDown, FiDownload, FiSave
 } from 'react-icons/fi';
 import { LuUndo2, LuRedo2, LuFlipHorizontal, LuFlipVertical } from "react-icons/lu";
 import { IoContrastOutline } from "react-icons/io5";
+import { RiScissorsCutLine } from "react-icons/ri";
+import { PiMagicWand } from "react-icons/pi";
+
+import { useAuth } from '../../contexts/AuthContext';
+import { uploadGraphicFile } from '../../services/mediaService';
+import ImageEditedUploadModal from '../ImageEditedUploadModal/ImageEditedUploadModal'; 
 import styles from './ImageEditor.module.css';
+
+const showUploadNotification = () => {
+    
+  return {
+    success: (data) => {
+      console.log('✅ Загрузка успешна:', data);
+      alert(`✅ ${data.message}`);
+    },
+    error: (data) => {
+      console.log('❌ Ошибка загрузки:', data);
+      alert(`❌ ${data.message}: ${data.error}`);
+    }
+  };
+};
 
 const ImageEditor = ({ 
   isOpen, 
   imageUrl, 
-  onClose  
+  imageData,
+  onClose,
 }) => {
+  const { user } = useAuth();
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  const apiKey = process.env.REACT_APP_API_KEY;
   
   const [saveFormat, setSaveFormat] = useState('png');
   const [showFormatModal, setShowFormatModal] = useState(false);
   const [saveAction, setSaveAction] = useState('download');
   const [showSaveDropdown, setShowSaveDropdown] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Состояние для модалки загрузки
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [editedImageBlob, setEditedImageBlob] = useState(null);
 
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +82,7 @@ const ImageEditor = ({
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isRemovingBackground, setIsRemovingBackground] = useState(false);
 
   // Закрытие дропдауна при клике вне
   useEffect(() => {
@@ -659,6 +687,129 @@ const ImageEditor = ({
   };
 
   // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
+const handleRemoveBackground = async () => {
+  if (!image || isRemovingBackground) return;
+  
+  setIsRemovingBackground(true);
+  
+  try {
+    // Создаем временный canvas для получения текущего отредактированного изображения
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) throw new Error('Cannot create canvas context');
+    
+    // Устанавливаем размеры canvas как у оригинального изображения
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
+    
+    // Применяем все текущие трансформации к изображению
+    tempCtx.save();
+    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+    tempCtx.rotate((rotation * Math.PI) / 180);
+    tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    tempCtx.filter = getFilters();
+    tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
+    tempCtx.restore();
+    
+    // Если есть активная обрезка, применяем её
+    let finalCanvas = tempCanvas;
+    if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+      const croppedCanvas = document.createElement('canvas');
+      const croppedCtx = croppedCanvas.getContext('2d');
+      if (!croppedCtx) throw new Error('Cannot create cropped canvas');
+      
+      croppedCanvas.width = cropRect.w;
+      croppedCanvas.height = cropRect.h;
+      
+      croppedCtx.drawImage(
+        tempCanvas,
+        cropRect.x, cropRect.y, cropRect.w, cropRect.h,
+        0, 0, cropRect.w, cropRect.h
+      );
+      
+      finalCanvas = croppedCanvas;
+    }
+    
+    // Конвертируем canvas в blob
+    const blob = await new Promise((resolve) => {
+      finalCanvas.toBlob((blob) => resolve(blob), 'image/png');
+    });
+    
+    // Формируем запрос к API
+    const form = new FormData();
+    form.append('image_file', blob, 'image.png');
+    form.append('format', 'png');
+    form.append('size', 'auto');
+    form.append('despill', 'medium');
+    
+    const options = {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey
+      },
+      body: form
+    };
+    
+    // Отправляем запрос
+    const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
+    
+    if (!apiResponse.ok) {
+      throw new Error(`API error: ${apiResponse.status}`);
+    }
+    
+    // Получаем обработанное изображение
+    const processedBlob = await apiResponse.blob();
+    
+    // Создаем URL для обработанного изображения
+    const processedUrl = URL.createObjectURL(processedBlob);
+    
+    // Загружаем обработанное изображение
+    const processedImage = new Image();
+    processedImage.onload = () => {
+      // Обновляем изображение
+      setImage(processedImage);
+      
+      // Сбрасываем трансформации
+      setRotation(0);
+      setZoom(baseZoom);
+      setFlipX(false);
+      setFlipY(false);
+      setCropMode(false);
+      setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+      setPanOffset({ x: 0, y: 0 });
+      
+      // Пересчитываем масштаб для нового изображения
+      const container = containerRef.current;
+      if (container) {
+        const fitZoom = calculateFitZoom(
+          processedImage.width, processedImage.height,
+          container.clientWidth, container.clientHeight
+        );
+        setBaseZoom(fitZoom);
+        setZoom(fitZoom);
+      }
+      
+      // Сохраняем в историю
+      setTimeout(() => saveToHistory(), 50);
+      
+      // Освобождаем URL
+      URL.revokeObjectURL(processedUrl);
+      
+      setIsRemovingBackground(false);
+    };
+    
+    processedImage.onerror = () => {
+      throw new Error('Failed to load processed image');
+    };
+    
+    processedImage.src = processedUrl;
+    
+  } catch (error) {
+    console.error('Error removing background:', error);
+    alert(`Ошибка при удалении фона: ${error.message}`);
+    setIsRemovingBackground(false);
+  }
+};
 
   const saveToHistory = useCallback(() => {
     const canvas = canvasRef.current;
@@ -929,24 +1080,24 @@ const ImageEditor = ({
     setShowFormatModal(true);
   };
 
-  const handleSaveAsClick = () => {
-    setSaveAction('saveToServer');
-    setShowFormatModal(true);
+  const handleSaveAsClick = async () => {
+    const quality = saveFormat === 'png' ? undefined : 0.92;
+    const blob = await createImageBlob(saveFormat, quality);
+    setEditedImageBlob(blob);
+    setShowUploadModal(true);
   };
 
-  const handleSave = () => {
-    alert('Функционал сохранения в разработке');
-  };
-
-  const confirmSave = async () => {
+  // Обработка выбора формата и открытие модалки загрузки
+  const handleConfirmFormat = async () => {
     setIsSaving(true);
     
     try {
       const quality = saveFormat === 'png' ? undefined : 0.92;
       const blob = await createImageBlob(saveFormat, quality);
-      const fileName = getSaveFileName();
       
       if (saveAction === 'download') {
+        // Скачивание
+        const fileName = getSaveFileName();
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -955,24 +1106,128 @@ const ImageEditor = ({
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        setShowFormatModal(false);
       } else {
-        const mimeType = saveFormat === 'png' ? 'image/png' : saveFormat === 'jpg' ? 'image/jpeg' : 'image/webp';
-        const fileToUpload = new File([blob], fileName, { type: mimeType });
-        
-        // Здесь должен быть ваш API вызов
-        // const result = await apiUploadFile(fileToUpload, [], folderId);
-        
-        alert('Изображение сохранено на сервере');
-        
+        // Сохранение на сервер - сохраняем blob и открываем модалку загрузки
+        setEditedImageBlob(blob);
+        setShowFormatModal(false);
+        setShowUploadModal(true);
       }
     } catch (err) {
       console.error('Operation failed:', err);
-      alert(saveAction === 'download' ? 'Не удалось скачать изображение' : 'Не удалось сохранить изображение');
+      alert(saveAction === 'download' ? 'Не удалось скачать изображение' : 'Не удалось подготовить изображение');
     } finally {
       setIsSaving(false);
-      setShowFormatModal(false);
     }
   };
+
+  // Обработка загрузки на сервер
+// Внутри компонента ImageEditor добавьте или замените функцию handleUpload:
+
+const handleUpload = async (finalFileName, allTags) => {
+  if (!editedImageBlob) return;
+
+  const uploadNotification = showUploadNotification();
+
+  try {
+    // Определяем, нужно ли конвертировать в WEBP
+    const shouldConvertToWebp = editedImageBlob.type.startsWith('image/') && 
+                               editedImageBlob.type !== 'image/webp';
+    
+    let fileToUpload;
+    let finalFileNameWithExt = finalFileName;
+
+    if (shouldConvertToWebp) {
+      // Конвертируем изображение в WEBP
+      const webpBlob = await convertToWebP(editedImageBlob);
+      
+      // Меняем расширение файла на .webp если нужно
+      if (!finalFileName.toLowerCase().endsWith('.webp')) {
+        finalFileNameWithExt = finalFileName.replace(/\.[^/.]+$/, '') + '.webp';
+      }
+      
+      fileToUpload = new File([webpBlob], finalFileNameWithExt, {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+      
+    } else {
+      // Если это уже WEBP или не изображение, используем оригинал
+      fileToUpload = new File(
+        [editedImageBlob], 
+        finalFileName, 
+        {
+          type: editedImageBlob.type,
+          lastModified: Date.now()
+        }
+      );
+    }
+
+    // Загружаем файл
+    const result = await uploadGraphicFile(
+      user.company[0].id,
+      fileToUpload,
+      null, 
+      allTags 
+    );
+
+    // Показываем успешное уведомление
+    uploadNotification.success({
+      title: `Файл ${finalFileNameWithExt}`,
+      message: "Успешно загружен",
+      error: null
+    });
+
+    // Закрываем все модалки после успешной загрузки
+    setShowUploadModal(false);
+    setEditedImageBlob(null);
+    
+    // Опционально: закрываем редактор
+    // onClose();
+
+  } catch (error) {
+    // Показываем уведомление об ошибке
+    uploadNotification.error({
+      title: 'Ошибка',
+      message: `Не удалось загрузить файл "${finalFileName}"`,
+      error: error.message
+    });
+  }
+};
+
+// Функция конвертации в WEBP (добавьте вне компонента или внутри)
+const convertToWebP = (blob) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      canvas.toBlob((webpBlob) => {
+        if (webpBlob) {
+          resolve(webpBlob);
+        } else {
+          reject(new Error('Не удалось конвертировать в WEBP'));
+        }
+      }, 'image/webp', 0.92);
+    };
+    
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Не удалось загрузить изображение для конвертации'));
+    };
+    
+    img.src = url;
+  });
+};
 
   useEffect(() => {
     if (image) {
@@ -1212,19 +1467,33 @@ const ImageEditor = ({
 
               <div className={styles.transformDivider} />
 
+              <button
+                className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
+                onClick={handleRemoveBackground}
+                disabled={isRemovingBackground}
+              >
+                {isRemovingBackground ? (
+                  <div className={styles.spinner} />
+                ) : (
+                  <PiMagicWand size={20} />
+                )}
+              </button>
+
+              <div className={styles.transformDivider} />
+
               <div className={styles.cropWrapper}>
                 <button
                   className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
                   onClick={() => setCropMode(!cropMode)}
                 >
-                  <FiCrop size={20} />
+                  <RiScissorsCutLine size={20} />
                 </button>
                 {cropMode && cropRect.w > 0 && (
                   <button
                     className={styles.applyCropButton}
                     onClick={applyCrop}
                   >
-                    Применить
+                    Вырезать
                   </button>
                 )}
               </div>
@@ -1268,16 +1537,6 @@ const ImageEditor = ({
                       <FiSave size={16} />
                       <span>Сохранить как</span>
                     </button>
-                    <button
-                      className={styles.dropdownItem}
-                      onClick={() => {
-                        handleSave();
-                        setShowSaveDropdown(false);
-                      }}
-                    >
-                      <FiCheck size={16} />
-                      <span>Сохранить</span>
-                    </button>
                   </div>
                 )}
               </div>
@@ -1286,7 +1545,7 @@ const ImageEditor = ({
                 className={styles.cancelButton}
                 onClick={onClose}
               >
-                Отмена
+                Закрыть
               </button>
             </div>
           </div>
@@ -1406,7 +1665,10 @@ const ImageEditor = ({
       {showFormatModal && (
         <div 
           className={styles.formatModalOverlay} 
-          onClick={() => setShowFormatModal(false)}
+          onClick={(e) => {
+            e.stopPropagation(); 
+            setShowFormatModal(false)
+          }}
         >
           <div className={styles.formatModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.formatModalHeader}>
@@ -1448,14 +1710,29 @@ const ImageEditor = ({
               </button>
               <button
                 className={styles.confirmButton}
-                onClick={confirmSave}
+                onClick={handleConfirmFormat}
                 disabled={isSaving}
               >
-                {isSaving ? 'Обработка...' : (saveAction === 'download' ? 'Скачать' : 'Сохранить')}
+                {isSaving ? 'Обработка...' : (saveAction === 'download' ? 'Скачать' : 'Далее')}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Модалка загрузки */}
+      {showUploadModal && (
+        <ImageEditedUploadModal
+          isOpen={showUploadModal}
+          onClose={() => {
+            setShowUploadModal(false);
+            setEditedImageBlob(null);
+          }}
+          onUpload={handleUpload}
+          user={user}
+          selectedFile={editedImageBlob ? new File([editedImageBlob], 'image.png', { type: editedImageBlob.type }) : null}
+          existingImageData={imageData}
+        />
       )}
     </>,
     document.body

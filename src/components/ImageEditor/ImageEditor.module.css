@@ -981,3 +981,23 @@
     transform: translateY(0);
   }
 }
+
+.transformButton.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.spinner {
+  width: 20px;
+  height: 15px;
+  border: 2px solid rgba(204, 204, 204, 0.6);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
