@@ -15,8 +15,25 @@ import { uploadGraphicFile } from '../../services/mediaService';
 import ImageEditedUploadModal from '../ImageEditedUploadModal/ImageEditedUploadModal'; 
 import styles from './ImageEditor.module.css';
 
+// Константы для пропорций обрезки
+const aspectRatios = [
+  { id: 'original', label: 'Оригинал', ratio: null },
+  { id: '1:1', label: '1:1 (Квадрат)', ratio: 1 },
+  //{ id: '16:9', label: '16:9 (Широкий)', ratio: 16 / 9 },
+  //{ id: '9:16', label: '9:16 (Вертикальный)', ratio: 9 / 16 },
+  //{ id: '4:5', label: '4:5 (Портрет)', ratio: 4 / 5 },
+  //{ id: '5:4', label: '5:4 (Ландшафт)', ratio: 5 / 4 },
+  { id: '3:4', label: '3:4 (Карточка)', ratio: 3 / 4 },
+  //{ id: '4:3', label: '4:3', ratio: 4 / 3 },
+  //{ id: '2:3', label: '2:3', ratio: 2 / 3 },
+  //{ id: '3:2', label: '3:2', ratio: 3 / 2 },
+  //{ id: '5:7', label: '5:7', ratio: 5 / 7 },
+  //{ id: '7:5', label: '7:5', ratio: 7 / 5 },
+  //{ id: '1:2', label: '1:2', ratio: 1 / 2 },
+  //{ id: '2:1', label: '2:1', ratio: 2 }
+];
+
 const showUploadNotification = () => {
-    
   return {
     success: (data) => {
       console.log('✅ Загрузка успешна:', data);
@@ -64,6 +81,16 @@ const ImageEditor = ({
   const [isResizing, setIsResizing] = useState(false);
   const [resizeCorner, setResizeCorner] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  // Новые состояния для обрезки по пропорциям
+  const [aspectCropMode, setAspectCropMode] = useState(false);
+  const [aspectCropRect, setAspectCropRect] = useState({ x: 0, y: 0, w: 0, h: 0 });
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('original');
+  const [isDraggingAspect, setIsDraggingAspect] = useState(false);
+  const [isResizingAspect, setIsResizingAspect] = useState(false);
+  const [resizeCornerAspect, setResizeCornerAspect] = useState(null);
+  const [dragStartAspect, setDragStartAspect] = useState({ x: 0, y: 0 });
+  
   const [activeFilter, setActiveFilter] = useState('none');
   const [adjustments, setAdjustments] = useState({
     brightness: 0,
@@ -142,6 +169,9 @@ const ImageEditor = ({
     setFlipY(false);
     setCropMode(false);
     setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setAspectCropMode(false);
+    setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setSelectedAspectRatio('original');
     setActiveFilter('none');
     setAdjustments({
       brightness: 0,
@@ -360,7 +390,127 @@ const ImageEditor = ({
     ctx.restore();
   };
 
-  // ==================== ФУНКЦИИ ОБРЕЗКИ ====================
+  // ==================== ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ КООРДИНАТ В ОРИГИНАЛЬНОМ РАЗМЕРЕ ====================
+  const getOriginalImageCoordinates = (rectOnCanvas) => {
+    if (!image || !canvasRef.current) return null;
+    
+    const canvas = canvasRef.current;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const imgWidth = image.width;
+    const imgHeight = image.height;
+    
+    // Вычисляем масштаб отображения изображения
+    const fitScale = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
+    const displayScale = fitScale * zoom;
+    
+    // Вычисляем смещение изображения на канвасе
+    const baseOffsetX = (canvasWidth - imgWidth * displayScale) / 2;
+    const baseOffsetY = (canvasHeight - imgHeight * displayScale) / 2;
+    const offsetX = baseOffsetX + panOffset.x;
+    const offsetY = baseOffsetY + panOffset.y;
+    
+    // Преобразуем координаты из канваса в координаты оригинального изображения
+    let originalX = (rectOnCanvas.x - offsetX) / displayScale;
+    let originalY = (rectOnCanvas.y - offsetY) / displayScale;
+    let originalW = rectOnCanvas.w / displayScale;
+    let originalH = rectOnCanvas.h / displayScale;
+    
+    // Применяем поворот
+    if (rotation !== 0) {
+      const centerX = imgWidth / 2;
+      const centerY = imgHeight / 2;
+      const angle = (rotation * Math.PI) / 180;
+      
+      const rotatePoint = (x, y, centerX, centerY, angle) => {
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const rotatedX = centerX + dx * Math.cos(angle) - dy * Math.sin(angle);
+        const rotatedY = centerY + dx * Math.sin(angle) + dy * Math.cos(angle);
+        return { x: rotatedX, y: rotatedY };
+      };
+      
+      const corners = [
+        { x: originalX, y: originalY },
+        { x: originalX + originalW, y: originalY },
+        { x: originalX, y: originalY + originalH },
+        { x: originalX + originalW, y: originalY + originalH }
+      ];
+      
+      const rotatedCorners = corners.map(corner => 
+        rotatePoint(corner.x, corner.y, centerX, centerY, -angle)
+      );
+      
+      const minX = Math.min(...rotatedCorners.map(c => c.x));
+      const maxX = Math.max(...rotatedCorners.map(c => c.x));
+      const minY = Math.min(...rotatedCorners.map(c => c.y));
+      const maxY = Math.max(...rotatedCorners.map(c => c.y));
+      
+      originalX = minX;
+      originalY = minY;
+      originalW = maxX - minX;
+      originalH = maxY - minY;
+    }
+    
+    // Применяем отражение
+    if (flipX) {
+      originalX = imgWidth - originalX - originalW;
+    }
+    if (flipY) {
+      originalY = imgHeight - originalY - originalH;
+    }
+    
+    // Ограничиваем координаты границами изображения
+    originalX = Math.max(0, Math.min(originalX, imgWidth));
+    originalY = Math.max(0, Math.min(originalY, imgHeight));
+    originalW = Math.min(originalW, imgWidth - originalX);
+    originalH = Math.min(originalH, imgHeight - originalY);
+    
+    return {
+      x: Math.round(originalX),
+      y: Math.round(originalY),
+      w: Math.max(1, Math.round(originalW)),
+      h: Math.max(1, Math.round(originalH))
+    };
+  };
+
+  // ==================== ФУНКЦИЯ ПРИМЕНЕНИЯ ОБРЕЗКИ С УЧЕТОМ ТРАНСФОРМАЦИЙ ====================
+  const applyCropWithTransformations = (originalCrop) => {
+    if (!image) return null;
+    
+    // Создаем временный канвас для применения трансформаций
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return null;
+    
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
+    
+    // Применяем поворот и отражение
+    tempCtx.save();
+    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+    tempCtx.rotate((rotation * Math.PI) / 180);
+    tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
+    tempCtx.restore();
+    
+    // Обрезаем изображение
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = originalCrop.w;
+    croppedCanvas.height = originalCrop.h;
+    const croppedCtx = croppedCanvas.getContext('2d');
+    if (!croppedCtx) return null;
+    
+    croppedCtx.drawImage(
+      tempCanvas,
+      originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
+      0, 0, originalCrop.w, originalCrop.h
+    );
+    
+    return croppedCanvas;
+  };
+
+  // ==================== ФУНКЦИИ ОБРЕЗКИ (ОБНОВЛЕННЫЕ) ====================
   
   const getCorner = (x, y) => {
     const margin = 8;
@@ -525,122 +675,768 @@ const ImageEditor = ({
     setResizeCorner(null);
   };
 
-  const drawCropOverlayOnly = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !cropMode || cropRect.w === 0 || cropRect.h === 0) return;
+const getImageTransformInfo = () => {
+  if (!image || !canvasRef.current) return null;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  const canvas = canvasRef.current;
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
 
-    ctx.save();
-    
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    
-    if (cropRect.y > 0) {
-      ctx.fillRect(0, 0, canvas.width, cropRect.y);
-    }
-    
-    if (cropRect.y + cropRect.h < canvas.height) {
-      ctx.fillRect(0, cropRect.y + cropRect.h, canvas.width, canvas.height - (cropRect.y + cropRect.h));
-    }
-    
-    if (cropRect.x > 0) {
-      ctx.fillRect(0, cropRect.y, cropRect.x, cropRect.h);
-    }
-    
-    if (cropRect.x + cropRect.w < canvas.width) {
-      ctx.fillRect(cropRect.x + cropRect.w, cropRect.y, canvas.width - (cropRect.x + cropRect.w), cropRect.h);
-    }
-    
-    ctx.strokeStyle = '#0a84ff';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
-    
-    ctx.fillStyle = '#0a84ff';
-    const markerSize = 8;
-    
-    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
-    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
-    
-    if (cropRect.w > 30 && cropRect.h > 30) {
-      ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
-      ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
-      ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
-      ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
-    }
-    
-    ctx.restore();
+  const scale = zoom;
+  const imgDisplayWidth = image.width * scale;
+  const imgDisplayHeight = image.height * scale;
+
+  const imgX = (canvasWidth - imgDisplayWidth) / 2 + panOffset.x;
+  const imgY = (canvasHeight - imgDisplayHeight) / 2 + panOffset.y;
+
+  const canvasToOriginalScaleX = image.width / imgDisplayWidth;
+  const canvasToOriginalScaleY = image.height / imgDisplayHeight;
+
+  return {
+    imgX,
+    imgY,
+    imgDisplayWidth,
+    imgDisplayHeight,
+    canvasToOriginalScaleX,
+    canvasToOriginalScaleY,
   };
+};
 
-  const applyCrop = () => {
-    if (!image || cropRect.w === 0 || cropRect.h === 0) {
-      setCropMode(false);
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const wasCropMode = cropMode;
+const applyCrop = () => {
+  if (!image || cropRect.w === 0 || cropRect.h === 0) {
     setCropMode(false);
-    
-    drawImageBase(image);
-    
+    return;
+  }
+
+  const transformInfo = getImageTransformInfo();
+  if (!transformInfo) return;
+
+  const { imgX, imgY, canvasToOriginalScaleX, canvasToOriginalScaleY } = transformInfo;
+
+  let originalX = Math.round((cropRect.x - imgX) * canvasToOriginalScaleX);
+  let originalY = Math.round((cropRect.y - imgY) * canvasToOriginalScaleY);
+  let originalWidth = Math.round(cropRect.w * canvasToOriginalScaleX);
+  let originalHeight = Math.round(cropRect.h * canvasToOriginalScaleY);
+
+  originalX = Math.max(0, Math.min(originalX, image.width - 1));
+  originalY = Math.max(0, Math.min(originalY, image.height - 1));
+
+  if (originalX + originalWidth > image.width) {
+    originalWidth = image.width - originalX;
+  }
+  if (originalY + originalHeight > image.height) {
+    originalHeight = image.height - originalY;
+  }
+
+  originalWidth = Math.max(1, originalWidth);
+  originalHeight = Math.max(1, originalHeight);
+
+  console.log('Crop coordinates:', { 
+    originalX, originalY, originalWidth, originalHeight,
+    imageSize: `${image.width}x${image.height}`
+  });
+
+  if (rotation !== 0 || flipX || flipY) {
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     if (!tempCtx) return;
 
-    tempCanvas.width = cropRect.w;
-    tempCanvas.height = cropRect.h;
-    
-    tempCtx.drawImage(
-      canvas,
-      cropRect.x, cropRect.y, cropRect.w, cropRect.h,
-      0, 0, cropRect.w, cropRect.h
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
+
+    tempCtx.save();
+    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+    tempCtx.rotate((rotation * Math.PI) / 180);
+    tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
+    tempCtx.restore();
+
+    const rotatedCanvas = tempCanvas;
+    const rotatedCtx = rotatedCanvas.getContext('2d');
+    if (!rotatedCtx) return;
+
+    const imageData = rotatedCtx.getImageData(
+      originalX,
+      originalY,
+      originalWidth,
+      originalHeight
     );
+
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = imageData.width;
+    croppedCanvas.height = imageData.height;
+    const croppedCtx = croppedCanvas.getContext('2d');
+    if (croppedCtx) {
+      croppedCtx.putImageData(imageData, 0, 0);
+    }
 
     const croppedImage = new Image();
     croppedImage.onload = () => {
       setCropMode(false);
       setCropRect({ x: 0, y: 0, w: 0, h: 0 });
       setImage(croppedImage);
-      
       setPanOffset({ x: 0, y: 0 });
-      
+      setRotation(0);
+      setFlipX(false);
+      setFlipY(false);
+
       const container = containerRef.current;
       if (container) {
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        
         const fitZoom = calculateFitZoom(
           croppedImage.width, croppedImage.height,
-          containerWidth, containerHeight
+          container.clientWidth, container.clientHeight
         );
-        
         setBaseZoom(fitZoom);
         setZoom(fitZoom);
-        
+
         setTimeout(() => {
           if (canvasRef.current && croppedImage) {
             drawImageBase(croppedImage);
+            saveToHistory();
           }
         }, 0);
       }
-      
-      saveToHistory();
     };
-    croppedImage.src = tempCanvas.toDataURL();
+    croppedImage.src = croppedCanvas.toDataURL();
+
+    return;
+  }
+
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  if (!tempCtx) return;
+
+  tempCanvas.width = originalWidth;
+  tempCanvas.height = originalHeight;
+
+  tempCtx.drawImage(
+    image,
+    originalX, originalY, originalWidth, originalHeight,
+    0, 0, originalWidth, originalHeight
+  );
+
+  const croppedImage = new Image();
+  croppedImage.onload = () => {
+    setCropMode(false);
+    setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setImage(croppedImage);
+    setPanOffset({ x: 0, y: 0 });
+    setRotation(0);
+    setFlipX(false);
+    setFlipY(false);
+
+    const container = containerRef.current;
+    if (container) {
+      const fitZoom = calculateFitZoom(
+        croppedImage.width, croppedImage.height,
+        container.clientWidth, container.clientHeight
+      );
+      setBaseZoom(fitZoom);
+      setZoom(fitZoom);
+
+      setTimeout(() => {
+        if (canvasRef.current && croppedImage) {
+          drawImageBase(croppedImage);
+          saveToHistory();
+        }
+      }, 0);
+    }
+  };
+  croppedImage.src = tempCanvas.toDataURL();
+};
+
+const applyAspectCrop = () => {
+  if (!image || aspectCropRect.w === 0 || aspectCropRect.h === 0) {
+    setAspectCropMode(false);
+    return;
+  }
+
+  const transformInfo = getImageTransformInfo();
+  if (!transformInfo) return;
+
+  const { imgX, imgY, canvasToOriginalScaleX, canvasToOriginalScaleY } = transformInfo;
+
+  let originalX = Math.round((aspectCropRect.x - imgX) * canvasToOriginalScaleX);
+  let originalY = Math.round((aspectCropRect.y - imgY) * canvasToOriginalScaleY);
+  let originalWidth = Math.round(aspectCropRect.w * canvasToOriginalScaleX);
+  let originalHeight = Math.round(aspectCropRect.h * canvasToOriginalScaleY);
+
+  originalX = Math.max(0, Math.min(originalX, image.width));
+  originalY = Math.max(0, Math.min(originalY, image.height));
+
+  if (originalX + originalWidth > image.width) {
+    originalWidth = image.width - originalX;
+  }
+  if (originalY + originalHeight > image.height) {
+    originalHeight = image.height - originalY;
+  }
+
+  originalWidth = Math.max(1, originalWidth);
+  originalHeight = Math.max(1, originalHeight);
+
+  console.log('Aspect crop coordinates:', { 
+    originalX, originalY, originalWidth, originalHeight,
+    imageSize: `${image.width}x${image.height}`
+  });
+
+  if (rotation !== 0 || flipX || flipY) {
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
+
+    tempCtx.save();
+    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+    tempCtx.rotate((rotation * Math.PI) / 180);
+    tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
+    tempCtx.restore();
+
+    const rotatedCtx = tempCanvas.getContext('2d');
+    if (!rotatedCtx) return;
+
+    const imageData = rotatedCtx.getImageData(
+      originalX,
+      originalY,
+      originalWidth,
+      originalHeight
+    );
+
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = imageData.width;
+    croppedCanvas.height = imageData.height;
+    const croppedCtx = croppedCanvas.getContext('2d');
+    if (croppedCtx) {
+      croppedCtx.putImageData(imageData, 0, 0);
+    }
+
+    const croppedImage = new Image();
+    croppedImage.onload = () => {
+      setAspectCropMode(false);
+      setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+      setImage(croppedImage);
+      setPanOffset({ x: 0, y: 0 });
+      setRotation(0);
+      setFlipX(false);
+      setFlipY(false);
+
+      const container = containerRef.current;
+      if (container) {
+        const fitZoom = calculateFitZoom(
+          croppedImage.width, croppedImage.height,
+          container.clientWidth, container.clientHeight
+        );
+        setBaseZoom(fitZoom);
+        setZoom(fitZoom);
+
+        setTimeout(() => {
+          if (canvasRef.current && croppedImage) {
+            drawImageBase(croppedImage);
+            saveToHistory();
+          }
+        }, 0);
+      }
+    };
+    croppedImage.src = croppedCanvas.toDataURL();
+
+    return;
+  }
+
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  if (!tempCtx) return;
+
+  tempCanvas.width = originalWidth;
+  tempCanvas.height = originalHeight;
+
+  tempCtx.drawImage(
+    image,
+    originalX, originalY, originalWidth, originalHeight,
+    0, 0, originalWidth, originalHeight
+  );
+
+  const croppedImage = new Image();
+  croppedImage.onload = () => {
+    setAspectCropMode(false);
+    setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setImage(croppedImage);
+    setPanOffset({ x: 0, y: 0 });
+    setRotation(0);
+    setFlipX(false);
+    setFlipY(false);
+
+    const container = containerRef.current;
+    if (container) {
+      const fitZoom = calculateFitZoom(
+        croppedImage.width, croppedImage.height,
+        container.clientWidth, container.clientHeight
+      );
+      setBaseZoom(fitZoom);
+      setZoom(fitZoom);
+
+      setTimeout(() => {
+        if (canvasRef.current && croppedImage) {
+          drawImageBase(croppedImage);
+          saveToHistory();
+        }
+      }, 0);
+    }
+  };
+  croppedImage.src = tempCanvas.toDataURL();
+};
+
+const drawCropOverlayOnly = () => {
+  const canvas = canvasRef.current;
+  if (!canvas || !cropMode || cropRect.w === 0 || cropRect.h === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.save();
+
+  const transformInfo = getImageTransformInfo();
+  let realWidth = cropRect.w;
+  let realHeight = cropRect.h;
+
+  if (transformInfo) {
+    realWidth = Math.round(cropRect.w * transformInfo.canvasToOriginalScaleX);
+    realHeight = Math.round(cropRect.h * transformInfo.canvasToOriginalScaleY);
+  }
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+  if (cropRect.y > 0) {
+    ctx.fillRect(0, 0, canvas.width, cropRect.y);
+  }
+  if (cropRect.y + cropRect.h < canvas.height) {
+    ctx.fillRect(0, cropRect.y + cropRect.h, canvas.width, canvas.height - (cropRect.y + cropRect.h));
+  }
+  if (cropRect.x > 0) {
+    ctx.fillRect(0, cropRect.y, cropRect.x, cropRect.h);
+  }
+  if (cropRect.x + cropRect.w < canvas.width) {
+    ctx.fillRect(cropRect.x + cropRect.w, cropRect.y, canvas.width - (cropRect.x + cropRect.w), cropRect.h);
+  }
+
+  ctx.strokeStyle = '#0a84ff';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+  ctx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
+
+  ctx.fillStyle = '#0a84ff';
+  const markerSize = 8;
+
+  ctx.fillRect(cropRect.x - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+
+  if (cropRect.w > 30 && cropRect.h > 30) {
+    ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x + cropRect.w/2 - markerSize/2, cropRect.y + cropRect.h - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(cropRect.x + cropRect.w - markerSize/2, cropRect.y + cropRect.h/2 - markerSize/2, markerSize, markerSize);
+  }
+
+  const sizeText = `${realWidth} × ${realHeight} px`;
+
+  ctx.font = '14px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+
+  const textMetrics = ctx.measureText(sizeText);
+  const textWidth = textMetrics.width;
+  const textHeight = 30;
+  const padding = 24;
+
+  const textX = cropRect.x + cropRect.w / 2;
+  const textY = cropRect.y + cropRect.h - 15;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(
+    textX - textWidth / 2 - padding / 2,
+    textY - textHeight + 10,
+    textWidth + padding,
+    textHeight
+  );
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(sizeText, textX, textY);
+
+  ctx.restore();
+};
+
+const drawAspectCropOverlay = () => {
+  const canvas = canvasRef.current;
+  if (!canvas || !aspectCropMode || aspectCropRect.w === 0 || aspectCropRect.h === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.save();
+
+  const transformInfo = getImageTransformInfo();
+  let realWidth = aspectCropRect.w;
+  let realHeight = aspectCropRect.h;
+
+  if (transformInfo) {
+    realWidth = Math.round(aspectCropRect.w * transformInfo.canvasToOriginalScaleX);
+    realHeight = Math.round(aspectCropRect.h * transformInfo.canvasToOriginalScaleY);
+  }
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+  if (aspectCropRect.y > 0) {
+    ctx.fillRect(0, 0, canvas.width, aspectCropRect.y);
+  }
+  if (aspectCropRect.y + aspectCropRect.h < canvas.height) {
+    ctx.fillRect(0, aspectCropRect.y + aspectCropRect.h, canvas.width, canvas.height - (aspectCropRect.y + aspectCropRect.h));
+  }
+  if (aspectCropRect.x > 0) {
+    ctx.fillRect(0, aspectCropRect.y, aspectCropRect.x, aspectCropRect.h);
+  }
+  if (aspectCropRect.x + aspectCropRect.w < canvas.width) {
+    ctx.fillRect(aspectCropRect.x + aspectCropRect.w, aspectCropRect.y, canvas.width - (aspectCropRect.x + aspectCropRect.w), aspectCropRect.h);
+  }
+
+  ctx.strokeStyle = '#0a84ff';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+  ctx.strokeRect(aspectCropRect.x, aspectCropRect.y, aspectCropRect.w, aspectCropRect.h);
+
+  ctx.fillStyle = '#0a84ff';
+  const markerSize = 8;
+
+  ctx.fillRect(aspectCropRect.x - markerSize/2, aspectCropRect.y - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(aspectCropRect.x + aspectCropRect.w - markerSize/2, aspectCropRect.y - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(aspectCropRect.x - markerSize/2, aspectCropRect.y + aspectCropRect.h - markerSize/2, markerSize, markerSize);
+  ctx.fillRect(aspectCropRect.x + aspectCropRect.w - markerSize/2, aspectCropRect.y + aspectCropRect.h - markerSize/2, markerSize, markerSize);
+
+  if (aspectCropRect.w > 30 && aspectCropRect.h > 30) {
+    ctx.fillRect(aspectCropRect.x + aspectCropRect.w/2 - markerSize/2, aspectCropRect.y - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(aspectCropRect.x + aspectCropRect.w/2 - markerSize/2, aspectCropRect.y + aspectCropRect.h - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(aspectCropRect.x - markerSize/2, aspectCropRect.y + aspectCropRect.h/2 - markerSize/2, markerSize, markerSize);
+    ctx.fillRect(aspectCropRect.x + aspectCropRect.w - markerSize/2, aspectCropRect.y + aspectCropRect.h/2 - markerSize/2, markerSize, markerSize);
+  }
+
+  const sizeText = `${realWidth} × ${realHeight} px`;
+
+  ctx.font = '14px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+
+  const textMetrics = ctx.measureText(sizeText);
+  const textWidth = textMetrics.width;
+  const textHeight = 30;
+  const padding = 24;
+
+  const textX = aspectCropRect.x + aspectCropRect.w / 2;
+  const textY = aspectCropRect.y + aspectCropRect.h - 15;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(
+    textX - textWidth / 2 - padding / 2,
+    textY - textHeight + 10,
+    textWidth + padding,
+    textHeight
+  );
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(sizeText, textX, textY);
+
+  ctx.restore();
+};
+
+// ==================== ФУНКЦИИ ОБРЕЗКИ ПО ПРОПОРЦИЯМ ====================
+  
+  const getImageDisplayInfo = () => {
+    if (!image || !canvasRef.current) return null;
+    
+    const canvas = canvasRef.current;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
+    const scale = zoom;
+    const imgWidth = image.width * scale;
+    const imgHeight = image.height * scale;
+    
+    const displayX = (canvasWidth - imgWidth) / 2 + panOffset.x;
+    const displayY = (canvasHeight - imgHeight) / 2 + panOffset.y;
+    
+    return { displayX, displayY, displayWidth: imgWidth, displayHeight: imgHeight };
   };
 
-  // ==================== ОБРАБОТЧИКИ МЫШИ ====================
+  const calculateAspectCropRectByRatio = (ratio) => {
+    if (!image || !canvasRef.current) return aspectCropRect;
+
+    const canvas = canvasRef.current;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    const imgDisplayInfo = getImageDisplayInfo();
+    if (!imgDisplayInfo) return aspectCropRect;
+
+    const maxWidth = Math.min(imgDisplayInfo.displayWidth, canvasWidth);
+    const maxHeight = Math.min(imgDisplayInfo.displayHeight, canvasHeight);
+
+    let targetWidth, targetHeight;
+
+    if (ratio === null) {
+      const imgRatio = image.width / image.height;
+      if (imgRatio >= 1) {
+        targetWidth = maxWidth;
+        targetHeight = targetWidth / imgRatio;
+        if (targetHeight > maxHeight) {
+          targetHeight = maxHeight;
+          targetWidth = targetHeight * imgRatio;
+        }
+      } else {
+        targetHeight = maxHeight;
+        targetWidth = targetHeight * imgRatio;
+        if (targetWidth > maxWidth) {
+          targetWidth = maxWidth;
+          targetHeight = targetWidth / imgRatio;
+        }
+      }
+    } else {
+      if (ratio >= 1) {
+        targetWidth = maxWidth;
+        targetHeight = targetWidth / ratio;
+        if (targetHeight > maxHeight) {
+          targetHeight = maxHeight;
+          targetWidth = targetHeight * ratio;
+        }
+      } else {
+        targetHeight = maxHeight;
+        targetWidth = targetHeight * ratio;
+        if (targetWidth > maxWidth) {
+          targetWidth = maxWidth;
+          targetHeight = targetWidth / ratio;
+        }
+      }
+    }
+
+    const centerX = imgDisplayInfo.displayX + imgDisplayInfo.displayWidth / 2;
+    const centerY = imgDisplayInfo.displayY + imgDisplayInfo.displayHeight / 2;
+
+    return {
+      x: centerX - targetWidth / 2,
+      y: centerY - targetHeight / 2,
+      w: targetWidth,
+      h: targetHeight
+    };
+  };
+
+  const getAspectCorner = (x, y) => {
+    const margin = 12;
+    
+    if (Math.abs(x - aspectCropRect.x) < margin && Math.abs(y - aspectCropRect.y) < margin) return 'tl';
+    if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w)) < margin && Math.abs(y - aspectCropRect.y) < margin) return 'tr';
+    if (Math.abs(x - aspectCropRect.x) < margin && Math.abs(y - (aspectCropRect.y + aspectCropRect.h)) < margin) return 'bl';
+    if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w)) < margin && Math.abs(y - (aspectCropRect.y + aspectCropRect.h)) < margin) return 'br';
+    
+    if (aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+      if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w/2)) < margin && Math.abs(y - aspectCropRect.y) < margin) return 'tm';
+      if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w/2)) < margin && Math.abs(y - (aspectCropRect.y + aspectCropRect.h)) < margin) return 'bm';
+      if (Math.abs(x - aspectCropRect.x) < margin && Math.abs(y - (aspectCropRect.y + aspectCropRect.h/2)) < margin) return 'lm';
+      if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w)) < margin && Math.abs(y - (aspectCropRect.y + aspectCropRect.h/2)) < margin) return 'rm';
+    }
+    
+    return null;
+  };
+
+  const handleAspectCropMouseDown = (e) => {
+    if (!aspectCropMode) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    if (aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+      const corner = getAspectCorner(x, y);
+      if (corner) {
+        setIsResizingAspect(true);
+        setResizeCornerAspect(corner);
+        setDragStartAspect({ x, y });
+        return;
+      }
+      
+      if (x >= aspectCropRect.x && x <= aspectCropRect.x + aspectCropRect.w && 
+          y >= aspectCropRect.y && y <= aspectCropRect.y + aspectCropRect.h) {
+        setIsDraggingAspect(true);
+        setDragStartAspect({ x, y });
+        return;
+      }
+    }
+    
+    const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
+    if (ratioOption && ratioOption.ratio) {
+      const aspectRatio = ratioOption.ratio;
+      let w = 200;
+      let h = w / aspectRatio;
+      
+      setAspectCropRect({
+        x: x - w / 2,
+        y: y - h / 2,
+        w,
+        h
+      });
+    } else {
+      setAspectCropRect({
+        x: x - 100,
+        y: y - 100,
+        w: 200,
+        h: 200
+      });
+    }
+  };
+
+  const handleAspectCropMouseMove = (e) => {
+    if (!aspectCropMode) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
+    const targetRatio = ratioOption?.ratio;
+    
+    if (isResizingAspect && resizeCornerAspect && targetRatio) {
+      let newRect = { ...aspectCropRect };
+      const minSize = 30;
+      
+      switch (resizeCornerAspect) {
+        case 'tl':
+          const newWidthTL = aspectCropRect.w + (aspectCropRect.x - x);
+          if (newWidthTL >= minSize) {
+            newRect.w = newWidthTL;
+            newRect.h = newRect.w / targetRatio;
+            newRect.x = aspectCropRect.x - (newRect.w - aspectCropRect.w);
+            newRect.y = aspectCropRect.y - (newRect.h - aspectCropRect.h);
+          }
+          break;
+        case 'tr':
+          const newWidthTR = x - aspectCropRect.x;
+          if (newWidthTR >= minSize) {
+            newRect.w = newWidthTR;
+            newRect.h = newRect.w / targetRatio;
+            newRect.y = aspectCropRect.y - (newRect.h - aspectCropRect.h);
+          }
+          break;
+        case 'bl':
+          const newWidthBL = aspectCropRect.w + (aspectCropRect.x - x);
+          if (newWidthBL >= minSize) {
+            newRect.w = newWidthBL;
+            newRect.h = newRect.w / targetRatio;
+            newRect.x = aspectCropRect.x - (newRect.w - aspectCropRect.w);
+          }
+          break;
+        case 'br':
+          const newWidthBR = x - aspectCropRect.x;
+          if (newWidthBR >= minSize) {
+            newRect.w = newWidthBR;
+            newRect.h = newRect.w / targetRatio;
+          }
+          break;
+        case 'tm':
+          const newHeightTM = aspectCropRect.h - (y - aspectCropRect.y);
+          if (newHeightTM >= minSize) {
+            newRect.h = newHeightTM;
+            newRect.w = newRect.h * targetRatio;
+            newRect.y = y;
+          }
+          break;
+        case 'bm':
+          const newHeightBM = y - aspectCropRect.y;
+          if (newHeightBM >= minSize) {
+            newRect.h = newHeightBM;
+            newRect.w = newRect.h * targetRatio;
+          }
+          break;
+        case 'lm':
+          const newWidthLM = aspectCropRect.w - (x - aspectCropRect.x);
+          if (newWidthLM >= minSize) {
+            newRect.w = newWidthLM;
+            newRect.h = newRect.w / targetRatio;
+            newRect.x = x;
+          }
+          break;
+        case 'rm':
+          const newWidthRM = x - aspectCropRect.x;
+          if (newWidthRM >= minSize) {
+            newRect.w = newWidthRM;
+            newRect.h = newRect.w / targetRatio;
+          }
+          break;
+        default:
+          return;
+      }
+      
+      const imgDisplayInfo = getImageDisplayInfo();
+      if (imgDisplayInfo) {
+        newRect.x = Math.max(imgDisplayInfo.displayX, Math.min(newRect.x, imgDisplayInfo.displayX + imgDisplayInfo.displayWidth - newRect.w));
+        newRect.y = Math.max(imgDisplayInfo.displayY, Math.min(newRect.y, imgDisplayInfo.displayY + imgDisplayInfo.displayHeight - newRect.h));
+      } else {
+        newRect.x = Math.max(0, Math.min(newRect.x, canvas.width - minSize));
+        newRect.y = Math.max(0, Math.min(newRect.y, canvas.height - minSize));
+      }
+      
+      if (newRect.w >= minSize && newRect.h >= minSize) {
+        setAspectCropRect(newRect);
+      }
+    } 
+    else if (isDraggingAspect) {
+      const deltaX = x - dragStartAspect.x;
+      const deltaY = y - dragStartAspect.y;
+      
+      let newX = aspectCropRect.x + deltaX;
+      let newY = aspectCropRect.y + deltaY;
+      
+      const imgDisplayInfo = getImageDisplayInfo();
+      if (imgDisplayInfo) {
+        newX = Math.max(imgDisplayInfo.displayX, Math.min(newX, imgDisplayInfo.displayX + imgDisplayInfo.displayWidth - aspectCropRect.w));
+        newY = Math.max(imgDisplayInfo.displayY, Math.min(newY, imgDisplayInfo.displayY + imgDisplayInfo.displayHeight - aspectCropRect.h));
+      } else {
+        newX = Math.max(0, Math.min(newX, canvas.width - aspectCropRect.w));
+        newY = Math.max(0, Math.min(newY, canvas.height - aspectCropRect.h));
+      }
+      
+      setAspectCropRect({
+        ...aspectCropRect,
+        x: newX,
+        y: newY
+      });
+      setDragStartAspect({ x, y });
+    }
+  };
+
+  const handleAspectCropMouseUp = () => {
+    setIsDraggingAspect(false);
+    setIsResizingAspect(false);
+    setResizeCornerAspect(null);
+  };
+
+  // ==================== ОБРАБОТЧИКИ МЫШИ (ОБНОВЛЕННЫЕ) ====================
   
   const handleCanvasMouseDown = (e) => {
     if (cropMode) {
       e.stopPropagation();
       handleCropMouseDown(e);
+    } else if (aspectCropMode) {
+      e.stopPropagation();
+      handleAspectCropMouseDown(e);
     }
   };
 
@@ -648,6 +1444,9 @@ const ImageEditor = ({
     if (cropMode) {
       e.stopPropagation();
       handleCropMouseMove(e);
+    } else if (aspectCropMode) {
+      e.stopPropagation();
+      handleAspectCropMouseMove(e);
     }
   };
 
@@ -655,11 +1454,14 @@ const ImageEditor = ({
     if (cropMode) {
       e.stopPropagation();
       handleCropMouseUp();
+    } else if (aspectCropMode) {
+      e.stopPropagation();
+      handleAspectCropMouseUp();
     }
   };
 
   const handleContainerMouseDown = (e) => {
-    if (cropMode) return;
+    if (cropMode || aspectCropMode) return;
     
     if (e.button === 0) {
       e.preventDefault();
@@ -669,7 +1471,7 @@ const ImageEditor = ({
   };
 
   const handleContainerMouseMove = (e) => {
-    if (cropMode) return;
+    if (cropMode || aspectCropMode) return;
     
     if (isPanning) {
       const deltaX = e.clientX - panStart.x;
@@ -687,178 +1489,191 @@ const ImageEditor = ({
   };
 
   // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
-const handleRemoveBackground = async () => {
-  if (!image || isRemovingBackground) return;
   
-  setIsRemovingBackground(true);
-  
-  try {
-    // Создаем временный canvas для получения текущего отредактированного изображения
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) throw new Error('Cannot create canvas context');
+  const handleRemoveBackground = async () => {
+    if (!image || isRemovingBackground) return;
     
-    // Устанавливаем размеры canvas как у оригинального изображения
-    tempCanvas.width = image.width;
-    tempCanvas.height = image.height;
+    setIsRemovingBackground(true);
     
-    // Применяем все текущие трансформации к изображению
-    tempCtx.save();
-    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-    tempCtx.rotate((rotation * Math.PI) / 180);
-    tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-    tempCtx.filter = getFilters();
-    tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
-    tempCtx.restore();
-    
-    // Если есть активная обрезка, применяем её
-    let finalCanvas = tempCanvas;
-    if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-      const croppedCanvas = document.createElement('canvas');
-      const croppedCtx = croppedCanvas.getContext('2d');
-      if (!croppedCtx) throw new Error('Cannot create cropped canvas');
+    try {
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) throw new Error('Cannot create canvas context');
       
-      croppedCanvas.width = cropRect.w;
-      croppedCanvas.height = cropRect.h;
+      tempCanvas.width = image.width;
+      tempCanvas.height = image.height;
       
-      croppedCtx.drawImage(
-        tempCanvas,
-        cropRect.x, cropRect.y, cropRect.w, cropRect.h,
-        0, 0, cropRect.w, cropRect.h
-      );
+      tempCtx.save();
+      tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+      tempCtx.rotate((rotation * Math.PI) / 180);
+      tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+      tempCtx.filter = getFilters();
+      tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
+      tempCtx.restore();
       
-      finalCanvas = croppedCanvas;
-    }
-    
-    // Конвертируем canvas в blob
-    const blob = await new Promise((resolve) => {
-      finalCanvas.toBlob((blob) => resolve(blob), 'image/png');
-    });
-    
-    // Формируем запрос к API
-    const form = new FormData();
-    form.append('image_file', blob, 'image.png');
-    form.append('format', 'png');
-    form.append('size', 'auto');
-    form.append('despill', 'medium');
-    
-    const options = {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey
-      },
-      body: form
-    };
-    
-    // Отправляем запрос
-    const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
-    
-    if (!apiResponse.ok) {
-      throw new Error(`API error: ${apiResponse.status}`);
-    }
-    
-    // Получаем обработанное изображение
-    const processedBlob = await apiResponse.blob();
-    
-    // Создаем URL для обработанного изображения
-    const processedUrl = URL.createObjectURL(processedBlob);
-    
-    // Загружаем обработанное изображение
-    const processedImage = new Image();
-    processedImage.onload = () => {
-      // Обновляем изображение
-      setImage(processedImage);
-      
-      // Сбрасываем трансформации
-      setRotation(0);
-      setZoom(baseZoom);
-      setFlipX(false);
-      setFlipY(false);
-      setCropMode(false);
-      setCropRect({ x: 0, y: 0, w: 0, h: 0 });
-      setPanOffset({ x: 0, y: 0 });
-      
-      // Пересчитываем масштаб для нового изображения
-      const container = containerRef.current;
-      if (container) {
-        const fitZoom = calculateFitZoom(
-          processedImage.width, processedImage.height,
-          container.clientWidth, container.clientHeight
-        );
-        setBaseZoom(fitZoom);
-        setZoom(fitZoom);
+      let finalCanvas = tempCanvas;
+      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+        const originalCrop = getOriginalImageCoordinates(cropRect);
+        
+        if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+          const croppedCanvas = document.createElement('canvas');
+          const croppedCtx = croppedCanvas.getContext('2d');
+          if (!croppedCtx) throw new Error('Cannot create cropped canvas');
+          
+          croppedCanvas.width = originalCrop.w;
+          croppedCanvas.height = originalCrop.h;
+          
+          croppedCtx.drawImage(
+            tempCanvas,
+            originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
+            0, 0, originalCrop.w, originalCrop.h
+          );
+          
+          finalCanvas = croppedCanvas;
+        }
       }
       
-      // Сохраняем в историю
-      setTimeout(() => saveToHistory(), 50);
+      const blob = await new Promise((resolve) => {
+        finalCanvas.toBlob((blob) => resolve(blob), 'image/png');
+      });
       
-      // Освобождаем URL
-      URL.revokeObjectURL(processedUrl);
+      const form = new FormData();
+      form.append('image_file', blob, 'image.png');
+      form.append('format', 'png');
+      form.append('size', 'auto');
+      form.append('despill', 'medium');
       
+      const options = {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey
+        },
+        body: form
+      };
+      
+      const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
+      
+      if (!apiResponse.ok) {
+        throw new Error(`API error: ${apiResponse.status}`);
+      }
+      
+      const processedBlob = await apiResponse.blob();
+      const processedUrl = URL.createObjectURL(processedBlob);
+      
+      const processedImage = new Image();
+      processedImage.onload = () => {
+        setImage(processedImage);
+        setRotation(0);
+        setZoom(baseZoom);
+        setFlipX(false);
+        setFlipY(false);
+        setCropMode(false);
+        setAspectCropMode(false);
+        setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+        setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+        setPanOffset({ x: 0, y: 0 });
+        
+        const container = containerRef.current;
+        if (container) {
+          const fitZoom = calculateFitZoom(
+            processedImage.width, processedImage.height,
+            container.clientWidth, container.clientHeight
+          );
+          setBaseZoom(fitZoom);
+          setZoom(fitZoom);
+        }
+        
+        setTimeout(() => saveToHistory(), 50);
+        URL.revokeObjectURL(processedUrl);
+        setIsRemovingBackground(false);
+      };
+      
+      processedImage.onerror = () => {
+        throw new Error('Failed to load processed image');
+      };
+      
+      processedImage.src = processedUrl;
+      
+    } catch (error) {
+      console.error('Error removing background:', error);
+      alert(`Ошибка при удалении фона: ${error.message}`);
       setIsRemovingBackground(false);
-    };
-    
-    processedImage.onerror = () => {
-      throw new Error('Failed to load processed image');
-    };
-    
-    processedImage.src = processedUrl;
-    
-  } catch (error) {
-    console.error('Error removing background:', error);
-    alert(`Ошибка при удалении фона: ${error.message}`);
-    setIsRemovingBackground(false);
-  }
-};
-
-  const saveToHistory = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    
-    const newState = {
-      imageData,
-      rotation,
-      zoom,
-      flipX,
-      flipY,
-      activeFilter,
-      adjustments: { ...adjustments },
-      cropRect: { ...cropRect },
-      cropMode,
-    };
-
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(newState);
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  }, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode]);
-
-  const restoreFromHistory = useCallback((state) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    canvas.width = state.imageData.width;
-    canvas.height = state.imageData.height;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.putImageData(state.imageData, 0, 0);
     }
+  };
 
-    setRotation(state.rotation);
-    setZoom(state.zoom);
-    setFlipX(state.flipX);
-    setFlipY(state.flipY);
-    setActiveFilter(state.activeFilter);
-    setAdjustments(state.adjustments);
-    setCropRect(state.cropRect);
-    setCropMode(state.cropMode);
-    setPanOffset({ x: 0, y: 0 });
-  }, []);
+const saveToHistory = useCallback(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  
+  const newState = {
+    imageData,
+    rotation,
+    zoom,
+    flipX,
+    flipY,
+    activeFilter,
+    adjustments: { ...adjustments },
+    cropRect: { ...cropRect },
+    cropMode,
+    aspectCropRect: { ...aspectCropRect },
+    aspectCropMode,
+    selectedAspectRatio,
+    panOffset: { ...panOffset },
+  };
+
+  // Проверяем, не совпадает ли новое состояние с последним
+  const lastState = history[historyIndex];
+  if (lastState && 
+      lastState.rotation === newState.rotation &&
+      lastState.zoom === newState.zoom &&
+      lastState.flipX === newState.flipX &&
+      lastState.flipY === newState.flipY &&
+      lastState.activeFilter === newState.activeFilter &&
+      JSON.stringify(lastState.adjustments) === JSON.stringify(newState.adjustments) &&
+      JSON.stringify(lastState.cropRect) === JSON.stringify(newState.cropRect) &&
+      lastState.cropMode === newState.cropMode &&
+      JSON.stringify(lastState.aspectCropRect) === JSON.stringify(newState.aspectCropRect) &&
+      lastState.aspectCropMode === newState.aspectCropMode &&
+      lastState.selectedAspectRatio === newState.selectedAspectRatio) {
+    return; // Состояние не изменилось, не сохраняем
+  }
+
+  const newHistory = history.slice(0, historyIndex + 1);
+  newHistory.push(newState);
+  setHistory(newHistory);
+  setHistoryIndex(newHistory.length - 1);
+}, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset]);
+
+
+const restoreFromHistory = useCallback((state) => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  canvas.width = state.imageData.width;
+  canvas.height = state.imageData.height;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.putImageData(state.imageData, 0, 0);
+  }
+
+  setRotation(state.rotation);
+  setZoom(state.zoom);
+  setFlipX(state.flipX);
+  setFlipY(state.flipY);
+  setActiveFilter(state.activeFilter);
+  setAdjustments(state.adjustments);
+  setCropRect(state.cropRect);
+  setCropMode(state.cropMode);
+  setAspectCropRect(state.aspectCropRect);
+  setAspectCropMode(state.aspectCropMode);
+  setSelectedAspectRatio(state.selectedAspectRatio);
+  setPanOffset(state.panOffset || { x: 0, y: 0 });
+}, []);
 
   const rotate = (direction) => {
     const newRotation = direction === 'right' ? rotation + 90 : rotation - 90;
@@ -885,54 +1700,91 @@ const handleRemoveBackground = async () => {
     setTimeout(() => saveToHistory(), 50);
   }, [saveToHistory]);
 
-  const reset = () => {
-    setRotation(0);
-    setZoom(baseZoom);
-    setFlipX(false);
-    setFlipY(false);
-    setActiveFilter('none');
-    setCropMode(false);
-    setCropRect({ x: 0, y: 0, w: 0, h: 0 });
-    setAdjustments({
-      brightness: 0,
-      contrast: 0,
-      saturation: 0,
-      exposure: 0,
-      temperature: 0,
-      vignette: 0
-    });
-    setPanOffset({ x: 0, y: 0 });
-    
-    if (imageUrl) {
-      fetch(imageUrl)
-        .then(res => res.blob())
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          const img = new Image();
-          img.onload = () => {
-            setImage(img);
-            URL.revokeObjectURL(url);
-          };
-          img.src = url;
-        });
-    }
-  };
+const reset = () => {
+  setRotation(0);
+  setZoom(baseZoom);
+  setFlipX(false);
+  setFlipY(false);
+  setActiveFilter('none');
+  setCropMode(false);
+  setAspectCropMode(false);
+  setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+  setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+  setSelectedAspectRatio('original');
+  setAdjustments({
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    exposure: 0,
+    temperature: 0,
+    vignette: 0
+  });
+  setPanOffset({ x: 0, y: 0 });
+  
+  if (imageUrl) {
+    fetch(imageUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          setImage(img);
+          URL.revokeObjectURL(url);
+          // После сброса очищаем историю и создаем новое начальное состояние
+          setTimeout(() => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const initialState = {
+                  imageData,
+                  rotation: 0,
+                  zoom: baseZoom,
+                  flipX: false,
+                  flipY: false,
+                  activeFilter: 'none',
+                  adjustments: {
+                    brightness: 0,
+                    contrast: 0,
+                    saturation: 0,
+                    exposure: 0,
+                    temperature: 0,
+                    vignette: 0
+                  },
+                  cropRect: { x: 0, y: 0, w: 0, h: 0 },
+                  cropMode: false,
+                  aspectCropRect: { x: 0, y: 0, w: 0, h: 0 },
+                  aspectCropMode: false,
+                  selectedAspectRatio: 'original',
+                  panOffset: { x: 0, y: 0 },
+                };
+                setHistory([initialState]);
+                setHistoryIndex(0);
+              }
+            }
+          }, 100);
+        };
+        img.src = url;
+      });
+  }
+};
 
-  const undo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      restoreFromHistory(history[newIndex]);
-    }
-  };
+const undo = () => {
+  if (historyIndex > 0) {
+    const newIndex = historyIndex - 1;
+    setHistoryIndex(newIndex);
+    restoreFromHistory(history[newIndex]);
+  }
+};
 
-  const redo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      restoreFromHistory(history[newIndex]);
-    }
-  };
+const redo = () => {
+  if (historyIndex < history.length - 1) {
+    const newIndex = historyIndex + 1;
+    setHistoryIndex(newIndex);
+    restoreFromHistory(history[newIndex]);
+  }
+};
 
   // Создание Blob для сохранения в исходном размере
   const createImageBlob = (format, quality) => {
@@ -957,7 +1809,26 @@ const handleRemoveBackground = async () => {
       let finalCanvas = tempCanvas;
       
       if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-        const originalCrop = getCropRectForOriginalSize();
+        const originalCrop = getOriginalImageCoordinates(cropRect);
+        
+        if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+          const croppedCanvas = document.createElement('canvas');
+          const croppedCtx = croppedCanvas.getContext('2d');
+          if (!croppedCtx) return;
+          
+          croppedCanvas.width = originalCrop.w;
+          croppedCanvas.height = originalCrop.h;
+          
+          croppedCtx.drawImage(
+            tempCanvas,
+            originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
+            0, 0, originalCrop.w, originalCrop.h
+          );
+          
+          finalCanvas = croppedCanvas;
+        }
+      } else if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+        const originalCrop = getOriginalImageCoordinates(aspectCropRect);
         
         if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
           const croppedCanvas = document.createElement('canvas');
@@ -1000,81 +1871,6 @@ const handleRemoveBackground = async () => {
     });
   };
 
-  const getCropRectForOriginalSize = () => {
-    if (!image || !cropMode || cropRect.w === 0 || cropRect.h === 0) return null;
-    
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-    const imgWidth = image.width;
-    const imgHeight = image.height;
-    
-    const fitScale = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
-    const currentZoom = zoom;
-    const displayScale = fitScale * currentZoom;
-    
-    const baseOffsetX = (canvasWidth - imgWidth * displayScale) / 2;
-    const baseOffsetY = (canvasHeight - imgHeight * displayScale) / 2;
-    const offsetX = baseOffsetX + panOffset.x;
-    const offsetY = baseOffsetY + panOffset.y;
-    
-    let originalX = (cropRect.x - offsetX) / displayScale;
-    let originalY = (cropRect.y - offsetY) / displayScale;
-    let originalW = cropRect.w / displayScale;
-    let originalH = cropRect.h / displayScale;
-    
-    if (rotation !== 0) {
-      const centerX = imgWidth / 2;
-      const centerY = imgHeight / 2;
-      const angle = (rotation * Math.PI) / 180;
-      
-      const rotatePoint = (x, y, centerX, centerY, angle) => {
-        const dx = x - centerX;
-        const dy = y - centerY;
-        const rotatedX = centerX + dx * Math.cos(angle) - dy * Math.sin(angle);
-        const rotatedY = centerY + dx * Math.sin(angle) + dy * Math.cos(angle);
-        return { x: rotatedX, y: rotatedY };
-      };
-      
-      const corners = [
-        { x: originalX, y: originalY },
-        { x: originalX + originalW, y: originalY },
-        { x: originalX, y: originalY + originalH },
-        { x: originalX + originalW, y: originalY + originalH }
-      ];
-      
-      const rotatedCorners = corners.map(corner => 
-        rotatePoint(corner.x, corner.y, centerX, centerY, -angle)
-      );
-      
-      const minX = Math.min(...rotatedCorners.map(c => c.x));
-      const maxX = Math.max(...rotatedCorners.map(c => c.x));
-      const minY = Math.min(...rotatedCorners.map(c => c.y));
-      const maxY = Math.max(...rotatedCorners.map(c => c.y));
-      
-      originalX = minX;
-      originalY = minY;
-      originalW = maxX - minX;
-      originalH = maxY - minY;
-    }
-    
-    if (flipX) {
-      originalX = imgWidth - originalX - originalW;
-    }
-    if (flipY) {
-      originalY = imgHeight - originalY - originalH;
-    }
-    
-    return {
-      x: Math.max(0, Math.min(originalX, imgWidth)),
-      y: Math.max(0, Math.min(originalY, imgHeight)),
-      w: Math.min(originalW, imgWidth - Math.max(0, originalX)),
-      h: Math.min(originalH, imgHeight - Math.max(0, originalY))
-    };
-  };
-
   const handleDownloadClick = () => {
     setSaveAction('download');
     setShowFormatModal(true);
@@ -1096,7 +1892,6 @@ const handleRemoveBackground = async () => {
       const blob = await createImageBlob(saveFormat, quality);
       
       if (saveAction === 'download') {
-        // Скачивание
         const fileName = getSaveFileName();
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -1108,7 +1903,6 @@ const handleRemoveBackground = async () => {
         URL.revokeObjectURL(url);
         setShowFormatModal(false);
       } else {
-        // Сохранение на сервер - сохраняем blob и открываем модалку загрузки
         setEditedImageBlob(blob);
         setShowFormatModal(false);
         setShowUploadModal(true);
@@ -1121,113 +1915,108 @@ const handleRemoveBackground = async () => {
     }
   };
 
-  // Обработка загрузки на сервер
-// Внутри компонента ImageEditor добавьте или замените функцию handleUpload:
-
-const handleUpload = async (finalFileName, allTags) => {
-  if (!editedImageBlob) return;
-
-  const uploadNotification = showUploadNotification();
-
-  try {
-    // Определяем, нужно ли конвертировать в WEBP
-    const shouldConvertToWebp = editedImageBlob.type.startsWith('image/') && 
-                               editedImageBlob.type !== 'image/webp';
-    
-    let fileToUpload;
-    let finalFileNameWithExt = finalFileName;
-
-    if (shouldConvertToWebp) {
-      // Конвертируем изображение в WEBP
-      const webpBlob = await convertToWebP(editedImageBlob);
+  const convertToWebP = (blob) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
       
-      // Меняем расширение файла на .webp если нужно
-      if (!finalFileName.toLowerCase().endsWith('.webp')) {
-        finalFileNameWithExt = finalFileName.replace(/\.[^/.]+$/, '') + '.webp';
-      }
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        canvas.toBlob((webpBlob) => {
+          if (webpBlob) {
+            resolve(webpBlob);
+          } else {
+            reject(new Error('Не удалось конвертировать в WEBP'));
+          }
+        }, 'image/webp', 0.92);
+      };
       
-      fileToUpload = new File([webpBlob], finalFileNameWithExt, {
-        type: 'image/webp',
-        lastModified: Date.now()
-      });
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Не удалось загрузить изображение для конвертации'));
+      };
       
-    } else {
-      // Если это уже WEBP или не изображение, используем оригинал
-      fileToUpload = new File(
-        [editedImageBlob], 
-        finalFileName, 
-        {
-          type: editedImageBlob.type,
+      img.src = url;
+    });
+  };
+
+  const handleUpload = async (finalFileName, allTags) => {
+    if (!editedImageBlob) return;
+
+    const uploadNotification = showUploadNotification();
+
+    try {
+      const shouldConvertToWebp = editedImageBlob.type.startsWith('image/') && 
+                                 editedImageBlob.type !== 'image/webp';
+      
+      let fileToUpload;
+      let finalFileNameWithExt = finalFileName;
+
+      if (shouldConvertToWebp) {
+        const webpBlob = await convertToWebP(editedImageBlob);
+        
+        if (!finalFileName.toLowerCase().endsWith('.webp')) {
+          finalFileNameWithExt = finalFileName.replace(/\.[^/.]+$/, '') + '.webp';
+        }
+        
+        fileToUpload = new File([webpBlob], finalFileNameWithExt, {
+          type: 'image/webp',
           lastModified: Date.now()
-        }
+        });
+        
+      } else {
+        fileToUpload = new File(
+          [editedImageBlob], 
+          finalFileName, 
+          {
+            type: editedImageBlob.type,
+            lastModified: Date.now()
+          }
+        );
+      }
+
+      const result = await uploadGraphicFile(
+        user.company[0].id,
+        fileToUpload,
+        null, 
+        allTags 
       );
+
+      uploadNotification.success({
+        title: `Файл ${finalFileNameWithExt}`,
+        message: "Успешно загружен",
+        error: null
+      });
+
+      setShowUploadModal(false);
+      setEditedImageBlob(null);
+
+    } catch (error) {
+      uploadNotification.error({
+        title: 'Ошибка',
+        message: `Не удалось загрузить файл "${finalFileName}"`,
+        error: error.message
+      });
     }
+  };
 
-    // Загружаем файл
-    const result = await uploadGraphicFile(
-      user.company[0].id,
-      fileToUpload,
-      null, 
-      allTags 
-    );
+  useEffect(() => {
+  if (historyIndex === -1) return;
 
-    // Показываем успешное уведомление
-    uploadNotification.success({
-      title: `Файл ${finalFileNameWithExt}`,
-      message: "Успешно загружен",
-      error: null
-    });
+  const timer = setTimeout(() => {
+    saveToHistory();
+  }, 100);
 
-    // Закрываем все модалки после успешной загрузки
-    setShowUploadModal(false);
-    setEditedImageBlob(null);
-    
-    // Опционально: закрываем редактор
-    // onClose();
-
-  } catch (error) {
-    // Показываем уведомление об ошибке
-    uploadNotification.error({
-      title: 'Ошибка',
-      message: `Не удалось загрузить файл "${finalFileName}"`,
-      error: error.message
-    });
-  }
-};
-
-// Функция конвертации в WEBP (добавьте вне компонента или внутри)
-const convertToWebP = (blob) => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(blob);
-    
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      
-      canvas.toBlob((webpBlob) => {
-        if (webpBlob) {
-          resolve(webpBlob);
-        } else {
-          reject(new Error('Не удалось конвертировать в WEBP'));
-        }
-      }, 'image/webp', 0.92);
-    };
-    
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Не удалось загрузить изображение для конвертации'));
-    };
-    
-    img.src = url;
-  });
-};
+  return () => clearTimeout(timer);
+}, [rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, saveToHistory]);
 
   useEffect(() => {
     if (image) {
@@ -1235,8 +2024,11 @@ const convertToWebP = (blob) => {
       if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
         drawCropOverlayOnly();
       }
+      if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+        drawAspectCropOverlay();
+      }
     }
-  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, panOffset]);
+  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset]);
 
   useEffect(() => {
     setPanOffset({ x: 0, y: 0 });
@@ -1484,7 +2276,10 @@ const convertToWebP = (blob) => {
               <div className={styles.cropWrapper}>
                 <button
                   className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
-                  onClick={() => setCropMode(!cropMode)}
+                  onClick={() => {
+                    setCropMode(!cropMode);
+                    if (aspectCropMode) setAspectCropMode(false);
+                  }}
                 >
                   <RiScissorsCutLine size={20} />
                 </button>
@@ -1494,6 +2289,31 @@ const convertToWebP = (blob) => {
                     onClick={applyCrop}
                   >
                     Вырезать
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.cropWrapper}>
+                <button
+                  className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
+                  onClick={() => {
+                    setAspectCropMode(!aspectCropMode);
+                    if (cropMode) setCropMode(false);
+                    if (!aspectCropMode) {
+                      const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
+                      const newRect = calculateAspectCropRectByRatio(ratioOption?.ratio || null);
+                      setAspectCropRect(newRect);
+                    }
+                  }}
+                >
+                  <FiCrop size={20} />
+                </button>
+                {aspectCropMode && aspectCropRect.w > 0 && (
+                  <button
+                    className={styles.applyCropButton}
+                    onClick={applyAspectCrop}
+                  >
+                    Обрезать
                   </button>
                 )}
               </div>
@@ -1559,7 +2379,7 @@ const convertToWebP = (blob) => {
               onMouseUp={handleContainerMouseUp}
               onMouseLeave={handleContainerMouseUp}
               style={{ 
-                cursor: cropMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab')
+                cursor: cropMode || aspectCropMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab')
               }}
             >
               {loading ? (
@@ -1659,6 +2479,25 @@ const convertToWebP = (blob) => {
               )}
             </div>
           </div>
+                    
+            <div className={styles.aspectRatiosBar}>
+              {aspectCropMode && (<div className={styles.aspectRatiosContainer}>
+                {aspectRatios.map(ratio => (
+                  <button
+                    key={ratio.id}
+                    className={`${styles.aspectRatioButton} ${selectedAspectRatio === ratio.id ? styles.active : ''}`}
+                    onClick={() => {
+                      setSelectedAspectRatio(ratio.id);
+                      const newRect = calculateAspectCropRectByRatio(ratio.ratio);
+                      setAspectCropRect(newRect);
+                    }}
+                  >
+                    {ratio.label}
+                  </button>
+                ))}
+              </div>)}
+            </div>
+          
         </div>
       </div>
 
