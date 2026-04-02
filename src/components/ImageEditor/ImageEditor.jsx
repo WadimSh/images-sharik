@@ -2,8 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   FiRotateCw, FiCrop, FiThermometer, FiSun, FiDroplet,
-  FiSliders, FiRotateCcw, FiCheck, FiZoomIn, FiZoomOut, FiMaximize,
-  FiChevronDown, FiDownload, FiSave
+  FiSliders, FiRotateCcw, FiCheck, FiZoomIn, FiZoomOut, 
+  FiChevronDown, FiDownload, FiMaximize, FiSave
 } from 'react-icons/fi';
 import { LuUndo2, LuRedo2, LuFlipHorizontal, LuFlipVertical } from "react-icons/lu";
 import { IoContrastOutline } from "react-icons/io5";
@@ -13,7 +13,27 @@ import { PiMagicWand } from "react-icons/pi";
 import { useAuth } from '../../contexts/AuthContext';
 import { uploadGraphicFile } from '../../services/mediaService';
 import ImageEditedUploadModal from '../ImageEditedUploadModal/ImageEditedUploadModal'; 
+import AdjustmentSlider from './AdjustmentSlider';
 import styles from './ImageEditor.module.css';
+
+// Хук для определения ширины экрана
+const useResponsive = (breakpoint = 1120) => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= breakpoint);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      setIsMobile(width <= breakpoint);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+
+  return { windowWidth, isMobile };
+};
 
 // Константы для пропорций обрезки
 const aspectRatios = [
@@ -30,7 +50,7 @@ const aspectRatios = [
   //{ id: '5:7', label: '5:7', ratio: 5 / 7 },
   //{ id: '7:5', label: '7:5', ratio: 7 / 5 },
   //{ id: '1:2', label: '1:2', ratio: 1 / 2 },
-  //{ id: '2:1', label: '2:1', ratio: 2 }
+  //{ id: '2:1', label: '2:1', ratio: 2 / 1 }
 ];
 
 const showUploadNotification = () => {
@@ -56,6 +76,10 @@ const ImageEditor = ({
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
+  
+  const responsive = useResponsive(1120);
+  const isMobile = responsive.isMobile;
+  const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
 
   const apiKey = process.env.REACT_APP_API_KEY;
   
@@ -110,6 +134,13 @@ const ImageEditor = ({
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isRemovingBackground, setIsRemovingBackground] = useState(false);
+
+  // Закрытие мобильной панели при изменении ширины экрана
+  useEffect(() => {
+    if (!isMobile) {
+      setIsMobilePanelOpen(false);
+    }
+  }, [isMobile]);
 
   // Закрытие дропдауна при клике вне
   useEffect(() => {
@@ -2064,51 +2095,11 @@ const redo = () => {
     }
   };
 
-  const AdjustmentSlider = ({ 
-    label, 
-    value, 
-    onChange, 
-    min = -100, 
-    max = 100,
-    icon 
-  }) => {
-    const valueClass = value > 0 ? styles.positive : value < 0 ? styles.negative : styles.zero;
-    const displayValue = value > 0 ? `+${value}` : `${value}`;
-
-    return (
-      <div className={styles.sliderGroup} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.sliderHeader}>
-          {icon && <span className={styles.sliderIcon}>{icon}</span>}
-          <span className={styles.sliderLabel}>{label}</span>
-          <span className={`${styles.sliderValue} ${valueClass}`}>
-            {displayValue}
-          </span>
-        </div>
-        <div className={styles.sliderTrack}>
-          <div className={styles.sliderBackground} />
-          <div 
-            className={styles.sliderFill}
-            style={{
-              width: `${Math.abs(value) / max * 50}%`,
-              left: value > 0 ? '50%' : `calc(50% - ${Math.abs(value) / max * 50}%)`,
-              backgroundColor: value > 0 ? '#3b82f6' : '#3b82f6'
-            }}
-          />
-          <input
-            type="range"
-            min={min}
-            max={max}
-            value={value}
-            onChange={(e) => {
-              onChange(Number(e.target.value));
-            }}
-            className={styles.slider}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <div className={styles.centerMarker} />
-        </div>
-      </div>
-    );
+  const handleOverlayClick = (e) => {
+    // Закрываем мобильную панель при клике на затемнение
+    if (isMobile && isMobilePanelOpen && e.target === e.currentTarget) {
+      setIsMobilePanelOpen(false);
+    }
   };
 
   const filters = [
@@ -2178,16 +2169,16 @@ const redo = () => {
             <div className={styles.editorHeaderLeft}>
               <button
                 className={styles.zoomButton}
-                onClick={() => setZoom(Math.min(3, zoom + 0.1))}
-                disabled={zoom >= 3}
+                onClick={() => setZoom(Math.min(50, zoom + 0.1))}
+                disabled={zoom >= 50}
               >
                 <FiZoomIn size={20} />
               </button>
 
               <button
                 className={styles.zoomButton}
-                onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
-                disabled={zoom <= 0.5}
+                onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
+                disabled={zoom <= 0.1}
               >
                 <FiZoomOut size={20} />
               </button>
@@ -2228,96 +2219,99 @@ const redo = () => {
               </div>
             </div>
 
-            <div className={styles.transformGroup}>
-              <button
-                className={styles.transformButton}
-                onClick={() => rotate('left')}
-              >
-                <FiRotateCcw size={20} />
-              </button>
-
-              <button
-                className={styles.transformButton}
-                onClick={() => rotate('right')}
-              >
-                <FiRotateCw size={20} />
-              </button>
-
-              <button
-                className={styles.transformButton}
-                onClick={() => flip('x')}
-              >
-                <LuFlipHorizontal size={20} />
-              </button>
-
-              <button
-                className={styles.transformButton}
-                onClick={() => flip('y')}
-              >
-                <LuFlipVertical size={20} />
-              </button>
-
-              <div className={styles.transformDivider} />
-
-              <button
-                className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
-                onClick={handleRemoveBackground}
-                disabled={isRemovingBackground}
-              >
-                {isRemovingBackground ? (
-                  <div className={styles.spinner} />
-                ) : (
-                  <PiMagicWand size={20} />
-                )}
-              </button>
-
-              <div className={styles.transformDivider} />
-
-              <div className={styles.cropWrapper}>
+            {/* Десктопная панель трансформации */}
+            {!isMobile && (
+              <div className={styles.transformGroup}>
                 <button
-                  className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
-                  onClick={() => {
-                    setCropMode(!cropMode);
-                    if (aspectCropMode) setAspectCropMode(false);
-                  }}
+                  className={styles.transformButton}
+                  onClick={() => rotate('left')}
                 >
-                  <RiScissorsCutLine size={20} />
+                  <FiRotateCcw size={20} />
                 </button>
-                {cropMode && cropRect.w > 0 && (
-                  <button
-                    className={styles.applyCropButton}
-                    onClick={applyCrop}
-                  >
-                    Вырезать
-                  </button>
-                )}
-              </div>
 
-              <div className={styles.cropWrapper}>
                 <button
-                  className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
-                  onClick={() => {
-                    setAspectCropMode(!aspectCropMode);
-                    if (cropMode) setCropMode(false);
-                    if (!aspectCropMode) {
-                      const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
-                      const newRect = calculateAspectCropRectByRatio(ratioOption?.ratio || null);
-                      setAspectCropRect(newRect);
-                    }
-                  }}
+                  className={styles.transformButton}
+                  onClick={() => rotate('right')}
                 >
-                  <FiCrop size={20} />
+                  <FiRotateCw size={20} />
                 </button>
-                {aspectCropMode && aspectCropRect.w > 0 && (
+
+                <button
+                  className={styles.transformButton}
+                  onClick={() => flip('x')}
+                >
+                  <LuFlipHorizontal size={20} />
+                </button>
+
+                <button
+                  className={styles.transformButton}
+                  onClick={() => flip('y')}
+                >
+                  <LuFlipVertical size={20} />
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <button
+                  className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
+                  onClick={handleRemoveBackground}
+                  disabled={isRemovingBackground}
+                >
+                  {isRemovingBackground ? (
+                    <div className={styles.spinner} />
+                  ) : (
+                    <PiMagicWand size={20} />
+                  )}
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <div className={styles.cropWrapper}>
                   <button
-                    className={styles.applyCropButton}
-                    onClick={applyAspectCrop}
+                    className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
+                    onClick={() => {
+                      setCropMode(!cropMode);
+                      if (aspectCropMode) setAspectCropMode(false);
+                    }}
                   >
-                    Обрезать
+                    <RiScissorsCutLine size={20} />
                   </button>
-                )}
+                  {cropMode && cropRect.w > 0 && (
+                    <button
+                      className={styles.applyCropButton}
+                      onClick={applyCrop}
+                    >
+                      Вырезать
+                    </button>
+                  )}
+                </div>
+
+                <div className={styles.cropWrapper}>
+                  <button
+                    className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
+                    onClick={() => {
+                      setAspectCropMode(!aspectCropMode);
+                      if (cropMode) setCropMode(false);
+                      if (!aspectCropMode) {
+                        const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
+                        const newRect = calculateAspectCropRectByRatio(ratioOption?.ratio || null);
+                        setAspectCropRect(newRect);
+                      }
+                    }}
+                  >
+                    <FiCrop size={20} />
+                  </button>
+                  {aspectCropMode && aspectCropRect.w > 0 && (
+                    <button
+                      className={styles.applyCropButton}
+                      onClick={applyAspectCrop}
+                    >
+                      Обрезать
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className={styles.editorHeaderRight}>
               <div className={styles.compositeButton} ref={dropdownRef}>
@@ -2370,10 +2364,114 @@ const redo = () => {
             </div>
           </div>
 
-          <div className={styles.editorContent}>
+          {/* Мобильная панель трансформации (вторая строка) */}
+          {isMobile && (
+            <div className={styles.editorHeaderSecondRow}>
+              <div className={styles.transformGroupMobile}>
+                <button
+                  className={styles.transformButton}
+                  onClick={() => rotate('left')}
+                >
+                  <FiRotateCcw size={20} />
+                </button>
+
+                <button
+                  className={styles.transformButton}
+                  onClick={() => rotate('right')}
+                >
+                  <FiRotateCw size={20} />
+                </button>
+
+                <button
+                  className={styles.transformButton}
+                  onClick={() => flip('x')}
+                >
+                  <LuFlipHorizontal size={20} />
+                </button>
+
+                <button
+                  className={styles.transformButton}
+                  onClick={() => flip('y')}
+                >
+                  <LuFlipVertical size={20} />
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <button
+                  className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
+                  onClick={handleRemoveBackground}
+                  disabled={isRemovingBackground}
+                >
+                  {isRemovingBackground ? (
+                    <div className={styles.spinner} />
+                  ) : (
+                    <PiMagicWand size={20} />
+                  )}
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <div className={styles.cropWrapper}>
+                  <button
+                    className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
+                    onClick={() => {
+                      setCropMode(!cropMode);
+                      if (aspectCropMode) setAspectCropMode(false);
+                    }}
+                  >
+                    <RiScissorsCutLine size={20} />
+                  </button>
+                  {cropMode && cropRect.w > 0 && (
+                    <button
+                      className={styles.applyCropButton}
+                      onClick={applyCrop}
+                    >
+                      Вырезать
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
+                  onClick={() => {
+                    setAspectCropMode(!aspectCropMode);
+                    if (cropMode) setCropMode(false);
+                    if (!aspectCropMode) {
+                      const ratioOption = aspectRatios.find(r => r.id === selectedAspectRatio);
+                      const newRect = calculateAspectCropRectByRatio(ratioOption?.ratio || null);
+                      setAspectCropRect(newRect);
+                    }
+                  }}
+                >
+                  <FiCrop size={20} />
+                </button>
+                {aspectCropMode && aspectCropRect.w > 0 && (
+                  <button
+                    className={styles.applyCropButton}
+                    onClick={applyAspectCrop}
+                  >
+                    Обрезать
+                  </button>
+                )}
+              </div>
+              
+              <button 
+                className={`${styles.mobilePanelToggle} ${isMobilePanelOpen ? styles.active : ''}`}
+                onClick={() => setIsMobilePanelOpen(!isMobilePanelOpen)}
+              >
+                <FiSliders size={20} />
+              </button>
+            </div>
+          )}
+
+          <div 
+            className={`${styles.editorContent} ${isMobile && isMobilePanelOpen ? styles.panelOpen : ''}`}
+            onClick={handleOverlayClick}
+          >
             <div 
               ref={containerRef} 
-              className={styles.canvasContainer}
+              className={`${styles.canvasContainer} ${isMobile && isMobilePanelOpen ? styles.panelOpen : ''}`}
               onMouseDown={handleContainerMouseDown}
               onMouseMove={handleContainerMouseMove}
               onMouseUp={handleContainerMouseUp}
@@ -2395,7 +2493,7 @@ const redo = () => {
               )}
             </div>
 
-            <div className={styles.toolsPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={`${styles.toolsPanel} ${isMobile ? styles.mobileToolsPanel : ''} ${isMobilePanelOpen ? styles.open : ''}`}>
               <div className={styles.tabs}>
                 <button 
                   className={`${styles.tab} ${activeTab === 'color' ? styles.active : ''}`}
@@ -2480,23 +2578,23 @@ const redo = () => {
             </div>
           </div>
                     
-            <div className={styles.aspectRatiosBar}>
-              {aspectCropMode && (<div className={styles.aspectRatiosContainer}>
-                {aspectRatios.map(ratio => (
-                  <button
-                    key={ratio.id}
-                    className={`${styles.aspectRatioButton} ${selectedAspectRatio === ratio.id ? styles.active : ''}`}
-                    onClick={() => {
-                      setSelectedAspectRatio(ratio.id);
-                      const newRect = calculateAspectCropRectByRatio(ratio.ratio);
-                      setAspectCropRect(newRect);
-                    }}
-                  >
-                    {ratio.label}
-                  </button>
-                ))}
-              </div>)}
-            </div>
+          <div className={styles.aspectRatiosBar}>
+            {aspectCropMode && (<div className={styles.aspectRatiosContainer}>
+              {aspectRatios.map(ratio => (
+                <button
+                  key={ratio.id}
+                  className={`${styles.aspectRatioButton} ${selectedAspectRatio === ratio.id ? styles.active : ''}`}
+                  onClick={() => {
+                    setSelectedAspectRatio(ratio.id);
+                    const newRect = calculateAspectCropRectByRatio(ratio.ratio);
+                    setAspectCropRect(newRect);
+                  }}
+                >
+                  {ratio.label}
+                </button>
+              ))}
+            </div>)}
+          </div>
           
         </div>
       </div>
