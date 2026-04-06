@@ -44,6 +44,21 @@ const getTagColor = (tag) => {
 // Список защищенных тегов (неудаляемые)
 const PROTECTED_TAGS = ['Wildberries', 'Ozon', '9999-9999'];
 
+const capitalizeTag = (tag) => {
+  if (!tag) return '';
+  
+  return tag.split(' ').map((word, index) => {
+    if (word.length === 0) return word;
+    if (word.toLowerCase() === 'др') {
+      return 'ДР';
+    }
+    if (index === 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    return word;
+  }).join(' ');
+};
+
 export const ImageDigitalizationModal = ({
   isOpen, 
   onClose,
@@ -275,9 +290,11 @@ export const ImageDigitalizationModal = ({
     }
   };
 
-  const handleAddCustomTag = () => {
-    if (customTag.trim()) {
-      handleAddTag(customTag.trim());
+   const handleAddCustomTag = () => {
+    let trimmedTag = customTag.trim();
+    if (trimmedTag) {
+      trimmedTag = capitalizeTag(trimmedTag);
+      handleAddTag(trimmedTag);
     }
   };
 

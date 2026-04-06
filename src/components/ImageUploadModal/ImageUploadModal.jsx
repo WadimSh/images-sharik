@@ -24,6 +24,25 @@ const ImageUploadModal = ({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const customTagInputRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Функция для преобразования строки в формат "С заглавной буквы"
+  const capitalizeTag = (tag) => {
+    if (!tag) return '';
+    
+    return tag.split(' ').map((word, index) => {
+      if (word.length === 0) return word;
+
+      if (word.toLowerCase() === 'др') {
+        return 'ДР';
+      }
+
+      if (index === 0) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+
+      return word;
+    }).join(' ');
+  };
   
   // Проверяем размер экрана
   useEffect(() => {
@@ -142,10 +161,14 @@ const ImageUploadModal = ({
   };
 
   const handleAddCustomTag = () => {
-    const trimmedTag = customTag.trim();
-    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-      setSelectedTags([...selectedTags, trimmedTag]);
-      setCustomTag('');
+    let trimmedTag = customTag.trim();
+    if (trimmedTag) {
+      // Преобразуем тег в формат с заглавной буквы
+      trimmedTag = capitalizeTag(trimmedTag);
+      if (!selectedTags.includes(trimmedTag)) {
+        setSelectedTags([...selectedTags, trimmedTag]);
+        setCustomTag('');
+      }
     }
   };
 
@@ -238,11 +261,21 @@ const ImageUploadModal = ({
     
     return `${fileNameParts.join('_')}.${extension}`;
   };
+  
+  const getAuthorName = () => {
+    if (user?.username) return user.username;
+    if (user?.email) return user.email.split('@')[0];
+    return 'user';
+  };
 
-  // Подготовка данных для второго этапа
+   // Подготовка данных для второго этапа
   const prepareImageInfo = () => {
     const filteredArticles = articles.filter(article => article.trim() !== '' && validateArticle(article));
-    const allTags = [...filteredArticles, ...selectedTags];
+
+    const authorName = getAuthorName();
+    const autoTags = ['Mobile', authorName];
+
+    const allTags = [...filteredArticles, ...selectedTags, ...autoTags];
     
     // Форматируем размер файла
     const formatFileSize = (bytes) => {

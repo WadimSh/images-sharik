@@ -45,6 +45,21 @@ export const formatFileName = (fileName) => {
   return transliterated.toLowerCase();
 };
 
+const capitalizeTag = (tag) => {
+  if (!tag) return '';
+  
+  return tag.split(' ').map((word, index) => {
+    if (word.length === 0) return word;
+    if (word.toLowerCase() === 'др') {
+      return 'ДР';
+    }
+    if (index === 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    return word;
+  }).join(' ');
+};
+
 export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const { t } = useContext(LanguageContext);
   const { user } = useAuth(); 
@@ -283,17 +298,18 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     }
   };
 
-  const handleAddCustomTag = () => {
-    const trimmedTag = customTag.trim();
-    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-      // Проверяем, что это не артикул
+   const handleAddCustomTag = () => {
+    let trimmedTag = customTag.trim();
+    if (trimmedTag) {
       if (validateArticle(trimmedTag)) {
         alert('Нельзя добавить артикул как тег. Артикулы определяются автоматически из имени файла.');
         return;
       }
-      
-      setSelectedTags([...selectedTags, trimmedTag]);
-      setCustomTag('');
+      trimmedTag = capitalizeTag(trimmedTag);
+      if (!selectedTags.includes(trimmedTag)) {
+        setSelectedTags([...selectedTags, trimmedTag]);
+        setCustomTag('');
+      }
     }
   };
 
@@ -754,7 +770,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
 
   return (
     <div className="modals-overlay" onClick={onClose}>
-      <div className="modals-container" onClick={e => e.stopPropagation()} style={{ height: '90vh' }}>
+      <div className="modals-container" onClick={e => e.stopPropagation()}>
         <div className="modals-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {step === 'upload' && (
