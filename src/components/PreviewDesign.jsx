@@ -1,6 +1,13 @@
 import { hexToRgba } from "../utils/hexToRgba";
 import img from "../assets/fallback.png";
 
+const TEXT_STYLES = {
+  NONE: 'none',
+  STROKE: 'stroke',
+  SHADOW: 'shadow',
+  COMBINED: 'combined'
+};
+
 export const PreviewDesign = ({ elements, size }) => {
   // Парсим размер из формата "900x1200" - это реальный размер файла
   const [realWidth, realHeight] = size ? size.split('x').map(Number) : [900, 1200];
@@ -27,6 +34,45 @@ export const PreviewDesign = ({ elements, size }) => {
   // Смещения для центрирования
   const offsetX = (previewCardWidth - previewWidth) / 2;
   const offsetY = (previewCardHeight - previewHeight) / 2;
+
+  const getTextStyles = (element) => {
+    const baseStyle = {
+      fontSize: `${(element.fontSize || 24)}px`,
+      fontFamily: element.fontFamily,
+      fontWeight: element.fontWeight,
+      fontStyle: element.fontStyle,
+      color: element.color,
+      textDecoration: element.textDecoration || 'none',
+      textAlign: element.textAlign || 'left',
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'normal',
+      overflow: 'hidden',
+      boxSizing: 'border-box',
+      lineHeight: 1.3,
+    };
+
+    // Применяем стили в зависимости от выбранного типа
+    switch (element.textStyle) {
+      case TEXT_STYLES.STROKE:
+        return {
+          ...baseStyle,
+          WebkitTextStroke: '3px white',
+          textStroke: '3px white',
+        };
+      case TEXT_STYLES.SHADOW:
+        return {
+          ...baseStyle,
+          textShadow: '0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8)'
+        };
+      case TEXT_STYLES.COMBINED:
+        return {
+          ...baseStyle,
+          textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 #666, 1px 1px 0 #666, 0 0 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.5)'
+        };
+      default:
+        return baseStyle;
+    }
+  };
 
   const renderArrow = (element, type) => {
     if (!element.lineEnds || element.lineEnds[type] !== 'arrow') return null;
@@ -157,18 +203,7 @@ export const PreviewDesign = ({ elements, size }) => {
                   key={element.id} 
                   style={{
                     ...style,
-                    fontSize: `${(element.fontSize || 24)}px`,
-                    fontFamily: element.fontFamily,
-                    fontWeight: element.fontWeight,
-                    fontStyle: element.fontStyle,
-                    color: element.color,
-                    textDecoration: element.textDecoration || 'none',
-                    textAlign: element.textAlign || 'left',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'normal',
-                    overflow: 'hidden',
-                    boxSizing: 'border-box',
-                    lineHeight: 1,
+                    ...getTextStyles(element)
                   }}
                 >
                   {element.text.split('\n').map((line, i) => (

@@ -2059,3 +2059,61 @@
 .canvas-size-dropdown {
   max-width: 160px;
 }
+
+/* Стили для кнопок оформления текста */
+.text-style-toggle {
+  display: flex;
+  position: relative;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.text-style-toggle .toggle-option {
+  padding: 8px 6px;
+  width: 25%;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.text-style-toggle .toggle-option.active {
+  color: white;
+}
+
+.text-style-toggle .active-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 25%;
+  background: #007bff;
+  border-radius: 3px;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 0;
+}
+
+/* Позиции индикатора для 4 кнопок */
+.text-style-toggle .active-indicator[data-active-option="none"] {
+  transform: translateX(0%);
+}
+
+.text-style-toggle .active-indicator[data-active-option="stroke"] {
+  transform: translateX(100%);
+}
+
+.text-style-toggle .active-indicator[data-active-option="shadow"] {
+  transform: translateX(200%);
+}
+
+.text-style-toggle .active-indicator[data-active-option="combined"] {
+  transform: translateX(300%);
+}

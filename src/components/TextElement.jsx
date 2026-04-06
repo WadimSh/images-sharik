@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import DraggableElement from './DraggableElement';
 
+const TEXT_STYLES = {
+  STROKE: 'stroke',     // Контур
+  SHADOW: 'shadow',     // Тень
+  COMBINED: 'combined'  // Комбинированный
+};
+
 export const TextElement = ({ 
   contextMenuRef,
   element, // Теперь получаем весь объект элемента
@@ -25,8 +31,9 @@ export const TextElement = ({
   const [editedText, setEditedText] = useState(element.text);
   const inputRef = useRef(null);
   const textContainerRef = useRef(null);
-  
-  const textStyle = {
+
+const getTextStyles = () => {
+  const baseStyle = {
     position: 'relative',
     paddingLeft: '2px',
     color: element.color || '#333',
@@ -36,17 +43,37 @@ export const TextElement = ({
     fontStyle: element.fontStyle || 'normal',
     textDecoration: element.textDecoration || 'none',
     textAlign: element.textAlign || 'left',
-    lineHeight: element.fontFamily === 'Lemon Tuesday' ? 1.8 : 1.1,
+    lineHeight: element.fontFamily === 'Lemon Tuesday' ? 1.8 : 1.3,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
     overflow: 'hidden',
     width: '100%',
     height: '100%',
-    // display: 'flex',
-    // alignItems: element.textAlign?.vertical || 'flex-start',
-    // justifyContent: element.textAlign?.horizontal || 'left',
   };
 
+  // Применяем стили в зависимости от выбранного типа
+  switch (element.textStyle) {
+    case TEXT_STYLES.STROKE:
+      return {
+        ...baseStyle,
+        WebkitTextStroke: '3px white',
+        textStroke: '3px white',
+      };
+    case TEXT_STYLES.SHADOW:
+      return {
+        ...baseStyle,
+        textShadow: '0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.8)'
+      };
+    case TEXT_STYLES.COMBINED:
+      return {
+        ...baseStyle,
+        textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 #666, 1px 1px 0 #666, 0 0 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.5)'
+      };
+    default:
+      return baseStyle; // Обычный текст без оформления
+  }
+};
+  
   const handleResize = (newSize) => {
     onResize({
       width: newSize.width,
@@ -118,18 +145,11 @@ export const TextElement = ({
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
             className='text-input'
-            style={{
-              ...textStyle,
-              width: '100%',
-              height: '100%',
-              resize: 'none',
-              border: 'none',
-              outline: 'none',
-            }}
+            style={getTextStyles()}
           />
         ) : (
           <div
-            style={textStyle}
+            style={getTextStyles()}
             dangerouslySetInnerHTML={{ __html: editedText.replace(/\n/g, '<br/>') }}
           />
         )}
@@ -137,3 +157,25 @@ export const TextElement = ({
     </DraggableElement>
   );
 };
+
+// контур
+// .thick-stroke {
+//   -webkit-text-stroke: 3px white;
+//   text-stroke: 3px white;
+// }
+
+// тень
+// text-shadow: 
+//  0 0 4px rgba(0, 0, 0, 0.8),
+//  0 0 4px rgba(0, 0, 0, 0.8),
+//  0 0 4px rgba(0, 0, 0, 0.8),
+//  0 0 4px rgba(0, 0, 0, 0.8);
+
+// комбинированная
+// text-shadow: 
+//  -1px -1px 0 white,
+//  1px -1px 0 white,
+//  -1px 1px 0 #666,
+//  1px 1px 0 #666,
+//  0 0 4px rgba(0, 0, 0, 0.8),
+//  0 0 8px rgba(0, 0, 0, 0.5);

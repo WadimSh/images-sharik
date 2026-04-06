@@ -21,60 +21,10 @@ import { BRAND_GRADIENT } from '../constants/brandGradient';
 import { BRAND_IMAGES } from '../constants/brandImages';
 import { BRAND_FONTS } from '../constants/brandFonts';
 
-const fontOptions = {
-  'GemarFont': 'GemarFont',
-  'HeliosCond': 'HeliosCond',
-  'BelbalFont': 'BelbalFont',
-  'BelbalFontRegul': 'BelbalFontRegul',
-  'FreeSetRegular': 'FreeSetRegular',
-  'FreeSetBold': 'FreeSetBold',
-  'MyriadPro': 'MyriadPro',
-  'RF_Krabuler': 'RF Krabuler',
-  'Bosk': 'Bosk',
-  'Troubleside': 'Troubleside',
-  'Badaboom': 'Badaboom',
-  'FuturaRound': 'FuturaRound',
-  'FuturaRoundDemi': 'FuturaRoundDemi',
-  'RoslinGothic_DG': 'RoslinGothic 👻',
-  'Alterna Nr': 'Alterna Nr 👻',
-  'Jolly Lodger': 'Jolly Lodger 👻',
-  'Swampy': 'Swampy 👻',
-  'Magnolia-Script': 'Magnolia 🌷',
-  'Lemon Tuesday': 'Lemon 🌷',
-  'UniNeueLight': 'Uni Neue 🌷',
-  'UniNeueHeavy-Italic': 'Uni Neue Heavy 🌷',
-  'NautilusPompilius': 'Nautilus 🌷',
-  'Cartonsix NC': 'Cartonsix 🎄',
-  'Ice Kingdom': 'Ice Kingdom ⛄🎄',
-  'Comic CAT': 'Comic 🎄❤️',
-  'Pribambas': 'Pribambas 🎄🌷',
-  'VividSans': 'VividSans 🎄',
-  'Zametka': 'Zametka 🎄',
-  'Kosko': 'Kosko ❤️',
-  'Bebas Neue Cyrillic': 'Bebas Neue ⚔️',
-  'ft83': 'Русский стиль 🪆',
-  'Sunday': 'Русский стиль 2🪆',
-  'HeliosCondBlack': 'Helios Cond Black 🎈',
-  'Arial': 'Arial',
-  'Times New Roman': 'Times New Roman',
-  'Verdana': 'Verdana',
-  'Georgia': 'Georgia',
-  'Courier New': 'Courier New',
-  'Calibri': 'Calibri',
-  'Tahoma': 'Tahoma',
-  'Impact': 'Impact',
-  'Comic Sans MS': 'Comic Sans MS',
-  'Lucida Sans': 'Lucida Sans',
-  'Segoe UI': 'Segoe UI',
-  'Cambria': 'Cambria',
-  'Garamond': 'Garamond',
-  'Franklin Gothic': 'Franklin Gothic',
-  'Consolas': 'Consolas',
-  'Palatino Linotype': 'Palatino Linotype',
-  'Trebuchet MS': 'Trebuchet MS',
-  'Book Antiqua': 'Book Antiqua',
-  'Century Gothic': 'Century Gothic',
-  'Candara': 'Candara'
+const TEXT_STYLES = {
+  STROKE: 'stroke',     // Контур
+  SHADOW: 'shadow',     // Тень
+  COMBINED: 'combined'  // Комбинированный
 };
 
 export const ElementsList = ({
@@ -1288,6 +1238,49 @@ export const ElementsList = ({
                       </div>
                     </div>
                   )}
+
+{element.type === 'text' && (
+  <div className="element-controls line" style={{ marginBottom: '0px' }}>
+    <span>Оформление заголовка</span>
+
+    <div className="style-controls-wrapper">
+      <div className="toggle-group text-style-toggle">
+        <button
+          className={`toggle-option ${(!element.textStyle || element.textStyle === 'none') ? 'active' : ''}`}
+          onClick={() => handleFontChange(element.id, 'textStyle', null)}
+        >
+          Обычный
+        </button>
+        <button
+          className={`toggle-option ${element.textStyle === TEXT_STYLES.STROKE ? 'active' : ''}`}
+          onClick={() => handleFontChange(element.id, 'textStyle', TEXT_STYLES.STROKE)}
+        >
+          Контур
+        </button>
+        <button
+          className={`toggle-option ${element.textStyle === TEXT_STYLES.SHADOW ? 'active' : ''}`}
+          onClick={() => handleFontChange(element.id, 'textStyle', TEXT_STYLES.SHADOW)}
+        >
+          Тень
+        </button>
+        <button
+          className={`toggle-option ${element.textStyle === TEXT_STYLES.COMBINED ? 'active' : ''}`}
+          onClick={() => handleFontChange(element.id, 'textStyle', TEXT_STYLES.COMBINED)}
+        >
+          Комбо
+        </button>
+        <div 
+          className="active-indicator" 
+          data-active-option={
+            !element.textStyle || element.textStyle === 'none' 
+              ? 'none' 
+              : element.textStyle
+          }
+        />
+      </div>
+    </div>
+  </div>
+)}
 
                   {element.type === 'text' && (
                     <div className="element-controls line">
