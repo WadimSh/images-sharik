@@ -71,7 +71,7 @@ export const ImageDigitalizationModal = ({
   onEditorClose
 }) => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();  
+  const { isAdmin, isAuthenticated } = useAuth();  
 
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
   const [currentImageData, setCurrentImageData] = useState(imageData);
@@ -238,8 +238,12 @@ export const ImageDigitalizationModal = ({
   const handleRemoveTag = async (tagToRemove, e) => {
     e.stopPropagation();
     
-    if (PROTECTED_TAGS.includes(tagToRemove)) {
-      alert(`Тег "${tagToRemove}" является системным и не может быть удален`);
+    if (!canDeleteTag(tagToRemove)) {
+      if (isAdmin) {
+        console.warn('Админ не может удалить тег? Проверьте логику');
+      } else {
+        alert(`Тег "${tagToRemove}" является системным и не может быть удален`);
+      }
       return;
     }
     
@@ -311,6 +315,11 @@ export const ImageDigitalizationModal = ({
 
   // Проверка, можно ли удалять тег
   const canDeleteTag = (tag) => {
+    // Админ может удалять любые теги
+    if (isAdmin) {
+      return true;
+    }
+    // Для обычных пользователей - только незащищенные теги
     return !PROTECTED_TAGS.includes(tag);
   };
 

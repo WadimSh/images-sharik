@@ -1,7 +1,10 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { LuImagePlus } from "react-icons/lu";
 import { FiArrowLeft } from 'react-icons/fi';
 import { IoMdImages } from "react-icons/io";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
+import { FaTimes } from "react-icons/fa";
+import { PiCirclesThreePlusLight } from "react-icons/pi";
 
 import { TagsFilterComponent } from "../TagsFilterComponent/TagsFilterComponent";
 import { useAuth } from "../../contexts/AuthContext"; 
@@ -10,6 +13,35 @@ import { LanguageContext } from "../../contexts/contextLanguage";
 import Pagination from "../../ui/Pagination/Pagination";
 import { PREDEFINED_TAGS } from "../../constants/tags";
 import './LibraryMediaModal.css';
+
+// Функция для получения цвета тега
+const getTagColor = (tag) => {
+  const predefinedTag = PREDEFINED_TAGS.find(t => t.name === tag);
+  if (predefinedTag) {
+    return predefinedTag.color;
+  }
+  
+  if (tag === "нет кода") {
+    return 'rgb(244, 67, 54)';
+  }
+  
+  const colors = [
+    'rgb(126, 171, 245)',
+    'rgb(80, 197, 111)',
+    'rgb(255, 208, 67)',
+    'rgb(229, 109, 173)',
+    'rgb(29, 183, 168)',
+    'rgb(255, 171, 45)',
+    'rgb(202, 106, 254)',
+    'rgb(222, 133, 93)',
+  ];
+  
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
 
 export const transliterateText = (text) => {
   const translitMap = {
@@ -68,7 +100,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(21);
+  const [itemsPerPage, setItemsPerPage] = useState(96);
   const [totalCount, setTotalCount] = useState(0);
 
   const [selectedFilterTags, setSelectedFilterTags] = useState([]);
@@ -79,6 +111,11 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [customTag, setCustomTag] = useState('');
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+
+  // Состояния для режима просмотра
+  const [viewMode, setViewMode] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [tagColors, setTagColors] = useState({});
 
   const handleFilterTagToggle = (tag) => {
     setSelectedFilterTags(prev => {
@@ -94,10 +131,21 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     setSelectedFilterTags([]);
   };
 
+  // Функция для проверки, является ли тег артикулом
+  const isArticleTag = (tag) => {
+    return /^\d{4}-\d{4}$/.test(tag);
+  };
+
+  // Функция фильтрации тегов для отображения (без артикулов)
+  const getVisibleTags = (tags) => {
+    if (!tags || tags.length === 0) return [];
+    return tags.filter(tag => tag && !isArticleTag(tag));
+  };
+
   useEffect(() => {
     if (!isOpen) return;
     
-    if (step === 'library') {
+    if (step === 'library' && !viewMode) {
       const controller = new AbortController();
       let timeoutId;
 
@@ -138,7 +186,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
         clearTimeout(timeoutId);
       };
     }
-  }, [isOpen, currentPage, itemsPerPage, step, selectedFilterTags]);
+  }, [isOpen, currentPage, itemsPerPage, step, selectedFilterTags, viewMode]);
 
   // Создаем превью изображения
   useEffect(() => {
@@ -159,6 +207,23 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
       reader.readAsDataURL(selectedFile);
     }
   }, [selectedFile, step]);
+
+  // Обновление цветов тегов при изменении выбранного изображения
+  useEffect(() => {
+    if (viewMode && images[selectedImageIndex]) {
+      updateTagColors(images[selectedImageIndex].tags || []);
+    }
+  }, [viewMode, selectedImageIndex, images]);
+
+  const updateTagColors = (tags) => {
+    if (tags && Array.isArray(tags)) {
+      const colors = {};
+      tags.forEach(tag => {
+        colors[tag] = getTagColor(tag);
+      });
+      setTagColors(colors);
+    }
+  };
 
   const getFullImageUrl = (thumbnailUrl) => {
     const baseUrl = 'https://mp.sharik.ru';
@@ -213,7 +278,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
       };
   
       setElements(prev => [...prev, newElement]);
-      onClose();
+      handleCloseViewMode();
     } catch (error) {
       console.error('Error loading image:', error);
       alert('Couldn`t upload image');
@@ -252,6 +317,82 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     
     input.click();
   };
+
+  // Открытие режима просмотра
+  const handleImageClickView = (index) => {
+    setSelectedImageIndex(index);
+    setViewMode(true);
+    updateTagColors(images[index].tags || []);
+  };
+
+  // Закрытие режима просмотра
+  const handleCloseViewMode = () => {
+    setViewMode(false);
+  };
+
+  // Применение выбранного изображения
+  const handleApplyImage = async () => {
+    const selectedImage = images[selectedImageIndex];
+    const imageUrl = getFullImageUrl(selectedImage.url);
+    await handleSelectImage(imageUrl);
+  };
+
+  // Обработчик клика по тегу в режиме просмотра
+  const handleTagClick = (tag) => {
+    // Закрываем режим просмотра
+    setViewMode(false);
+    // Добавляем тег в фильтры и сбрасываем страницу
+    setSelectedFilterTags(prev => {
+      if (!prev.includes(tag)) {
+        return [...prev, tag];
+      }
+      return prev;
+    });
+    setCurrentPage(1);
+  };
+
+  // Удаление фильтра
+  const removeFilter = (tagToRemove) => {
+    setSelectedFilterTags(prev => prev.filter(t => t !== tagToRemove));
+    setCurrentPage(1);
+  };
+
+  // Навигация в режиме просмотра
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    if (images.length === 0) return;
+    
+    const newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1;
+    setSelectedImageIndex(newIndex);
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    if (images.length === 0) return;
+    
+    const newIndex = selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0;
+    setSelectedImageIndex(newIndex);
+  };
+
+  // Клавиатурная навигация
+  useEffect(() => {
+    if (!viewMode) return;
+    
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        handlePrevImage(e);
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage(e);
+      } else if (e.key === 'Escape') {
+        handleCloseViewMode();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [viewMode, selectedImageIndex, images]);
 
   // Извлечение ВСЕХ артикулов из имени файла
   const extractArticleCodesFromFileName = (fileName) => {
@@ -298,7 +439,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     }
   };
 
-   const handleAddCustomTag = () => {
+  const handleAddCustomTag = () => {
     let trimmedTag = customTag.trim();
     if (trimmedTag) {
       if (validateArticle(trimmedTag)) {
@@ -313,7 +454,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     }
   };
 
-  const handleRemoveTag = (tagToRemove) => {
+  const handleRemoveCustomTag = (tagToRemove) => {
     setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
   };
 
@@ -375,176 +516,169 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
 
   // Функция для загрузки изображения на сервер
   const handleUploadImage = async () => {
-  try {
-    if (!selectedFile || !user || !user.company || user.company.length === 0) {
-      alert('Ошибка: нет данных пользователя или компании');
-      return;
-    }
-    
-    // Проверяем, что выбран хотя бы один не-артикульный тег
-    if (!canUpload()) {
-      alert('Пожалуйста, выберите хотя бы один тег (не артикул)');
-      return;
-    }
-    
-    setIsUploading(true);
-    
-    // 🔥 КОНВЕРТИРУЕМ В WEBP
-    let processedFile;
-    const finalFileName = generateFileName().replace(/\.(png|jpg|jpeg)$/i, '.webp');
-    
-    // Если файл уже WEBP, используем как есть
-    if (selectedFile.type === 'image/webp') {
-      const blob = new Blob([selectedFile], { type: 'image/webp' });
-      processedFile = new File([blob], finalFileName, {
-        type: 'image/webp',
-        lastModified: selectedFile.lastModified
-      });
-    } else {
-      // Конвертируем в WEBP
-      try {
-        // Создаем Image элемент для загрузки исходного файла
-        const img = new Image();
-        const imageUrl = URL.createObjectURL(selectedFile);
-        
-        const webpBlob = await new Promise((resolve, reject) => {
-          img.onload = () => {
-            // Создаем canvas с размерами изображения
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            
-            // Рисуем изображение на canvas
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            
-            // Конвертируем в WEBP с качеством 0.92
-            canvas.toBlob(
-              (blob) => {
-                if (blob) {
-                  resolve(blob);
-                } else {
-                  reject(new Error('Не удалось конвертировать изображение в WEBP'));
-                }
-              },
-              'image/webp',
-              0.92
-            );
-          };
-          
-          img.onerror = () => {
-            reject(new Error('Не удалось загрузить изображение для конвертации'));
-          };
-          
-          img.src = imageUrl;
-        });
-        
-        // Создаем File объект из WEBP blob
-        processedFile = new File([webpBlob], finalFileName, {
+    try {
+      if (!selectedFile || !user || !user.company || user.company.length === 0) {
+        alert('Ошибка: нет данных пользователя или компании');
+        return;
+      }
+      
+      // Проверяем, что выбран хотя бы один не-артикульный тег
+      if (!canUpload()) {
+        alert('Пожалуйста, выберите хотя бы один тег (не артикул)');
+        return;
+      }
+      
+      setIsUploading(true);
+      
+      // КОНВЕРТИРУЕМ В WEBP
+      let processedFile;
+      const finalFileName = generateFileName().replace(/\.(png|jpg|jpeg)$/i, '.webp');
+      
+      // Если файл уже WEBP, используем как есть
+      if (selectedFile.type === 'image/webp') {
+        const blob = new Blob([selectedFile], { type: 'image/webp' });
+        processedFile = new File([blob], finalFileName, {
           type: 'image/webp',
           lastModified: selectedFile.lastModified
         });
-        
-        // Очищаем временный URL
-        URL.revokeObjectURL(imageUrl);
-        
-      } catch (conversionError) {
-        console.warn('Ошибка конвертации в WEBP, используем исходный файл:', conversionError);
-        
-        // Если конвертация не удалась, используем исходный файл
-        const blob = new Blob([selectedFile], { type: selectedFile.type });
-        processedFile = new File([blob], finalFileName, {
-          type: selectedFile.type,
-          lastModified: selectedFile.lastModified
-        });
+      } else {
+        // Конвертируем в WEBP
+        try {
+          const img = new Image();
+          const imageUrl = URL.createObjectURL(selectedFile);
+          
+          const webpBlob = await new Promise((resolve, reject) => {
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+              
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+              
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    resolve(blob);
+                  } else {
+                    reject(new Error('Не удалось конвертировать изображение в WEBP'));
+                  }
+                },
+                'image/webp',
+                0.92
+              );
+            };
+            
+            img.onerror = () => {
+              reject(new Error('Не удалось загрузить изображение для конвертации'));
+            };
+            
+            img.src = imageUrl;
+          });
+          
+          processedFile = new File([webpBlob], finalFileName, {
+            type: 'image/webp',
+            lastModified: selectedFile.lastModified
+          });
+          
+          URL.revokeObjectURL(imageUrl);
+          
+        } catch (conversionError) {
+          console.warn('Ошибка конвертации в WEBP, используем исходный файл:', conversionError);
+          
+          const blob = new Blob([selectedFile], { type: selectedFile.type });
+          processedFile = new File([blob], finalFileName, {
+            type: selectedFile.type,
+            lastModified: selectedFile.lastModified
+          });
+        }
       }
-    }
-    
-    // Извлекаем артикулы из имени файла
-    const extractedArticles = extractArticleCodesFromFileName(originalFileName);
-    
-    // Если нет артикулов в имени файла, добавляем 9999-9999
-    const articleTags = extractedArticles.length > 0 
-      ? extractedArticles 
-      : ['9999-9999'];
-    
-    // Объединяем все теги: артикулы (из имени или 9999-9999) + выбранные пользователем теги
-    const allTags = [...articleTags, ...selectedTags];
-          
-    const companyId = user.company[0].id;
-    const uploadResult = await uploadGraphicFile(
-      companyId,
-      processedFile,
-      null,
-      allTags 
-    );
-    
-    if (!uploadResult || !uploadResult.success) {
-      throw new Error(uploadResult?.message || 'Не удалось загрузить файл на сервер');
-    }
-    
-    const uploadedFile = uploadResult.data || uploadResult.file;
-    
-    if (!uploadedFile) {
-      throw new Error('Нет данных о загруженном файле в ответе сервера');
-    }
-    
-    const imageUrl = uploadedFile.url || uploadedFile.fileUrl;
-          
-    if (!imageUrl) {
-      throw new Error('Нет URL изображения в ответе сервера');
-    }
-    
-    const fullImageUrl = getFullImageUrl(imageUrl);
-          
-    const img = new Image();
-    img.src = fullImageUrl;
-    
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-    });
+      
+      // Извлекаем артикулы из имени файла
+      const extractedArticles = extractArticleCodesFromFileName(originalFileName);
+      
+      // Если нет артикулов в имени файла, добавляем 9999-9999
+      const articleTags = extractedArticles.length > 0 
+        ? extractedArticles 
+        : ['9999-9999'];
+      
+      // Объединяем все теги: артикулы (из имени или 9999-9999) + выбранные пользователем теги
+      const allTags = [...articleTags, ...selectedTags];
+            
+      const companyId = user.company[0].id;
+      const uploadResult = await uploadGraphicFile(
+        companyId,
+        processedFile,
+        null,
+        allTags 
+      );
+      
+      if (!uploadResult || !uploadResult.success) {
+        throw new Error(uploadResult?.message || 'Не удалось загрузить файл на сервер');
+      }
+      
+      const uploadedFile = uploadResult.data || uploadResult.file;
+      
+      if (!uploadedFile) {
+        throw new Error('Нет данных о загруженном файле в ответе сервера');
+      }
+      
+      const imageUrl = uploadedFile.url || uploadedFile.fileUrl;
+            
+      if (!imageUrl) {
+        throw new Error('Нет URL изображения в ответе сервера');
+      }
+      
+      const fullImageUrl = getFullImageUrl(imageUrl);
+            
+      const img = new Image();
+      img.src = fullImageUrl;
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
 
-    const containerWidth = 450;
-    const containerHeight = 600;
-    
-    const scale = Math.min(
-      containerWidth / img.naturalWidth,
-      containerHeight / img.naturalHeight,
-      1
-    );
-    
-    const newWidth = img.naturalWidth * scale;
-    const newHeight = img.naturalHeight * scale;
-    
-    const position = {
-      x: (containerWidth - newWidth) / 2,
-      y: (containerHeight - newHeight) / 2
-    };
+      const containerWidth = 450;
+      const containerHeight = 600;
+      
+      const scale = Math.min(
+        containerWidth / img.naturalWidth,
+        containerHeight / img.naturalHeight,
+        1
+      );
+      
+      const newWidth = img.naturalWidth * scale;
+      const newHeight = img.naturalHeight * scale;
+      
+      const position = {
+        x: (containerWidth - newWidth) / 2,
+        y: (containerHeight - newHeight) / 2
+      };
 
-    const newElement = {
-      id: generateUniqueId(),
-      type: 'image',
-      position,
-      image: fullImageUrl,
-      width: newWidth,
-      height: newHeight,
-      originalWidth: img.naturalWidth,
-      originalHeight: img.naturalHeight,
-      isFlipped: false,
-      rotation: 0        
-    };
-    
-    setElements(prev => [...prev, newElement]);
-    onClose();
-    
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    alert('Ошибка при загрузке изображения на сервер: ' + (error.message || 'Неизвестная ошибка'));
-  } finally {
-    setIsUploading(false);
-  }
-};
+      const newElement = {
+        id: generateUniqueId(),
+        type: 'image',
+        position,
+        image: fullImageUrl,
+        width: newWidth,
+        height: newHeight,
+        originalWidth: img.naturalWidth,
+        originalHeight: img.naturalHeight,
+        isFlipped: false,
+        rotation: 0        
+      };
+      
+      setElements(prev => [...prev, newElement]);
+      onClose();
+      
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Ошибка при загрузке изображения на сервер: ' + (error.message || 'Неизвестная ошибка'));
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleBackToLibrary = () => {
     setStep('library');
@@ -553,6 +687,92 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     setSelectedTags([]);
     setCustomTag('');
   };
+
+  // Режим просмотра изображения
+  if (viewMode && images[selectedImageIndex]) {
+    const currentImage = images[selectedImageIndex];
+    const fullImageUrl = getFullImageUrl(currentImage.url);
+    const visibleTags = getVisibleTags(currentImage.tags || []);
+
+    return (
+      <div className="modals-overlay" onClick={handleCloseViewMode}>
+        <div className="view-mode-container" onClick={e => e.stopPropagation()}>
+          <div className="view-mode-header">
+            <div className="view-mode-header-left">
+              <button onClick={handleCloseViewMode} className="back-btn">
+                <FiArrowLeft />
+              </button>
+              <h3 className="view-mode-title">{currentImage.fileName}</h3>
+            </div>
+            <div className="view-mode-header-right">
+              <button onClick={handleApplyImage} className="apply-bttn">
+                <PiCirclesThreePlusLight size={20} />
+                Применить изображение
+              </button>
+              <button onClick={handleCloseViewMode} className="close-btn">&times;</button>
+            </div>
+          </div>
+
+          <div className="view-mode-body">
+            <div className="view-mode-image-container">
+              <img
+                src={fullImageUrl}
+                alt={currentImage.fileName}
+                className="view-mode-image"
+              />
+              
+              {/* Теги поверх изображения */}
+              {visibleTags.length > 0 && (
+                <div className="image-tags-overlay">
+                  <div className="tags-container-overlay">
+                    {visibleTags.map((tag, index) => (
+                      <div key={index} className="tag-overlay-wrapper">
+                        <span 
+                          className="tags-overlay tag-clickable"
+                          style={{
+                            backgroundColor: tagColors[tag],
+                            zIndex: visibleTags.length - index,
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => handleTagClick(tag)}
+                        >
+                          {tag}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Кнопки навигации */}
+          {images.length > 1 && (
+            <>
+              <button 
+                className="view-mode-nav-btn view-mode-nav-prev"
+                onClick={handlePrevImage}
+              >
+                <HiOutlineChevronLeft size={32} />
+              </button>
+              
+              <button 
+                className="view-mode-nav-btn view-mode-nav-next"
+                onClick={handleNextImage}
+              >
+                <HiOutlineChevronRight size={32} />
+              </button>
+            </>
+          )}
+
+          {/* Счетчик изображений */}
+          <div className="view-mode-counter">
+            {selectedImageIndex + 1} / {images.length}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Рендер контента
   const renderContent = () => {
@@ -657,7 +877,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
                           <span className="selected-tag-text">{tag}</span>
                           <button
                             type="button"
-                            onClick={() => handleRemoveTag(tag)}
+                            onClick={() => handleRemoveCustomTag(tag)}
                             className="selected-tag-remove"
                           >
                             ×
@@ -683,7 +903,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     // Шаг библиотеки
     return (
       <>
-        <div className="main-categories">
+        <div className="main-categories" style={{ padding: '10px 14px' }}>
           <TagsFilterComponent 
             selectedFilterTags={selectedFilterTags}
             onTagToggle={handleFilterTagToggle}
@@ -697,63 +917,96 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
           </button>
         </div>
 
-<div className="modals-content">
-  <div className="images-grids">
-    {isLoading ? (
-      [...Array(24)].map((_, index) => (
-        <div key={index} className="skeleton-item" />
-      ))
-    ) : images.length === 0 ? (
-      <div className="no-images-found">
-        <div className="no-images-icon">
-          <IoMdImages size={74}/>
-        </div>
-        <div className="no-images-title">Ничего не найдено</div>
-        <div className="no-images-text">
-          {selectedFilterTags.length > 0 
-            ? 'По выбранным фильтрам изображений нет. Попробуйте изменить критерии поиска.'
-            : 'В библиотеке пока нет изображений. Нажмите "Загрузить изображение", чтобы добавить первое фото.'}
-        </div>
+        {/* Индикатор активных фильтров */}
         {selectedFilterTags.length > 0 && (
-          <button 
-            className="clear-filters-btn-large"
-            onClick={() => {
-              handleClearAllFilters();
-              setCurrentPage(1);
-            }}
-          >
-            ✕ Очистить фильтры
-          </button>
-        )}
-      </div>
-    ) : (
-      images.map((image) => (
-        <div 
-          key={image._id} 
-          className="images_card"
-          onClick={() => handleSelectImage(getFullImageUrl(image.url))}
-        >
-          <div className="images-container">
-            <img
-              src={getFullImageUrl(image.thumbnailUrl)}
-              alt={image.fileName}
-              loading="lazy"
-              className="image-thumbnail"
-              onError={(e) => {
-                e.target.src = getFullImageUrl(image.url);
-              }}
-            />
-          </div>
-          <div className="image-info-overlay">
-            <div className="image-filename" title={image.fileName}>
-              {image.fileName}
+          <div className="active-filters-bar">
+            <span className="active-filter-label">Активные фильтры:</span>
+            <div className="active-filters-list">
+              {selectedFilterTags.map(tag => (
+                <span key={tag} className="filter-tag">
+                  {tag}
+                  <button onClick={() => removeFilter(tag)}>
+                    <FaTimes size={12} />
+                  </button>
+                </span>
+              ))}
+              {selectedFilterTags.length > 0 && (
+                  <button 
+                    className="filter-tag"
+                    onClick={() => {
+                      handleClearAllFilters();
+                      setCurrentPage(1);
+                    }}
+                  >
+                    Очистить фильтры
+                  </button>
+                )}
             </div>
           </div>
+        )}
+
+        <div className="modals-content">
+          <div className="images-grids">
+            {isLoading ? (
+              [...Array(24)].map((_, index) => (
+                <div key={index} className="skeleton-item" />
+              ))
+            ) : images.length === 0 ? (
+              <div className="no-images-found">
+                <div className="no-images-icon">
+                  <IoMdImages size={74}/>
+                </div>
+                <div className="no-images-title">Ничего не найдено</div>
+                <div className="no-images-text">
+                  {selectedFilterTags.length > 0 
+                    ? 'По выбранным фильтрам изображений нет. Попробуйте изменить критерии поиска.'
+                    : 'В библиотеке пока нет изображений. Нажмите "Загрузить изображение", чтобы добавить первое фото.'}
+                </div>
+                {selectedFilterTags.length > 0 && (
+                  <button 
+                    className="clear-filters-btn-large"
+                    onClick={() => {
+                      handleClearAllFilters();
+                      setCurrentPage(1);
+                    }}
+                  >
+                    ✕ Очистить фильтры
+                  </button>
+                )}
+              </div>
+            ) : (
+              images.map((image, index) => (
+                <div 
+                  key={image._id} 
+                  className="images_card"
+                  onClick={() => handleImageClickView(index)}
+                >
+                  <div className="images-container">
+                    <img
+                      src={getFullImageUrl(image.thumbnailUrl)}
+                      alt={image.fileName}
+                      loading="lazy"
+                      className="image-thumbnail"
+                      onError={(e) => {
+                        e.target.src = getFullImageUrl(image.url);
+                      }}
+                    />
+                  </div>
+                  <div className="image-info-overlay">
+                    <div className="image-filename" title={image.fileName}>
+                      {image.fileName}
+                    </div>
+                    {getVisibleTags(image.tags).length > 0 && (
+                      <div className="image-tags" title={getVisibleTags(image.tags).join(' • ')}>
+                        {getVisibleTags(image.tags).join(' • ')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      ))
-    )}
-  </div>
-</div>
 
         <div className="modals-footer">
           <Pagination
@@ -770,15 +1023,15 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
 
   return (
     <div className="modals-overlay" onClick={onClose}>
-      <div className="modals-container" onClick={e => e.stopPropagation()}>
-        <div className="modals-header">
+      <div className="modals-container" onClick={e => e.stopPropagation()} style={{ height: '90vh' }}>
+        <div className="modals-header" style={{padding: '10px 14px'}}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {step === 'upload' && (
               <button onClick={handleBackToLibrary} className="back-btn">
                 <FiArrowLeft />
               </button>
             )}
-            <h2>
+            <h2 style={{ fontSize: '1.3rem' }}>
               {step === 'library' ? 'Выберите изображение' : 'Добавьте теги к изображению'}
             </h2>
           </div>
