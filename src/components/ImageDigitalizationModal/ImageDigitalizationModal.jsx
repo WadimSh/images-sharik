@@ -89,6 +89,8 @@ export const ImageDigitalizationModal = ({
   useEffect(() => {
     if (isOpen) {
       const handleEscKey = (e) => {
+        if (showEditor) return;
+
         if (e.key === 'Escape') {
           onClose();
         }
@@ -100,7 +102,7 @@ export const ImageDigitalizationModal = ({
         document.removeEventListener('keydown', handleEscKey);
       };
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, showEditor]);
 
   // Закрытие поповера при клике вне его
   useEffect(() => {

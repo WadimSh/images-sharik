@@ -2159,6 +2159,51 @@ const redo = () => {
     }
   };
 
+  useEffect(() => {
+  if (!isOpen) return;
+
+  const handleKeyboard = (e) => {
+    const target = e.target;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+
+    // Ctrl/Cmd + Z - отмена
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'я')) {
+      e.preventDefault();
+      undo();
+    }
+    // Ctrl/Cmd + Y - повтор
+    else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'н')) {
+      e.preventDefault();
+      redo();
+    }
+    // Ctrl/Cmd + 0 - сброс зума
+    else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+      e.preventDefault();
+      fitToContainer();
+    }
+    // Ctrl/Cmd + Plus - увеличение
+    else if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')) {
+      e.preventDefault();
+      setZoom(prev => Math.min(50, prev + 0.05));
+    }
+    // Ctrl/Cmd + Minus - уменьшение
+    else if ((e.ctrlKey || e.metaKey) && (e.key === '-' || e.key === '_')) {
+      e.preventDefault();
+      setZoom(prev => Math.max(0.1, prev - 0.05));
+    }
+    // Escape - СБРОС ВСЕХ ИЗМЕНЕНИЙ (истории)
+    else if (e.key === 'Escape') {
+      e.preventDefault();
+      reset(); 
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyboard);
+  return () => window.removeEventListener('keydown', handleKeyboard);
+}, [isOpen, undo, redo, fitToContainer, zoom, reset]);
+
   if (!isOpen || !mounted) return null;
 
   return createPortal(
@@ -2169,7 +2214,7 @@ const redo = () => {
             <div className={styles.editorHeaderLeft}>
               <button
                 className={styles.zoomButton}
-                onClick={() => setZoom(Math.min(50, zoom + 0.1))}
+                onClick={() => setZoom(Math.min(50, zoom + 0.05))}
                 disabled={zoom >= 50}
               >
                 <FiZoomIn size={20} />
@@ -2177,7 +2222,7 @@ const redo = () => {
 
               <button
                 className={styles.zoomButton}
-                onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
+                onClick={() => setZoom(Math.max(0.1, zoom - 0.05))}
                 disabled={zoom <= 0.1}
               >
                 <FiZoomOut size={20} />

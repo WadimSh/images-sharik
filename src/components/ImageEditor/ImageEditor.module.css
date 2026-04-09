@@ -1,3 +1,7 @@
+*:focus {
+  outline: none;
+}
+
 .editorOverlay {
   position: fixed;
   top: 0;
