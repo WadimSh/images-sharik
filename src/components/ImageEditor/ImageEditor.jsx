@@ -1740,43 +1740,129 @@ const drawAspectCropOverlay = () => {
 
   // ==================== ОБРАБОТЧИКИ ТАЧА ====================
 
-  const handleCanvasTouchStart = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    if (!touch) return;
+const handleCanvasTouchStart = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touch = e.touches[0];
+  if (!touch) return;
 
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  const x = (touch.clientX - rect.left) * scaleX;
+  const y = (touch.clientY - rect.top) * scaleY;
+
+  if (cropMode) {
     const fakeEvent = {
       clientX: touch.clientX,
       clientY: touch.clientY,
+      stopPropagation: () => {},
     };
-
-    if (cropMode) {
-      handleCropMouseDown(fakeEvent);
-    } else if (aspectCropMode) {
-      handleAspectCropMouseDown(fakeEvent);
-    } else if (lassoMode) {
-      handleCanvasMouseDown(fakeEvent);
-    }
-  };
-
-  const handleCanvasTouchMove = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    if (!touch) return;
-
+    handleCropMouseDown(fakeEvent);
+  } else if (aspectCropMode) {
     const fakeEvent = {
       clientX: touch.clientX,
       clientY: touch.clientY,
+      stopPropagation: () => {},
     };
+    handleAspectCropMouseDown(fakeEvent);
+  } else if (lassoMode) {
+    setIsDrawingLasso(true);
+    setLassoPoints(prev => [...prev, { x, y }]);
+  }
+};
 
-    if (cropMode) {
-      handleCropMouseMove(fakeEvent);
-    } else if (aspectCropMode) {
-      handleAspectCropMouseMove(fakeEvent);
-    } else if (lassoMode) {
-      handleCanvasMouseMove(fakeEvent);
+const handleCanvasTouchMove = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const touch = e.touches[0];
+  if (!touch) return;
+
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  const x = (touch.clientX - rect.left) * scaleX;
+  const y = (touch.clientY - rect.top) * scaleY;
+
+  if (cropMode) {
+    const fakeEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      stopPropagation: () => {},
+    };
+    handleCropMouseMove(fakeEvent);
+  } else if (aspectCropMode) {
+    const fakeEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      stopPropagation: () => {},
+    };
+    handleAspectCropMouseMove(fakeEvent);
+  } else if (lassoMode && isDrawingLasso) {
+    if (image) {
+      drawImageBase(image);
+      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+        drawCropOverlayOnly();
+      }
+      if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+        drawAspectCropOverlay();
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (ctx && lassoPoints.length > 0) {
+        ctx.save();
+
+        if (lassoPoints.length >= 2) {
+          ctx.fillStyle = 'rgba(10, 132, 255, 0.1)';
+          ctx.strokeStyle = '#0a84ff';
+          ctx.lineWidth = 1;
+
+          ctx.beginPath();
+          ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+          for (let i = 1; i < lassoPoints.length; i++) {
+            ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+          }
+          ctx.lineTo(x, y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        lassoPoints.forEach((point) => {
+          ctx.fillStyle = '#0a84ff';
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+
+        if (lassoPoints.length > 0) {
+          ctx.strokeStyle = '#0a84ff';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(lassoPoints[lassoPoints.length - 1].x, lassoPoints[lassoPoints.length - 1].y);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
     }
-  };
+  }
+};
 
   const handleCanvasTouchEnd = (e) => {
     e.preventDefault();
@@ -2816,6 +2902,7 @@ const redo = () => {
 
                 <div className={styles.transformDivider} />
 
+              <div className={styles.cropWrapper}>    
                 <button
                   className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
@@ -2827,6 +2914,15 @@ const redo = () => {
                     <PiMagicWand size={20} />
                   )}
                 </button>
+                {lassoMode && lassoPoints.length >= 3 && (
+                  <button
+                    className={styles.applyCropButton}
+                    onClick={finishLasso}
+                  >
+                    ✓
+                  </button>
+                )}
+              </div>
 
                 <div className={styles.transformDivider} />
 
