@@ -8,7 +8,7 @@ import {
 import { LuUndo2, LuRedo2, LuFlipHorizontal, LuFlipVertical } from "react-icons/lu";
 import { IoContrastOutline } from "react-icons/io5";
 import { RiScissorsCutLine } from "react-icons/ri";
-import { PiMagicWand } from "react-icons/pi";
+import { PiMagicWand, PiLasso } from "react-icons/pi";
 
 import { useAuth } from '../../contexts/AuthContext';
 import { uploadGraphicFile } from '../../services/mediaService';
@@ -39,18 +39,7 @@ const useResponsive = (breakpoint = 1120) => {
 const aspectRatios = [
   { id: 'original', label: 'Оригинал', ratio: null },
   { id: '1:1', label: '1:1 (Квадрат)', ratio: 1 },
-  //{ id: '16:9', label: '16:9 (Широкий)', ratio: 16 / 9 },
-  //{ id: '9:16', label: '9:16 (Вертикальный)', ratio: 9 / 16 },
-  //{ id: '4:5', label: '4:5 (Портрет)', ratio: 4 / 5 },
-  //{ id: '5:4', label: '5:4 (Ландшафт)', ratio: 5 / 4 },
   { id: '3:4', label: '3:4 (Карточка)', ratio: 3 / 4 },
-  //{ id: '4:3', label: '4:3', ratio: 4 / 3 },
-  //{ id: '2:3', label: '2:3', ratio: 2 / 3 },
-  //{ id: '3:2', label: '3:2', ratio: 3 / 2 },
-  //{ id: '5:7', label: '5:7', ratio: 5 / 7 },
-  //{ id: '7:5', label: '7:5', ratio: 7 / 5 },
-  //{ id: '1:2', label: '1:2', ratio: 1 / 2 },
-  //{ id: '2:1', label: '2:1', ratio: 2 / 1 }
 ];
 
 const showUploadNotification = () => {
@@ -114,6 +103,11 @@ const ImageEditor = ({
   const [isResizingAspect, setIsResizingAspect] = useState(false);
   const [resizeCornerAspect, setResizeCornerAspect] = useState(null);
   const [dragStartAspect, setDragStartAspect] = useState({ x: 0, y: 0 });
+  
+  // Состояния для лассо
+  const [lassoMode, setLassoMode] = useState(false);
+  const [lassoPoints, setLassoPoints] = useState([]);
+  const [isDrawingLasso, setIsDrawingLasso] = useState(false);
   
   const [activeFilter, setActiveFilter] = useState('none');
   const [adjustments, setAdjustments] = useState({
@@ -203,6 +197,9 @@ const ImageEditor = ({
     setAspectCropMode(false);
     setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
     setSelectedAspectRatio('original');
+    setLassoMode(false);
+    setLassoPoints([]);
+    setIsDrawingLasso(false);
     setActiveFilter('none');
     setAdjustments({
       brightness: 0,
@@ -421,6 +418,140 @@ const ImageEditor = ({
     ctx.restore();
   };
 
+  // ==================== ФУНКЦИИ ДЛЯ ЛАССО ====================
+  
+  const applyLassoDelete = () => {
+    if (!image || lassoPoints.length < 3) {
+      setLassoMode(false);
+      setLassoPoints([]);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const transformInfo = getImageTransformInfo();
+    if (!transformInfo) return;
+
+    const { imgX, imgY, canvasToOriginalScaleX, canvasToOriginalScaleY } = transformInfo;
+
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
+
+    tempCtx.drawImage(image, 0, 0);
+
+    tempCtx.beginPath();
+    const firstPoint = lassoPoints[0];
+    const startX = (firstPoint.x - imgX) * canvasToOriginalScaleX;
+    const startY = (firstPoint.y - imgY) * canvasToOriginalScaleY;
+    tempCtx.moveTo(startX, startY);
+
+    for (let i = 1; i < lassoPoints.length; i++) {
+      const point = lassoPoints[i];
+      const x = (point.x - imgX) * canvasToOriginalScaleX;
+      const y = (point.y - imgY) * canvasToOriginalScaleY;
+      tempCtx.lineTo(x, y);
+    }
+    tempCtx.closePath();
+    tempCtx.clip();
+
+    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    const newImage = new Image();
+    newImage.onload = () => {
+      setImage(newImage);
+      setLassoMode(false);
+      setLassoPoints([]);
+      setPanOffset({ x: 0, y: 0 });
+
+      const container = containerRef.current;
+      if (container) {
+        const fitZoom = calculateFitZoom(
+          newImage.width, newImage.height,
+          container.clientWidth, container.clientHeight
+        );
+        setBaseZoom(fitZoom);
+        setZoom(fitZoom);
+
+        setTimeout(() => {
+          if (canvasRef.current && newImage) {
+            drawImageBase(newImage);
+            requestAnimationFrame(() => {
+              saveToHistory();
+            });
+          }
+        }, 0);
+      }
+    };
+    newImage.src = tempCanvas.toDataURL('image/png');
+  };
+
+  const drawLassoOverlay = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !lassoMode || lassoPoints.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.save();
+
+    if (lassoPoints.length >= 3) {
+      ctx.fillStyle = 'rgba(10, 132, 255, 0.1)';
+      ctx.strokeStyle = '#0a84ff';
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+      for (let i = 1; i < lassoPoints.length; i++) {
+        ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    lassoPoints.forEach((point, index) => {
+      ctx.fillStyle = '#0a84ff';
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    if (lassoPoints.length > 1) {
+      ctx.strokeStyle = '#0a84ff';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+      for (let i = 1; i < lassoPoints.length; i++) {
+        ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  };
+
+  const finishLasso = () => {
+    if (lassoPoints.length >= 3) {
+      applyLassoDelete();
+    } else {
+      setLassoMode(false);
+      setLassoPoints([]);
+    }
+    setIsDrawingLasso(false);
+  };
+
   // ==================== ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ КООРДИНАТ В ОРИГИНАЛЬНОМ РАЗМЕРЕ ====================
   const getOriginalImageCoordinates = (rectOnCanvas) => {
     if (!image || !canvasRef.current) return null;
@@ -544,7 +675,7 @@ const ImageEditor = ({
   // ==================== ФУНКЦИИ ОБРЕЗКИ (ОБНОВЛЕННЫЕ) ====================
   
   const getCorner = (x, y) => {
-    const margin = 8;
+    const margin = isMobile ? 16 : 8;
     
     if (Math.abs(x - cropRect.x) < margin && Math.abs(y - cropRect.y) < margin) return 'tl';
     if (Math.abs(x - (cropRect.x + cropRect.w)) < margin && Math.abs(y - cropRect.y) < margin) return 'tr';
@@ -1259,7 +1390,7 @@ const drawAspectCropOverlay = () => {
   };
 
   const getAspectCorner = (x, y) => {
-    const margin = 12;
+    const margin = isMobile ? 20 : 12;
     
     if (Math.abs(x - aspectCropRect.x) < margin && Math.abs(y - aspectCropRect.y) < margin) return 'tl';
     if (Math.abs(x - (aspectCropRect.x + aspectCropRect.w)) < margin && Math.abs(y - aspectCropRect.y) < margin) return 'tr';
@@ -1459,7 +1590,7 @@ const drawAspectCropOverlay = () => {
     setResizeCornerAspect(null);
   };
 
-  // ==================== ОБРАБОТЧИКИ МЫШИ (ОБНОВЛЕННЫЕ) ====================
+  // ==================== ОБРАБОТЧИКИ МЫШИ И ТАЧА ====================
   
   const handleCanvasMouseDown = (e) => {
     if (cropMode) {
@@ -1468,16 +1599,95 @@ const drawAspectCropOverlay = () => {
     } else if (aspectCropMode) {
       e.stopPropagation();
       handleAspectCropMouseDown(e);
+    } else if (lassoMode) {
+      e.stopPropagation();
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      setIsDrawingLasso(true);
+      setLassoPoints(prev => [...prev, { x, y }]);
     }
   };
 
   const handleCanvasMouseMove = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
     if (cropMode) {
       e.stopPropagation();
       handleCropMouseMove(e);
     } else if (aspectCropMode) {
       e.stopPropagation();
       handleAspectCropMouseMove(e);
+    } else if (lassoMode && isDrawingLasso) {
+      e.stopPropagation();
+
+      if (image) {
+        drawImageBase(image);
+        if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+          drawCropOverlayOnly();
+        }
+        if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+          drawAspectCropOverlay();
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (ctx && lassoPoints.length > 0) {
+          ctx.save();
+
+          if (lassoPoints.length >= 2) {
+            ctx.fillStyle = 'rgba(10, 132, 255, 0.1)';
+            ctx.strokeStyle = '#0a84ff';
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+            for (let i = 1; i < lassoPoints.length; i++) {
+              ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+            }
+            ctx.lineTo(x, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+
+          lassoPoints.forEach((point) => {
+            ctx.fillStyle = '#0a84ff';
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          });
+
+          if (lassoPoints.length > 0) {
+            ctx.strokeStyle = '#0a84ff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(lassoPoints[lassoPoints.length - 1].x, lassoPoints[lassoPoints.length - 1].y);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+      }
     }
   };
 
@@ -1488,6 +1698,15 @@ const drawAspectCropOverlay = () => {
     } else if (aspectCropMode) {
       e.stopPropagation();
       handleAspectCropMouseUp();
+    } else if (lassoMode) {
+      e.stopPropagation();
+    }
+  };
+
+  const handleCanvasDoubleClick = (e) => {
+    if (lassoMode && lassoPoints.length >= 3) {
+      e.stopPropagation();
+      finishLasso();
     }
   };
 
@@ -1518,6 +1737,114 @@ const drawAspectCropOverlay = () => {
   const handleContainerMouseUp = () => {
     setIsPanning(false);
   };
+
+  // ==================== ОБРАБОТЧИКИ ТАЧА ====================
+
+  const handleCanvasTouchStart = (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const fakeEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    };
+
+    if (cropMode) {
+      handleCropMouseDown(fakeEvent);
+    } else if (aspectCropMode) {
+      handleAspectCropMouseDown(fakeEvent);
+    } else if (lassoMode) {
+      handleCanvasMouseDown(fakeEvent);
+    }
+  };
+
+  const handleCanvasTouchMove = (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const fakeEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    };
+
+    if (cropMode) {
+      handleCropMouseMove(fakeEvent);
+    } else if (aspectCropMode) {
+      handleAspectCropMouseMove(fakeEvent);
+    } else if (lassoMode) {
+      handleCanvasMouseMove(fakeEvent);
+    }
+  };
+
+  const handleCanvasTouchEnd = (e) => {
+    e.preventDefault();
+    if (cropMode) {
+      handleCropMouseUp();
+    } else if (aspectCropMode) {
+      handleAspectCropMouseUp();
+    }
+  };
+
+  const handleContainerTouchStart = (e) => {
+    if (cropMode || aspectCropMode) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    setIsPanning(true);
+    setPanStart({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleContainerTouchMove = (e) => {
+    if (cropMode || aspectCropMode) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    if (isPanning) {
+      const deltaX = touch.clientX - panStart.x;
+      const deltaY = touch.clientY - panStart.y;
+      setPanOffset(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }));
+      setPanStart({ x: touch.clientX, y: touch.clientY });
+    }
+  };
+
+  const handleContainerTouchEnd = (e) => {
+    e.preventDefault();
+    setIsPanning(false);
+  };
+
+  const handleWheel = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    const newZoom = Math.max(0.1, Math.min(50, zoom + delta));
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+
+    const mouseX = e.clientX - rect.left - rect.width / 2;
+    const mouseY = e.clientY - rect.top - rect.height / 2;
+
+    const zoomRatio = newZoom / zoom;
+
+    setPanOffset(prev => ({
+      x: prev.x * zoomRatio + mouseX * (1 - zoomRatio),
+      y: prev.y * zoomRatio + mouseY * (1 - zoomRatio)
+    }));
+
+    setZoom(newZoom);
+  }, [zoom]);
 
   // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
   
@@ -1600,6 +1927,8 @@ const drawAspectCropOverlay = () => {
         setFlipY(false);
         setCropMode(false);
         setAspectCropMode(false);
+        setLassoMode(false);
+        setLassoPoints([]);
         setCropRect({ x: 0, y: 0, w: 0, h: 0 });
         setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
         setPanOffset({ x: 0, y: 0 });
@@ -1655,6 +1984,7 @@ const saveToHistory = useCallback(() => {
     aspectCropMode,
     selectedAspectRatio,
     panOffset: { ...panOffset },
+    lassoMode,
   };
 
   // Проверяем, не совпадает ли новое состояние с последним
@@ -1670,7 +2000,8 @@ const saveToHistory = useCallback(() => {
       lastState.cropMode === newState.cropMode &&
       JSON.stringify(lastState.aspectCropRect) === JSON.stringify(newState.aspectCropRect) &&
       lastState.aspectCropMode === newState.aspectCropMode &&
-      lastState.selectedAspectRatio === newState.selectedAspectRatio) {
+      lastState.selectedAspectRatio === newState.selectedAspectRatio &&
+      lastState.lassoMode === newState.lassoMode) {
     return; // Состояние не изменилось, не сохраняем
   }
 
@@ -1678,7 +2009,7 @@ const saveToHistory = useCallback(() => {
   newHistory.push(newState);
   setHistory(newHistory);
   setHistoryIndex(newHistory.length - 1);
-}, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset]);
+}, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, lassoMode]);
 
 
 const restoreFromHistory = useCallback((state) => {
@@ -1704,6 +2035,7 @@ const restoreFromHistory = useCallback((state) => {
   setAspectCropMode(state.aspectCropMode);
   setSelectedAspectRatio(state.selectedAspectRatio);
   setPanOffset(state.panOffset || { x: 0, y: 0 });
+  setLassoMode(state.lassoMode || false);
 }, []);
 
   const rotate = (direction) => {
@@ -1739,6 +2071,9 @@ const reset = () => {
   setActiveFilter('none');
   setCropMode(false);
   setAspectCropMode(false);
+  setLassoMode(false);
+  setLassoPoints([]);
+  setIsDrawingLasso(false);
   setCropRect({ x: 0, y: 0, w: 0, h: 0 });
   setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
   setSelectedAspectRatio('original');
@@ -1789,6 +2124,7 @@ const reset = () => {
                   aspectCropMode: false,
                   selectedAspectRatio: 'original',
                   panOffset: { x: 0, y: 0 },
+                  lassoMode: false,
                 };
                 setHistory([initialState]);
                 setHistoryIndex(0);
@@ -2047,7 +2383,7 @@ const redo = () => {
   }, 100);
 
   return () => clearTimeout(timer);
-}, [rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, saveToHistory]);
+}, [rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, lassoMode, saveToHistory]);
 
   useEffect(() => {
     if (image) {
@@ -2058,8 +2394,11 @@ const redo = () => {
       if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
         drawAspectCropOverlay();
       }
+      if (lassoMode && lassoPoints.length > 0) {
+        drawLassoOverlay();
+      }
     }
-  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset]);
+  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset, lassoMode, lassoPoints]);
 
   useEffect(() => {
     setPanOffset({ x: 0, y: 0 });
@@ -2298,6 +2637,23 @@ const redo = () => {
                 <div className={styles.transformDivider} />
 
                 <button
+                  className={`${styles.transformButton} ${lassoMode ? styles.active : ''}`}
+                  onClick={() => {
+                    setLassoMode(!lassoMode);
+                    if (cropMode) setCropMode(false);
+                    if (aspectCropMode) setAspectCropMode(false);
+                    if (!lassoMode) {
+                      setLassoPoints([]);
+                      setIsDrawingLasso(false);
+                    }
+                  }}
+                >
+                  <PiLasso size={20} />
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <button
                   className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
                   disabled={isRemovingBackground}
@@ -2444,6 +2800,23 @@ const redo = () => {
                 <div className={styles.transformDivider} />
 
                 <button
+                  className={`${styles.transformButton} ${lassoMode ? styles.active : ''}`}
+                  onClick={() => {
+                    setLassoMode(!lassoMode);
+                    if (cropMode) setCropMode(false);
+                    if (aspectCropMode) setAspectCropMode(false);
+                    if (!lassoMode) {
+                      setLassoPoints([]);
+                      setIsDrawingLasso(false);
+                    }
+                  }}
+                >
+                  <PiLasso size={20} />
+                </button>
+
+                <div className={styles.transformDivider} />
+
+                <button
                   className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
                   disabled={isRemovingBackground}
@@ -2521,8 +2894,13 @@ const redo = () => {
               onMouseMove={handleContainerMouseMove}
               onMouseUp={handleContainerMouseUp}
               onMouseLeave={handleContainerMouseUp}
+              onTouchStart={handleContainerTouchStart}
+              onTouchMove={handleContainerTouchMove}
+              onTouchEnd={handleContainerTouchEnd}
+              onWheel={handleWheel}
               style={{ 
-                cursor: cropMode || aspectCropMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab')
+                cursor: cropMode || aspectCropMode ? 'crosshair' : lassoMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab'),
+                touchAction: cropMode || aspectCropMode || lassoMode ? 'none' : 'pan-y'
               }}
             >
               {loading ? (
@@ -2534,6 +2912,11 @@ const redo = () => {
                   onMouseDown={handleCanvasMouseDown}
                   onMouseMove={handleCanvasMouseMove}
                   onMouseUp={handleCanvasMouseUp}
+                  onDoubleClick={handleCanvasDoubleClick}
+                  onTouchStart={handleCanvasTouchStart}
+                  onTouchMove={handleCanvasTouchMove}
+                  onTouchEnd={handleCanvasTouchEnd}
+                  style={{ touchAction: 'none' }}
                 />
               )}
             </div>
