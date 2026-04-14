@@ -85,6 +85,7 @@ export const ImageDigitalizationModal = ({
   
   const tagButtonRef = useRef(null);
   const popoverRef = useRef(null);
+  const isManualNavigation = useRef(false);
  
   useEffect(() => {
     if (isOpen) {
@@ -122,19 +123,37 @@ export const ImageDigitalizationModal = ({
   }, []);
 
   // Синхронизация с пропсами
-  useEffect(() => {
-    if (imageData) {
+useEffect(() => {
+  if (imageData) {
+    // Проверяем, изменился ли ID изображения
+    if (!currentImageData || currentImageData._id !== imageData._id) {
       setCurrentImageData(imageData);
       updateTagColors(imageData.tags);
+    } else {
+      // Если ID тот же, обновляем только теги, не трогаем остальное
+      setCurrentImageData(prev => ({
+        ...prev,
+        tags: imageData.tags
+      }));
+      updateTagColors(imageData.tags);
     }
-  }, [imageData]);
+  }
+}, [imageData]);
 
-  useEffect(() => {
-    if (images && imageData) {
-      const index = images.findIndex(img => img._id === imageData._id);
-      setCurrentImageIndex(index >= 0 ? index : currentIndex);
+useEffect(() => {
+  // Пропускаем, если было ручное переключение
+  if (isManualNavigation.current) {
+    isManualNavigation.current = false;
+    return;
+  }
+  
+  if (images && currentImageData) {
+    const index = images.findIndex(img => img._id === currentImageData._id);
+    if (index !== -1 && index !== currentImageIndex) {
+      setCurrentImageIndex(index);
     }
-  }, [images, imageData, currentIndex]);
+  }
+}, [images]);
 
   const updateTagColors = (tags) => {
     if (tags && Array.isArray(tags)) {
@@ -151,29 +170,36 @@ export const ImageDigitalizationModal = ({
     onClose();
   };
 
-  const handlePrevImage = (e) => {
-    e.stopPropagation(); 
-    if (!images || images.length === 0) return;
+const handlePrevImage = (e) => {
+  e.stopPropagation(); 
+  if (!images || images.length === 0) return;
+  
+  isManualNavigation.current = true; // Помечаем как ручное переключение
+  
+  const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+  const newImage = images[newIndex];
     
-    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
-    const newImage = images[newIndex];
-    setCurrentImageIndex(newIndex);
-    setCurrentImageData(newImage);
-    setShowTagPopover(false);
-    updateTagColors(newImage.tags);
-  };
+  setCurrentImageIndex(newIndex);
+  setCurrentImageData(newImage);
+  setShowTagPopover(false);
+  updateTagColors(newImage.tags);
+};
 
-  const handleNextImage = (e) => {
-    e.stopPropagation(); 
-    if (!images || images.length === 0) return;
+
+const handleNextImage = (e) => {
+  e.stopPropagation(); 
+  if (!images || images.length === 0) return;
+  
+  isManualNavigation.current = true; // Помечаем как ручное переключение
+  
+  const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+  const newImage = images[newIndex];
     
-    const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
-    const newImage = images[newIndex];
-    setCurrentImageIndex(newIndex);
-    setCurrentImageData(newImage);
-    setShowTagPopover(false);
-    updateTagColors(newImage.tags);
-  };
+  setCurrentImageIndex(newIndex);
+  setCurrentImageData(newImage);
+  setShowTagPopover(false);
+  updateTagColors(newImage.tags);
+};
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
@@ -237,64 +263,84 @@ export const ImageDigitalizationModal = ({
     }
   };
 
-  const handleRemoveTag = async (tagToRemove, e) => {
-    e.stopPropagation();
-    
-    if (!canDeleteTag(tagToRemove)) {
-      if (isAdmin) {
-        console.warn('Админ не может удалить тег? Проверьте логику');
-      } else {
-        alert(`Тег "${tagToRemove}" является системным и не может быть удален`);
-      }
-      return;
-    }
-    
-    if (!currentImageData || isTagOperationLoading || !onRemoveTag) return;
-
-    // Запрашиваем подтверждение перед удалением
-    const confirmDelete = window.confirm(`Вы уверены, что хотите удалить тег "${tagToRemove}"?`);
+const handleRemoveTag = async (tagToRemove, e) => {
+  e.stopPropagation();
   
-    if (!confirmDelete) {
-      return; // Если пользователь отменил, выходим из функции
+  if (!canDeleteTag(tagToRemove)) {
+    if (isAdmin) {
+      console.warn('Админ не может удалить тег? Проверьте логику');
+    } else {
+      alert(`Тег "${tagToRemove}" является системным и не может быть удален`);
     }
-    
-    setIsTagOperationLoading(true);
-    try {
-      await onRemoveTag(currentImageData._id, tagToRemove);
-      // Обновляем локальное состояние
-      const updatedTags = currentImageData.tags.filter(t => t !== tagToRemove);
-      const updatedImageData = { ...currentImageData, tags: updatedTags };
-      setCurrentImageData(updatedImageData);
-      updateTagColors(updatedTags);
-    } catch (error) {
-      console.error('Ошибка при удалении тега:', error);
-    } finally {
-      setIsTagOperationLoading(false);
-    }
-  };
+    return;
+  }
+  
+  if (!currentImageData || isTagOperationLoading || !onRemoveTag) return;
 
-  const handleAddTag = async (tagToAdd) => {
-    if (!tagToAdd || !currentImageData || isTagOperationLoading || !onAddTag) return;
+  const confirmDelete = window.confirm(`Вы уверены, что хотите удалить тег "${tagToRemove}"?`);
+  
+  if (!confirmDelete) {
+    return;
+  }
+  
+  // Сохраняем текущий ID перед операцией
+  const currentId = currentImageData._id;
+  const currentIdx = currentImageIndex;
+  
+  setIsTagOperationLoading(true);
+  try {
+    await onRemoveTag(currentId, tagToRemove);
     
-    setIsTagOperationLoading(true);
-    try {
-      await onAddTag(currentImageData._id, tagToAdd);
-      
-      // Обновляем локальное состояние
-      const updatedTags = [...(currentImageData.tags || []), tagToAdd];
-      const updatedImageData = { ...currentImageData, tags: updatedTags };
-      setCurrentImageData(updatedImageData);
-      updateTagColors(updatedTags);
-      
-      setCustomTag('');
-      setTagSearchTerm('');
-      setShowTagPopover(false);
-    } catch (error) {
-      console.error('Ошибка при добавлении тега:', error);
-    } finally {
-      setIsTagOperationLoading(false);
-    }
-  };
+    // Обновляем локальное состояние
+    const updatedTags = currentImageData.tags.filter(t => t !== tagToRemove);
+    const updatedImageData = { ...currentImageData, tags: updatedTags };
+    setCurrentImageData(updatedImageData);
+    updateTagColors(updatedTags);
+    
+    // Восстанавливаем индекс, если он изменился
+    setTimeout(() => {
+      setCurrentImageIndex(currentIdx);
+    }, 0);
+    
+  } catch (error) {
+    console.error('Ошибка при удалении тега:', error);
+  } finally {
+    setIsTagOperationLoading(false);
+  }
+};
+
+const handleAddTag = async (tagToAdd) => {
+  if (!tagToAdd || !currentImageData || isTagOperationLoading || !onAddTag) return;
+  
+  // Сохраняем текущий ID и индекс перед операцией
+  const currentId = currentImageData._id;
+  const currentIdx = currentImageIndex;
+  
+  setIsTagOperationLoading(true);
+  try {
+    await onAddTag(currentId, tagToAdd);
+    
+    // Обновляем локальное состояние
+    const updatedTags = [...(currentImageData.tags || []), tagToAdd];
+    const updatedImageData = { ...currentImageData, tags: updatedTags };
+    setCurrentImageData(updatedImageData);
+    updateTagColors(updatedTags);
+    
+    setCustomTag('');
+    setTagSearchTerm('');
+    setShowTagPopover(false);
+    
+    // Восстанавливаем индекс, если он изменился
+    setTimeout(() => {
+      setCurrentImageIndex(currentIdx);
+    }, 0);
+    
+  } catch (error) {
+    console.error('Ошибка при добавлении тега:', error);
+  } finally {
+    setIsTagOperationLoading(false);
+  }
+};
 
    const handleAddCustomTag = () => {
     let trimmedTag = customTag.trim();

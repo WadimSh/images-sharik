@@ -71,7 +71,7 @@ export const Images = () => {
     fileName: ''
   });
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // Состояние для фильтров
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -188,39 +188,61 @@ export const Images = () => {
     }, 100);
   }, [loadImagesFromBackend]);
 
-  const handleAddTag = async (fileId, tag) => {
-    try {
-      await apiAddTagToFile(fileId, tag);
-      // Обновляем локальное состояние images
-      setImages(prevImages => 
-        prevImages.map(img => 
-          img._id === fileId 
-            ? { ...img, tags: [...(img.tags || []), tag] }
-            : img
-        )
+const handleAddTag = async (fileId, tag) => {
+  try {
+    await apiAddTagToFile(fileId, tag);
+    
+    setImages(prevImages => {
+      const updatedImages = prevImages.map(img => 
+        img._id === fileId 
+          ? { ...img, tags: [...(img.tags || []), tag] }
+          : img
       );
-    } catch (error) {
-      console.error('Ошибка при добавлении тега:', error);
-      alert('Не удалось добавить тег');
-    }
-  };
+      
+      // Обновляем selectedImage если он открыт и это тот же файл
+      if (selectedImage && selectedImage._id === fileId) {
+        const updatedImage = updatedImages.find(img => img._id === fileId);
+        if (updatedImage) {
+          setSelectedImage(updatedImage);
+          // НЕ обновляем индекс здесь, он должен остаться тем же
+        }
+      }
+      
+      return updatedImages;
+    });
+  } catch (error) {
+    console.error('Ошибка при добавлении тега:', error);
+    alert('Не удалось добавить тег');
+  }
+};
 
-  const handleRemoveTag = async (fileId, tagToRemove) => {
-    try {
-      await apiRemoveTagFromFile(fileId, tagToRemove);
-      // Обновляем локальное состояние images
-      setImages(prevImages => 
-        prevImages.map(img => 
-          img._id === fileId 
-            ? { ...img, tags: img.tags.filter(t => t !== tagToRemove) }
-            : img
-        )
+const handleRemoveTag = async (fileId, tagToRemove) => {
+  try {
+    await apiRemoveTagFromFile(fileId, tagToRemove);
+    
+    setImages(prevImages => {
+      const updatedImages = prevImages.map(img => 
+        img._id === fileId 
+          ? { ...img, tags: img.tags.filter(t => t !== tagToRemove) }
+          : img
       );
-    } catch (error) {
-      console.error('Ошибка при удалении тега:', error);
-      alert('Не удалось удалить тег');
-    }
-  };
+      
+      // Обновляем selectedImage если он открыт и это тот же файл
+      if (selectedImage && selectedImage._id === fileId) {
+        const updatedImage = updatedImages.find(img => img._id === fileId);
+        if (updatedImage) {
+          setSelectedImage(updatedImage);
+          // НЕ обновляем индекс здесь, он должен остаться тем же
+        }
+      }
+      
+      return updatedImages;
+    });
+  } catch (error) {
+    console.error('Ошибка при удалении тега:', error);
+    alert('Не удалось удалить тег');
+  }
+};
 
   const handleDeleteImage = async () => {
     if (!deleteModal.imageId) return;

@@ -2882,27 +2882,9 @@ const redo = () => {
                 >
                   <LuFlipVertical size={20} />
                 </button>
-
+              
                 <div className={styles.transformDivider} />
-
-                <button
-                  className={`${styles.transformButton} ${lassoMode ? styles.active : ''}`}
-                  onClick={() => {
-                    setLassoMode(!lassoMode);
-                    if (cropMode) setCropMode(false);
-                    if (aspectCropMode) setAspectCropMode(false);
-                    if (!lassoMode) {
-                      setLassoPoints([]);
-                      setIsDrawingLasso(false);
-                    }
-                  }}
-                >
-                  <PiLasso size={20} />
-                </button>
-
-                <div className={styles.transformDivider} />
-
-              <div className={styles.cropWrapper}>    
+                  
                 <button
                   className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
@@ -2914,17 +2896,33 @@ const redo = () => {
                     <PiMagicWand size={20} />
                   )}
                 </button>
-                {lassoMode && lassoPoints.length >= 3 && (
-                  <button
-                    className={styles.applyCropButton}
-                    onClick={finishLasso}
-                  >
-                    ✓
-                  </button>
-                )}
-              </div>
-
+                
                 <div className={styles.transformDivider} />
+
+                <div className={styles.cropWrapper}>
+                  <button
+                    className={`${styles.transformButton} ${lassoMode ? styles.active : ''}`}
+                    onClick={() => {
+                      setLassoMode(!lassoMode);
+                      if (cropMode) setCropMode(false);
+                      if (aspectCropMode) setAspectCropMode(false);
+                      if (!lassoMode) {
+                        setLassoPoints([]);
+                        setIsDrawingLasso(false);
+                      }
+                    }}
+                  >
+                    <PiLasso size={20} />
+                  </button>
+                  {lassoMode && lassoPoints.length >= 3 && (
+                    <button
+                      className={styles.applyCropButton}
+                      onClick={finishLasso}
+                    >
+                      Удалить
+                    </button>
+                  )}
+                </div>
 
                 <div className={styles.cropWrapper}>
                   <button

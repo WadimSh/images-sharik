@@ -212,7 +212,7 @@ export const Reports = () => {
         </button>
         <h2 style={{ color: '#333'}}>{'Отчет по сотрудникам'}</h2>
 
-        <div className="date-picker-container" style={{ marginLeft: '10px' }}>
+        <div className="date-picker-container" style={{ marginLeft: 'auto' }}>
           {!loading && reportData && (
             <DateRangePicker 
               initialStartDate={initialDateRange.startDate} 

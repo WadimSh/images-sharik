@@ -70,7 +70,7 @@ const redirectToSignIn = () => {
 
 export async function fetchDataWithFetch(url, options = {}) {
     const originalOptions = { ...options };
-    const { timeout = 60000, signal: externalSignal } = originalOptions;
+    const { timeout = 600000, signal: externalSignal } = originalOptions;
 
     let accessToken = getAccessToken();
     
