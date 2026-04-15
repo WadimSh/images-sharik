@@ -505,6 +505,9 @@ export const Gallery = () => {
     } catch (error) {
       console.error('Bulk download error:', error);
       alert('Ошибка при массовом скачивании');
+    } finally {
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
     }
   };
 
@@ -637,6 +640,9 @@ export const Gallery = () => {
       console.error('Bulk deletion error:', error);
       loadDesignsFromBackend(filters);
       alert('Ошибка при удалении дизайнов');
+    } finally {
+      setSelectedItems(new Set());
+      setIsSelectionMode(false);
     }
   };
 
