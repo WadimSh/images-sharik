@@ -778,7 +778,6 @@ const parseArticlesFromQuery = (query) => {
 //                  }
 //                })}
 
-
         console.error('Error:', error);
         setError(error.message || "An error occurred");
         setValidArticles([]);
