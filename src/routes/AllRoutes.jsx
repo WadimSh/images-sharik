@@ -10,6 +10,8 @@ import Reports from "../views/Reports";
 import Images from "../views/Images";
 import Products from "../views/Products";
 import Template from "../views/Template";
+import ProductImageDownloader from "../views/ProductImageDownloader";
+
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -64,6 +66,15 @@ const AllRoutes = () => {
             <Reports />
           </AdminProtectedRoute>
         } 
+      />
+
+      <Route 
+        path="/downloader"
+        element={
+          <AdminProtectedRoute>
+            <ProductImageDownloader />
+          </AdminProtectedRoute>
+        }
       />
       
       {/*<Route 
