@@ -77,6 +77,12 @@ const ImageEditor = ({
   const [saveAction, setSaveAction] = useState('download');
   const [showSaveDropdown, setShowSaveDropdown] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [resizeMode, setResizeMode] = useState(false);
+  const [targetWidth, setTargetWidth] = useState('');
+  const [targetHeight, setTargetHeight] = useState('');
+  const [originalDimensions, setOriginalDimensions] = useState({ width: 0, height: 0 });
+  const [aspectRatio, setAspectRatio] = useState(1);
   
   // Состояние для модалки загрузки
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -146,6 +152,74 @@ const ImageEditor = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+// Функция для получения текущих размеров изображения
+const getCurrentImageDimensions = useCallback(async () => {
+  if (!image) return { width: 0, height: 0 };
+  
+  let width = image.width;
+  let height = image.height;
+  
+  // Учитываем обрезку
+  if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+    const originalCrop = getOriginalImageCoordinates(cropRect);
+    if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+      width = originalCrop.w;
+      height = originalCrop.h;
+    }
+  } else if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+    const originalCrop = getOriginalImageCoordinates(aspectCropRect);
+    if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+      width = originalCrop.w;
+      height = originalCrop.h;
+    }
+  }
+  
+  return { width, height };
+}, [image, cropMode, cropRect, aspectCropMode, aspectCropRect]);
+
+// Функция для изменения размера изображения
+const resizeImage = async (blob, targetW, targetH) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Cannot create canvas context'));
+        return;
+      }
+      
+      // Используем высокое качество для ресайза
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, targetW, targetH);
+      
+      canvas.toBlob((resizedBlob) => {
+        if (resizedBlob) {
+          resolve(resizedBlob);
+        } else {
+          reject(new Error('Failed to resize image'));
+        }
+      }, blob.type, 0.92);
+    };
+    
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load image for resizing'));
+    };
+    
+    img.src = url;
+  });
+};
+
 
   // Получаем имя оригинального файла
   const getOriginalFileName = () => {
@@ -2325,48 +2399,114 @@ const redo = () => {
   };
 
   const handleDownloadClick = () => {
-    setSaveAction('download');
-    setShowFormatModal(true);
+    openFormatModal('download');
   };
 
   const handleSaveAsClick = async () => {
-    const quality = saveFormat === 'png' ? undefined : 0.92;
-    const blob = await createImageBlob(saveFormat, quality);
-    setEditedImageBlob(blob);
-    setShowUploadModal(true);
+    openFormatModal('save');
   };
 
-  // Обработка выбора формата и открытие модалки загрузки
-  const handleConfirmFormat = async () => {
-    setIsSaving(true);
+// Функции для обработки изменения размеров
+const handleWidthChange = (e) => {
+  const newWidth = parseInt(e.target.value, 10);
+  if (!isNaN(newWidth) && newWidth > 0) {
+    setTargetWidth(String(newWidth));
+    const newHeight = Math.round(newWidth / aspectRatio);
+    setTargetHeight(String(newHeight));
     
-    try {
-      const quality = saveFormat === 'png' ? undefined : 0.92;
-      const blob = await createImageBlob(saveFormat, quality);
+  } else {
+    setTargetWidth('');
+  }
+};
+
+const handleHeightChange = (e) => {
+  const newHeight = parseInt(e.target.value, 10);
+  if (!isNaN(newHeight) && newHeight > 0) {
+    setTargetHeight(String(newHeight));
+    const newWidth = Math.round(newHeight * aspectRatio);
+    setTargetWidth(String(newWidth));
+    
+  } else {
+    setTargetHeight('');
+  }
+};
+
+const toggleResizeMode = () => {
+  if (!resizeMode) {
+    // Включаем режим изменения размера
+    setResizeMode(true);
+  } else {
+    // Выключаем режим изменения размера
+    setResizeMode(false);
+    setTargetWidth('');
+    setTargetHeight('');
+  }
+};
+
+const resetToOriginalSize = () => {
+  setTargetWidth(String(originalDimensions.width));
+  setTargetHeight(String(originalDimensions.height));
+};
+
+// Обработка выбора формата и открытие модалки загрузки
+const handleConfirmFormat = async () => {
+  setIsSaving(true);
+  
+  try {
+    const quality = saveFormat === 'png' ? undefined : 0.92;
+    let blob = await createImageBlob(saveFormat, quality);
+    
+    // Изменяем размер если нужно
+    if (resizeMode && targetWidth && targetHeight) {
+      const newWidth = parseInt(targetWidth, 10);
+      const newHeight = parseInt(targetHeight, 10);
       
-      if (saveAction === 'download') {
-        const fileName = getSaveFileName();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        setShowFormatModal(false);
-      } else {
-        setEditedImageBlob(blob);
-        setShowFormatModal(false);
-        setShowUploadModal(true);
+      if (newWidth > 0 && newHeight > 0) {
+        blob = await resizeImage(blob, newWidth, newHeight);
       }
-    } catch (err) {
-      console.error('Operation failed:', err);
-      alert(saveAction === 'download' ? 'Не удалось скачать изображение' : 'Не удалось подготовить изображение');
-    } finally {
-      setIsSaving(false);
     }
-  };
+    
+    if (saveAction === 'download') {
+      const fileName = getSaveFileName();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setShowFormatModal(false);
+      setResizeMode(false);
+      setTargetWidth('');
+      setTargetHeight('');
+    } else {
+      setEditedImageBlob(blob);
+      setShowFormatModal(false);
+      setShowUploadModal(true);
+      setResizeMode(false);
+      setTargetWidth('');
+      setTargetHeight('');
+    }
+  } catch (err) {
+    console.error('Operation failed:', err);
+    alert(saveAction === 'download' ? 'Не удалось скачать изображение' : 'Не удалось подготовить изображение');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+// Функция для получения размеров при открытии модалки
+const openFormatModal = async (action) => {
+  setSaveAction(action);
+  const dims = await getCurrentImageDimensions();
+  setOriginalDimensions(dims);
+  setAspectRatio(dims.width / dims.height);
+  setTargetWidth(String(dims.width));
+  setTargetHeight(String(dims.height));
+  setResizeMode(false);
+  setShowFormatModal(true);
+};
 
   const convertToWebP = (blob) => {
     return new Promise((resolve, reject) => {
@@ -3126,7 +3266,10 @@ const redo = () => {
           className={styles.formatModalOverlay} 
           onClick={(e) => {
             e.stopPropagation(); 
-            setShowFormatModal(false)
+            setShowFormatModal(false);
+            setResizeMode(false);
+            setTargetWidth('');
+            setTargetHeight('');
           }}
         >
           <div className={styles.formatModal} onClick={(e) => e.stopPropagation()}>
@@ -3134,8 +3277,17 @@ const redo = () => {
               <h3 className={styles.formatModalTitle}>
                 {saveAction === 'download' ? 'Выберите формат для скачивания' : 'Выберите формат для сохранения'}
               </h3>
+              <button 
+                className={styles.formatModalClose}
+                onClick={() => {
+                  setShowFormatModal(false);
+                  setResizeMode(false);
+                }}
+              >
+                ✕
+              </button>
             </div>
-            
+              
             <div className={styles.formatOptions}>
               <button
                 className={`${styles.formatOptionCard} ${saveFormat === 'png' ? styles.active : ''}`}
@@ -3158,11 +3310,98 @@ const redo = () => {
                 <div className={styles.formatOptionIcon}>WEBP</div>
               </button>
             </div>
+              
+            {/* Секция изменения размера */}
+            <div className={styles.resizeSection}>
+              <div className={styles.resizeHeader}>
+                <label className={styles.resizeToggle}>
+                  <input
+                    type="checkbox"
+                    checked={resizeMode}
+                    onChange={toggleResizeMode}
+                  />
+                  <span>Изменить размер изображения</span>
+                </label>
+                {resizeMode && (
+                  <button
+                    className={styles.resetSizeButton}
+                    onClick={resetToOriginalSize}
+                    type="button"
+                  >
+                    Оригинал
+                  </button>
+                )}
+              </div>
+              
+              {resizeMode && (
+                <div className={styles.resizeControls}>
+                  <div className={styles.resizeInputGroup}>
+                    <label>Ширина (px)</label>
+                    <div className={styles.resizeInputWrapper}>
+                      <input
+                        type="number"
+                        min="1"
+                        max="8000"
+                        value={targetWidth}
+                        onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              return;
+            }
+          }}
+          onKeyUp={(e) => e.stopPropagation()}
+                        onChange={handleWidthChange}
+                        className={styles.resizeInput}
+                        placeholder="Ширина"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className={styles.resizeInputGroup}>
+                    <label>Высота (px)</label>
+                    <div className={styles.resizeInputWrapper}>
+                      <input
+                        type="number"
+                        min="1"
+                        max="8000"
+                        value={targetHeight}
+                        onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              return;
+            }
+          }}
+          onKeyUp={(e) => e.stopPropagation()}
+                        onChange={handleHeightChange}
+                        className={styles.resizeInput}
+                        placeholder="Высота"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {resizeMode && originalDimensions.width > 0 && (
+                <div className={styles.sizeInfo}>
+                  <span className={styles.sizeInfoText}>
+                    Оригинал: {originalDimensions.width} × {originalDimensions.height} px
+                  </span>
+                  {targetWidth && targetHeight && (
+                    <span className={styles.sizeInfoNew}>
+                      Новый: {targetWidth} × {targetHeight} px
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             
             <div className={styles.formatModalFooter}>
               <button
                 className={styles.cancelButton}
-                onClick={() => setShowFormatModal(false)}
+                onClick={() => {
+                  setShowFormatModal(false);
+                  setResizeMode(false);
+                }}
                 disabled={isSaving}
               >
                 Отмена
@@ -3170,7 +3409,7 @@ const redo = () => {
               <button
                 className={styles.confirmButton}
                 onClick={handleConfirmFormat}
-                disabled={isSaving}
+                disabled={isSaving || (resizeMode && (!targetWidth || !targetHeight))}
               >
                 {isSaving ? 'Обработка...' : (saveAction === 'download' ? 'Скачать' : 'Далее')}
               </button>
