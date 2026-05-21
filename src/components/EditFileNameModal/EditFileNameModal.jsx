@@ -1,14 +1,16 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import { useMarketplace } from "../../contexts/contextMarketplace";
-import './EditFileNameModal.css';
+import styles from './EditFileNameModal.module.css';
 
 const EditFileNameModal = ({ 
   isOpen, 
   onClose, 
   onConfirm, 
   initialFileName,
-  slideNumber
+  slideNumber,
+  marketplace,
+  removeBackground = false
 }) => {
   const { t } = useContext(LanguageContext);
   const { marketplace: globalMarketplace } = useMarketplace();
@@ -17,14 +19,22 @@ const EditFileNameModal = ({
   const [articles, setArticles] = useState('');
   const [selectedMarketplace, setSelectedMarketplace] = useState('');
   const [error, setError] = useState('');
+  const [transparentBg, setTransparentBg] = useState(removeBackground);
 
   // Парсим начальное имя файла только один раз при открытии
   const [parsedData, setParsedData] = useState(null);
+  const [cleanInitialFileName, setCleanInitialFileName] = useState('');
   
   useEffect(() => {
     if (isOpen && initialFileName) {
+      // Убираем расширение из initialFileName для отображения
+      const fileNameWithoutExt = initialFileName.replace(/\.(webp|png|jpg|jpeg)$/i, '');
+      setCleanInitialFileName(fileNameWithoutExt);
+      
       const parseFileName = (fileName) => {
-        const parts = fileName.replace('.webp', '').split('_');
+        // Убираем расширение перед парсингом
+        const nameWithoutExt = fileName.replace(/\.(webp|png|jpg|jpeg)$/i, '');
+        const parts = nameWithoutExt.split('_');
         
         if (parts.length < 6) {
           return {
@@ -37,9 +47,18 @@ const EditFileNameModal = ({
           };
         }
         
-        const articlesPart = parts.slice(0, parts.length - 5).join('_');
+        let articlesPart = parts.slice(0, parts.length - 5).join('_');
+        let slideTypePart = parts[parts.length - 4];
+        
+        // Если в slideType есть _transparent, убираем его
+        if (slideTypePart.includes('_transparent')) {
+          slideTypePart = slideTypePart.replace('_transparent', '');
+          setTransparentBg(true);
+        } else {
+          setTransparentBg(false);
+        }
+        
         const marketplacePart = parts[parts.length - 5];
-        const slideTypePart = parts[parts.length - 4];
         const sizePart = parts[parts.length - 3];
         const datePart = parts[parts.length - 2];
         const timePart = parts[parts.length - 1];
@@ -64,7 +83,6 @@ const EditFileNameModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      // Добавляем обработчик клавиши Escape
       const handleEscKey = (e) => {
         if (e.key === 'Escape') {
           onClose();
@@ -144,72 +162,113 @@ const EditFileNameModal = ({
     
     if (!parsedData) return;
     
-    const newFileName = `${articles}_${selectedMarketplace}_${parsedData.slideType}_${parsedData.size}_${parsedData.date}_${parsedData.time}.webp`;
-    onConfirm(newFileName, articles, selectedMarketplace);
+    // Всегда используем WEBP формат
+    const extension = 'webp';
+    const isAM = selectedMarketplace === 'AM';
+    // true = сохраняем с прозрачным фоном (без добавления белого фона)
+    // false = добавляем белый фон при сохранении
+    const shouldBeTransparent = isAM && transparentBg;
+    
+    // Добавляем суффикс _transparent если нужно
+    const bgSuffix = shouldBeTransparent ? '_transparent' : '';
+    
+    const newFileName = `${articles}_${selectedMarketplace}_${parsedData.slideType}${bgSuffix}_${parsedData.size}_${parsedData.date}_${parsedData.time}.${extension}`;
+    onConfirm(newFileName, articles, selectedMarketplace, shouldBeTransparent);
     onClose();
   };
   
   if (!isOpen || !parsedData) return null;
   
+  const isAM = selectedMarketplace === 'AM';
+  const bgSuffix = (isAM && transparentBg) ? '_transparent' : '';
+  
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content" ref={modalRef}>
-        <div className="modal-header">
+    <div className={styles.modalOverlay} onClick={handleOverlayClick}>
+      <div className={styles.modalContent} ref={modalRef}>
+        <div className={styles.modalHeader}>
           <h3>{t('header.editFileName')}</h3>
           <button 
-            className="modal-close-btn"
+            className={styles.modalCloseBtn}
             onClick={onClose}
           >
             &times;
           </button>
         </div>
         
-        <div className="original-name">
+        <div className={styles.originalName}>
           <strong>{t('header.originalName')}</strong>
-          <code>{initialFileName}</code>
+          <code>{cleanInitialFileName}</code>
         </div>
         
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label>{t('header.article')}</label>
           <input
             type="text"
             value={articles}
             onChange={handleArticleChange}
             placeholder="XXXX-XXXX"
-            className={`input-field ${error ? 'input-error' : ''}`}
+            className={`${styles.inputField} ${error ? styles.inputError : ''}`}
             maxLength={9}
           />
         </div>
         
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label>{t('header.marketplace')}</label>
           <select 
             value={selectedMarketplace} 
             onChange={(e) => setSelectedMarketplace(e.target.value)}
-            className="select-field"
+            className={styles.selectField}
           >
             <option value="WB">Wildberries (WB)</option>
             <option value="OZ">Ozon (OZ)</option>
             <option value="AM">Amazon (AM)</option>
           </select>
         </div>
+
+        {/* Переключатель фона только для Amazon */}
+        {isAM && (
+          <div className={styles.formGroup}>
+            <label>Фон при сохранении</label>
+            <div className={styles.backgroundToggle}>
+              <button
+                type="button"
+                className={`${styles.toggleBtn} ${!transparentBg ? styles.active : ''}`}
+                onClick={() => setTransparentBg(false)}
+              >
+                Добавить белый фон
+              </button>
+              <button
+                type="button"
+                className={`${styles.toggleBtn} ${transparentBg ? styles.active : ''}`}
+                onClick={() => setTransparentBg(true)}
+              >
+                Сохранить как есть
+              </button>
+            </div>
+            <small className={styles.hint}>
+              {!transparentBg 
+                ? "Автоматически добавится белый фон (изображение всегда будет с фоном)" 
+                : "Фон не будет добавляться принудительно (сохранится текущее состояние)"}
+            </small>
+          </div>
+        )}
         
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label>{t('header.newFileName')}</label>
-          <div className="preview-box">
+          <div className={styles.previewBox}>
             <code>
-              {articles}_{selectedMarketplace}_{parsedData.slideType}_{parsedData.size}_{parsedData.date}_{parsedData.time}.webp
+              {articles}_{selectedMarketplace}_{parsedData.slideType}{bgSuffix}_{parsedData.size}_{parsedData.date}_{parsedData.time}.webp
             </code>
           </div>
         </div>
         
-        <div className="modal-buttons">
-          <button onClick={onClose} className="btn-cancel">
+        <div className={styles.modalButtons}>
+          <button onClick={onClose} className={styles.btnCancel}>
             {t('modals.cancel')}
           </button>
           <button 
             onClick={handleSubmit} 
-            className={`btn-confirm ${isSubmitDisabled() ? 'btn-disabled' : ''}`}
+            className={`${styles.btnConfirm} ${isSubmitDisabled() ? styles.btnDisabled : ''}`}
             disabled={isSubmitDisabled()}
           >
             {t('modals.confirm')}

@@ -55,6 +55,7 @@ export const HeaderSection = ({
   const [loading, setLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState('');
+  const [removeBackground, setRemoveBackground] = useState(false); // Состояние для AM
       
   const handleBack = () => {
     if (!slideNumber) {
@@ -70,7 +71,7 @@ export const HeaderSection = ({
   
   // Функция для формирования заголовка
   const getHeaderTitle = () => {
-    const slide = slideNumber || 'collage'; // По умолчанию первый слайд
+    const slide = slideNumber || 'collage';
     
     if (slide === 'collage') {
       const collageTitles = {
@@ -89,7 +90,7 @@ export const HeaderSection = ({
   };
 
   // Генерация имени файла по умолчанию
-  const generateDefaultFileName = (baseCode, slideType) => {
+  const generateDefaultFileName = (baseCode, slideType, transparentBg = false) => {
     const now = new Date();
     const datePart = [
       String(now.getDate()).padStart(2, '0'),
@@ -103,18 +104,17 @@ export const HeaderSection = ({
       String(now.getSeconds()).padStart(2, '0')
     ].join('');
     
-    return `${baseCode}_${marketplace}_${slideType}_${sizeLabel}_${datePart}_${timePart}.webp`;
+    const bgSuffix = transparentBg ? '_transparent' : '';
+    return `${baseCode}_${marketplace}_${slideType}${bgSuffix}_${sizeLabel}_${datePart}_${timePart}.png`;
   };
 
   // Функция для подготовки скачивания
   const prepareDownload = () => {
     if (!slideNumber) {
-      // Для коллажей скачиваем сразу без редактирования
       handleDownload();
       return;
     }
     
-    // Для слайдов формируем имя файла и показываем окно редактирования
     let baseCode, slideType;
     
     if (slideNumber === '') {
@@ -126,31 +126,28 @@ export const HeaderSection = ({
       slideType = slideType === '1' ? 'main' : `slide${slideType}`;
     }
     
-    const defaultFileName = generateDefaultFileName(baseCode, slideType);
+    const defaultFileName = generateDefaultFileName(baseCode, slideType, removeBackground);
     setGeneratedFileName(defaultFileName);
     setShowEditModal(true);
   };
   
   // Обработчик подтверждения редактирования
-  const handleEditConfirm = (newFileName, articles, marketplace) => {
-    // Запускаем скачивание с обновленными данными
-    handleDownload(newFileName, articles, marketplace);
+  const handleEditConfirm = (newFileName, articles, marketplace, transparentBg) => {
+    setRemoveBackground(transparentBg);
+    handleDownload(newFileName, articles, marketplace, transparentBg);
   };
 
   // Функция для удаления макета
   const handleDeleteTemplate = async(templateName) => {
     try {
-      // Находим макет по имени из кэша
       const design = await apiGetDesignByName(templateName);
       if (!design) {
         console.error('Template not found:', templateName);
         return;
       }
 
-      // Удаляем через API по ID
       await apiDeleteDesign(design.id);
 
-      // Обновляем локальное состояние из кэша
       const updatedDesigns = await apiGetAllDesigns();
       const updatedTemplatesObj = {};
       const updatedTemplatesSize = {};
@@ -171,17 +168,14 @@ export const HeaderSection = ({
 
   const handleDeleteCollageTemple = async(templateName) => {
     try {
-      // Находим макет по имени из кэша
       const collage = await apiGetCollageByName(templateName);
       if (!collage) {
         console.error('Template not found:', templateName);
         return;
       }
 
-      // Удаляем через API по ID
       await apiDeleteCollage(collage.id);
 
-      // Обновляем локальное состояние из кэша
       const updatedCollages = await apiGetAllCollages();
       const updatedTemplatesObj = {};
       const updatedTemplatesSize = {};
@@ -200,25 +194,21 @@ export const HeaderSection = ({
     }
   };
 
-  // Функция выгрузки макета в одельный файл
+  // Функция выгрузки макета
   const handleExportTemplate = (templateName) => {
     const template = templates[templateName];
     if (!template) return;
   
     const templateSizeValue = templateSize[templateName] || '900x1200';
 
-    // Формируем имя файла с размером
     const fileName = templateName
       .toLowerCase()
       .replace(/\s+/g, '_')
       .replace(/[^a-zа-яё0-9_-]/gi, '') 
-      + '_' + templateSizeValue // Добавляем размер через нижнее подчеркивание
+      + '_' + templateSizeValue
       + '.json';
   
-    // Создаем JSON строку
     const json = JSON.stringify(template, null, 2);
-    
-    // Создаем Blob и ссылку для скачивания
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     
@@ -228,19 +218,99 @@ export const HeaderSection = ({
     document.body.appendChild(link);
     link.click();
     
-    // Очистка
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  // Основная функция скачивания
-const handleDownload = async (customFileName = null, customArticles = null, customMarketplace = null) => {
+// Функция для получения прозрачного изображения в формате WEBP
+const captureWithTransparentBackground = async (element, width, height, scale) => {
+  const allElements = element.querySelectorAll('*');
+  const originalStyles = [];
+  
+  // Сохраняем оригинальные стили и делаем фон прозрачным
+  allElements.forEach(el => {
+    const computedStyle = window.getComputedStyle(el);
+    const bgColor = computedStyle.backgroundColor;
+    const bgImage = computedStyle.backgroundImage;
+    
+    originalStyles.push({
+      element: el,
+      backgroundColor: bgColor,
+      backgroundImage: bgImage
+    });
+    
+    if (bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+      el.style.backgroundColor = 'transparent';
+    }
+    if (bgImage !== 'none') {
+      el.style.backgroundImage = 'none';
+    }
+  });
+  
+  // Обрабатываем сам элемент
+  const originalElementBg = element.style.backgroundColor;
+  const originalElementBgImage = element.style.backgroundImage;
+  element.style.backgroundColor = 'transparent';
+  element.style.backgroundImage = 'none';
+  
+  await new Promise(resolve => setTimeout(resolve, 50));
+  
+  // Захватываем изображение с прозрачным фоном
+  const pngDataUrl = await domtoimage.toPng(element, {
+    width: width * scale,
+    height: height * scale,
+    bgcolor: null, // null для прозрачности
+    quality: 1,
+    style: {
+      'transform': `scale(${scale})`,
+      'transform-origin': '0 0'
+    }
+  });
+  
+  // Восстанавливаем стили
+  element.style.backgroundColor = originalElementBg;
+  element.style.backgroundImage = originalElementBgImage;
+  
+  originalStyles.forEach(({ element: el, backgroundColor, backgroundImage }) => {
+    el.style.backgroundColor = backgroundColor;
+    el.style.backgroundImage = backgroundImage;
+  });
+  
+  // Конвертируем PNG в WEBP с сохранением прозрачности
+  const pngBlob = await (await fetch(pngDataUrl)).blob();
+  const img = new Image();
+  const canvas = document.createElement('canvas');
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  
+  const webpBlob = await new Promise((resolve) => {
+    img.onload = () => {
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      // Конвертируем в WEBP с сохранением прозрачности
+      canvas.toBlob(
+        (blob) => resolve(blob),
+        'image/webp',
+        0.92 // Качество 92% для хорошего баланса размера и качества
+      );
+    };
+    img.src = URL.createObjectURL(pngBlob);
+  });
+  
+  URL.revokeObjectURL(img.src);
+  
+  return webpBlob;
+};
+
+// Обновленная основная функция скачивания
+const handleDownload = async (customFileName = null, customArticles = null, customMarketplace = null, transparentBg = false) => {
   try {
     setLoading(true);
     setShowBlindZones(false);
     setZoom(prev => ({ ...prev, level: 1 }));
     
-    // 🔥 СОЗДАЕМ ВИЗУАЛЬНЫЙ ЩИТ (ОВЕРЛЕЙ)
+    // Создаем оверлей (код остается таким же)
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
     overlay.style.top = '0';
@@ -255,7 +325,6 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     overlay.style.justifyContent = 'center';
     overlay.style.backdropFilter = 'blur(4px)';
     
-    // Спиннер
     const spinner = document.createElement('div');
     spinner.style.width = '50px';
     spinner.style.height = '50px';
@@ -264,7 +333,6 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     spinner.style.borderRadius = '50%';
     spinner.style.animation = 'spin 1s linear infinite';
     
-    // Текст
     const text = document.createElement('div');
     text.style.marginTop = '20px';
     text.style.fontSize = '18px';
@@ -272,7 +340,6 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     text.style.color = '#333';
     text.innerText = 'Генерируем изображение...';
     
-    // Добавляем анимацию spin
     const style = document.createElement('style');
     style.textContent = `
       @keyframes spin {
@@ -286,24 +353,19 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     overlay.appendChild(text);
     document.body.appendChild(overlay);
     
-    // Даем время на отрисовку оверлея
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Получаем элемент для рендеринга
     const element = captureRef.current;
     const width = Math.floor(element.offsetWidth);
     const height = Math.floor(element.offsetHeight);
-    
-    // Коэффициент увеличения (2x)
     const scale = 2;
     const targetWidth = width * scale;
     const targetHeight = height * scale;
     
-    // Сохраняем оригинальные src для восстановления
+    // Конвертируем blob URL в data URL
     const images = element.getElementsByTagName('img');
     const originalSrcs = [];
     
-    // Конвертируем все blob URL в data URL
     for (let i = 0; i < images.length; i++) {
       const img = images[i];
       if (img.src.startsWith('blob:')) {
@@ -330,29 +392,54 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     const originalTransformOrigin = element.style.transformOrigin;
     const originalTransition = element.style.transition;
     
-    // Временно масштабируем элемент
-    element.style.transition = 'none'; // Без transition под оверлеем
+    element.style.transition = 'none';
     element.style.transform = `scale(${scale})`;
     element.style.transformOrigin = '0 0';
     
-    // Убираем градиент и устанавливаем белый фон
-    element.style.background = '#FFFFFF';
-    element.style.backgroundImage = 'none';
-    element.style.backgroundColor = '#FFFFFF';
+    let finalBlob;
+    const currentMarketplace = customMarketplace || marketplace;
+    const isAM = currentMarketplace === 'AM';
+    const shouldRemoveBg = isAM && transparentBg;
     
-    // 🔥 ПОЛУЧАЕМ PNG ДЛЯ ПРОМЕЖУТОЧНОЙ ОБРАБОТКИ
-    const pngDataUrl = await domtoimage.toPng(element, {
-      width: targetWidth,
-      height: targetHeight,
-      bgcolor: '#FFFFFF',
-      quality: 1,
-      style: {
-        'transform': `scale(${scale})`,
-        'transform-origin': '0 0'
-      }
-    });
+    if (shouldRemoveBg) {
+      // Для прозрачного фона используем специальную функцию
+      finalBlob = await captureWithTransparentBackground(element, width, height, scale);
+    } else {
+      // Для обычного фона
+      element.style.background = '#FFFFFF';
+      element.style.backgroundImage = 'none';
+      element.style.backgroundColor = '#FFFFFF';
+      
+      const pngDataUrl = await domtoimage.toPng(element, {
+        width: targetWidth,
+        height: targetHeight,
+        bgcolor: '#FFFFFF',
+        quality: 1,
+        style: {
+          'transform': `scale(${scale})`,
+          'transform-origin': '0 0'
+        }
+      });
+      
+      // Конвертируем в WEBP
+      const pngBlob = await (await fetch(pngDataUrl)).blob();
+      const img = new Image();
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      
+      finalBlob = await new Promise((resolve) => {
+        img.onload = () => {
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((blob) => resolve(blob), 'image/webp', 0.92);
+        };
+        img.src = URL.createObjectURL(pngBlob);
+      });
+      URL.revokeObjectURL(img.src);
+    }
     
-    // Возвращаем все как было
+    // Восстанавливаем стили
     element.style.transform = originalTransform;
     element.style.transition = originalTransition;
     element.style.background = originalBackground;
@@ -361,39 +448,12 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     element.style.backgroundColor = originalBackgroundColor;
     element.style.transformOrigin = originalTransformOrigin;
     
-    // Восстанавливаем оригинальные src
     originalSrcs.forEach(item => {
       item.img.src = item.src;
     });
     
-    // 🔥 КОНВЕРТИРУЕМ PNG В WEBP
-    const pngBlob = await (await fetch(pngDataUrl)).blob();
-    
-    // Создаем Image элемент для конвертации
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    
-    // Конвертируем в WEBP
-    const webpBlob = await new Promise((resolve) => {
-      img.onload = () => {
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        
-        // Конвертируем в WEBP с качеством 0.92 (отличный баланс размера и качества)
-        canvas.toBlob(
-          (blob) => resolve(blob),
-          'image/webp',
-          0.92
-        );
-      };
-      img.src = URL.createObjectURL(pngBlob);
-    });
-    
     // Определяем параметры для сохранения
     let fileName;
-    let webpFileName;
     let articlesForHistory;
     let marketplaceForHistory;
     let slideTypeForHistory;
@@ -403,8 +463,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     
     if (customFileName) {
       fileName = customFileName;
-      webpFileName = customFileName.replace('.png', '.webp');
-      const parts = customFileName.replace('.png', '').split('_');
+      const parts = customFileName.replace('.webp', '').split('_');
       if (parts.length >= 6) {
         articlesForHistory = parts.slice(0, parts.length - 5);
         marketplaceForHistory = parts[parts.length - 5];
@@ -413,16 +472,14 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     } else if (slideNumber === '') {
       const articles = JSON.parse(localStorage.getItem('collage-articles')) || [];
       const baseCode = articles.length > 0 ? articles.join('_') : 'collage';
-      fileName = generateDefaultFileName(baseCode, 'collage');
-      webpFileName = fileName.replace('.png', '.webp');
+      fileName = generateDefaultFileName(baseCode, 'collage', shouldRemoveBg);
       articlesForHistory = articles;
       marketplaceForHistory = marketplace;
       slideTypeForHistory = 'collage';
     } else {
       [baseCode, slideNumberPart] = id.split('_');
       slideType = slideNumberPart === '1' ? 'main' : `slide${slideNumberPart}`;
-      fileName = generateDefaultFileName(baseCode, slideType);
-      webpFileName = fileName.replace('.png', '.webp');
+      fileName = generateDefaultFileName(baseCode, slideType, shouldRemoveBg);
       articlesForHistory = baseCode.split('_');
       marketplaceForHistory = marketplace;
       slideTypeForHistory = slideType;
@@ -433,90 +490,89 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       ? localStorage.getItem(sessionKey) 
       : sessionStorage.getItem(sessionKey);
     
-    // 🔥 СОЗДАЕМ ФАЙЛ WEBP ДЛЯ ЗАГРУЗКИ
-    const webpImageFile = new File([webpBlob], webpFileName, { type: 'image/webp' });
-    
-    let uploadedFileData = null;
-    const getMarketplaceFullName = (marketplaceCode) => {
-      const marketplaceMap = {
-        'WB': 'Wildberries',
-        'OZ': 'Ozon',
-        'AM': 'Amazon'
-      };
-      return marketplaceMap[marketplaceCode] || marketplaceCode;
-    };
-    
-    const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
-    const tags = [...(articlesForHistory || [])];
-    
-    if (marketplaceTag) { tags.push(marketplaceTag); }
-    
-    if (companyId && marketplaceForHistory !== 'AM') {
-      try {
-        // 🔥 ЗАГРУЖАЕМ WEBP В ХРАНИЛИЩЕ
-        const uploadResult = await uploadGraphicFile(companyId, webpImageFile, null, tags);
-        console.log('Файл WEBP успешно загружен на сервер:', uploadResult);
-        
-        if (uploadResult?.success && uploadResult?.data) {
-          uploadedFileData = {
-            fileId: uploadResult.data._id,
-            url: uploadResult.data.url,
-            thumbnailUrl: uploadResult.data.thumbnailUrl
-          };
-        }
-      } catch (uploadError) {
-        console.warn('Ошибка загрузки WEBP файла на сервер:', uploadError);
-      }
-    }
-    
-    if (designData && fileName) {
-      const historyKey = fileName.replace('.png', '');
-      const parsedDesignData = JSON.parse(designData);
+    // Для AM не загружаем на сервер
+    if (!isAM) {
+      const imageFile = new File([finalBlob], fileName, { type: 'image/webp' });
       
-      if (marketplaceForHistory !== 'AM') {
+      let uploadedFileData = null;
+      const getMarketplaceFullName = (marketplaceCode) => {
+        const marketplaceMap = {
+          'WB': 'Wildberries',
+          'OZ': 'Ozon',
+          'AM': 'Amazon'
+        };
+        return marketplaceMap[marketplaceCode] || marketplaceCode;
+      };
+      
+      const marketplaceTag = getMarketplaceFullName(marketplaceForHistory || marketplace);
+      const tags = [...(articlesForHistory || [])];
+      
+      if (marketplaceTag) { tags.push(marketplaceTag); }
+      
+      if (companyId && marketplaceForHistory !== 'AM') {
         try {
-          const historyData = {
-            name: historyKey,
-            data: parsedDesignData,
-            company: companyId,
-            articles: articlesForHistory,
-            marketplace: marketplaceForHistory || marketplace,
-            type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
-            size: sizeLabel
-          };
+          const uploadResult = await uploadGraphicFile(companyId, imageFile, null, tags);
+          console.log('Файл успешно загружен на сервер:', uploadResult);
           
-          if (uploadedFileData) {
-            historyData.fileId = uploadedFileData.fileId;
-            historyData.url = uploadedFileData.url;
-            historyData.thumbnailUrl = uploadedFileData.thumbnailUrl;
+          if (uploadResult?.success && uploadResult?.data) {
+            uploadedFileData = {
+              fileId: uploadResult.data._id,
+              url: uploadResult.data.url,
+              thumbnailUrl: uploadResult.data.thumbnailUrl
+            };
           }
-          
-          await apiCreateHistory(historyData);
-          console.log('История успешно отправлена на сервер:', historyKey);
-        } catch (backendError) {
-          console.warn('Ошибка отправки истории на сервер:', backendError);
-          alert(`Ошибка отправки истории на сервер: ${backendError}`);
+        } catch (uploadError) {
+          console.warn('Ошибка загрузки файла на сервер:', uploadError);
         }
-      } else {
-        console.log('Сохранение истории пропущено для marketplace AM');
       }
+      
+      if (designData && fileName) {
+        const historyKey = fileName.replace('.webp', '');
+        const parsedDesignData = JSON.parse(designData);
+        
+        if (marketplaceForHistory !== 'AM') {
+          try {
+            const historyData = {
+              name: historyKey,
+              data: parsedDesignData,
+              company: companyId,
+              articles: articlesForHistory,
+              marketplace: marketplaceForHistory || marketplace,
+              type: slideTypeForHistory || (slideNumber === '1' ? 'main' : `slide${slideNumber}`),
+              size: sizeLabel
+            };
+            
+            if (uploadedFileData) {
+              historyData.fileId = uploadedFileData.fileId;
+              historyData.url = uploadedFileData.url;
+              historyData.thumbnailUrl = uploadedFileData.thumbnailUrl;
+            }
+            
+            await apiCreateHistory(historyData);
+            console.log('История успешно отправлена на сервер:', historyKey);
+          } catch (backendError) {
+            console.warn('Ошибка отправки истории на сервер:', backendError);
+          }
+        }
+      }
+    } else {
+      console.log('Для AM пропущена загрузка на сервер и сохранение в историю');
     }
     
-    // 🔥 УБИРАЕМ ВИЗУАЛЬНЫЙ ЩИТ
-    document.body.removeChild(overlay);
-    document.head.removeChild(style);
+    // Убираем оверлей
+    if (overlay.parentNode) document.body.removeChild(overlay);
+    if (style.parentNode) document.head.removeChild(style);
     
-    // 🔥 СКАЧИВАЕМ WEBP ФАЙЛ
-    const url = URL.createObjectURL(webpBlob);
+    // Скачиваем файл
+    const url = URL.createObjectURL(finalBlob);
     const link = document.createElement('a');
-    link.download = webpFileName;
+    link.download = fileName;
     link.href = url;
     document.body.appendChild(link);
     link.click();
     
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    URL.revokeObjectURL(img.src); // Очищаем временный URL
     
     setLoading(false);
   } catch (error) {
@@ -524,15 +580,10 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     alert('Error during image generation!');
     setLoading(false);
     
-    // В случае ошибки тоже убираем оверлей
     const overlay = document.querySelector('div[style*="z-index: 999999"]');
-    if (overlay) {
-      document.body.removeChild(overlay);
-    }
-    const style = document.querySelector('style[text-content*="spin"]');
-    if (style) {
-      document.head.removeChild(style);
-    }
+    if (overlay && overlay.parentNode) document.body.removeChild(overlay);
+    const styleElement = document.querySelector('style[text-content*="spin"]');
+    if (styleElement && styleElement.parentNode) document.head.removeChild(styleElement);
   }
 };
   
@@ -550,7 +601,6 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
     size: slideNumber ? templateSize : collageSize,
   };
 
-  // Эффект для загрузки макетов при монтировании и изменении
   useEffect(() => {
     const loadTemplates = async () => {
       try {
@@ -569,7 +619,6 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
           }, {});
           setTemplateSize(templatesSize);
         }
-
       } catch (error) {
         console.error('Error loading layouts:', error);
       }
@@ -627,6 +676,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       <button onClick={slideNumber ? handleCreateTemplate : handleCreateCollageTemple} className="template-button">
         <FaClipboardCheck /> {`${t('header.createLayout')}`}
       </button>
+      
       <button onClick={prepareDownload} className="download-button">
         {!loading ? (
           <><FaDownload /> {`${t('header.downloadDesign')}`}</>
@@ -636,7 +686,7 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
       </button>
     </div>
 
-    {/* Модальное окно для редактирования названия (только для слайдов) */}
+    {/* Модальное окно для редактирования названия */}
       {slideNumber && (
         <EditFileNameModal
           isOpen={showEditModal}
@@ -644,6 +694,8 @@ const handleDownload = async (customFileName = null, customArticles = null, cust
           onConfirm={handleEditConfirm}
           initialFileName={generatedFileName}
           slideNumber={slideNumber}
+          marketplace={marketplace}
+          removeBackground={removeBackground}
         />
       )}
     </>

@@ -1,4 +1,4 @@
-.modal-overlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   backdrop-filter: blur(2px);
 }
 
-.modal-content {
+.modalContent {
   background: white;
   padding: 24px;
   border-radius: 8px;
@@ -36,7 +36,7 @@
   }
 }
 
-.modal-header {
+.modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -45,13 +45,13 @@
   border-bottom: 1px solid #eee;
 }
 
-.modal-header h3 {
+.modalHeader h3 {
   margin: 0;
   color: #333;
   font-size: 1.25rem;
 }
 
-.modal-close-btn {
+.modalCloseBtn {
   background: none;
   border: none;
   font-size: 28px;
@@ -68,12 +68,12 @@
   transition: all 0.2s;
 }
 
-.modal-close-btn:hover {
+.modalCloseBtn:hover {
   background-color: #f5f5f5;
   color: #333;
 }
 
-.original-name {
+.originalName {
   background: #f8f9fa;
   padding: 12px;
   border-radius: 6px;
@@ -81,14 +81,14 @@
   border-left: 4px solid #2196F3;
 }
 
-.original-name strong {
+.originalName strong {
   display: block;
   margin-bottom: 8px;
   color: #555;
   font-size: 0.9rem;
 }
 
-.original-name code {
+.originalName code {
   display: block;
   color: #666;
   font-size: 0.8rem;
@@ -97,11 +97,11 @@
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
-.form-group {
+.formGroup {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.formGroup label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
@@ -109,8 +109,8 @@
   font-size: 0.95rem;
 }
 
-.input-field,
-.select-field {
+.inputField,
+.selectField {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ddd;
@@ -120,37 +120,41 @@
   box-sizing: border-box;
 }
 
-.input-field:focus,
-.select-field:focus {
+.inputField:focus,
+.selectField:focus {
   outline: none;
   border-color: #2196F3;
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
-.input-field:hover,
-.select-field:hover {
+.inputField:hover,
+.selectField:hover {
   border-color: #bbb;
 }
 
-.input-error {
+.inputError {
   border-color: #f44336;
   box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }
 
-.input-error:focus {
+.inputError:focus {
   border-color: #f44336;
   box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }
 
-.form-group small {
+.hint {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   color: #666;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   line-height: 1.4;
+  padding: 6px 8px;
+  background: #fafaf8;
+  border-radius: 4px;
+  border-left: 3px solid #f0af2d;
 }
 
-.preview-box {
+.previewBox {
   background: #f8f9fa;
   padding: 12px;
   border-radius: 6px;
@@ -161,12 +165,12 @@
   margin-top: 5px;
 }
 
-.preview-box code {
+.previewBox code {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   color: #495057;
 }
 
-.modal-buttons {
+.modalButtons {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -175,8 +179,8 @@
   border-top: 1px solid #eee;
 }
 
-.btn-cancel,
-.btn-confirm {
+.btnCancel,
+.btnConfirm {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
@@ -187,41 +191,72 @@
   min-width: 100px;
 }
 
-.btn-cancel {
+.btnCancel {
   background: #f8f9fa;
   color: #495057;
   border: 1px solid #dee2e6;
 }
 
-.btn-cancel:hover {
+.btnCancel:hover {
   background: #e9ecef;
   border-color: #ced4da;
 }
 
-.btn-confirm {
+.btnConfirm {
   background: #2196F3;
   color: white;
   border: 1px solid #2196F3;
 }
 
-.btn-confirm:hover {
+.btnConfirm:hover {
   background: #0b7dda;
   border-color: #0b7dda;
 }
 
-.btn-confirm:active,
-.btn-cancel:active {
+.btnConfirm:active,
+.btnCancel:active {
   transform: translateY(1px);
 }
 
-.btn-disabled {
+.btnDisabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #cccccc;
   border-color: #cccccc;
 }
 
-.btn-disabled:hover {
+.btnDisabled:hover {
   background-color: #cccccc;
   border-color: #cccccc;
+}
+
+/* Стили для переключателя фона */
+.backgroundToggle {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.toggleBtn:hover {
+  border-color: #2196F3;
+  background: #f0f8ff;
+}
+
+.toggleBtn.active {
+  background: #2196F3;
+  border-color: #2196F3;
+  color: white;
 }
