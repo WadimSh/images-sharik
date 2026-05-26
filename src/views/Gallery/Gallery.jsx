@@ -752,7 +752,7 @@ export const Gallery = () => {
         code: item.code,
         name: item.name,
         multiplicity: item.multiplicity,
-        link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
+        link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}/`,
         images: images,
         properties: propertiesList,
         originProperties: originPropertiesList,

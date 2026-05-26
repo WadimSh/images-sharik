@@ -203,7 +203,7 @@ const processProductsMeta = (productsData, externalImagesMap) => {
       code: item.code,
       name: item.name,
       multiplicity: item.multiplicity,
-      link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}`,
+      link: `https://new.sharik.ru/tovary-dly-prazdnika/${item.slug}/`,
       images: allImages, // Теперь включает и базовые, и внешние изображения
       properties: propertiesList,
       originProperties: originPropertiesList,
@@ -777,7 +777,6 @@ const parseArticlesFromQuery = (query) => {
 //                    setIsSearchActive(false);
 //                  }
 //                })}
-
 
         console.error('Error:', error);
         setError(error.message || "An error occurred");

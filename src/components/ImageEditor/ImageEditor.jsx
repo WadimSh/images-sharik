@@ -60,6 +60,7 @@ const ImageEditor = ({
   imageUrl, 
   imageData,
   onClose,
+  onImageSaved,
 }) => {
   const { user } = useAuth();
   const canvasRef = useRef(null);
@@ -2406,6 +2407,10 @@ const redo = () => {
     openFormatModal('save');
   };
 
+  const handleApplyClick = () => {
+    openFormatModal('apply');
+  };
+
 // Функции для обработки изменения размеров
 const handleWidthChange = (e) => {
   const newWidth = parseInt(e.target.value, 10);
@@ -2480,6 +2485,13 @@ const handleConfirmFormat = async () => {
       setResizeMode(false);
       setTargetWidth('');
       setTargetHeight('');
+    } else if (saveAction === 'apply' && onImageSaved) {
+      await onImageSaved(blob);
+      setShowFormatModal(false);
+      setResizeMode(false);
+      setTargetWidth('');
+      setTargetHeight('');
+      onClose();
     } else {
       setEditedImageBlob(blob);
       setShowFormatModal(false);
@@ -2978,6 +2990,18 @@ const openFormatModal = async (action) => {
                       <FiSave size={16} />
                       <span>Сохранить как</span>
                     </button>
+                    {onImageSaved && (
+                      <button
+                        className={styles.dropdownItem}
+                        onClick={() => {
+                          handleApplyClick();
+                          setShowSaveDropdown(false);
+                        }}
+                      >
+                        <FiCheck size={16} />
+                        <span>Применить</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -3275,7 +3299,11 @@ const openFormatModal = async (action) => {
           <div className={styles.formatModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.formatModalHeader}>
               <h3 className={styles.formatModalTitle}>
-                {saveAction === 'download' ? 'Выберите формат для скачивания' : 'Выберите формат для сохранения'}
+                {saveAction === 'download'
+                  ? 'Выберите формат для скачивания'
+                  : saveAction === 'apply'
+                    ? 'Выберите формат для применения'
+                    : 'Выберите формат для сохранения'}
               </h3>
               <button 
                 className={styles.formatModalClose}
@@ -3411,7 +3439,7 @@ const openFormatModal = async (action) => {
                 onClick={handleConfirmFormat}
                 disabled={isSaving || (resizeMode && (!targetWidth || !targetHeight))}
               >
-                {isSaving ? 'Обработка...' : (saveAction === 'download' ? 'Скачать' : 'Далее')}
+                {isSaving ? 'Обработка...' : (saveAction === 'download' ? 'Скачать' : saveAction === 'apply' ? 'Применить' : 'Далее')}
               </button>
             </div>
           </div>

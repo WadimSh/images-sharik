@@ -26,6 +26,7 @@ import { ZoomControls } from '../../ui/ZoomControls/ZoomControls';
 import { PreviewDesign } from '../../components/PreviewDesign';
 import { LibraryMediaModal } from '../../components/LibraryMediaModal/LibraryMediaModal';
 import { DragDropUploadModal } from '../../components/DragDropUploadModal';
+import ImageEditor from '../../components/ImageEditor/ImageEditor';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
@@ -45,6 +46,7 @@ export const Generator = () => {
   const storageMetaKey = `product-${baseId}`
   const savedMetaDate = isCollageMode ? null : sessionStorage.getItem(storageMetaKey);
   const initialMetaDateElement = savedMetaDate ? JSON.parse(savedMetaDate) : null;
+  const [productMeta, setProductMeta] = useState(initialMetaDateElement);
  
   // Загрузка из sessionStorage при инициализации
   const storageKey = isCollageMode 
@@ -108,6 +110,11 @@ export const Generator = () => {
   const [editingTextId, setEditingTextId] = useState(null);
   const [elements, setElements] = useState(processedElements);
   const [indexImg, setIndexImg] = useState(-1);
+  const [productEditor, setProductEditor] = useState({
+    isOpen: false,
+    imageUrl: null,
+    elementId: null,
+  });
   // Состояния для модалки создания макетов
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   // Для работы с макетами
@@ -320,7 +327,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
     if (!template) return;
 
     // Заменяем плейсхолдер на текущее изображение товара
-    const productImage = initialMetaDateElement?.images?.[indexImg] || '';
+    const productImage = productMeta?.images?.[indexImg] || '';
 
     const modifiedElements = template.map(element => ({
       ...element,
@@ -1016,6 +1023,71 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
     ));
   };
 
+  const handleEditProductImage = (elementId) => {
+    const element = elements.find(el => el.id === elementId);
+    if (!element?.image) return;
+
+    setProductEditor({
+      isOpen: true,
+      imageUrl: element.image,
+      elementId: element.id,
+    });
+  };
+
+  const handleProductEditorClose = () => {
+    setProductEditor({
+      isOpen: false,
+      imageUrl: null,
+      elementId: null,
+    });
+  };
+
+  const handleProductImageSaved = async (blob) => {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    const productElement = elements.find(el => el.type === 'image' && el.isProduct);
+    if (!productElement) return;
+
+    let imageIndex = indexImg;
+    if (imageIndex < 0 && productMeta?.images) {
+      imageIndex = productMeta.images.findIndex(img => productElement.image === img);
+    }
+
+    if (productMeta) {
+      setProductMeta(prev => {
+        if (!prev) return prev;
+
+        const newImages = [...(prev.images || [])];
+        if (newImages.length === 0) {
+          newImages.push(dataUrl);
+        } else if (imageIndex >= 0 && imageIndex < newImages.length) {
+          newImages[imageIndex] = dataUrl;
+        } else {
+          newImages.push(dataUrl);
+        }
+
+        const updatedMeta = { ...prev, images: newImages };
+        sessionStorage.setItem(storageMetaKey, JSON.stringify(updatedMeta));
+        return updatedMeta;
+      });
+    }
+
+    setElements(prev => prev.map(el =>
+      el.id === productElement.id
+        ? { ...el, image: dataUrl, isFlipped: el.isFlipped || false }
+        : el
+    ));
+
+    if (imageIndex >= 0) {
+      setIndexImg(imageIndex);
+    }
+  };
+
   // Добавить обработчик выбора изображения из библиотеки для компонента элемент
   const handleSelectFromLibrary = async (imageName) => {
     try {
@@ -1367,12 +1439,12 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
 
   useEffect(() => {
     // Найти индекс активного изображения
-    const activeIndex = initialMetaDateElement?.images?.findIndex(img => 
+    const activeIndex = productMeta?.images?.findIndex(img => 
       elements.some(el => el.type === 'image' && el.image === img && el.isProduct)
     ) ?? -1;
 
     setIndexImg(activeIndex);
-  }, [elements, initialMetaDateElement?.images]);
+  }, [elements, productMeta?.images]);
 
   // Эффект для закрытия меню при клике вне его области
   useEffect(() => {
@@ -1506,9 +1578,9 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
         sizeLabel={containerSize.fileName}
       />
       <div className="content-wrapper">
-        {(!isCollageMode && initialMetaDateElement !== null) && (
+        {(!isCollageMode && productMeta !== null) && (
           <ProductMetaInfo 
-            initialMetaDateElement={initialMetaDateElement}
+            initialMetaDateElement={productMeta}
           />
         )}
 
@@ -1519,9 +1591,9 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
             paddingBottom: containerSize.fileName !== '1416x708' ? '0' : '10px',
           }}
         >
-          {(!isCollageMode && initialMetaDateElement !== null) ? (
+          {(!isCollageMode && productMeta !== null) ? (
             <ProductImagesGrid 
-              images={initialMetaDateElement?.images}
+              images={productMeta?.images}
               elements={elements}
               handleImageSelect={handleImageSelect}
               isGrid={containerSize.width}
@@ -1943,6 +2015,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
             borderColorInputRef={borderColorInputRef}
             handleRemoveElement={handleRemoveElement}
             handleFlipImage={handleFlipImage}
+            handleEditProductImage={handleEditProductImage}
             handleColorButtonClick={handleColorButtonClick}
             handleRemoveBackground={handleRemoveBackground}
             handleAddShadow={handleAddShadow}
@@ -2056,6 +2129,15 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
         user={user}
         onUploadComplete={handleUploadComplete}
       />
+
+      {productEditor.isOpen && (
+        <ImageEditor
+          isOpen={productEditor.isOpen}
+          imageUrl={productEditor.imageUrl}
+          onClose={handleProductEditorClose}
+          onImageSaved={handleProductImageSaved}
+        />
+      )}
   </div>
   );
 };

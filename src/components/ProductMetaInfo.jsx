@@ -1,10 +1,16 @@
 export const ProductMetaInfo = ({ 
   initialMetaDateElement 
-}) => (
+}) => {
+  const productLink = initialMetaDateElement.link !== '#'
+    ? (initialMetaDateElement.link.endsWith('/')
+        ? initialMetaDateElement.link
+        : `${initialMetaDateElement.link}/`)
+    : '#';
+
+  return (
   <div className="meta-info">
-   {initialMetaDateElement.link !== '#' ? (
-      <a href={initialMetaDateElement.link} className='meta-link' target="_blank" rel="noopener noreferrer">
-        <h3 className='meta-title'>
+   {productLink !== '#' ? (
+      <a href={productLink} className='meta-link' target="_blank" rel="noopener noreferrer">        <h3 className='meta-title'>
           {initialMetaDateElement.code}
           <span className="meta-subtitle"> {initialMetaDateElement.name}</span>
         </h3>
@@ -36,4 +42,5 @@ export const ProductMetaInfo = ({
       </div>
     ))}
   </div>
-);
+  );
+};

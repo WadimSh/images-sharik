@@ -4,6 +4,7 @@ import { FaChevronDown, FaWandMagicSparkles, FaPencil, FaArrowRightArrowLeft } f
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbRadiusTopLeft, TbRadiusTopRight, TbRadiusBottomLeft, TbRadiusBottomRight } from "react-icons/tb";
+import { RiImageEditLine } from "react-icons/ri";
 import { LuImageOff } from "react-icons/lu";
 import { BsBorderWidth, BsLockFill, BsUnlockFill } from "react-icons/bs";
 import { RxBorderWidth } from "react-icons/rx";
@@ -34,6 +35,7 @@ export const ElementsList = ({
   borderColorInputRef,
   handleRemoveElement,
   handleFlipImage,
+  handleEditProductImage,
   handleColorButtonClick,
   handleRemoveBackground,
   handleAddShadow,
@@ -404,8 +406,22 @@ export const ElementsList = ({
                     </div>
                   )}
 
-                  {(element.type === 'image' || element.type === 'element') && (
+                  {element.isProduct && handleEditProductImage && (
                     <div className="element-controls">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditProductImage(element.id);
+                        }}
+                        className="remove-bg-button"
+                      >
+                        <><RiImageEditLine /> {t('modals.edit')}</>
+                      </button>
+                    </div>
+                  )}
+
+                  {(element.type === 'image' || element.type === 'element') && (
+                    <div className="element-controls" style={{ paddingTop: '0px' }}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
