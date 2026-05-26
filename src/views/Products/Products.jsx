@@ -1,11 +1,12 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { RiImageEditLine } from 'react-icons/ri';
 
 import { LanguageContext } from '../../contexts/contextLanguage';
 import { useGetCode } from '../../hooks/useGetCode';
 import { apiGetAllImages } from '../../services/mediaService';
 import { ImageSliderModal } from '../../components/ImageSliderModal';
-
+import ImageEditor from '../../components/ImageEditor/ImageEditor';
 const articleToTag = (article) => {
   if (!article) return null;
   return article.trim();
@@ -19,6 +20,7 @@ export const Products = () => {
   const [productInfo, setProductInfo] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [storageImages, setStorageImages] = useState([]);
+  const [storageFiles, setStorageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     portal: null,
@@ -33,6 +35,12 @@ export const Products = () => {
     images: [],
     currentIndex: 0,
     source: null // 'portal' или 'storage'
+  });
+
+  const [editorConfig, setEditorConfig] = useState({
+    isOpen: false,
+    imageUrl: null,
+    imageData: null,
   });
 
   // Функция открытия слайдера для портала
@@ -65,6 +73,75 @@ export const Products = () => {
     setSliderConfig(prev => ({ ...prev, currentIndex: newIndex }));
   };
 
+  const openEditor = (imageUrl, imageData = null) => {
+    setEditorConfig({
+      isOpen: true,
+      imageUrl,
+      imageData,
+    });
+  };
+
+  const closeEditor = () => {
+    setEditorConfig({
+      isOpen: false,
+      imageUrl: null,
+      imageData: null,
+    });
+  };
+
+  const handleSliderEdit = (imageUrl, index) => {
+    const imageData = sliderConfig.source === 'storage' ? storageFiles[index] : null;
+    closeSlider();
+    openEditor(imageUrl, imageData);
+  };
+
+  const loadStorageImages = useCallback(async (articleTag) => {
+    const params = {
+      page: 1,
+      limit: 100,
+      sortBy: 'uploadDate',
+      sortOrder: 'desc',
+      tags: [articleTag, articleTag],
+    };
+
+    Object.keys(params).forEach(key => {
+      if (params[key] === '' || params[key] === undefined ||
+          (Array.isArray(params[key]) && params[key].length === 0)) {
+        delete params[key];
+      }
+    });
+
+    const storageResponse = await apiGetAllImages(params);
+
+    if (storageResponse?.files && Array.isArray(storageResponse.files)) {
+      setStorageFiles(storageResponse.files);
+      setStorageImages(storageResponse.files.map(file =>
+        `https://mp.sharik.ru${file.url}`
+      ));
+      return true;
+    }
+
+    setStorageFiles([]);
+    setStorageImages([]);
+    return false;
+  }, []);
+
+  const handleEditorClose = async () => {
+    const wasStorageImage = Boolean(editorConfig.imageData);
+    closeEditor();
+
+    if (wasStorageImage && article) {
+      const articleTag = articleToTag(article);
+      if (articleTag) {
+        try {
+          await loadStorageImages(articleTag);
+        } catch (error) {
+          console.error('Failed to refresh storage images:', error);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchProductData = async () => {
       if (!article) {
@@ -79,6 +156,7 @@ export const Products = () => {
       setProductInfo(null);
       setProductImages([]);
       setStorageImages([]);
+      setStorageFiles([]);
 
       try {
         // 1. Запрос на портал - оборачиваем в try/catch отдельно
@@ -131,37 +209,15 @@ export const Products = () => {
           const articleTag = articleToTag(article);
           
           if (articleTag) {
-            // Формируем params как в loadImagesFromBackend
-            const params = {
-              page: 1,
-              limit: 100,
-              sortBy: 'uploadDate',
-              sortOrder: 'desc'
-            };
-
-            // Подготовка тегов с дублированием для бэкенда
-            if (articleTag) {
-              params.tags = [articleTag, articleTag];
-            }
-
-            // Очищаем пустые параметры
-            Object.keys(params).forEach(key => {
-              if (params[key] === '' || params[key] === undefined || 
-                  (Array.isArray(params[key]) && params[key].length === 0)) {
-                delete params[key];
+            try {
+              const hasStorageImages = await loadStorageImages(articleTag);
+              if (!hasStorageImages) {
+                setErrors(prev => ({ ...prev, storage: 'Нет изображений в хранилище' }));
               }
-            });
-
-            // Выбираем нужный API метод в зависимости от прав
-            const storageResponse = await apiGetAllImages(params);
-
-            if (storageResponse && storageResponse.files && Array.isArray(storageResponse.files)) {
-              const storageImageUrls = storageResponse.files.map(file => 
-                `https://mp.sharik.ru${file.url}`
-              );
-              setStorageImages(storageImageUrls);
-            } else {
-              setErrors(prev => ({ ...prev, storage: 'Нет изображений в хранилище' }));
+            } catch (storageError) {
+              setErrors(prev => ({ ...prev, storage: 'Не удалось подключиться к хранилищу' }));
+              setStorageImages([]);
+              setStorageFiles([]);
             }
           } else {
             setErrors(prev => ({ ...prev, storage: 'Неверный формат артикула' }));
@@ -169,6 +225,7 @@ export const Products = () => {
         } catch (storageError) {
           setErrors(prev => ({ ...prev, storage: 'Не удалось подключиться к хранилищу' }));
           setStorageImages([]);
+          setStorageFiles([]);
         }
 
       } finally {
@@ -177,7 +234,7 @@ export const Products = () => {
     };
 
     fetchProductData();
-  }, [article]);
+  }, [article, loadStorageImages]);
 
   // Получаем коды для маркетплейсов
   const wbCode = article ? getCode(article, "WB") : null;
@@ -701,6 +758,17 @@ export const Products = () => {
                     onClick={() => openPortalSlider(index)}
                     style={{ cursor: 'pointer' }}
                   >
+                    <button
+                      type="button"
+                      className="product-image-edit-btn"
+                      title={t('modals.edit')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditor(img);
+                      }}
+                    >
+                      <RiImageEditLine size={14} />
+                    </button>
                     <div className="images-container">
                       <img src={img} alt={`portal-${index}`} className="image-thumbnail" />
                     </div>
@@ -722,6 +790,17 @@ export const Products = () => {
                     onClick={() => openStorageSlider(index)}
                     style={{ cursor: 'pointer' }}
                   >
+                    <button
+                      type="button"
+                      className="product-image-edit-btn"
+                      title={t('modals.edit')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditor(img, storageFiles[index]);
+                      }}
+                    >
+                      <RiImageEditLine size={14} />
+                    </button>
                     <div className="images-container">
                       <img src={img} alt={`storage-${index}`} className="image-thumbnail" />
                     </div>
@@ -741,6 +820,17 @@ export const Products = () => {
               currentIndex={sliderConfig.currentIndex}
               onClose={closeSlider}
               onIndexChange={handleSliderIndexChange}
+              onEdit={handleSliderEdit}
+              editLabel={t('modals.edit')}
+            />
+          )}
+
+          {editorConfig.isOpen && (
+            <ImageEditor
+              isOpen={editorConfig.isOpen}
+              imageUrl={editorConfig.imageUrl}
+              imageData={editorConfig.imageData}
+              onClose={handleEditorClose}
             />
           )}
         </div>

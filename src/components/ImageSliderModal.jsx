@@ -1,7 +1,8 @@
 import { useRef, useEffect } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { RiImageEditLine } from "react-icons/ri";
 
-export const ImageSliderModal = ({ baseCode, images, currentIndex, onClose, onIndexChange }) => {
+export const ImageSliderModal = ({ baseCode, images, currentIndex, onClose, onIndexChange, onEdit, editLabel = 'Редактировать' }) => {
   const thumbnailsRef = useRef(null);
   const thumbnailRefs = useRef([]);
   
@@ -135,10 +136,21 @@ export const ImageSliderModal = ({ baseCode, images, currentIndex, onClose, onIn
           </div>
           
         </div>
-        <div className="modals-footer">
+        <div className="modals-footer" style={{ justifyContent: onEdit ? 'space-between' : 'center', alignItems: 'center' }}>
+          {onEdit && (
+            <button
+              type="button"
+              className="slider-edit-btn"
+              onClick={() => onEdit(images[currentIndex], currentIndex)}
+            >
+              <RiImageEditLine size={16} />
+              <span>{editLabel}</span>
+            </button>
+          )}
           <div className="slider-counter">
             {currentIndex + 1} / {images.length}
           </div>
+          {onEdit && <div style={{ width: '130px' }} />}
         </div>
       </div>
     </div>

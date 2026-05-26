@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { PiCopySimpleBold } from "react-icons/pi";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 import { HiOutlineDownload } from "react-icons/hi";
 import { FaTimes, FaTags, FaPlus } from "react-icons/fa";
 import { RiImageEditLine } from "react-icons/ri";
+import { FiMaximize } from "react-icons/fi";
 
 import ImageEditor from "../ImageEditor/ImageEditor";
 import { useAuth } from "../../contexts/AuthContext";
@@ -82,10 +84,13 @@ export const ImageDigitalizationModal = ({
   const [isTagOperationLoading, setIsTagOperationLoading] = useState(false);
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [showEditor, setShowEditor] = useState(false);
+  const [showFullscreen, setShowFullscreen] = useState(false);
   
   const tagButtonRef = useRef(null);
   const popoverRef = useRef(null);
   const isManualNavigation = useRef(false);
+  const fullscreenThumbnailsRef = useRef(null);
+  const fullscreenThumbnailRefs = useRef([]);
  
   useEffect(() => {
     if (isOpen) {
@@ -93,6 +98,10 @@ export const ImageDigitalizationModal = ({
         if (showEditor) return;
 
         if (e.key === 'Escape') {
+          if (showFullscreen) {
+            setShowFullscreen(false);
+            return;
+          }
           onClose();
         }
       };
@@ -103,7 +112,7 @@ export const ImageDigitalizationModal = ({
         document.removeEventListener('keydown', handleEscKey);
       };
     }
-  }, [isOpen, onClose, showEditor]);
+  }, [isOpen, onClose, showEditor, showFullscreen]);
 
   // Закрытие поповера при клике вне его
   useEffect(() => {
@@ -121,6 +130,12 @@ export const ImageDigitalizationModal = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowFullscreen(false);
+    }
+  }, [isOpen]);
 
   // Синхронизация с пропсами
 useEffect(() => {
@@ -167,6 +182,7 @@ useEffect(() => {
 
   const handleClose = () => {
     setShowTagPopover(false);
+    setShowFullscreen(false);
     onClose();
   };
 
@@ -186,7 +202,7 @@ const handlePrevImage = (e) => {
 };
 
 
-const handleNextImage = (e) => {
+  const handleNextImage = (e) => {
   e.stopPropagation(); 
   if (!images || images.length === 0) return;
   
@@ -200,6 +216,36 @@ const handleNextImage = (e) => {
   setShowTagPopover(false);
   updateTagColors(newImage.tags);
 };
+
+  const handleGoToImage = (index) => {
+    if (!images || images.length === 0 || index < 0 || index >= images.length) return;
+
+    isManualNavigation.current = true;
+
+    const newImage = images[index];
+    setCurrentImageIndex(index);
+    setCurrentImageData(newImage);
+    setShowTagPopover(false);
+    updateTagColors(newImage.tags);
+  };
+
+  const getFullImageUrl = (image) => `https://mp.sharik.ru${image.url}`;
+  const getFullThumbnailUrl = (image) => `https://mp.sharik.ru${image.thumbnailUrl}`;
+
+  useEffect(() => {
+    if (!showFullscreen || !fullscreenThumbnailsRef.current) return;
+
+    const activeThumb = fullscreenThumbnailRefs.current[currentImageIndex];
+    if (!activeThumb) return;
+
+    const container = fullscreenThumbnailsRef.current;
+    const needsScroll = container.scrollWidth > container.clientWidth;
+
+    if (needsScroll) {
+      const scrollLeft = activeThumb.offsetLeft - (container.clientWidth / 2) + (activeThumb.clientWidth / 2);
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [showFullscreen, currentImageIndex, images]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
@@ -413,6 +459,16 @@ const handleAddTag = async (tagToAdd) => {
     setShowEditor(true);
   };
 
+  const handleOpenFullscreen = (e) => {
+    e.stopPropagation();
+    setShowFullscreen(true);
+  };
+
+  const handleCloseFullscreen = (e) => {
+    e?.stopPropagation?.();
+    setShowFullscreen(false);
+  };
+
   const handleEditorClose = () => {
     setShowEditor(false);
     if (onEditorClose) {
@@ -429,9 +485,99 @@ const handleAddTag = async (tagToAdd) => {
     return null;
   }
 
-  const fullImageUrl = `https://mp.sharik.ru${currentImageData.url}`;
-  const fullThumbnailUrl = `https://mp.sharik.ru${currentImageData.thumbnailUrl}`;
+  const fullImageUrl = getFullImageUrl(currentImageData);
+  const fullThumbnailUrl = getFullThumbnailUrl(currentImageData);
   const tags = currentImageData.tags || [];
+  const hasMultipleImages = images && images.length > 1;
+
+  const renderFullscreenViewer = () => {
+    if (!showFullscreen) return null;
+
+    return createPortal(
+      <div className="image-fullscreen-overlay" onClick={handleCloseFullscreen}>
+        <div className="image-fullscreen-toolbar" onClick={(e) => e.stopPropagation()}>
+          <span className="image-fullscreen-title" title={currentImageData.fileName}>
+            {currentImageData.fileName}
+          </span>
+          {hasMultipleImages && (
+            <span className="image-fullscreen-counter">
+              {currentImageIndex + 1} / {images.length}
+            </span>
+          )}
+          <button
+            type="button"
+            className="image-fullscreen-close-btn"
+            onClick={handleCloseFullscreen}
+            aria-label="Закрыть полноэкранный режим"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div className="image-fullscreen-body" onClick={(e) => e.stopPropagation()}>
+          {hasMultipleImages && (
+            <button
+              type="button"
+              className="image-fullscreen-nav image-fullscreen-nav-prev"
+              onClick={handlePrevImage}
+              aria-label="Предыдущее изображение"
+            >
+              <HiOutlineChevronLeft size={32} />
+            </button>
+          )}
+
+          <div className="image-fullscreen-image-wrap">
+            <img
+              src={fullImageUrl}
+              alt={currentImageData.fileName}
+              className="image-fullscreen-image"
+              onError={(e) => {
+                e.target.src = fullThumbnailUrl;
+              }}
+            />
+          </div>
+
+          {hasMultipleImages && (
+            <button
+              type="button"
+              className="image-fullscreen-nav image-fullscreen-nav-next"
+              onClick={handleNextImage}
+              aria-label="Следующее изображение"
+            >
+              <HiOutlineChevronRight size={32} />
+            </button>
+          )}
+        </div>
+
+        {hasMultipleImages && (
+          <div className="image-fullscreen-thumbnails-wrap" onClick={(e) => e.stopPropagation()}>
+            <div className="image-fullscreen-thumbnails" ref={fullscreenThumbnailsRef}>
+              {images.map((image, index) => (
+                <button
+                  key={image._id || index}
+                  type="button"
+                  ref={(el) => { fullscreenThumbnailRefs.current[index] = el; }}
+                  className={`image-fullscreen-thumb ${index === currentImageIndex ? 'active' : ''}`}
+                  onClick={() => handleGoToImage(index)}
+                  aria-label={`Изображение ${index + 1}`}
+                >
+                  <img
+                    src={getFullThumbnailUrl(image)}
+                    alt={`Миниатюра ${index + 1}`}
+                    className="image-fullscreen-thumb-image"
+                    onError={(e) => {
+                      e.target.src = getFullImageUrl(image);
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>,
+      document.body
+    );
+  };
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
@@ -539,6 +685,16 @@ const handleAddTag = async (tagToAdd) => {
                     e.target.src = fullThumbnailUrl;
                   }}
                 />
+
+                <button
+                  type="button"
+                  className="image-fullscreen-open-btn"
+                  onClick={handleOpenFullscreen}
+                  title="Полноэкранный просмотр"
+                  aria-label="Полноэкранный просмотр"
+                >
+                  <FiMaximize size={18} />
+                </button>
                 
                 {/* Теги поверх изображения */}
                 {tags.length > 0 && (
@@ -703,6 +859,8 @@ const handleAddTag = async (tagToAdd) => {
         imageData={currentImageData}
         onClose={handleEditorClose}
       />
+
+      {renderFullscreenViewer()}
     </div>
   );
 };
