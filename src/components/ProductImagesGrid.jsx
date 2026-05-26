@@ -19,7 +19,7 @@ export const ProductImagesGrid = ({
       
       return (
         <div 
-          key={index}
+          key={`${img}-${index}`}
           className={`image-item ${isActive ? 'active' : ''}`}
           onClick={() => handleImageSelect(img, index)}
         >

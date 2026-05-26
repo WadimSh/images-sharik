@@ -2407,8 +2407,20 @@ const redo = () => {
     openFormatModal('save');
   };
 
-  const handleApplyClick = () => {
-    openFormatModal('apply');
+  const handleApplyClick = async () => {
+    if (!onImageSaved) return;
+
+    setIsSaving(true);
+    try {
+      const blob = await createImageBlob('png');
+      await onImageSaved(blob);
+      onClose();
+    } catch (err) {
+      console.error('Apply failed:', err);
+      alert('Не удалось применить изображение');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
 // Функции для обработки изменения размеров
@@ -2502,7 +2514,13 @@ const handleConfirmFormat = async () => {
     }
   } catch (err) {
     console.error('Operation failed:', err);
-    alert(saveAction === 'download' ? 'Не удалось скачать изображение' : 'Не удалось подготовить изображение');
+    alert(
+      saveAction === 'download'
+        ? 'Не удалось скачать изображение'
+        : saveAction === 'apply'
+          ? 'Не удалось применить изображение'
+          : 'Не удалось подготовить изображение'
+    );
   } finally {
     setIsSaving(false);
   }
@@ -2997,9 +3015,10 @@ const openFormatModal = async (action) => {
                           handleApplyClick();
                           setShowSaveDropdown(false);
                         }}
+                        disabled={isSaving}
                       >
                         <FiCheck size={16} />
-                        <span>Применить</span>
+                        <span>{isSaving ? 'Сохранение...' : 'Применить'}</span>
                       </button>
                     )}
                   </div>

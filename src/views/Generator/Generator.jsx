@@ -30,9 +30,79 @@ import ImageEditor from '../../components/ImageEditor/ImageEditor';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMarketplace } from '../../contexts/contextMarketplace';
 import { useGetCode } from '../../hooks/useGetCode';
-import { slidesDB } from '../../utils/handleDB';
+import { slidesDB, productsDB } from '../../utils/handleDB';
 import { LanguageContext } from '../../contexts/contextLanguage';
+import { uploadGraphicFile } from '../../services/mediaService';
 import { SIZE_PRESETS_BY_MARKETPLACE } from '../../constants/sizePresetsByMarketplace';
+
+const getFullStorageImageUrl = (imageUrl) => {
+  const baseUrl = 'https://mp.sharik.ru';
+  return imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
+};
+
+const convertBlobToWebP = (blob) => new Promise((resolve, reject) => {
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(blob);
+
+  img.onload = () => {
+    URL.revokeObjectURL(objectUrl);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    canvas.toBlob((webpBlob) => {
+      if (webpBlob) {
+        resolve(webpBlob);
+      } else {
+        reject(new Error('Не удалось конвертировать изображение в WEBP'));
+      }
+    }, 'image/webp', 0.92);
+  };
+
+  img.onerror = () => {
+    URL.revokeObjectURL(objectUrl);
+    reject(new Error('Не удалось обработать изображение'));
+  };
+
+  img.src = objectUrl;
+});
+
+const getBlobImageDimensions = (blob) => new Promise((resolve, reject) => {
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(blob);
+
+  img.onload = () => {
+    URL.revokeObjectURL(objectUrl);
+    resolve({ width: img.width, height: img.height });
+  };
+
+  img.onerror = () => {
+    URL.revokeObjectURL(objectUrl);
+    reject(new Error('Не удалось получить размеры изображения'));
+  };
+
+  img.src = objectUrl;
+});
+
+const generateProductEditedFileName = (productCode, width, height) => {
+  const now = new Date();
+  const datePart = now.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).replace(/\./g, '');
+  const timePart = now.toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).replace(/:/g, '');
+
+  return `${productCode}_edited_${width}x${height}_${datePart}_${timePart}.webp`;
+};
 
 export const Generator = () => {
   const { id } = useParams();
@@ -1043,49 +1113,79 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
   };
 
   const handleProductImageSaved = async (blob) => {
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-
     const productElement = elements.find(el => el.type === 'image' && el.isProduct);
     if (!productElement) return;
 
-    let imageIndex = indexImg;
-    if (imageIndex < 0 && productMeta?.images) {
-      imageIndex = productMeta.images.findIndex(img => productElement.image === img);
+    const productCode = productMeta?.code || baseId;
+    if (!productCode) {
+      throw new Error('Не удалось определить код товара');
     }
 
+    if (!user?.company?.[0]?.id) {
+      throw new Error('Не удалось определить компанию для загрузки');
+    }
+
+    const webpBlob = await convertBlobToWebP(blob);
+    const dimensions = await getBlobImageDimensions(webpBlob);
+    const fileName = generateProductEditedFileName(
+      productCode,
+      dimensions.width,
+      dimensions.height
+    );
+    const file = new File([webpBlob], fileName, {
+      type: 'image/webp',
+      lastModified: Date.now(),
+    });
+
+    const uploadResult = await uploadGraphicFile(
+      user.company[0].id,
+      file,
+      null,
+      [productCode]
+    );
+
+    if (!uploadResult?.success) {
+      throw new Error(uploadResult?.message || 'Ошибка загрузки изображения');
+    }
+
+    const uploadedFile = uploadResult.data || uploadResult.file;
+    if (!uploadedFile?.url) {
+      throw new Error('Нет данных о загруженном файле');
+    }
+
+    const imageUrl = getFullStorageImageUrl(uploadedFile.url);
+    const currentImages = productMeta?.images || [];
+    const newImages = [...currentImages];
+
+    if (!newImages.includes(imageUrl)) {
+      newImages.push(imageUrl);
+    }
+
+    const nextImageIndex = newImages.indexOf(imageUrl);
+
     if (productMeta) {
-      setProductMeta(prev => {
-        if (!prev) return prev;
+      const updatedMeta = { ...productMeta, images: newImages };
+      sessionStorage.setItem(storageMetaKey, JSON.stringify(updatedMeta));
 
-        const newImages = [...(prev.images || [])];
-        if (newImages.length === 0) {
-          newImages.push(dataUrl);
-        } else if (imageIndex >= 0 && imageIndex < newImages.length) {
-          newImages[imageIndex] = dataUrl;
-        } else {
-          newImages.push(dataUrl);
-        }
+      try {
+        await productsDB.put({
+          code: `product-${productCode}`,
+          data: updatedMeta,
+        });
+      } catch (error) {
+        console.error('Failed to update product meta in DB:', error);
+      }
 
-        const updatedMeta = { ...prev, images: newImages };
-        sessionStorage.setItem(storageMetaKey, JSON.stringify(updatedMeta));
-        return updatedMeta;
-      });
+      setProductMeta(updatedMeta);
     }
 
     setElements(prev => prev.map(el =>
       el.id === productElement.id
-        ? { ...el, image: dataUrl, isFlipped: el.isFlipped || false }
+        ? { ...el, image: imageUrl, isFlipped: el.isFlipped || false }
         : el
     ));
 
-    if (imageIndex >= 0) {
-      setIndexImg(imageIndex);
-    }
+    setIndexImg(nextImageIndex);
   };
 
   // Добавить обработчик выбора изображения из библиотеки для компонента элемент
