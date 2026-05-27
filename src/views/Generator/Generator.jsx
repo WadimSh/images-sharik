@@ -101,7 +101,7 @@ const generateProductEditedFileName = (productCode, width, height) => {
     second: '2-digit',
   }).replace(/:/g, '');
 
-  return `${productCode}_edited_${width}x${height}_${datePart}_${timePart}.webp`;
+  return `${productCode}_used_${width}x${height}_${datePart}_${timePart}.webp`;
 };
 
 export const Generator = () => {
