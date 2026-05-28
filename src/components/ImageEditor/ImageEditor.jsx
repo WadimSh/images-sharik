@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   FiRotateCw, FiCrop, FiThermometer, FiSun, FiDroplet,
@@ -14,6 +14,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { uploadGraphicFile } from '../../services/mediaService';
 import ImageEditedUploadModal from '../ImageEditedUploadModal/ImageEditedUploadModal'; 
 import AdjustmentSlider from './AdjustmentSlider';
+import ImprovementsPanel from './ImprovementsPanel';
+import { isUpscaleAvailable, UPSCALE_DISABLED_REASON } from './improvementsConfig';
+import { getEditorExportDimensions } from './utils/prepareEditorImageBlob';
+import { usePhotoroomProcessing } from './usePhotoroomProcessing';
 import styles from './ImageEditor.module.css';
 
 // Хук для определения ширины экрана
@@ -134,7 +138,6 @@ const ImageEditor = ({
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  const [isRemovingBackground, setIsRemovingBackground] = useState(false);
 
   // Закрытие мобильной панели при изменении ширины экрана
   useEffect(() => {
@@ -2009,119 +2012,6 @@ const handleCanvasTouchMove = (e) => {
 
   // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
   
-  const handleRemoveBackground = async () => {
-    if (!image || isRemovingBackground) return;
-    
-    setIsRemovingBackground(true);
-    
-    try {
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) throw new Error('Cannot create canvas context');
-      
-      tempCanvas.width = image.width;
-      tempCanvas.height = image.height;
-      
-      tempCtx.save();
-      tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-      tempCtx.rotate((rotation * Math.PI) / 180);
-      tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-      tempCtx.filter = getFilters();
-      tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
-      tempCtx.restore();
-      
-      let finalCanvas = tempCanvas;
-      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-        const originalCrop = getOriginalImageCoordinates(cropRect);
-        
-        if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
-          const croppedCanvas = document.createElement('canvas');
-          const croppedCtx = croppedCanvas.getContext('2d');
-          if (!croppedCtx) throw new Error('Cannot create cropped canvas');
-          
-          croppedCanvas.width = originalCrop.w;
-          croppedCanvas.height = originalCrop.h;
-          
-          croppedCtx.drawImage(
-            tempCanvas,
-            originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
-            0, 0, originalCrop.w, originalCrop.h
-          );
-          
-          finalCanvas = croppedCanvas;
-        }
-      }
-      
-      const blob = await new Promise((resolve) => {
-        finalCanvas.toBlob((blob) => resolve(blob), 'image/png');
-      });
-      
-      const form = new FormData();
-      form.append('image_file', blob, 'image.png');
-      form.append('format', 'png');
-      form.append('size', 'auto');
-      form.append('despill', 'medium');
-      
-      const options = {
-        method: 'POST',
-        headers: {
-          'x-api-key': apiKey
-        },
-        body: form
-      };
-      
-      const apiResponse = await fetch('https://sdk.photoroom.com/v1/segment', options);
-      
-      if (!apiResponse.ok) {
-        throw new Error(`API error: ${apiResponse.status}`);
-      }
-      
-      const processedBlob = await apiResponse.blob();
-      const processedUrl = URL.createObjectURL(processedBlob);
-      
-      const processedImage = new Image();
-      processedImage.onload = () => {
-        setImage(processedImage);
-        setRotation(0);
-        setZoom(baseZoom);
-        setFlipX(false);
-        setFlipY(false);
-        setCropMode(false);
-        setAspectCropMode(false);
-        setLassoMode(false);
-        setLassoPoints([]);
-        setCropRect({ x: 0, y: 0, w: 0, h: 0 });
-        setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
-        setPanOffset({ x: 0, y: 0 });
-        
-        const container = containerRef.current;
-        if (container) {
-          const fitZoom = calculateFitZoom(
-            processedImage.width, processedImage.height,
-            container.clientWidth, container.clientHeight
-          );
-          setBaseZoom(fitZoom);
-          setZoom(fitZoom);
-        }
-        
-        setTimeout(() => saveToHistory(), 50);
-        URL.revokeObjectURL(processedUrl);
-        setIsRemovingBackground(false);
-      };
-      
-      processedImage.onerror = () => {
-        throw new Error('Failed to load processed image');
-      };
-      
-      processedImage.src = processedUrl;
-      
-    } catch (error) {
-      console.error('Error removing background:', error);
-      alert(`Ошибка при удалении фона: ${error.message}`);
-      setIsRemovingBackground(false);
-    }
-  };
-
 const saveToHistory = useCallback(() => {
   const canvas = canvasRef.current;
   if (!canvas) return;
@@ -2172,6 +2062,73 @@ const saveToHistory = useCallback(() => {
   setHistoryIndex(newHistory.length - 1);
 }, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, lassoMode]);
 
+  const handleImageProcessed = useCallback((processedImage, containerRef, calculateFitZoomFn) => {
+    setImage(processedImage);
+    setRotation(0);
+    setFlipX(false);
+    setFlipY(false);
+    setCropMode(false);
+    setAspectCropMode(false);
+    setLassoMode(false);
+    setLassoPoints([]);
+    setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setPanOffset({ x: 0, y: 0 });
+
+    const container = containerRef.current;
+    if (container) {
+      const fitZoom = calculateFitZoomFn(
+        processedImage.width, processedImage.height,
+        container.clientWidth, container.clientHeight
+      );
+      setBaseZoom(fitZoom);
+      setZoom(fitZoom);
+    }
+  }, []);
+
+  const editorExportDimensions = useMemo(() => {
+    return getEditorExportDimensions({
+      image,
+      cropMode,
+      cropRect,
+      getOriginalImageCoordinates,
+    });
+  }, [image, cropMode, cropRect, rotation, zoom, panOffset, flipX, flipY]);
+
+  const isUpscaleSupported = isUpscaleAvailable(
+    editorExportDimensions.width,
+    editorExportDimensions.height
+  );
+
+  const improvementDisabledState = useMemo(() => ({
+    disabledImprovements: {
+      upscale: !isUpscaleSupported,
+    },
+    disabledReasons: {
+      upscale: !isUpscaleSupported ? UPSCALE_DISABLED_REASON : undefined,
+    },
+  }), [isUpscaleSupported]);
+
+  const {
+    activeProcessing,
+    isProcessing,
+    handleRemoveBackground,
+    handleImprovement,
+  } = usePhotoroomProcessing({
+    apiKey,
+    image,
+    rotation,
+    flipX,
+    flipY,
+    cropMode,
+    cropRect,
+    getFilters,
+    getOriginalImageCoordinates,
+    containerRef,
+    calculateFitZoom,
+    onImageProcessed: handleImageProcessed,
+    onSaveHistory: saveToHistory,
+  });
 
 const restoreFromHistory = useCallback((state) => {
   const canvas = canvasRef.current;
@@ -2910,11 +2867,11 @@ const openFormatModal = async (action) => {
                 <div className={styles.transformDivider} />
 
                 <button
-                  className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
+                  className={`${styles.transformButton} ${activeProcessing === 'background' ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
-                  disabled={isRemovingBackground}
+                  disabled={isProcessing}
                 >
-                  {isRemovingBackground ? (
+                  {activeProcessing === 'background' ? (
                     <div className={styles.spinner} />
                   ) : (
                     <PiMagicWand size={20} />
@@ -3069,11 +3026,11 @@ const openFormatModal = async (action) => {
                 <div className={styles.transformDivider} />
                   
                 <button
-                  className={`${styles.transformButton} ${isRemovingBackground ? styles.loading : ''}`}
+                  className={`${styles.transformButton} ${activeProcessing === 'background' ? styles.loading : ''}`}
                   onClick={handleRemoveBackground}
-                  disabled={isRemovingBackground}
+                  disabled={isProcessing}
                 >
-                  {isRemovingBackground ? (
+                  {activeProcessing === 'background' ? (
                     <div className={styles.spinner} />
                   ) : (
                     <PiMagicWand size={20} />
@@ -3212,6 +3169,12 @@ const openFormatModal = async (action) => {
                 >
                   Эффекты
                 </button>
+                <button 
+                  className={`${styles.tab} ${activeTab === 'improvements' ? styles.active : ''}`}
+                  onClick={() => setActiveTab('improvements')}
+                >
+                  Улучшения
+                </button>
               </div>
 
               {activeTab === 'color' && (
@@ -3279,6 +3242,16 @@ const openFormatModal = async (action) => {
                     ))}
                   </div>
                 </div>
+              )}
+
+              {activeTab === 'improvements' && (
+                <ImprovementsPanel
+                  activeProcessing={activeProcessing}
+                  onImprovementClick={handleImprovement}
+                  disabled={isProcessing}
+                  disabledImprovements={improvementDisabledState.disabledImprovements}
+                  disabledReasons={improvementDisabledState.disabledReasons}
+                />
               )}
             </div>
           </div>
