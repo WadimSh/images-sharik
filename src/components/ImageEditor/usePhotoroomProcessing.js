@@ -5,6 +5,7 @@ import {
   removeBackground,
   IMPROVEMENT_HANDLERS,
 } from './services/photoroomService';
+import { EXPAND_MAX_FILE_SIZE, EXPAND_SOURCE_DISABLED_REASON } from './expandConfig';
 
 const ERROR_MESSAGES = {
   background: 'Ошибка при удалении фона',
@@ -12,6 +13,8 @@ const ERROR_MESSAGES = {
   uncrop: 'Ошибка при восстановлении изображения',
   shadow: 'Ошибка при добавлении тени',
   lighting: 'Ошибка при изменении освещённости',
+  expand: 'Ошибка при увеличении изображения',
+  createBackground: 'Ошибка при создании фона',
   catalogStudio: 'Ошибка при создании каталожного изображения',
   lifestyleEnvironment: 'Ошибка при создании сцены в окружении',
   lifestyleInUse: 'Ошибка при создании сцены в использовании',
@@ -71,6 +74,11 @@ export function usePhotoroomProcessing({
 
     try {
       const blob = await getEditorBlob();
+
+      if (operationId === 'expand' && blob.size > EXPAND_MAX_FILE_SIZE) {
+        throw new Error(EXPAND_SOURCE_DISABLED_REASON);
+      }
+
       const processedBlob = await apiHandler(apiKey, blob);
       await applyProcessedBlob(processedBlob);
     } catch (error) {

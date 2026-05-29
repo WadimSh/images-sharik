@@ -1,5 +1,7 @@
 import { IMPROVEMENTS, PRODUCT_SHOWCASE } from './improvementsConfig';
 import ShadowImprovementCard from './ShadowImprovementCard';
+import BackgroundImprovementCard from './BackgroundImprovementCard';
+import ExpandImprovementCard from './ExpandImprovementCard';
 import styles from './ImageEditor.module.css';
 
 const ImprovementCard = ({
@@ -65,6 +67,35 @@ const ImprovementsPanel = ({
                 activeProcessing={activeProcessing}
                 onApply={(options) => onImprovementClick('shadow', options)}
                 disabled={disabled || disabledImprovements.shadow}
+              />
+            );
+          }
+
+          if (item.id === 'createBackground') {
+            return (
+              <BackgroundImprovementCard
+                key={item.id}
+                label={item.label}
+                description={item.description}
+                icon={item.icon}
+                activeProcessing={activeProcessing}
+                onApply={(options) => onImprovementClick('createBackground', options)}
+                disabled={disabled || disabledImprovements.createBackground}
+              />
+            );
+          }
+
+          if (item.id === 'expand') {
+            return (
+              <ExpandImprovementCard
+                key={item.id}
+                label={item.label}
+                description={item.description}
+                icon={item.icon}
+                activeProcessing={activeProcessing}
+                onApply={(options) => onImprovementClick('expand', options)}
+                disabled={disabled || disabledImprovements.expand}
+                disabledReason={disabledReasons.expand}
               />
             );
           }

@@ -1,4 +1,4 @@
-import { FiSun, FiMaximize, FiLayers, FiRefreshCw, FiPackage, FiHome, FiUser } from 'react-icons/fi';
+import { FiSun, FiMaximize, FiLayers, FiRefreshCw, FiPackage, FiHome, FiUser, FiImage, FiMaximize2 } from 'react-icons/fi';
 
 export const AI_UPSCALE_FAST_MAX = 1000;
 
@@ -37,6 +37,18 @@ export const IMPROVEMENTS = [
     label: 'Изменить освещённость',
     description: 'естественная коррекция света',
     icon: FiSun,
+  },
+  {
+    id: 'createBackground',
+    label: 'Создать фон',
+    description: 'AI-генерация нового фона',
+    icon: FiImage,
+  },
+  {
+    id: 'expand',
+    label: 'Увеличение изображения',
+    description: 'расширение полотна с заполнением краёв',
+    icon: FiMaximize2,
   },
 ];
 

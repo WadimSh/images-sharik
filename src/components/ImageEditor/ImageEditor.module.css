@@ -97,6 +97,13 @@
   font-weight: 500;
 }
 
+.imageDimensions {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .fitButton {
   display: flex;
   align-items: center;
@@ -688,6 +695,88 @@
 }
 
 .shadowApplyButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.expandSizeControls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.expandAspectButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.backgroundTextarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.backgroundTextarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.backgroundTextarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.backgroundFileInput {
+  width: 100%;
+  font-size: 12px;
+  color: #374151;
+}
+
+.backgroundGuidancePreview {
+  position: relative;
+  width: 100%;
+  max-width: 160px;
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.backgroundGuidancePreview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.backgroundGuidanceRemove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.backgroundGuidanceRemove:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -1647,6 +1736,10 @@
   .zoomValue {
     min-width: 45px;
     font-size: 13px;
+  }
+
+  .imageDimensions {
+    font-size: 12px;
   }
   
   .resetButton {

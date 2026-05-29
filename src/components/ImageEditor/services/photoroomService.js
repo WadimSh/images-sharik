@@ -95,6 +95,43 @@ export async function adjustLighting(apiKey, blob) {
   return fetchPhotoroom(EDIT_URL, apiKey, form);
 }
 
+export async function expandImage(apiKey, blob, options = {}) {
+  const { outputWidth, outputHeight } = options;
+
+  const form = createEditForm(blob, {
+    outputSize: `${outputWidth}x${outputHeight}`,
+    referenceBox: 'originalImage',
+    removeBackground: 'false',
+    'expand.mode': 'ai.auto',
+  });
+
+  return fetchPhotoroom(EDIT_URL, apiKey, form);
+}
+
+export async function createBackground(apiKey, blob, options = {}) {
+  const { prompt = '', guidanceImage, guidanceScale = 0.6 } = options;
+
+  const form = new FormData();
+  form.append('imageFile', blob, 'image.png');
+  form.append('referenceBox', 'originalImage');
+
+  const trimmedPrompt = prompt.trim();
+  if (trimmedPrompt) {
+    form.append('background.prompt', trimmedPrompt);
+  }
+
+  if (guidanceImage) {
+    form.append(
+      'background.guidance.imageFile',
+      guidanceImage,
+      guidanceImage.name || 'guidance.jpg'
+    );
+    form.append('background.guidance.scale', String(guidanceScale));
+  }
+
+  return fetchPhotoroom(EDIT_URL, apiKey, form);
+}
+
 export async function catalogStudioImage(apiKey, blob) {
   const form = createEditForm(blob, {
     outputSize: '2000x2000',
@@ -141,6 +178,8 @@ export const IMPROVEMENT_HANDLERS = {
   uncrop: uncropImage,
   shadow: addShadow,
   lighting: adjustLighting,
+  expand: expandImage,
+  createBackground,
   catalogStudio: catalogStudioImage,
   lifestyleEnvironment: lifestyleEnvironmentImage,
   lifestyleInUse: lifestyleInUseImage,

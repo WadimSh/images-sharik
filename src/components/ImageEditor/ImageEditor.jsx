@@ -16,6 +16,7 @@ import ImageEditedUploadModal from '../ImageEditedUploadModal/ImageEditedUploadM
 import AdjustmentSlider from './AdjustmentSlider';
 import ImprovementsPanel from './ImprovementsPanel';
 import { isUpscaleAvailable, UPSCALE_DISABLED_REASON } from './improvementsConfig';
+import { isExpandSourceAvailable, EXPAND_SOURCE_DISABLED_REASON } from './expandConfig';
 import { getEditorExportDimensions } from './utils/prepareEditorImageBlob';
 import { usePhotoroomProcessing } from './usePhotoroomProcessing';
 import styles from './ImageEditor.module.css';
@@ -298,7 +299,7 @@ const resizeImage = async (blob, targetW, targetH) => {
     if (isOpen) {
       resetAllSettings();
     }
-  }, [isOpen, resetAllSettings]);
+  }, [isOpen]);
 
   useEffect(() => {
     setMounted(true);
@@ -2095,7 +2096,46 @@ const saveToHistory = useCallback(() => {
     });
   }, [image, cropMode, cropRect, rotation, zoom, panOffset, flipX, flipY]);
 
+  const displayImageDimensions = useMemo(() => {
+    if (!image) return { width: 0, height: 0 };
+
+    let width = image.width;
+    let height = image.height;
+
+    if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+      const originalCrop = getOriginalImageCoordinates(cropRect);
+      if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+        width = originalCrop.w;
+        height = originalCrop.h;
+      }
+    } else if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+      const originalCrop = getOriginalImageCoordinates(aspectCropRect);
+      if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
+        width = originalCrop.w;
+        height = originalCrop.h;
+      }
+    }
+
+    return { width, height };
+  }, [
+    image,
+    cropMode,
+    cropRect,
+    aspectCropMode,
+    aspectCropRect,
+    rotation,
+    zoom,
+    panOffset,
+    flipX,
+    flipY,
+  ]);
+
   const isUpscaleSupported = isUpscaleAvailable(
+    editorExportDimensions.width,
+    editorExportDimensions.height
+  );
+
+  const isExpandSourceSupported = isExpandSourceAvailable(
     editorExportDimensions.width,
     editorExportDimensions.height
   );
@@ -2103,11 +2143,13 @@ const saveToHistory = useCallback(() => {
   const improvementDisabledState = useMemo(() => ({
     disabledImprovements: {
       upscale: !isUpscaleSupported,
+      expand: !isExpandSourceSupported,
     },
     disabledReasons: {
       upscale: !isUpscaleSupported ? UPSCALE_DISABLED_REASON : undefined,
+      expand: !isExpandSourceSupported ? EXPAND_SOURCE_DISABLED_REASON : undefined,
     },
-  }), [isUpscaleSupported]);
+  }), [isUpscaleSupported, isExpandSourceSupported]);
 
   const {
     activeProcessing,
@@ -2788,6 +2830,15 @@ const openFormatModal = async (action) => {
               </button>
 
               <span className={styles.zoomValue}>{Math.round(zoom * 100)}%</span>
+
+              {displayImageDimensions.width > 0 && displayImageDimensions.height > 0 && (
+                <>
+                  <div className={styles.headerDivider} />
+                  <span className={styles.imageDimensions}>
+                    {displayImageDimensions.width} × {displayImageDimensions.height} px
+                  </span>
+                </>
+              )}
 
               <div className={styles.headerDivider} />
 
