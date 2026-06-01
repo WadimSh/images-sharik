@@ -3228,6 +3228,7 @@ const openFormatModal = async (action) => {
                 </button>
               </div>
 
+              <div className={styles.toolsPanelBody}>
               {activeTab === 'color' && (
                 <div className={styles.toolsGroup}>
                   <AdjustmentSlider
@@ -3304,6 +3305,7 @@ const openFormatModal = async (action) => {
                   disabledReasons={improvementDisabledState.disabledReasons}
                 />
               )}
+              </div>
             </div>
           </div>
                     
