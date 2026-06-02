@@ -72,20 +72,6 @@ const ImprovementsPanel = ({
             );
           }
 
-          if (item.id === 'createBackground') {
-            return (
-              <BackgroundImprovementCard
-                key={item.id}
-                label={item.label}
-                description={item.description}
-                icon={item.icon}
-                activeProcessing={activeProcessing}
-                onApply={(options) => onImprovementClick('createBackground', options)}
-                disabled={disabled || disabledImprovements.createBackground}
-              />
-            );
-          }
-
           if (item.id === 'expand') {
             return (
               <ExpandImprovementCard
@@ -117,16 +103,32 @@ const ImprovementsPanel = ({
       <div className={styles.improvementsSection}>
         <h4 className={styles.improvementsSectionTitle}>Показать товар</h4>
         <div className={styles.improvementsWideList}>
-          {PRODUCT_SHOWCASE.map((item) => (
-            <ImprovementCard
-              key={item.id}
-              {...item}
-              activeProcessing={activeProcessing}
-              onImprovementClick={onImprovementClick}
-              disabled={disabled || disabledImprovements[item.id]}
-              disabledReason={disabledReasons[item.id]}
-            />
-          ))}
+          {PRODUCT_SHOWCASE.map((item) => {
+            if (item.id === 'createBackground') {
+              return (
+                <BackgroundImprovementCard
+                  key={item.id}
+                  label={item.label}
+                  description={item.description}
+                  icon={item.icon}
+                  activeProcessing={activeProcessing}
+                  onApply={(options) => onImprovementClick('createBackground', options)}
+                  disabled={disabled || disabledImprovements.createBackground}
+                />
+              );
+            }
+
+            return (
+              <ImprovementCard
+                key={item.id}
+                {...item}
+                activeProcessing={activeProcessing}
+                onImprovementClick={onImprovementClick}
+                disabled={disabled || disabledImprovements[item.id]}
+                disabledReason={disabledReasons[item.id]}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

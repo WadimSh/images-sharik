@@ -39,12 +39,6 @@ export const IMPROVEMENTS = [
     icon: FiSun,
   },
   {
-    id: 'createBackground',
-    label: 'Создать фон',
-    description: 'AI-генерация нового фона',
-    icon: FiImage,
-  },
-  {
     id: 'expand',
     label: 'Увеличение изображения',
     description: 'расширение полотна с заполнением краёв',
@@ -53,6 +47,12 @@ export const IMPROVEMENTS = [
 ];
 
 export const PRODUCT_SHOWCASE = [
+  {
+    id: 'createBackground',
+    label: 'Создать фон',
+    description: 'AI-генерация нового фона',
+    icon: FiImage,
+  },
   {
     id: 'catalogStudio',
     label: 'Каталог (студийно)',
