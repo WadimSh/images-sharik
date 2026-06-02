@@ -15,7 +15,8 @@ const BackgroundImprovementCard = ({
   disabled,
 }) => {
   const isLoading = activeProcessing === 'createBackground';
-  const isDisabled = disabled || isLoading;
+  const isBusy = activeProcessing !== null;
+  const isDisabled = disabled || isBusy;
   const [isExpanded, setIsExpanded] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [guidanceImage, setGuidanceImage] = useState(null);
@@ -69,6 +70,7 @@ const BackgroundImprovementCard = ({
         type="button"
         className={`${styles.improvementCard} ${styles.improvementCardWide} ${isLoading ? styles.loading : ''}`}
         onClick={() => setIsExpanded((prev) => !prev)}
+        disabled={isDisabled}
       >
         <div className={styles.improvementPreviewWide}>
           {isLoading ? (

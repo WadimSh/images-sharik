@@ -18,7 +18,8 @@ const ShadowImprovementCard = ({
   disabled,
 }) => {
   const isLoading = activeProcessing === 'shadow';
-  const isDisabled = disabled || isLoading;
+  const isBusy = activeProcessing !== null;
+  const isDisabled = disabled || isBusy;
   const [isExpanded, setIsExpanded] = useState(false);
   const [mode, setMode] = useState(SHADOW_MODE.AUTO);
   const [overrides, setOverrides] = useState(SHADOW_DEFAULT_OVERRIDES);
@@ -40,6 +41,7 @@ const ShadowImprovementCard = ({
         type="button"
         className={`${styles.improvementCard} ${styles.improvementCardWide} ${isLoading ? styles.loading : ''}`}
         onClick={() => setIsExpanded((prev) => !prev)}
+        disabled={isDisabled}
       >
         <div className={styles.improvementPreviewWide}>
           {isLoading ? (

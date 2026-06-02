@@ -8,6 +8,13 @@ db.version(1).stores({
   slides: 'code', // Данные слайдов
 });
 
+db.version(2).stores({
+  designs: 'code',
+  products: 'code',
+  slides: 'code',
+  editorHistory: 'id, sessionId, createdAt',
+});
+
 // Общий метод для очистки таблицы
 const clearTable = async (table) => {
   try {
@@ -206,5 +213,51 @@ export const slidesDB = {
   async clearAll() {
     return await clearTable(db.slides);
   }
+};
+
+// Снимки истории редактора изображений (IndexedDB)
+export const editorHistoryDB = {
+  async addSnapshot(sessionId, blob) {
+    try {
+      const id = crypto.randomUUID();
+      await db.editorHistory.add({
+        id,
+        sessionId,
+        blob,
+        createdAt: Date.now(),
+      });
+      return id;
+    } catch (error) {
+      console.error('Error when adding editor history snapshot:', error);
+      throw error;
+    }
+  },
+
+  async getSnapshot(id) {
+    try {
+      return await db.editorHistory.get(id);
+    } catch (error) {
+      console.error('Error receiving editor history snapshot:', error);
+      throw error;
+    }
+  },
+
+  async deleteSnapshot(id) {
+    try {
+      await db.editorHistory.delete(id);
+    } catch (error) {
+      console.error('Error deleting editor history snapshot:', error);
+      throw error;
+    }
+  },
+
+  async clearSession(sessionId) {
+    try {
+      await db.editorHistory.where('sessionId').equals(sessionId).delete();
+    } catch (error) {
+      console.error('Error clearing editor history session:', error);
+      throw error;
+    }
+  },
 };
 

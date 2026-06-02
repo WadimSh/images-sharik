@@ -15,8 +15,9 @@ const ImprovementCard = ({
   disabledReason,
 }) => {
   const isLoading = activeProcessing === id;
-  const isDisabled = disabled || isLoading;
-  const showUnavailableHint = disabled && !isLoading && disabledReason;
+  const isBusy = activeProcessing !== null;
+  const isDisabled = disabled || isBusy;
+  const showUnavailableHint = disabled && !isBusy && disabledReason;
 
   return (
     <button

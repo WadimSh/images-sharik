@@ -21,9 +21,10 @@ const ExpandImprovementCard = ({
   disabledReason,
 }) => {
   const isLoading = activeProcessing === 'expand';
+  const isBusy = activeProcessing !== null;
   const isSourceDisabled = Boolean(disabled);
-  const isDisabled = isSourceDisabled || isLoading;
-  const showUnavailableHint = isSourceDisabled && !isLoading && disabledReason;
+  const isDisabled = isSourceDisabled || isBusy;
+  const showUnavailableHint = isSourceDisabled && !isBusy && disabledReason;
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [aspectId, setAspectId] = useState(EXPAND_ASPECT_RATIOS[0].id);
@@ -85,6 +86,7 @@ const ExpandImprovementCard = ({
         type="button"
         className={`${styles.improvementCard} ${styles.improvementCardWide} ${isLoading ? styles.loading : ''} ${showUnavailableHint ? styles.improvementCardUnavailable : ''}`}
         onClick={() => setIsExpanded((prev) => !prev)}
+        disabled={isDisabled}
       >
         <div className={styles.improvementPreviewWide}>
           {isLoading ? (

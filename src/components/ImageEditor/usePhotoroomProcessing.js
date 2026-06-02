@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { prepareEditorImageBlob } from './utils/prepareEditorImageBlob';
 import { loadImageFromBlob } from './utils/loadImageFromBlob';
 import {
@@ -36,6 +36,7 @@ export function usePhotoroomProcessing({
   onSaveHistory,
 }) {
   const [activeProcessing, setActiveProcessing] = useState(null);
+  const processingRef = useRef(false);
 
   const isProcessing = activeProcessing !== null;
 
@@ -63,13 +64,42 @@ export function usePhotoroomProcessing({
 
   const applyProcessedBlob = useCallback(async (blob) => {
     const processedImage = await loadImageFromBlob(blob);
+
+    const container = containerRef.current;
+    let fitZoom = 1;
+    if (container) {
+      fitZoom = calculateFitZoom(
+        processedImage.width,
+        processedImage.height,
+        container.clientWidth,
+        container.clientHeight
+      );
+    }
+
     onImageProcessed(processedImage, containerRef, calculateFitZoom);
-    setTimeout(() => onSaveHistory(), 50);
+
+    await onSaveHistory({
+      newImage: processedImage,
+      stateOverrides: {
+        rotation: 0,
+        flipX: false,
+        flipY: false,
+        cropMode: false,
+        aspectCropMode: false,
+        lassoMode: false,
+        cropRect: { x: 0, y: 0, w: 0, h: 0 },
+        aspectCropRect: { x: 0, y: 0, w: 0, h: 0 },
+        panOffset: { x: 0, y: 0 },
+        zoom: fitZoom,
+        baseZoom: fitZoom,
+      },
+    });
   }, [onImageProcessed, containerRef, calculateFitZoom, onSaveHistory]);
 
   const runOperation = useCallback(async (operationId, apiHandler) => {
-    if (!image || isProcessing) return;
+    if (!image || processingRef.current) return;
 
+    processingRef.current = true;
     setActiveProcessing(operationId);
 
     try {
@@ -86,9 +116,10 @@ export function usePhotoroomProcessing({
       const prefix = ERROR_MESSAGES[operationId] || 'Ошибка обработки изображения';
       alert(`${prefix}: ${error.message}`);
     } finally {
+      processingRef.current = false;
       setActiveProcessing(null);
     }
-  }, [image, isProcessing, getEditorBlob, apiKey, applyProcessedBlob]);
+  }, [image, getEditorBlob, apiKey, applyProcessedBlob]);
 
   const handleRemoveBackground = useCallback(() => {
     runOperation('background', removeBackground);

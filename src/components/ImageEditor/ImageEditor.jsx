@@ -19,6 +19,17 @@ import { isUpscaleAvailable, UPSCALE_DISABLED_REASON } from './improvementsConfi
 import { isExpandSourceAvailable, EXPAND_SOURCE_DISABLED_REASON } from './expandConfig';
 import { getEditorExportDimensions } from './utils/prepareEditorImageBlob';
 import { usePhotoroomProcessing } from './usePhotoroomProcessing';
+import { editorHistoryDB } from '../../utils/handleDB';
+import {
+  MAX_EDITOR_HISTORY,
+  areHistoryStatesEqual,
+  buildHistoryState,
+  createInitialHistoryState,
+  createImageMutationStateOverrides,
+  deleteHistorySnapshots,
+  loadSnapshotImage,
+  saveImageSnapshot,
+} from './utils/editorHistoryUtils';
 import styles from './ImageEditor.module.css';
 
 // Хук для определения ширины экрана
@@ -71,6 +82,14 @@ const ImageEditor = ({
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
+  const historySessionIdRef = useRef(null);
+  const isRestoringHistoryRef = useRef(false);
+  const isHistoryNavigatingRef = useRef(false);
+  const historyRef = useRef([]);
+  const historyIndexRef = useRef(-1);
+  const loadedImageUrlRef = useRef(null);
+  const loadingImageUrlRef = useRef(null);
+  const imageRef = useRef(null);
   
   const responsive = useResponsive(1120);
   const isMobile = responsive.isMobile;
@@ -132,6 +151,38 @@ const ImageEditor = ({
   });
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+
+  useEffect(() => {
+    historyIndexRef.current = historyIndex;
+  }, [historyIndex]);
+
+  useEffect(() => {
+    imageRef.current = image;
+  }, [image]);
+
+  useEffect(() => {
+    if (isOpen) {
+      historySessionIdRef.current = crypto.randomUUID();
+      return undefined;
+    }
+
+    const sessionId = historySessionIdRef.current;
+    historySessionIdRef.current = null;
+
+    if (sessionId) {
+      editorHistoryDB.clearSession(sessionId);
+    }
+
+    loadedImageUrlRef.current = null;
+    loadingImageUrlRef.current = null;
+    setContainerSize({ width: 0, height: 0 });
+
+    return undefined;
+  }, [isOpen]);
   const [activeTab, setActiveTab] = useState('color');
   const [mounted, setMounted] = useState(false);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -317,91 +368,108 @@ const resizeImage = async (blob, targetW, targetH) => {
     };
   }, [isOpen]);
 
-  // Отслеживаем размеры контейнера
+  // Отслеживаем размеры контейнера после открытия редактора
   useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setContainerSize({ width, height });
+    if (!isOpen || !containerRef.current) return undefined;
+
+    const container = containerRef.current;
+
+    const updateContainerSize = () => {
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      setContainerSize({ width, height });
+
+      if (width > 0 && height > 0 && imageRef.current) {
+        requestAnimationFrame(() => {
+          if (imageRef.current) {
+            drawImageBase(imageRef.current);
+          }
+        });
       }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateContainerSize();
     });
-    
-    resizeObserver.observe(containerRef.current);
+
+    resizeObserver.observe(container);
+    updateContainerSize();
+
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [isOpen]);
 
   // Загрузка изображения
   useEffect(() => {
     const loadImage = async () => {
       if (!isOpen || !imageUrl) return;
-      
+
+      const currentImage = imageRef.current;
+      if (loadedImageUrlRef.current === imageUrl && currentImage) {
+        setLoading(false);
+        requestAnimationFrame(() => {
+          drawImageBase(currentImage);
+        });
+        return;
+      }
+
+      if (loadingImageUrlRef.current === imageUrl) {
+        return;
+      }
+
+      loadingImageUrlRef.current = imageUrl;
       setLoading(true);
       try {
         const response = await fetch(imageUrl);
         if (!response.ok) throw new Error('Failed to load image');
-        
+
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
-        
+
         const img = new Image();
         img.onload = () => {
-          setImage(img);
-          
+          loadedImageUrlRef.current = imageUrl;
+          loadingImageUrlRef.current = null;
+
           const container = containerRef.current;
           let fitZoom = 1;
           if (container) {
             const containerWidth = container.clientWidth;
             const containerHeight = container.clientHeight;
-            fitZoom = calculateFitZoom(img.width, img.height, containerWidth, containerHeight);
+            if (containerWidth > 0 && containerHeight > 0) {
+              fitZoom = calculateFitZoom(img.width, img.height, containerWidth, containerHeight);
+            }
             setBaseZoom(fitZoom);
             setZoom(fitZoom);
           }
-          
-          drawImageBase(img);
-          
-          const canvas = canvasRef.current;
-          if (canvas) {
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-              
-              const initialState = {
-                imageData,
-                rotation: 0,
-                zoom: fitZoom,
-                flipX: false,
-                flipY: false,
-                activeFilter: 'none',
-                adjustments: {
-                  brightness: 0,
-                  contrast: 0,
-                  saturation: 0,
-                  exposure: 0,
-                  temperature: 0,
-                  vignette: 0
-                },
-                cropRect: { x: 0, y: 0, w: 0, h: 0 },
-                cropMode: false,
-              };
-              setHistory([initialState]);
-              setHistoryIndex(0);
-            }
-          }
-          
-          URL.revokeObjectURL(objectUrl);
+
+          setImage(img);
           setLoading(false);
+          URL.revokeObjectURL(objectUrl);
+
+          const sessionId = historySessionIdRef.current;
+          if (sessionId) {
+            saveImageSnapshot(sessionId, img)
+              .then((snapshotId) => {
+                const initialState = createInitialHistoryState(snapshotId, fitZoom);
+                setHistory([initialState]);
+                setHistoryIndex(0);
+              })
+              .catch((error) => {
+                console.error('Failed to initialize editor history:', error);
+              });
+          }
         };
         img.src = objectUrl;
       } catch (err) {
         console.error('Failed to load image:', err);
+        loadingImageUrlRef.current = null;
         alert('Не удалось загрузить изображение');
         setLoading(false);
         onClose();
       }
     };
-    
+
     loadImage();
   }, [imageUrl, isOpen, containerSize]);
 
@@ -563,7 +631,10 @@ const resizeImage = async (blob, targetW, targetH) => {
           if (canvasRef.current && newImage) {
             drawImageBase(newImage);
             requestAnimationFrame(() => {
-              saveToHistory();
+              saveToHistory({
+                newImage,
+                stateOverrides: createImageMutationStateOverrides(fitZoom),
+              });
             });
           }
         }, 0);
@@ -1033,7 +1104,10 @@ const applyCrop = () => {
         setTimeout(() => {
           if (canvasRef.current && croppedImage) {
             drawImageBase(croppedImage);
-            saveToHistory();
+            saveToHistory({
+              newImage: croppedImage,
+              stateOverrides: createImageMutationStateOverrides(fitZoom),
+            });
           }
         }, 0);
       }
@@ -1078,7 +1152,10 @@ const applyCrop = () => {
       setTimeout(() => {
         if (canvasRef.current && croppedImage) {
           drawImageBase(croppedImage);
-          saveToHistory();
+          saveToHistory({
+            newImage: croppedImage,
+            stateOverrides: createImageMutationStateOverrides(fitZoom),
+          });
         }
       }, 0);
     }
@@ -1175,7 +1252,10 @@ const applyAspectCrop = () => {
         setTimeout(() => {
           if (canvasRef.current && croppedImage) {
             drawImageBase(croppedImage);
-            saveToHistory();
+            saveToHistory({
+              newImage: croppedImage,
+              stateOverrides: createImageMutationStateOverrides(fitZoom),
+            });
           }
         }, 0);
       }
@@ -1220,7 +1300,10 @@ const applyAspectCrop = () => {
       setTimeout(() => {
         if (canvasRef.current && croppedImage) {
           drawImageBase(croppedImage);
-          saveToHistory();
+          saveToHistory({
+            newImage: croppedImage,
+            stateOverrides: createImageMutationStateOverrides(fitZoom),
+          });
         }
       }, 0);
     }
@@ -2013,55 +2096,126 @@ const handleCanvasTouchMove = (e) => {
 
   // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
   
-const saveToHistory = useCallback(() => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-  
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  
-  const newState = {
-    imageData,
-    rotation,
-    zoom,
-    flipX,
-    flipY,
-    activeFilter,
-    adjustments: { ...adjustments },
-    cropRect: { ...cropRect },
-    cropMode,
-    aspectCropRect: { ...aspectCropRect },
-    aspectCropMode,
-    selectedAspectRatio,
-    panOffset: { ...panOffset },
-    lassoMode,
-  };
+const saveToHistory = useCallback(async ({ newImage: newImageOverride, stateOverrides } = {}) => {
+  if (isRestoringHistoryRef.current) return;
 
-  // Проверяем, не совпадает ли новое состояние с последним
-  const lastState = history[historyIndex];
-  if (lastState && 
-      lastState.rotation === newState.rotation &&
-      lastState.zoom === newState.zoom &&
-      lastState.flipX === newState.flipX &&
-      lastState.flipY === newState.flipY &&
-      lastState.activeFilter === newState.activeFilter &&
-      JSON.stringify(lastState.adjustments) === JSON.stringify(newState.adjustments) &&
-      JSON.stringify(lastState.cropRect) === JSON.stringify(newState.cropRect) &&
-      lastState.cropMode === newState.cropMode &&
-      JSON.stringify(lastState.aspectCropRect) === JSON.stringify(newState.aspectCropRect) &&
-      lastState.aspectCropMode === newState.aspectCropMode &&
-      lastState.selectedAspectRatio === newState.selectedAspectRatio &&
-      lastState.lassoMode === newState.lassoMode) {
-    return; // Состояние не изменилось, не сохраняем
+  const sessionId = historySessionIdRef.current;
+  if (!sessionId) return;
+
+  const imageSource = newImageOverride || image;
+  if (!imageSource) return;
+
+  const currentHistory = historyRef.current;
+  const currentIndex = historyIndexRef.current;
+  const lastState = currentHistory[currentIndex];
+
+  let snapshotId = lastState?.snapshotId;
+
+  try {
+    if (newImageOverride || !snapshotId) {
+      snapshotId = await saveImageSnapshot(sessionId, imageSource);
+    }
+
+    const newState = buildHistoryState(snapshotId, {
+      rotation: stateOverrides?.rotation ?? rotation,
+      zoom: stateOverrides?.zoom ?? zoom,
+      baseZoom: stateOverrides?.baseZoom ?? baseZoom,
+      flipX: stateOverrides?.flipX ?? flipX,
+      flipY: stateOverrides?.flipY ?? flipY,
+      activeFilter: stateOverrides?.activeFilter ?? activeFilter,
+      adjustments: stateOverrides?.adjustments ?? adjustments,
+      cropRect: stateOverrides?.cropRect ?? cropRect,
+      cropMode: stateOverrides?.cropMode ?? cropMode,
+      aspectCropRect: stateOverrides?.aspectCropRect ?? aspectCropRect,
+      aspectCropMode: stateOverrides?.aspectCropMode ?? aspectCropMode,
+      selectedAspectRatio: stateOverrides?.selectedAspectRatio ?? selectedAspectRatio,
+      panOffset: stateOverrides?.panOffset ?? panOffset,
+      lassoMode: stateOverrides?.lassoMode ?? lassoMode,
+    });
+
+    if (lastState && areHistoryStatesEqual(lastState, newState)) {
+      if (newImageOverride || snapshotId !== lastState.snapshotId) {
+        await editorHistoryDB.deleteSnapshot(snapshotId);
+      }
+      return;
+    }
+
+    const truncatedHistory = currentHistory.slice(0, currentIndex + 1);
+    const orphanedStates = currentHistory.slice(currentIndex + 1);
+    const newHistory = [...truncatedHistory, newState];
+
+    while (newHistory.length > MAX_EDITOR_HISTORY) {
+      const removedState = newHistory.shift();
+      if (removedState?.snapshotId) {
+        await editorHistoryDB.deleteSnapshot(removedState.snapshotId);
+      }
+    }
+
+    await deleteHistorySnapshots(orphanedStates);
+
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  } catch (error) {
+    console.error('Failed to save editor history:', error);
   }
+}, [
+  image,
+  rotation,
+  zoom,
+  baseZoom,
+  flipX,
+  flipY,
+  activeFilter,
+  adjustments,
+  cropRect,
+  cropMode,
+  aspectCropRect,
+  aspectCropMode,
+  selectedAspectRatio,
+  panOffset,
+  lassoMode,
+]);
 
-  const newHistory = history.slice(0, historyIndex + 1);
-  newHistory.push(newState);
-  setHistory(newHistory);
-  setHistoryIndex(newHistory.length - 1);
-}, [history, historyIndex, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, lassoMode]);
+const finishHistoryRestore = useCallback(() => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      isRestoringHistoryRef.current = false;
+    });
+  });
+}, []);
+
+const restoreFromHistory = useCallback(async (state) => {
+  if (!state?.snapshotId) return;
+
+  isRestoringHistoryRef.current = true;
+
+  try {
+    const restoredImage = await loadSnapshotImage(state.snapshotId);
+
+    setImage(restoredImage);
+    setRotation(state.rotation);
+    setZoom(state.zoom);
+    setBaseZoom(state.baseZoom ?? state.zoom);
+    setFlipX(state.flipX);
+    setFlipY(state.flipY);
+    setActiveFilter(state.activeFilter);
+    setAdjustments(state.adjustments);
+    setCropRect(state.cropRect);
+    setCropMode(state.cropMode);
+    setAspectCropRect(state.aspectCropRect);
+    setAspectCropMode(state.aspectCropMode);
+    setSelectedAspectRatio(state.selectedAspectRatio);
+    setPanOffset(state.panOffset || { x: 0, y: 0 });
+    setLassoMode(state.lassoMode || false);
+    setLassoPoints([]);
+    setIsDrawingLasso(false);
+    finishHistoryRestore();
+  } catch (error) {
+    console.error('Failed to restore editor history:', error);
+    isRestoringHistoryRef.current = false;
+    alert('Не удалось восстановить состояние из истории');
+  }
+}, [finishHistoryRestore]);
 
   const handleImageProcessed = useCallback((processedImage, containerRef, calculateFitZoomFn) => {
     setImage(processedImage);
@@ -2172,32 +2326,6 @@ const saveToHistory = useCallback(() => {
     onSaveHistory: saveToHistory,
   });
 
-const restoreFromHistory = useCallback((state) => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-  
-  canvas.width = state.imageData.width;
-  canvas.height = state.imageData.height;
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    ctx.putImageData(state.imageData, 0, 0);
-  }
-
-  setRotation(state.rotation);
-  setZoom(state.zoom);
-  setFlipX(state.flipX);
-  setFlipY(state.flipY);
-  setActiveFilter(state.activeFilter);
-  setAdjustments(state.adjustments);
-  setCropRect(state.cropRect);
-  setCropMode(state.cropMode);
-  setAspectCropRect(state.aspectCropRect);
-  setAspectCropMode(state.aspectCropMode);
-  setSelectedAspectRatio(state.selectedAspectRatio);
-  setPanOffset(state.panOffset || { x: 0, y: 0 });
-  setLassoMode(state.lassoMode || false);
-}, []);
-
   const rotate = (direction) => {
     const newRotation = direction === 'right' ? rotation + 90 : rotation - 90;
     setRotation(newRotation % 360);
@@ -2253,63 +2381,66 @@ const reset = () => {
       .then(blob => {
         const url = URL.createObjectURL(blob);
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           setImage(img);
           URL.revokeObjectURL(url);
-          // После сброса очищаем историю и создаем новое начальное состояние
-          setTimeout(() => {
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const initialState = {
-                  imageData,
-                  rotation: 0,
-                  zoom: baseZoom,
-                  flipX: false,
-                  flipY: false,
-                  activeFilter: 'none',
-                  adjustments: {
-                    brightness: 0,
-                    contrast: 0,
-                    saturation: 0,
-                    exposure: 0,
-                    temperature: 0,
-                    vignette: 0
-                  },
-                  cropRect: { x: 0, y: 0, w: 0, h: 0 },
-                  cropMode: false,
-                  aspectCropRect: { x: 0, y: 0, w: 0, h: 0 },
-                  aspectCropMode: false,
-                  selectedAspectRatio: 'original',
-                  panOffset: { x: 0, y: 0 },
-                  lassoMode: false,
-                };
-                setHistory([initialState]);
-                setHistoryIndex(0);
-              }
-            }
-          }, 100);
+
+          const container = containerRef.current;
+          let fitZoom = baseZoom;
+          if (container) {
+            fitZoom = calculateFitZoom(
+              img.width,
+              img.height,
+              container.clientWidth,
+              container.clientHeight
+            );
+            setBaseZoom(fitZoom);
+            setZoom(fitZoom);
+          }
+
+          drawImageBase(img);
+
+          const sessionId = historySessionIdRef.current;
+          if (!sessionId) return;
+
+          try {
+            await deleteHistorySnapshots(historyRef.current);
+            const snapshotId = await saveImageSnapshot(sessionId, img);
+            const initialState = createInitialHistoryState(snapshotId, fitZoom);
+            setHistory([initialState]);
+            setHistoryIndex(0);
+          } catch (error) {
+            console.error('Failed to reset editor history:', error);
+          }
         };
         img.src = url;
       });
   }
 };
 
-const undo = () => {
-  if (historyIndex > 0) {
+const undo = async () => {
+  if (isHistoryNavigatingRef.current || historyIndex <= 0) return;
+
+  isHistoryNavigatingRef.current = true;
+  try {
     const newIndex = historyIndex - 1;
     setHistoryIndex(newIndex);
-    restoreFromHistory(history[newIndex]);
+    await restoreFromHistory(history[newIndex]);
+  } finally {
+    isHistoryNavigatingRef.current = false;
   }
 };
 
-const redo = () => {
-  if (historyIndex < history.length - 1) {
+const redo = async () => {
+  if (isHistoryNavigatingRef.current || historyIndex >= history.length - 1) return;
+
+  isHistoryNavigatingRef.current = true;
+  try {
     const newIndex = historyIndex + 1;
     setHistoryIndex(newIndex);
-    restoreFromHistory(history[newIndex]);
+    await restoreFromHistory(history[newIndex]);
+  } finally {
+    isHistoryNavigatingRef.current = false;
   }
 };
 
@@ -2631,7 +2762,7 @@ const openFormatModal = async (action) => {
   };
 
   useEffect(() => {
-  if (historyIndex === -1) return;
+  if (historyIndex === -1 || isRestoringHistoryRef.current) return;
 
   const timer = setTimeout(() => {
     saveToHistory();
@@ -2641,39 +2772,42 @@ const openFormatModal = async (action) => {
 }, [rotation, zoom, flipX, flipY, activeFilter, adjustments, cropRect, cropMode, aspectCropRect, aspectCropMode, selectedAspectRatio, panOffset, lassoMode, saveToHistory]);
 
   useEffect(() => {
-    if (image) {
-      drawImageBase(image);
-      if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-        drawCropOverlayOnly();
-      }
-      if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
-        drawAspectCropOverlay();
-      }
-      if (lassoMode && lassoPoints.length > 0) {
-        drawLassoOverlay();
-      }
+    if (loading || !image) return;
+
+    drawImageBase(image);
+    if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
+      drawCropOverlayOnly();
     }
-  }, [image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset, lassoMode, lassoPoints]);
+    if (aspectCropMode && aspectCropRect.w > 0 && aspectCropRect.h > 0) {
+      drawAspectCropOverlay();
+    }
+    if (lassoMode && lassoPoints.length > 0) {
+      drawLassoOverlay();
+    }
+  }, [loading, image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset, lassoMode, lassoPoints]);
 
   useEffect(() => {
+    if (isRestoringHistoryRef.current) return;
     setPanOffset({ x: 0, y: 0 });
   }, [image, zoom, rotation, flipX, flipY, baseZoom]);
 
   useEffect(() => {
-    if (image && containerRef.current) {
-      const container = containerRef.current;
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      
-      const fitZoom = calculateFitZoom(
-        image.width, image.height,
-        containerWidth, containerHeight
-      );
-      
-      setBaseZoom(fitZoom);
-      setZoom(fitZoom);
-      setPanOffset({ x: 0, y: 0 });
-    }
+    if (isRestoringHistoryRef.current || !image || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    if (containerWidth === 0 || containerHeight === 0) return;
+
+    const fitZoom = calculateFitZoom(
+      image.width, image.height,
+      containerWidth, containerHeight
+    );
+
+    setBaseZoom(fitZoom);
+    setZoom(fitZoom);
+    setPanOffset({ x: 0, y: 0 });
   }, [image]);
 
   const fitToContainer = () => {
