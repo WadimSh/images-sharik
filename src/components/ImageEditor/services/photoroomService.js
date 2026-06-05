@@ -129,7 +129,9 @@ export async function createBackground(apiKey, blob, options = {}) {
     form.append('background.guidance.scale', String(guidanceScale));
   }
 
-  return fetchPhotoroom(EDIT_URL, apiKey, form);
+  return fetchPhotoroom(EDIT_URL, apiKey, form, {
+    'pr-ai-background-model-version': 'background-studio-beta-2025-03-17',
+  });
 }
 
 export async function catalogStudioImage(apiKey, blob) {

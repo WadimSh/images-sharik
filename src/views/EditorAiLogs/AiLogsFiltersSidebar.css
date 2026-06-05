@@ -1,0 +1,61 @@
+.ai-logs-filters-sidebar {
+  width: 320px;
+}
+
+.ai-logs-filters-content {
+  padding: 8px 14px 10px;
+}
+
+.ai-logs-filter-field {
+  margin-bottom: 10px;
+}
+
+.ai-logs-filter-field:last-child {
+  margin-bottom: 0;
+}
+
+.ai-logs-filter-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ai-logs-filters-sidebar .heatmap-filter {
+  min-width: 0;
+}
+
+.ai-logs-filters-sidebar .heatmap-filter-button {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.ai-logs-filters-sidebar .heatmap-filter-label {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.ai-logs-filters-sidebar .custom-select-container {
+  width: 100%;
+}
+
+.ai-logs-filters-sidebar .sidebar-filters-header {
+  padding: 12px 14px;
+}
+
+.ai-logs-filters-sidebar .sidebar-filters-footer {
+  padding: 10px 14px 12px;
+}
+
+.ai-logs-filters-sidebar .filter-actions {
+  gap: 8px;
+}
+
+.ai-logs-filters-sidebar .apply-btn,
+.ai-logs-filters-sidebar .reset-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
-import { TbReport } from "react-icons/tb";
+import { TbReport, TbListDetails } from "react-icons/tb";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { LuImagePlus } from "react-icons/lu";
 // import { MdCreateNewFolder } from "react-icons/md";
@@ -270,6 +270,14 @@ const convertToWebP = (file) => {
       navigate('/reports');
   }
 
+  const handleAiLogsClick = async () => {
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+    navigate('/ai-logs');
+  }
+
   const handleMediaClick = async () => {
     if (!isAuthenticated) {
       navigate('/sign-in');
@@ -374,7 +382,16 @@ const convertToWebP = (file) => {
               <TbReport className="creat-temp-icon" />
             </button>
           </Tooltip>
-          
+        )}
+        {isAdmin && (
+          <Tooltip
+            content={t('header.aiLogs')}
+            position='bottom'
+          >
+            <button onClick={handleAiLogsClick} className="creat-temp-button">
+              <TbListDetails className="creat-temp-icon" />
+            </button>
+          </Tooltip>
         )}
         <LanguageSwitcher />
       </div>

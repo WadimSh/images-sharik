@@ -2234,6 +2234,7 @@ const shouldShowMobilePreview = showMobilePreview && containerSize.fileName === 
         <ImageEditor
           isOpen={productEditor.isOpen}
           imageUrl={productEditor.imageUrl}
+          source="generator"
           onClose={handleProductEditorClose}
           onImageSaved={handleProductImageSaved}
         />

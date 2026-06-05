@@ -75,6 +75,7 @@ const ImageEditor = ({
   isOpen, 
   imageUrl, 
   imageData,
+  source,
   onClose,
   onImageSaved,
 }) => {
@@ -2305,6 +2306,19 @@ const restoreFromHistory = useCallback(async (state) => {
     },
   }), [isUpscaleSupported, isExpandSourceSupported]);
 
+  const logContext = useMemo(() => ({
+    companyId: user?.company?.[0]?.id,
+    source,
+    getSessionId: () => historySessionIdRef.current,
+    getExportDimensions: () => getEditorExportDimensions({
+      image,
+      cropMode,
+      cropRect,
+      getOriginalImageCoordinates,
+    }),
+    imageData,
+  }), [user, source, imageData, image, cropMode, cropRect, getOriginalImageCoordinates]);
+
   const {
     activeProcessing,
     isProcessing,
@@ -2324,6 +2338,7 @@ const restoreFromHistory = useCallback(async (state) => {
     calculateFitZoom,
     onImageProcessed: handleImageProcessed,
     onSaveHistory: saveToHistory,
+    logContext,
   });
 
   const rotate = (direction) => {

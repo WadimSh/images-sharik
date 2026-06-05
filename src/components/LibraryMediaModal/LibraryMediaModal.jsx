@@ -92,7 +92,8 @@ const capitalizeTag = (tag) => {
   }).join(' ');
 };
 
-export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
+export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage }) => {
+  const isPickMode = Boolean(onSelectImage);
   const { t } = useContext(LanguageContext);
   const { user } = useAuth(); 
 
@@ -237,7 +238,25 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
     setCurrentPage(page);
   };
 
-  const handleSelectImage = async (imageUrl) => {
+  const handleSelectImage = async (imageUrl, imageMeta = {}) => {
+    if (isPickMode) {
+      try {
+        await onSelectImage({
+          url: imageUrl,
+          fileName: imageMeta.fileName,
+          id: imageMeta._id || imageMeta.id,
+        });
+        handleCloseViewMode();
+        onClose();
+      } catch (error) {
+        console.error('Error selecting image:', error);
+        alert('Не удалось выбрать изображение');
+      }
+      return;
+    }
+
+    if (!setElements) return;
+
     try {
       const img = new Image();
       img.src = imageUrl;
@@ -334,7 +353,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
   const handleApplyImage = async () => {
     const selectedImage = images[selectedImageIndex];
     const imageUrl = getFullImageUrl(selectedImage.url);
-    await handleSelectImage(imageUrl);
+    await handleSelectImage(imageUrl, selectedImage);
   };
 
   // Обработчик клика по тегу в режиме просмотра
@@ -656,6 +675,16 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
         y: (containerHeight - newHeight) / 2
       };
 
+      if (isPickMode) {
+        await onSelectImage({
+          url: fullImageUrl,
+          fileName: uploadedFile.fileName || finalFileName,
+          id: uploadedFile._id || uploadedFile.id,
+        });
+        onClose();
+        return;
+      }
+
       const newElement = {
         id: generateUniqueId(),
         type: 'image',
@@ -707,7 +736,7 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements }) => {
             <div className="view-mode-header-right">
               <button onClick={handleApplyImage} className="apply-bttn">
                 <PiCirclesThreePlusLight size={20} />
-                Применить изображение
+                {isPickMode ? 'Выбрать изображение' : 'Применить изображение'}
               </button>
               <button onClick={handleCloseViewMode} className="close-btn">&times;</button>
             </div>

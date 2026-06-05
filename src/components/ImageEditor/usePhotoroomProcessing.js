@@ -6,6 +6,18 @@ import {
   IMPROVEMENT_HANDLERS,
 } from './services/photoroomService';
 import { EXPAND_MAX_FILE_SIZE, EXPAND_SOURCE_DISABLED_REASON } from './expandConfig';
+import {
+  apiStartEditorAiLog,
+  apiCompleteEditorAiLog,
+} from '../../services/editorAiLogService';
+import {
+  getOperationMeta,
+  buildStartPayload,
+  blobToImageMeta,
+  extractEditorAiLogId,
+  mapErrorCode,
+  extractHttpStatus,
+} from './utils/editorAiLogUtils';
 
 const ERROR_MESSAGES = {
   background: 'Ошибка при удалении фона',
@@ -34,6 +46,7 @@ export function usePhotoroomProcessing({
   calculateFitZoom,
   onImageProcessed,
   onSaveHistory,
+  logContext,
 }) {
   const [activeProcessing, setActiveProcessing] = useState(null);
   const processingRef = useRef(false);
@@ -96,30 +109,99 @@ export function usePhotoroomProcessing({
     });
   }, [onImageProcessed, containerRef, calculateFitZoom, onSaveHistory]);
 
-  const runOperation = useCallback(async (operationId, apiHandler) => {
-    if (!image || processingRef.current) return;
+  const runOperation = useCallback(async (operationId, apiHandler, options = {}) => {
+    if (!image) {
+      console.warn(`[EditorAiLog] skipped ${operationId}: no image`);
+      return;
+    }
+    if (processingRef.current) {
+      console.warn(`[EditorAiLog] skipped ${operationId}: already processing`);
+      return;
+    }
 
     processingRef.current = true;
     setActiveProcessing(operationId);
 
-    try {
-      const blob = await getEditorBlob();
+    const startedAt = new Date().toISOString();
+    let logId = null;
+    let inputBlob = null;
 
-      if (operationId === 'expand' && blob.size > EXPAND_MAX_FILE_SIZE) {
+    try {
+      inputBlob = await getEditorBlob();
+
+      const meta = getOperationMeta(operationId);
+      const canLog = Boolean(logContext?.companyId);
+
+      if (!canLog) {
+        console.warn('[EditorAiLog] skipped: no companyId');
+      }
+
+      if (canLog) {
+        try {
+          const started = await apiStartEditorAiLog(
+            await buildStartPayload({
+              logContext,
+              operationId,
+              meta,
+              options,
+              inputBlob,
+              startedAt,
+            })
+          );
+          logId = extractEditorAiLogId(started);
+          if (!logId) {
+            console.warn('[EditorAiLog] start response has no id:', started);
+          }
+        } catch (logError) {
+          console.warn('[EditorAiLog] start failed:', logError);
+        }
+      }
+
+      if (operationId === 'expand' && inputBlob.size > EXPAND_MAX_FILE_SIZE) {
         throw new Error(EXPAND_SOURCE_DISABLED_REASON);
       }
 
-      const processedBlob = await apiHandler(apiKey, blob);
+      const processedBlob = await apiHandler(apiKey, inputBlob, options);
       await applyProcessedBlob(processedBlob);
+
+      if (logId) {
+        const finishedAt = new Date().toISOString();
+        const outputImage = await blobToImageMeta(processedBlob);
+        await apiCompleteEditorAiLog(logId, {
+          finishedAt,
+          durationMs: Date.now() - new Date(startedAt).getTime(),
+          responseData: {
+            status: 'success',
+            httpStatus: 200,
+            outputImage,
+          },
+        }).catch((e) => console.warn('[EditorAiLog] complete failed:', e));
+      }
     } catch (error) {
       console.error(`Photoroom ${operationId} error:`, error);
       const prefix = ERROR_MESSAGES[operationId] || 'Ошибка обработки изображения';
       alert(`${prefix}: ${error.message}`);
+
+      if (logId) {
+        const finishedAt = new Date().toISOString();
+        await apiCompleteEditorAiLog(logId, {
+          finishedAt,
+          durationMs: Date.now() - new Date(startedAt).getTime(),
+          responseData: {
+            status: 'error',
+            httpStatus: extractHttpStatus(error),
+            error: {
+              code: mapErrorCode(operationId, error),
+              message: error.message?.slice(0, 2000),
+            },
+          },
+        }).catch((e) => console.warn('[EditorAiLog] complete error failed:', e));
+      }
     } finally {
       processingRef.current = false;
       setActiveProcessing(null);
     }
-  }, [image, getEditorBlob, apiKey, applyProcessedBlob]);
+  }, [image, getEditorBlob, apiKey, applyProcessedBlob, logContext]);
 
   const handleRemoveBackground = useCallback(() => {
     runOperation('background', removeBackground);
@@ -128,7 +210,7 @@ export function usePhotoroomProcessing({
   const handleImprovement = useCallback((improvementId, options) => {
     const handler = IMPROVEMENT_HANDLERS[improvementId];
     if (!handler) return;
-    runOperation(improvementId, (apiKey, blob) => handler(apiKey, blob, options));
+    runOperation(improvementId, handler, options);
   }, [runOperation]);
 
   return {

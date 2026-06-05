@@ -775,6 +775,30 @@
   box-sizing: border-box;
 }
 
+.backgroundLibraryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.backgroundLibraryButton:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.backgroundLibraryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .backgroundGuidancePreview {
   position: relative;
   width: 100%;

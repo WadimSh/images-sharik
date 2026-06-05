@@ -830,6 +830,7 @@ export const Products = () => {
               isOpen={editorConfig.isOpen}
               imageUrl={editorConfig.imageUrl}
               imageData={editorConfig.imageData}
+              source="product_detail"
               onClose={handleEditorClose}
             />
           )}

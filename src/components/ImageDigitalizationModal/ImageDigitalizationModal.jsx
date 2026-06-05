@@ -857,6 +857,7 @@ const handleAddTag = async (tagToAdd) => {
         isOpen={showEditor}
         imageUrl={fullImageUrl}
         imageData={currentImageData}
+        source="library"
         onClose={handleEditorClose}
       />
 
