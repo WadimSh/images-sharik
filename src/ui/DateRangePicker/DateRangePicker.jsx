@@ -65,8 +65,8 @@ export const DateRangePicker = ({
     // Последний день месяца
     const lastDay = new Date(year, month + 1, 0);
     
-    // День недели первого дня (0 - воскресенье, 1 - понедельник)
-    const firstDayOfWeek = firstDay.getDay();
+    // getDay(): 0=вс, 1=пн …; сетка начинается с понедельника (как в заголовке)
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
     // Количество дней в месяце
     const daysInMonth = lastDay.getDate();
     
@@ -74,7 +74,7 @@ export const DateRangePicker = ({
     
     // Дни предыдущего месяца
     const prevMonthLastDay = new Date(year, month, 0).getDate();
-    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+    for (let i = mondayOffset - 1; i >= 0; i--) {
       const date = new Date(year, month - 1, prevMonthLastDay - i);
       days.push({
         date,
