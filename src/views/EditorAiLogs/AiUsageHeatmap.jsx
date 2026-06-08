@@ -72,19 +72,6 @@ const AiUsageHeatmap = ({ logs, startDate, endDate }) => {
             {year ? `операций за ${year} год` : 'операций за год'}
           </span>
         </div>
-
-        <div className="ai-heatmap-legend">
-          <span>Меньше</span>
-          {LEVEL_COLORS.map((color, index) => (
-            <span
-              key={color}
-              className="ai-heatmap-legend-cell"
-              style={{ backgroundColor: color }}
-              title={index === 0 ? 'Нет операций' : undefined}
-            />
-          ))}
-          <span>Больше</span>
-        </div>
       </div>
 
       <div className="ai-heatmap-scroll">
@@ -139,6 +126,19 @@ const AiUsageHeatmap = ({ logs, startDate, endDate }) => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="ai-heatmap-legend">
+        <span>Меньше</span>
+        {LEVEL_COLORS.map((color, index) => (
+          <span
+            key={color}
+            className="ai-heatmap-legend-cell"
+            style={{ backgroundColor: color }}
+            title={index === 0 ? 'Нет операций' : undefined}
+          />
+        ))}
+        <span>Больше</span>
       </div>
     </div>
   );

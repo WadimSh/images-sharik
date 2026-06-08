@@ -375,15 +375,28 @@ export function getDefaultDateRange(days = 30) {
   return { startDate, endDate };
 }
 
-export function getYearDateRange() {
-  const year = new Date().getFullYear();
-  const startDate = new Date(year, 0, 1);
+export function getYearDateRange(year = new Date().getFullYear()) {
+  const normalizedYear = Number(year) || new Date().getFullYear();
+  const startDate = new Date(normalizedYear, 0, 1);
   startDate.setHours(0, 0, 0, 0);
 
-  const endDate = new Date(year, 11, 31);
+  const endDate = new Date(normalizedYear, 11, 31);
   endDate.setHours(0, 0, 0, 0);
 
-  return { startDate, endDate, year };
+  return { startDate, endDate, year: normalizedYear };
+}
+
+export const HEATMAP_FIRST_YEAR = 2025;
+
+export function getHeatmapYearOptions(firstYear = HEATMAP_FIRST_YEAR) {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+
+  for (let year = currentYear; year >= firstYear; year -= 1) {
+    years.push(year);
+  }
+
+  return years;
 }
 
 export function toIsoDateStart(date) {

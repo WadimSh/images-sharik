@@ -22,7 +22,7 @@ import {
   getDefaultDateRange,
   getDefaultTableFilters,
   getLogId,
-  getLogOwner,
+  getHeatmapYearOptions,
   getYearDateRange,
   toIsoDateEnd,
   toIsoDateStart,
@@ -39,7 +39,7 @@ export const EditorAiLogs = () => {
   const [heatmapError, setHeatmapError] = useState(null);
   const [initialDateRange, setInitialDateRange] = useState(getDefaultDateRange);
   const [selectedOperations, setSelectedOperations] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [heatmapYear, setHeatmapYear] = useState(() => new Date().getFullYear());
 
   const [tableLogs, setTableLogs] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
@@ -65,7 +65,8 @@ export const EditorAiLogs = () => {
     [tableFilters]
   );
   const companyId = user?.company?.[0]?.id;
-  const heatmapDateRange = useMemo(() => getYearDateRange(), []);
+  const heatmapDateRange = useMemo(() => getYearDateRange(heatmapYear), [heatmapYear]);
+  const heatmapYearOptions = useMemo(() => getHeatmapYearOptions(), []);
 
   const loadHeatmapLogs = useCallback(async () => {
     if (!companyId) {
@@ -204,37 +205,13 @@ export const EditorAiLogs = () => {
     }
   };
 
-  const userOptions = useMemo(() => {
-    const usersMap = new Map();
-
-    heatmapLogs.forEach((log) => {
-      const owner = getLogOwner(log);
-      if (!usersMap.has(owner.id)) {
-        usersMap.set(owner.id, owner.name);
-      }
-    });
-
-    return Array.from(usersMap.entries())
-      .map(([id, label]) => ({ id, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'ru'));
-  }, [heatmapLogs]);
-
   const filteredHeatmapLogs = useMemo(() => {
-    return heatmapLogs.filter((log) => {
-      if (selectedOperations.length > 0 && !selectedOperations.includes(log.operationId)) {
-        return false;
-      }
+    if (selectedOperations.length === 0) {
+      return heatmapLogs;
+    }
 
-      if (selectedUsers.length > 0) {
-        const ownerId = getLogOwner(log).id;
-        if (!selectedUsers.includes(ownerId)) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [heatmapLogs, selectedOperations, selectedUsers]);
+    return heatmapLogs.filter((log) => selectedOperations.includes(log.operationId));
+  }, [heatmapLogs, selectedOperations]);
 
   return (
     <div className="ai-logs-page">
@@ -261,7 +238,20 @@ export const EditorAiLogs = () => {
           <div className="ai-logs-heatmap-card">
             <div className="ai-logs-heatmap-header">
               <h3 className="ai-logs-heatmap-title">
-                {`Активность AI-операций за ${heatmapDateRange.year} год`}
+                Активность AI-операций за{' '}
+                <select
+                  className="ai-heatmap-year-select"
+                  value={heatmapYear}
+                  onChange={(event) => setHeatmapYear(Number(event.target.value))}
+                  aria-label="Год для тепловой карты"
+                >
+                  {heatmapYearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                {' '}год
               </h3>
 
               {!heatmapLoading && (
@@ -271,12 +261,6 @@ export const EditorAiLogs = () => {
                     options={AI_OPERATION_OPTIONS}
                     selected={selectedOperations}
                     onChange={setSelectedOperations}
-                  />
-                  <HeatmapFilter
-                    label="Пользователи"
-                    options={userOptions}
-                    selected={selectedUsers}
-                    onChange={setSelectedUsers}
                   />
                 </div>
               )}

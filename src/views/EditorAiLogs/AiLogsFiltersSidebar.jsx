@@ -98,7 +98,7 @@ const AiLogsFiltersSidebar = ({
             <input
               type="text"
               className="filter-input"
-              placeholder="Имя или email"
+              placeholder="Имя пользователя"
               value={localFilters.ownerSearch}
               onChange={(event) => updateFilter('ownerSearch', event.target.value)}
             />
