@@ -7,6 +7,7 @@ import {
   BACKGROUND_PROMPT_PLACEHOLDER,
 } from './backgroundConfig';
 import { loadLibraryImageAsFile } from './utils/loadLibraryImageAsFile';
+import { stopEditorKeyPropagation } from './utils/editorInputUtils';
 import styles from './ImageEditor.module.css';
 
 const BackgroundImprovementCard = ({
@@ -116,6 +117,8 @@ const BackgroundImprovementCard = ({
                   className={styles.backgroundTextarea}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={stopEditorKeyPropagation}
+                  onKeyUp={stopEditorKeyPropagation}
                   placeholder={BACKGROUND_PROMPT_PLACEHOLDER}
                   rows={3}
                   disabled={isDisabled}

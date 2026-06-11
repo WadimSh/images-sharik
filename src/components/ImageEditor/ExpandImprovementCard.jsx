@@ -9,6 +9,7 @@ import {
   isExpandFreeAspect,
   isExpandOutputValid,
 } from './expandConfig';
+import { stopEditorKeyPropagation } from './utils/editorInputUtils';
 import styles from './ImageEditor.module.css';
 
 const ExpandImprovementCard = ({
@@ -144,6 +145,8 @@ const ExpandImprovementCard = ({
                       max="5000"
                       value={outputWidth}
                       onChange={handleWidthChange}
+                      onKeyDown={stopEditorKeyPropagation}
+                      onKeyUp={stopEditorKeyPropagation}
                       className={styles.resizeInput}
                       disabled={isDisabled}
                     />
@@ -160,6 +163,8 @@ const ExpandImprovementCard = ({
                       max="5000"
                       value={outputHeight}
                       onChange={handleHeightChange}
+                      onKeyDown={stopEditorKeyPropagation}
+                      onKeyUp={stopEditorKeyPropagation}
                       className={styles.resizeInput}
                       disabled={isDisabled}
                     />

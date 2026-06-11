@@ -40,8 +40,10 @@ export function usePhotoroomProcessing({
   flipY,
   cropMode,
   cropRect,
+  aspectCropMode,
+  aspectCropRect,
   getFilters,
-  getOriginalImageCoordinates,
+  resolveCropRectOnTransformedCanvas,
   containerRef,
   calculateFitZoom,
   onImageProcessed,
@@ -62,7 +64,9 @@ export function usePhotoroomProcessing({
       filterCss: getFilters(),
       cropMode,
       cropRect,
-      getOriginalImageCoordinates,
+      aspectCropMode,
+      aspectCropRect,
+      resolveCropRectOnTransformedCanvas,
     });
   }, [
     image,
@@ -71,8 +75,10 @@ export function usePhotoroomProcessing({
     flipY,
     cropMode,
     cropRect,
+    aspectCropMode,
+    aspectCropRect,
     getFilters,
-    getOriginalImageCoordinates,
+    resolveCropRectOnTransformedCanvas,
   ]);
 
   const applyProcessedBlob = useCallback(async (blob) => {

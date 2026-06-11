@@ -9,6 +9,7 @@ import { RiImageEditLine } from "react-icons/ri";
 import { FiMaximize } from "react-icons/fi";
 
 import ImageEditor from "../ImageEditor/ImageEditor";
+import { isEditableTarget } from "../ImageEditor/utils/editorInputUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { Tooltip } from "../../ui/Tooltip/Tooltip";
 import { PREDEFINED_TAGS } from "../../constants/tags";
@@ -248,6 +249,14 @@ const handlePrevImage = (e) => {
   }, [showFullscreen, currentImageIndex, images]);
 
   const handleKeyDown = (e) => {
+    if (showEditor || showFullscreen) {
+      return;
+    }
+
+    if (isEditableTarget(e.target) || isEditableTarget(document.activeElement)) {
+      return;
+    }
+
     if (e.key === 'ArrowLeft') {
       handlePrevImage(e);
     } else if (e.key === 'ArrowRight') {
@@ -262,7 +271,7 @@ const handlePrevImage = (e) => {
         document.removeEventListener('keydown', handleKeyDown);
       };
     }
-  }, [isOpen, currentImageIndex, images]);
+  }, [isOpen, currentImageIndex, images, showEditor, showFullscreen]);
 
   const handleDownload = async () => {
     if (!currentImageData || isDownloading) return;

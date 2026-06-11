@@ -1,23 +1,42 @@
 /**
  * Подготавливает blob текущего состояния редактора (трансформации, фильтры, обрезка).
  */
+
+import { getRotatedBoundingSize } from './editorMath';
+import { renderTransformedImageCanvas, cropRenderedImage } from './cropImageProcessing';
+
 export function getEditorExportDimensions({
   image,
   cropMode,
   cropRect,
-  getOriginalImageCoordinates,
+  aspectCropMode,
+  aspectCropRect,
+  rotation = 0,
+  resolveCropRectOnTransformedCanvas,
 }) {
   if (!image) return { width: 0, height: 0 };
 
-  if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-    const originalCrop = getOriginalImageCoordinates(cropRect);
+  const activeCropRect = cropMode && cropRect?.w > 0 && cropRect?.h > 0
+    ? cropRect
+    : aspectCropMode && aspectCropRect?.w > 0 && aspectCropRect?.h > 0
+      ? aspectCropRect
+      : null;
 
-    if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
-      return { width: originalCrop.w, height: originalCrop.h };
+  if (activeCropRect && resolveCropRectOnTransformedCanvas) {
+    const mappedCrop = resolveCropRectOnTransformedCanvas(activeCropRect);
+    if (mappedCrop?.w > 0 && mappedCrop?.h > 0) {
+      return {
+        width: Math.round(mappedCrop.w),
+        height: Math.round(mappedCrop.h),
+      };
     }
   }
 
-  return { width: image.width, height: image.height };
+  const bounds = getRotatedBoundingSize(image.width, image.height, rotation);
+  return {
+    width: Math.round(bounds.width),
+    height: Math.round(bounds.height),
+  };
 }
 
 export async function prepareEditorImageBlob({
@@ -28,51 +47,48 @@ export async function prepareEditorImageBlob({
   filterCss,
   cropMode,
   cropRect,
-  getOriginalImageCoordinates,
+  aspectCropMode,
+  aspectCropRect,
+  resolveCropRectOnTransformedCanvas,
+  mimeType = 'image/png',
+  quality,
 }) {
-  const tempCanvas = document.createElement('canvas');
-  const tempCtx = tempCanvas.getContext('2d');
-  if (!tempCtx) throw new Error('Cannot create canvas context');
+  const transformedCanvas = renderTransformedImageCanvas({
+    image,
+    rotation,
+    flipX,
+    flipY,
+    filterCss,
+  });
 
-  tempCanvas.width = image.width;
-  tempCanvas.height = image.height;
+  let finalCanvas = transformedCanvas;
 
-  tempCtx.save();
-  tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-  tempCtx.rotate((rotation * Math.PI) / 180);
-  tempCtx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-  tempCtx.filter = filterCss;
-  tempCtx.drawImage(image, -image.width / 2, -image.height / 2, image.width, image.height);
-  tempCtx.restore();
+  const activeCropRect = cropMode && cropRect?.w > 0 && cropRect?.h > 0
+    ? cropRect
+    : aspectCropMode && aspectCropRect?.w > 0 && aspectCropRect?.h > 0
+      ? aspectCropRect
+      : null;
 
-  let finalCanvas = tempCanvas;
+  if (activeCropRect && resolveCropRectOnTransformedCanvas) {
+    const mappedCrop = resolveCropRectOnTransformedCanvas(activeCropRect);
 
-  if (cropMode && cropRect.w > 0 && cropRect.h > 0) {
-    const originalCrop = getOriginalImageCoordinates(cropRect);
-
-    if (originalCrop && originalCrop.w > 0 && originalCrop.h > 0) {
-      const croppedCanvas = document.createElement('canvas');
-      const croppedCtx = croppedCanvas.getContext('2d');
-      if (!croppedCtx) throw new Error('Cannot create cropped canvas');
-
-      croppedCanvas.width = originalCrop.w;
-      croppedCanvas.height = originalCrop.h;
-
-      croppedCtx.drawImage(
-        tempCanvas,
-        originalCrop.x, originalCrop.y, originalCrop.w, originalCrop.h,
-        0, 0, originalCrop.w, originalCrop.h
-      );
-
-      finalCanvas = croppedCanvas;
+    if (mappedCrop?.w > 0 && mappedCrop?.h > 0) {
+      const croppedCanvas = cropRenderedImage(transformedCanvas, mappedCrop);
+      if (croppedCanvas) {
+        finalCanvas = croppedCanvas;
+      }
     }
   }
 
   const blob = await new Promise((resolve, reject) => {
-    finalCanvas.toBlob((result) => {
-      if (result) resolve(result);
-      else reject(new Error('Failed to export image'));
-    }, 'image/png');
+    finalCanvas.toBlob(
+      (result) => {
+        if (result) resolve(result);
+        else reject(new Error('Failed to export image'));
+      },
+      mimeType,
+      quality
+    );
   });
 
   return blob;
