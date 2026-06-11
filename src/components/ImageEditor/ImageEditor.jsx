@@ -9,7 +9,9 @@ import { LuUndo2, LuRedo2, LuFlipHorizontal, LuFlipVertical } from "react-icons/
 import { IoContrastOutline } from "react-icons/io5";
 import { RiScissorsCutLine } from "react-icons/ri";
 import { PiMagicWand } from "react-icons/pi";
+import StraightenIcon from './StraightenIcon';
 import { LassoEraseInsideIcon, LassoEraseOutsideIcon } from './LassoEraseIcons';
+import StraightenSliderBar, { formatStraightenAngle } from './StraightenSliderBar';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { uploadGraphicFile } from '../../services/mediaService';
@@ -30,6 +32,13 @@ import {
   getRectForOriginalSize,
   getRotatedBoundingSize,
 } from './utils/editorMath';
+import {
+  applyStraightenToImage,
+  clampStraightenAngle,
+  computeStraightenScale,
+  drawStraightenGridOverlay,
+  getImageBoundsCornersOnCanvas,
+} from './utils/straightenUtils';
 import { usePhotoroomProcessing } from './usePhotoroomProcessing';
 import { editorHistoryDB } from '../../utils/handleDB';
 import {
@@ -37,6 +46,7 @@ import {
   areHistoryStatesEqual,
   buildHistoryState,
   createInitialHistoryState,
+  createDefaultAdjustments,
   createImageMutationStateOverrides,
   deleteHistorySnapshots,
   loadSnapshotImage,
@@ -154,6 +164,8 @@ const ImageEditor = ({
   const [lassoOperation, setLassoOperation] = useState('eraseInside');
   const [lassoPoints, setLassoPoints] = useState([]);
   const [isDrawingLasso, setIsDrawingLasso] = useState(false);
+  const [straightenMode, setStraightenMode] = useState(false);
+  const [straightenAngle, setStraightenAngle] = useState(0);
   
   const [activeFilter, setActiveFilter] = useState('none');
   const [adjustments, setAdjustments] = useState({
@@ -375,6 +387,8 @@ const resizeImage = async (blob, targetW, targetH) => {
     setLassoMode(false);
     setLassoPoints([]);
     setIsDrawingLasso(false);
+    setStraightenMode(false);
+    setStraightenAngle(0);
     setActiveFilter('none');
     setAdjustments({
       brightness: 0,
@@ -605,9 +619,75 @@ const resizeImage = async (blob, targetW, targetH) => {
     ctx.translate(canvas.width / 2 + panOffset.x, canvas.height / 2 + panOffset.y);
     ctx.rotate((rotation * Math.PI) / 180);
     ctx.scale(flipX ? -zoom : zoom, flipY ? -zoom : zoom);
-    ctx.filter = getFilters();
-    ctx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
+
+    if (straightenMode) {
+      const halfW = img.width / 2;
+      const halfH = img.height / 2;
+      const straightenScale = computeStraightenScale(img.width, img.height, straightenAngle);
+      const filters = getFilters();
+
+      ctx.save();
+      ctx.rotate((straightenAngle * Math.PI) / 180);
+      ctx.scale(straightenScale, straightenScale);
+      ctx.filter = filters;
+      ctx.globalAlpha = 0.38;
+      ctx.drawImage(img, -halfW, -halfH, img.width, img.height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(-halfW, -halfH, img.width, img.height);
+      ctx.clip();
+      ctx.rotate((straightenAngle * Math.PI) / 180);
+      ctx.scale(straightenScale, straightenScale);
+      ctx.filter = filters;
+      ctx.drawImage(img, -halfW, -halfH, img.width, img.height);
+      ctx.restore();
+    } else {
+      ctx.filter = getFilters();
+      ctx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
+    }
+
     ctx.restore();
+
+    if (straightenMode) {
+      const corners = getImageBoundsCornersOnCanvas(
+        img.width,
+        img.height,
+        canvas.width,
+        canvas.height,
+        zoom,
+        panOffset,
+        rotation,
+        flipX,
+        flipY
+      );
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+      ctx.beginPath();
+      ctx.rect(0, 0, canvas.width, canvas.height);
+      ctx.moveTo(corners[0].x, corners[0].y);
+      for (let i = 1; i < corners.length; i += 1) {
+        ctx.lineTo(corners[i].x, corners[i].y);
+      }
+      ctx.closePath();
+      ctx.fill('evenodd');
+
+      drawStraightenGridOverlay(ctx, corners);
+
+      ctx.strokeStyle = '#0a84ff';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(corners[0].x, corners[0].y);
+      for (let i = 1; i < corners.length; i += 1) {
+        ctx.lineTo(corners[i].x, corners[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
   };
 
   // ==================== ФУНКЦИИ ДЛЯ ЛАССО ====================
@@ -618,7 +698,65 @@ const resizeImage = async (blob, targetW, targetH) => {
     setIsDrawingLasso(false);
   };
 
+  const resetStraighten = () => {
+    setStraightenMode(false);
+    setStraightenAngle(0);
+  };
+
+  const toggleStraightenMode = () => {
+    setStraightenMode((active) => {
+      if (active) {
+        setStraightenAngle(0);
+        return false;
+      }
+      setStraightenAngle(0);
+      return true;
+    });
+  };
+
+  const handleToggleStraightenMode = () => {
+    if (!straightenMode) {
+      setCropMode(false);
+      setAspectCropMode(false);
+      resetLasso();
+    }
+    toggleStraightenMode();
+  };
+
+  const handleStraightenAngleChange = (angle) => {
+    setStraightenAngle(clampStraightenAngle(angle));
+  };
+
+  const applyStraighten = () => {
+    if (!straightenMode) return;
+
+    if (!image || straightenAngle === 0) {
+      resetStraighten();
+      return;
+    }
+
+    void applyStraightenToImage({
+      image,
+      angleDeg: straightenAngle,
+      rotation,
+      flipX,
+      flipY,
+      filterCss: getFilters(),
+    }).then((result) => {
+      if (result) {
+        finalizeMutationResult(result, () => {
+          resetStraighten();
+          setActiveFilter('none');
+          setAdjustments(createDefaultAdjustments());
+        });
+      } else {
+        setStraightenMode(false);
+      }
+    });
+  };
+
   const toggleLasso = (operation) => {
+    if (straightenMode) resetStraighten();
     if (lassoMode && lassoOperation === operation) {
       resetLasso();
       return;
@@ -1492,7 +1630,7 @@ const drawAspectCropOverlay = () => {
   };
 
   const handleContainerMouseDown = (e) => {
-    if (cropMode || aspectCropMode) return;
+    if (cropMode || aspectCropMode || straightenMode) return;
     
     if (e.button === 0) {
       e.preventDefault();
@@ -1502,7 +1640,7 @@ const drawAspectCropOverlay = () => {
   };
 
   const handleContainerMouseMove = (e) => {
-    if (cropMode || aspectCropMode) return;
+    if (cropMode || aspectCropMode || straightenMode) return;
     
     if (isPanning) {
       const deltaX = e.clientX - panStart.x;
@@ -1655,7 +1793,7 @@ const handleCanvasTouchMove = (e) => {
   };
 
   const handleContainerTouchStart = (e) => {
-    if (cropMode || aspectCropMode) return;
+    if (cropMode || aspectCropMode || straightenMode) return;
 
     e.preventDefault();
     const touch = e.touches[0];
@@ -1666,7 +1804,7 @@ const handleCanvasTouchMove = (e) => {
   };
 
   const handleContainerTouchMove = (e) => {
-    if (cropMode || aspectCropMode) return;
+    if (cropMode || aspectCropMode || straightenMode) return;
 
     e.preventDefault();
     const touch = e.touches[0];
@@ -1832,6 +1970,8 @@ const restoreFromHistory = useCallback(async (state) => {
     setLassoMode(state.lassoMode || false);
     setLassoPoints([]);
     setIsDrawingLasso(false);
+    setStraightenMode(false);
+    setStraightenAngle(0);
     finishHistoryRestore();
   } catch (error) {
     console.error('Failed to restore editor history:', error);
@@ -1849,6 +1989,8 @@ const restoreFromHistory = useCallback(async (state) => {
     setAspectCropMode(false);
     setLassoMode(false);
     setLassoPoints([]);
+    setStraightenMode(false);
+    setStraightenAngle(0);
     setCropRect({ x: 0, y: 0, w: 0, h: 0 });
     setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
     setPanOffset({ x: 0, y: 0 });
@@ -2029,10 +2171,12 @@ const reset = () => {
   setActiveFilter('none');
   setCropMode(false);
   setAspectCropMode(false);
-  setLassoMode(false);
-  setLassoPoints([]);
-  setIsDrawingLasso(false);
-  setCropRect({ x: 0, y: 0, w: 0, h: 0 });
+    setLassoMode(false);
+    setLassoPoints([]);
+    setIsDrawingLasso(false);
+    setStraightenMode(false);
+    setStraightenAngle(0);
+    setCropRect({ x: 0, y: 0, w: 0, h: 0 });
   setAspectCropRect({ x: 0, y: 0, w: 0, h: 0 });
   setSelectedAspectRatio('original');
   setAdjustments({
@@ -2395,12 +2539,12 @@ const openFormatModal = async (action) => {
     if (lassoMode && lassoPoints.length > 0) {
       drawLassoOverlay();
     }
-  }, [loading, image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset, lassoMode, lassoPoints]);
+  }, [loading, image, rotation, zoom, flipX, flipY, activeFilter, adjustments, cropMode, cropRect, aspectCropMode, aspectCropRect, panOffset, lassoMode, lassoPoints, straightenMode, straightenAngle]);
 
   useEffect(() => {
     if (isRestoringHistoryRef.current) return;
     setPanOffset({ x: 0, y: 0 });
-  }, [image, zoom, rotation, flipX, flipY, baseZoom]);
+  }, [image, rotation, flipX, flipY, baseZoom]);
 
   useEffect(() => {
     if (isRestoringHistoryRef.current || !image || !containerRef.current) return;
@@ -2628,6 +2772,24 @@ const openFormatModal = async (action) => {
                   <FiRotateCw size={20} />
                 </button>
 
+                <div className={`${styles.cropWrapper} ${styles.straightenControlWrapper}`}>
+                  <button
+                    className={`${styles.transformButton} ${straightenMode ? styles.active : ''}`}
+                    onClick={handleToggleStraightenMode}
+                    title="Выровнять изображение"
+                  >
+                    <StraightenIcon size={20} />
+                  </button>
+                  {straightenMode && (
+                    <button
+                      className={`${styles.applyCropButton} ${styles.applyCropButtonFloating}`}
+                      onClick={applyStraighten}
+                    >
+                      Готово
+                    </button>
+                  )}
+                </div>
+
                 <button
                   className={styles.transformButton}
                   onClick={() => flip('x')}
@@ -2700,6 +2862,7 @@ const openFormatModal = async (action) => {
                   <button
                     className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
                     onClick={() => {
+                      if (straightenMode) resetStraighten();
                       setCropMode(!cropMode);
                       if (aspectCropMode) setAspectCropMode(false);
                     }}
@@ -2720,6 +2883,7 @@ const openFormatModal = async (action) => {
                   <button
                     className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
                     onClick={() => {
+                      if (straightenMode) resetStraighten();
                       setAspectCropMode(!aspectCropMode);
                       if (cropMode) setCropMode(false);
                       if (!aspectCropMode) {
@@ -2825,6 +2989,24 @@ const openFormatModal = async (action) => {
                   <FiRotateCw size={20} />
                 </button>
 
+                <div className={`${styles.cropWrapper} ${styles.straightenControlWrapper}`}>
+                  <button
+                    className={`${styles.transformButton} ${straightenMode ? styles.active : ''}`}
+                    onClick={handleToggleStraightenMode}
+                    title="Выровнять изображение"
+                  >
+                    <StraightenIcon size={20} />
+                  </button>
+                  {straightenMode && (
+                    <button
+                      className={`${styles.applyCropButton} ${styles.applyCropButtonFloating}`}
+                      onClick={applyStraighten}
+                    >
+                      Готово
+                    </button>
+                  )}
+                </div>
+
                 <button
                   className={styles.transformButton}
                   onClick={() => flip('x')}
@@ -2895,6 +3077,7 @@ const openFormatModal = async (action) => {
                   <button
                     className={`${styles.transformButton} ${cropMode ? styles.active : ''}`}
                     onClick={() => {
+                      if (straightenMode) resetStraighten();
                       setCropMode(!cropMode);
                       if (aspectCropMode) setAspectCropMode(false);
                     }}
@@ -2914,6 +3097,7 @@ const openFormatModal = async (action) => {
                 <button
                   className={`${styles.transformButton} ${aspectCropMode ? styles.active : ''}`}
                   onClick={() => {
+                    if (straightenMode) resetStraighten();
                     setAspectCropMode(!aspectCropMode);
                     if (cropMode) setCropMode(false);
                     if (!aspectCropMode) {
@@ -2960,10 +3144,17 @@ const openFormatModal = async (action) => {
               onTouchEnd={handleContainerTouchEnd}
               onWheel={handleWheel}
               style={{ 
-                cursor: cropMode || aspectCropMode ? 'crosshair' : lassoMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab'),
-                touchAction: cropMode || aspectCropMode || lassoMode ? 'none' : 'pan-y'
+                cursor: cropMode || aspectCropMode || straightenMode ? 'crosshair' : lassoMode ? 'crosshair' : (isPanning ? 'grabbing' : 'grab'),
+                touchAction: cropMode || aspectCropMode || lassoMode || straightenMode ? 'none' : 'pan-y'
               }}
             >
+              {straightenMode && (
+                <div className={styles.straightenAnglePanel}>
+                  <span className={styles.straightenAngleValue}>
+                    {formatStraightenAngle(straightenAngle)}°
+                  </span>
+                </div>
+              )}
               {loading ? (
                 <div className={styles.loader}>Загрузка изображения...</div>
               ) : (
@@ -3085,8 +3276,9 @@ const openFormatModal = async (action) => {
             </div>
           </div>
                     
-          <div className={styles.aspectRatiosBar}>
-            {aspectCropMode && (<div className={styles.aspectRatiosContainer}>
+          <div className={`${styles.aspectRatiosBar} ${straightenMode ? styles.aspectRatiosBarStraighten : ''}`}>
+            {!straightenMode && aspectCropMode && (
+              <div className={styles.aspectRatiosContainer}>
               {aspectRatios.map(ratio => (
                 <button
                   key={ratio.id}
@@ -3100,7 +3292,13 @@ const openFormatModal = async (action) => {
                   {ratio.label}
                 </button>
               ))}
-            </div>)}
+            </div>
+            )}
+            <StraightenSliderBar
+              visible={straightenMode}
+              angle={straightenAngle}
+              onChange={handleStraightenAngleChange}
+            />
           </div>
           
         </div>
