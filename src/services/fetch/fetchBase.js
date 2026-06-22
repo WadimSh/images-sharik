@@ -1,4 +1,22 @@
-const baseURL = process.env.REACT_APP_API_URL || 'https://mp.sharik.ru';
+/** Основной хост приложения (api :3001 в dev, mp.sharik.ru в prod). */
+export const getApiBaseUrl = () =>
+  (process.env.REACT_APP_API_URL || 'https://mp.sharik.ru').replace(/\/$/, '');
+
+/**
+ * Базовый URL ai-api (Studio).
+ * Переопределение: REACT_APP_STUDIO_URL
+ */
+export const getStudioBaseUrl = () =>
+  (process.env.REACT_APP_STUDIO_URL || 'https://mp.sharik.ru/studio').replace(/\/$/, '');
+
+/** Собрать полный URL Studio-эндпоинта, напр. buildStudioUrl('/providers/models'). */
+export const buildStudioUrl = (path = '') => {
+  const base = getStudioBaseUrl();
+  if (!path) return base;
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
+const baseURL = getApiBaseUrl();
 
 let isRefreshing = false;
 
@@ -190,3 +208,73 @@ export const tokenUtils = {
     setAccessToken,
     clearTokens
 };
+
+/**
+ * JSON-запросы к ai-api (Studio).
+ * @param {string} path — путь от корня studio, напр. `/providers/models?companyId=...`
+ */
+export async function fetchStudioDataWithFetch(path, options = {}) {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const studioUrl = buildStudioUrl(normalizedPath);
+    const apiBase = getApiBaseUrl();
+
+    if (studioUrl.startsWith(`${apiBase}/`)) {
+        return fetchDataWithFetch(studioUrl.slice(apiBase.length), options);
+    }
+
+    return fetchAbsoluteJsonWithAuth(studioUrl, options);
+}
+
+async function fetchAbsoluteJsonWithAuth(fullUrl, options = {}) {
+    const originalOptions = { ...options };
+    const { timeout = 600000, signal: externalSignal } = originalOptions;
+
+    let accessToken = getAccessToken();
+    const internalController = !externalSignal ? new AbortController() : null;
+    const signal = externalSignal || internalController?.signal;
+
+    const timeoutId = setTimeout(() => {
+        if (internalController) {
+            internalController.abort();
+        }
+    }, timeout);
+
+    try {
+        let config = createRequestConfig(originalOptions, accessToken, signal);
+        let response = await fetch(fullUrl, config);
+
+        if (response.status === 401 && !isRefreshing) {
+            isRefreshing = true;
+            try {
+                const newAccessToken = await refreshToken();
+                const retryConfig = createRequestConfig(originalOptions, newAccessToken, signal);
+                response = await fetch(fullUrl, retryConfig);
+            } catch (error) {
+                redirectToSignIn();
+                throw error;
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+            const error = new Error(errorMessage);
+            error.httpStatus = response.status;
+            error.code = errorData.code;
+            error.data = errorData;
+            throw error;
+        }
+
+        return response.json();
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            if (externalSignal?.aborted) throw error;
+            throw new Error(`Request timeout after ${timeout}ms`);
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}

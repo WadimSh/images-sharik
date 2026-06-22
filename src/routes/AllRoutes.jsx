@@ -8,6 +8,7 @@ import Generator from "../views/Generator";
 import Gallery from "../views/Gallery";
 import Reports from "../views/Reports";
 import EditorAiLogs from "../views/EditorAiLogs";
+import AiChat from "../views/AiChat";
 import Images from "../views/Images";
 import Products from "../views/Products";
 import Template from "../views/Template";
@@ -67,6 +68,15 @@ const AllRoutes = () => {
             <Reports />
           </AdminProtectedRoute>
         } 
+      />
+
+      <Route
+        path="/ai-chat"
+        element={
+          <AdminProtectedRoute>
+            <AiChat />
+          </AdminProtectedRoute>
+        }
       />
 
       <Route

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { RiCollageFill } from "react-icons/ri";
 import { IoFolderOpen } from "react-icons/io5";
 import { TbReport, TbListDetails } from "react-icons/tb";
+import { VscCopilot } from "react-icons/vsc";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { LuImagePlus } from "react-icons/lu";
 // import { MdCreateNewFolder } from "react-icons/md";
@@ -270,6 +271,14 @@ const convertToWebP = (file) => {
       navigate('/reports');
   }
 
+  const handleAiChatClick = async () => {
+    if (!isAuthenticated) {
+      navigate('/sign-in');
+      return;
+    }
+    navigate('/ai-chat');
+  }
+
   const handleAiLogsClick = async () => {
     if (!isAuthenticated) {
       navigate('/sign-in');
@@ -342,16 +351,6 @@ const convertToWebP = (file) => {
             <MdCreateNewFolder className="creat-temp-icon" />
           </button>
         )*/}
-        {!isPhotographer && (
-          <Tooltip
-            content={t('header.gallery')}
-            position='bottom'
-          >
-            <button onClick={handleGalleryClick} className="creat-temp-button">
-              <IoFolderOpen className="creat-temp-icon" />
-            </button>
-          </Tooltip>
-        )}
         {<div className={isPhotographer ? "creat-image-wrapper-photo" : "creat-image-wrapper"}>
           <Tooltip
             content={t('Загрузить изображение')}
@@ -362,6 +361,16 @@ const convertToWebP = (file) => {
             </button>
           </Tooltip>
         </div>}
+        {!isPhotographer && (
+          <Tooltip
+            content={t('header.gallery')}
+            position='bottom'
+          >
+            <button onClick={handleGalleryClick} className="creat-temp-button">
+              <IoFolderOpen className="creat-temp-icon" />
+            </button>
+          </Tooltip>
+        )}
         {
           <Tooltip
             content={t('header.library')}
@@ -373,6 +382,16 @@ const convertToWebP = (file) => {
           </Tooltip>
           
         }
+        {isAdmin && (
+          <Tooltip
+            content={t('header.aiChat')}
+            position='bottom'
+          >
+            <button onClick={handleAiChatClick} className="creat-temp-button">
+              <VscCopilot className="creat-temp-icon" />
+            </button>
+          </Tooltip>
+        )}
         {isAdmin && (
           <Tooltip
             content={t('header.reports')}

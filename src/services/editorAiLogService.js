@@ -11,7 +11,16 @@ export async function apiStartEditorAiLog(data) {
   });
 }
 
-/** Этап 2: после ответа AI (success или error) */
+/** Этап 2: после получения taskId (Mitup async) — `{ providerTaskId }` */
+export async function apiProcessingEditorAiLog(logId, data) {
+  return fetchDataWithFetch(`${BASE}/${logId}/processing`, {
+    method: 'PATCH',
+    data,
+    timeout: 15000,
+  });
+}
+
+/** Этап 3: после ответа AI (success или error) */
 export async function apiCompleteEditorAiLog(logId, data) {
   return fetchDataWithFetch(`${BASE}/${logId}/complete`, {
     method: 'PATCH',

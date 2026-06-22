@@ -1,0 +1,21 @@
+.ai-chat-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ai-chat-page-header {
+  margin: 10px 10px 12px;
+  flex-shrink: 0;
+}
+
+.ai-chat-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 12px;
+}
