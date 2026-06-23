@@ -1,0 +1,168 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { apiGetChatMessages } from '../services/chatService';
+
+const MESSAGES_LIMIT = 50;
+
+/**
+ * @param {object|null|undefined} message
+ * @returns {string}
+ */
+export function getChatMessageId(message) {
+  return message?.id || message?._id || '';
+}
+
+/**
+ * @param {object} params
+ * @param {string|null|undefined} params.companyId
+ * @param {string|null|undefined} params.activeSessionId
+ * @param {import('react').MutableRefObject<boolean>} [params.skipInitialLoadRef]
+ */
+export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef }) {
+  const [messages, setMessages] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+
+  const pageRef = useRef(1);
+  const scrollContainerRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = useCallback((behavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView?.({ behavior, block: 'end' });
+  }, []);
+
+  const loadMessages = useCallback(
+    async (sessionId, { reset = true, page = 1 } = {}) => {
+      if (!sessionId || !companyId) {
+        if (reset) {
+          setMessages([]);
+          setPagination(null);
+          setError(null);
+        }
+        return;
+      }
+
+      const setLoadingState = reset ? setLoading : setLoadingMore;
+
+      try {
+        setLoadingState(true);
+        if (reset) {
+          setError(null);
+        }
+
+        const response = await apiGetChatMessages(sessionId, {
+          companyId,
+          page,
+          limit: MESSAGES_LIMIT,
+        });
+
+        const items = response?.data || [];
+        pageRef.current = page;
+        setPagination(response?.pagination || null);
+
+        setMessages((prev) => (reset ? items : [...prev, ...items]));
+      } catch (err) {
+        console.error('useChatMessages load error:', err);
+        if (reset) {
+          setMessages([]);
+          setPagination(null);
+          setError(err?.message || 'Ошибка загрузки сообщений');
+        }
+      } finally {
+        setLoadingState(false);
+      }
+    },
+    [companyId]
+  );
+
+  useEffect(() => {
+    if (!activeSessionId) {
+      setMessages([]);
+      setPagination(null);
+      setError(null);
+      setLoading(false);
+      setLoadingMore(false);
+      pageRef.current = 1;
+      return;
+    }
+
+    pageRef.current = 1;
+
+    if (skipInitialLoadRef?.current) {
+      skipInitialLoadRef.current = false;
+      return;
+    }
+
+    loadMessages(activeSessionId, { reset: true, page: 1 });
+  }, [activeSessionId, loadMessages, skipInitialLoadRef]);
+
+  useEffect(() => {
+    if (!activeSessionId || loading || messages.length === 0) {
+      return;
+    }
+
+    scrollToBottom('auto');
+  }, [activeSessionId, loading, messages.length, scrollToBottom]);
+
+  const loadMore = useCallback(async () => {
+    if (!activeSessionId || !pagination?.hasNext || loading || loadingMore) {
+      return;
+    }
+
+    await loadMessages(activeSessionId, {
+      reset: false,
+      page: pageRef.current + 1,
+    });
+  }, [activeSessionId, pagination?.hasNext, loading, loadingMore, loadMessages]);
+
+  const appendMessage = useCallback(
+    (message) => {
+      if (!message) return;
+
+      setMessages((prev) => {
+        const messageId = getChatMessageId(message);
+        if (messageId && prev.some((item) => getChatMessageId(item) === messageId)) {
+          return prev;
+        }
+        return [...prev, message];
+      });
+
+      requestAnimationFrame(() => scrollToBottom('smooth'));
+    },
+    [scrollToBottom]
+  );
+
+  const updateMessage = useCallback((messageId, patch) => {
+    if (!messageId) return;
+
+    setMessages((prev) =>
+      prev.map((message) =>
+        getChatMessageId(message) === messageId ? { ...message, ...patch } : message
+      )
+    );
+  }, []);
+
+  const replaceMessages = useCallback((nextMessages) => {
+    setMessages(Array.isArray(nextMessages) ? nextMessages : []);
+  }, []);
+
+  return {
+    messages,
+    pagination,
+    loading,
+    loadingMore,
+    error,
+    hasMore: Boolean(pagination?.hasNext),
+    isWelcomeState: !activeSessionId,
+    loadMessages,
+    loadMore,
+    appendMessage,
+    updateMessage,
+    replaceMessages,
+    scrollContainerRef,
+    messagesEndRef,
+    scrollToBottom,
+  };
+}

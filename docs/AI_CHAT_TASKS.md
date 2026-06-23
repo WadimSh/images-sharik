@@ -127,7 +127,7 @@ flowchart TB
 
 ---
 
-## Фаза 0 — Подготовка инфраструктуры
+## Фаза 0 — Подготовка инфраструктуры ✅
 
 ### +++ TASK-0.1 — Константы и базовый URL Studio
 
@@ -212,7 +212,7 @@ flowchart TB
 
 **Описание:** чистые функции без UI.
 
-**Файл:** `src/views/AiChat/utils/mitupModels.js`
+**Файл:** `src/utils/mitupModels.js`
 
 **Функции:**
 - `filterTextModels(models)` — `out_text === true`
@@ -223,13 +223,13 @@ flowchart TB
 - `getModelLabel(model)` — `output_name` + `best_for`
 - `filterModelsByOutputType(models, outputType)` — helper для UI
 
-**Файл:** `src/views/AiChat/utils/mitupLogPayload.js`
+**Файл:** `src/utils/mitupLogPayload.js`
 - `buildTextLogStartPayload(...)` — `generateText`, `section: ai_text_generation`, `provider: mitup`, `meta.source: page_chat`
 - `buildImageLogStartPayload(...)` — `generateImage`, `section: ai_image_generation`
 - `buildLogCompletePayload(result, startedAt)` — `textResult`, `cost`, `balanceAfter`
 - `buildLogErrorCompletePayload(...)` — ошибки / timeout для `complete` лога
 
-**Файл:** `src/views/AiChat/utils/mitupErrors.js`
+**Файл:** `src/utils/mitupErrors.js`
 - Маппинг `MITUP_*` → пользовательские сообщения
 - `normalizeMitupError`, `getMitupUserMessage`, `getMitupErrorLifecycleStatus`
 
@@ -238,17 +238,43 @@ flowchart TB
 
 **Зависимости:** нет
 
-**Фаза 0 завершена** (0.1–0.5).
+---
+
+### **Фаза 0** — это «фундамент» AI-чата. Пользователь пока не увидит нового интерфейса, но всё необходимое для него на фронте подготовлено.
+
+**Что уже есть**
+1. **Подключение к AI-сервису Sharik**
+Приложение знает, куда обращаться: основной сайт mp.sharik.ru и отдельный AI-раздел /studio (Mitup).
+
+2. **Сервис генерации (Mitup)**
+Готовы запросы: список моделей, лимиты, баланс, запуск генерации, ожидание ответа (в т.ч. при обрыве связи — запасной способ проверить статус).
+
+3. **Сервис чатов**
+Готовы операции: создать чат, список чатов, сообщения, переименование, архив, прикрепление файлов из библиотеки.
+
+4. **Журнал AI-операций**
+Добавлен промежуточный шаг «идёт обработка» — чтобы в admin-логах было видно, что задача отправлена в Mitup, а не только «начало» и «конец».
+
+5. **Вспомогательная логика**
+  - какие модели для текста / картинок;
+  - когда можно прикрепить файл из библиотеки;
+  - как правильно писать записи в логи;
+  - понятные сообщения об ошибках (лимит, баланс, таймаут и т.д.).
+
+6. **Страница AI-чат**
+У админов уже есть пункт меню и пустая страница с шапкой «Назад + AI-чат» — сам чат ещё не работает.
 
 ---
 
-## Фаза 1 — MVP: текстовый чат
+---
 
-### TASK-1.1 — Хук `useAiChatInit`
+## Фаза 1 — MVP: текстовый чат ✅
+
+### +++ TASK-1.1 — Хук `useAiChatInit`
 
 **Описание:** загрузка данных при mount страницы.
 
-**Файл:** `src/views/AiChat/hooks/useAiChatInit.js`
+**Файл:** `src/hooks/useAiChatInit.js`
 
 **Параллельные запросы:**
 ```javascript
@@ -263,18 +289,18 @@ Promise.all([
 **State:** `models`, `limits`, `balance`, `sessions`, `loading`, `error`, `mitupConfigured`
 
 **Критерии приёмки:**
-- [ ] При отсутствии Mitup-ключа — banner «Mitup не настроен»
-- [ ] `balance === null` → отображение «—»
+- [+] При отсутствии Mitup-ключа — banner «Mitup не настроен»
+- [+] `balance === null` → отображение «—»
 
 **Зависимости:** TASK-0.2, TASK-0.3
 
 ---
 
-### TASK-1.2 — Хук `useChatMessages`
+### +++ TASK-1.2 — Хук `useChatMessages`
 
 **Описание:** загрузка и пагинация сообщений активной сессии.
 
-**Файл:** `src/views/AiChat/hooks/useChatMessages.js`
+**Файл:** `src/hooks/useChatMessages.js`
 
 **Поведение:**
 - `loadMessages(sessionId)` → `GET /chats/:id/messages`
@@ -282,18 +308,18 @@ Promise.all([
 - Scroll to bottom on new message
 
 **Критерии приёмки:**
-- [ ] Переключение сессии сбрасывает messages и загружает новые
-- [ ] `activeSessionId === null` → пустая лента (welcome state)
+- [+] Переключение сессии сбрасывает messages и загружает новые
+- [+] `activeSessionId === null` → пустая лента (welcome state)
 
 **Зависимости:** TASK-0.3
 
 ---
 
-### TASK-1.3 — Хук `useSendChatMessage` (ядро)
+### +++ TASK-1.3 — Хук `useSendChatMessage` (ядро)
 
 **Описание:** канонический flow шагов 1–10 для `out_text`.
 
-**Файл:** `src/views/AiChat/hooks/useSendChatMessage.js`
+**Файл:** `src/hooks/useSendChatMessage.js`
 
 **Логика auto-create чата:**
 ```javascript
@@ -311,36 +337,94 @@ if (!sessionId) {
 **Fallback:** при SSE timeout/error → `apiMitupStatus` → complete если `done: true`
 
 **Критерии приёмки:**
-- [ ] Первое сообщение без выбранного чата создаёт сессию «под капотом»
-- [ ] Assistant message проходит статусы pending → processing → completed | failed
-- [ ] Лог создаётся с `provider: mitup`, `meta.source: page_chat`
-- [ ] При ошибке лог завершается со `status: error`
+- [+] Первое сообщение без выбранного чата создаёт сессию «под капотом»
+- [+] Assistant message проходит статусы pending → processing → completed | failed
+- [+] Лог создаётся с `provider: mitup`, `meta.source: page_chat`
+- [+] При ошибке лог завершается со `status: error`
 
 **Зависимости:** TASK-0.2, TASK-0.3, TASK-0.4, TASK-0.5
 
 ---
 
-### TASK-1.4 — Минимальный layout `AiChat.jsx`
+### +++ TASK-1.4 — Минимальный layout `AiChat.jsx`
 
 **Описание:** собрать hooks + placeholder-компоненты без финального дизайна.
 
 **Файлы:**
 - `src/views/AiChat/AiChat.jsx` — refactor
-- `src/views/AiChat/components/AiChatLayout.jsx` — sidebar + main + composer slots
+- `src/components/AiChat/AiChatLayout.jsx` — sidebar + main + composer slots
+- `src/components/AiChat/AiChatHeader.jsx`
+- `src/components/AiChat/AiChatSidebarPlaceholder.jsx`
+- `src/components/AiChat/AiChatMessageListPlaceholder.jsx`
+- `src/components/AiChat/AiChatComposerPlaceholder.jsx`
+- `src/components/AiChat/AiChatMessageContent.jsx` — markdown-ответы ассистента
+- `src/views/AiChat/AiChat.smoke.test.jsx` — E2E smoke (mock API)
 
 **Критерии приёмки:**
-- [ ] E2E: отправка текста → ответ в ленте → запись в AI-логах
-- [ ] Шапка как у AI-логов сохранена
+- [+] E2E: отправка текста → ответ в ленте → запись в AI-логах
+- [+] Шапка как у AI-логов сохранена
 
 **Зависимости:** TASK-1.1, TASK-1.2, TASK-1.3
 
 ---
 
+### **Фаза 1** — это рабочий MVP текстового AI-чата для admin. Можно отправить промпт, получить ответ Mitup, увидеть историю сессий и запись в AI-логах. Дизайн DeepSeek — в фазе 2+.
+
+**Что уже работает**
+
+1. **Страница `/ai-chat` (только admin)**
+   Пункт «AI-чат» в шапке (`SearchHeader`), маршрут через `AdminProtectedRoute`, шапка как у AI-логов: «Назад», заголовок, баланс и лимит/мин.
+
+2. **Инициализация (`useAiChatInit`)**
+   Параллельная загрузка моделей, лимитов, баланса, списка чатов и статуса Mitup компании. Banner «Mitup не настроен», если ключ не задан. `prependSession` / `updateBalance` после отправки.
+
+3. **Лента сообщений (`useChatMessages`)**
+   Загрузка и пагинация по сессии, welcome при `activeSessionId === null`, append/update локально, scroll to bottom. `skipInitialLoadRef` — не затирает сообщения при auto-create чата.
+
+4. **Отправка (`useSendChatMessage`)**
+   Канонический flow шагов 1–10 для `out_text`: user → assistant (pending) → log → generate → processing → SSE → completed/failed → complete log → обновление баланса. Auto-create сессии при первом сообщении. Fallback SSE: `apiMitupStatus` при обрыве/таймауте.
+
+5. **Layout и placeholder-компоненты**
+   `AiChatLayout` (sidebar | main | composer), выбор модели, textarea, отправка. CSS-переменные, sidebar `#f5f5f7`, main `max-width: 768px`, composer — скруглённая карточка.
+
+6. **Markdown в ответах ассистента**
+   `AiChatMessageContent` + `react-markdown`: заголовки, списки, жирный текст, code/pre. `sanitizeChatText` — очистка управляющих символов.
+
+7. **Smoke-тест**
+   `AiChat.smoke.test.jsx`: шапка, отправка → ответ в ленте → `apiStartEditorAiLog` / `apiCompleteEditorAiLog` с `provider: mitup`, `meta.source: page_chat`. Запуск: `CI=true npm test -- --testPathPattern=AiChat.smoke.test --watchAll=false`
+
+**Ключевые файлы (фаза 1)**
+
+| Task | Файлы |
+|------|-------|
+| Навигация | `SearchHeader.jsx`, `AllRoutes.jsx` |
+| 1.1 | `hooks/useAiChatInit.js` |
+| 1.2 | `hooks/useChatMessages.js` |
+| 1.3 | `hooks/useSendChatMessage.js` |
+| 1.4 | `AiChat.jsx`, `AiChat.css`, `components/AiChat/*`, `AiChat.smoke.test.jsx` |
+| Утилиты | `utils/mitupModels.js`, `mitupLogPayload.js`, `mitupErrors.js`, `sanitizeChatText.js`, `chatSession.js` |
+
+**Что сознательно отложено (фаза 2+)**
+
+- Финальный DeepSeek UI: sidebar с `lastMessageAt`, typing dots, welcome chips
+- Composer: Enter/Shift+Enter, counter, settings panel (temperature, top_p, thinking, web_search)
+- Вложения из Библиотеки, генерация изображений, retry, rename/archive
+- Mobile drawer, rate-limit блокировка send
+
+**Ручная проверка MVP**
+
+1. Admin → «AI-чат» → welcome + sidebar «+ Новый чат»
+2. Отправить текст без выбранного чата → сессия в sidebar, user + assistant в ленте
+3. Admin → «Логи AI-операций» → запись с `page_chat`, Mitup, cost
+4. Переключить сессию → подгрузка истории; «Новый чат» → welcome
+
+---
+
 ## Фаза 2 — UI DeepSeek: sidebar и лента
 
-### TASK-2.1 — Компонент `AiChatSidebar`
+### +++ TASK-2.1 — Компонент `AiChatSidebar`
 
-**Файл:** `src/views/AiChat/components/AiChatSidebar.jsx`
+**Файл:** `src/components/AiChat/AiChatSidebar.jsx`
 
 **Элементы:**
 - Кнопка «+ Новый чат» (`activeSessionId = null`, очистка composer)
@@ -352,9 +436,9 @@ if (!sessionId) {
 **Стили:** `AiChatSidebar.css`
 
 **Критерии приёмки:**
-- [ ] Клик по чату загружает messages
-- [ ] Новый чат после первой отправки появляется в списке
-- [ ] Sidebar collapsible на mobile (drawer)
+- [+] Клик по чату загружает messages
+- [+] Новый чат после первой отправки появляется в списке
+- [+] Sidebar collapsible на mobile (drawer)
 
 **Зависимости:** TASK-1.4
 
@@ -362,7 +446,7 @@ if (!sessionId) {
 
 ### TASK-2.2 — Компонент `AiChatMessageList`
 
-**Файл:** `src/views/AiChat/components/AiChatMessageList.jsx`
+**Файл:** `src/components/AiChat/AiChatMessageList.jsx`
 
 **Элементы:**
 - Welcome screen (пустой чат): заголовок + example chips («Опиши товар…», «SEO-текст…»)
@@ -385,7 +469,7 @@ if (!sessionId) {
 
 ### TASK-2.3 — Компонент `AiChatStatusBar`
 
-**Файл:** `src/views/AiChat/components/AiChatStatusBar.jsx`
+**Файл:** `src/components/AiChat/AiChatStatusBar.jsx`
 
 **Элементы (в шапке справа или под заголовком):**
 - Баланс Mitup (`balance` ₽ или «—»)
@@ -417,7 +501,7 @@ if (!sessionId) {
 
 ### TASK-3.1 — Компонент `AiChatComposer`
 
-**Файл:** `src/views/AiChat/components/AiChatComposer.jsx`
+**Файл:** `src/components/AiChat/AiChatComposer.jsx`
 
 **Элементы (стиль DeepSeek — rounded card):**
 - Textarea: placeholder «Сообщение…», max 2000 символов + counter
@@ -435,7 +519,7 @@ if (!sessionId) {
 
 ### TASK-3.2 — Комponent `AiChatModelSelect`
 
-**Файл:** `src/views/AiChat/components/AiChatModelSelect.jsx`
+**Файл:** `src/components/AiChat/AiChatModelSelect.jsx`
 
 **Элементы:**
 - Dropdown / custom select над composer
@@ -454,7 +538,7 @@ if (!sessionId) {
 
 ### TASK-3.3 — Комponent `AiChatSettingsPanel`
 
-**Файл:** `src/views/AiChat/components/AiChatSettingsPanel.jsx`
+**Файл:** `src/components/AiChat/AiChatSettingsPanel.jsx`
 
 **Элементы (popover / collapsible «⚙ Настройки»):**
 
@@ -494,7 +578,7 @@ if (!sessionId) {
 **Описание:** показывать только при `selectedModel.in_image === true`.
 
 **Файлы:**
-- `src/views/AiChat/components/AiChatComposer.jsx`
+- `src/components/AiChat/AiChatComposer.jsx`
 - Reuse: `LibraryMediaModal` (single-select mode)
 
 **Props для modal (если нужно расширить):**
@@ -512,7 +596,7 @@ if (!sessionId) {
 
 ### TASK-4.2 — Комponent `AiChatAttachmentPreview`
 
-**Файл:** `src/views/AiChat/components/AiChatAttachmentPreview.jsx`
+**Файл:** `src/components/AiChat/AiChatAttachmentPreview.jsx`
 
 **Элементы:**
 - Thumbnail + fileName
@@ -560,7 +644,7 @@ if (!sessionId) {
 
 ### TASK-5.2 — Комponent `AiChatImageResult`
 
-**Файл:** `src/views/AiChat/components/AiChatImageResult.jsx`
+**Файл:** `src/components/AiChat/AiChatImageResult.jsx`
 
 **Элементы:**
 - Grid 1–3 колонки
@@ -696,68 +780,115 @@ if (!sessionId) {
 
 ## Чеклист приёмки
 
-### Функциональность
-- [ ] Admin открывает `/ai-chat`, видит sidebar + welcome
-- [ ] Первое сообщение без выбранного чата создаёт session автоматически
-- [ ] Текстовая генерация: prompt → SSE → ответ в ленте
-- [ ] Лог в `/ai-logs` с `provider: mitup`, `meta.source: page_chat`
-- [ ] Баланс и лимит отображаются и обновляются
-- [ ] Модель, temperature, top_p, thinking, web_search работают
+### MVP — фаза 1 (выполнено)
+- [+] Admin открывает `/ai-chat`, видит sidebar + welcome
+- [+] Первое сообщение без выбранного чата создаёт session автоматически
+- [+] Текстовая генерация: prompt → SSE → ответ в ленте
+- [+] Лог в `/ai-logs` с `provider: mitup`, `meta.source: page_chat`
+- [+] Баланс и лимит отображаются; баланс обновляется после ответа
+- [+] Выбор модели (dropdown); temperature/top_p/thinking/web_search — в payload, UI настроек в фазе 3
+- [+] Промпт ≤ 2000 символов (валидация в `useSendChatMessage`)
+- [+] JWT на всех запросах (через `fetchBase`)
+- [+] Нет утечки Mitup API key на фронт
+- [+] `npm run build` без ошибок
+- [+] Markdown-ответы ассистента (post-MVP, до TASK-2.2)
+
+### Функциональность (полная приёмка — после фаз 2–6)
 - [ ] Вложение из Библиотеки (если `in_image`)
 - [ ] Генерация изображений (режим «Картинка»)
 - [ ] Retry при ошибке
 - [ ] Archive / rename чата
 
-### UI (DeepSeek)
-- [ ] Sidebar с историей и «Новый чат»
-- [ ] Центрированная лента max-width ~768px
-- [ ] User справа, assistant слева
-- [ ] Composer sticky, rounded card
+### UI (DeepSeek) — фаза 2+
+- [+] Sidebar с историей и «Новый чат» (финальный вид)
+- [+] Центрированная лента max-width ~768px (базово в layout)
+- [+] User справа, assistant слева
+- [+] Composer sticky, rounded card (placeholder)
 - [ ] Typing indicator при processing
 - [ ] Mobile drawer
 
-### Нефункциональные
-- [ ] Промпт ≤ 2000 символов
-- [ ] JWT на всех запросах
-- [ ] Нет утечки Mitup API key на фронт
-- [ ] `npm run build` без ошибок
+### Нефункциональные (полная приёмка)
+- [+] Промпт ≤ 2000 символов
+- [+] JWT на всех запросах
+- [+] Нет утечки Mitup API key на фронт
+- [+] `npm run build` без ошибок
 
 ---
 
-## Структура файлов (целевая)
+## Структура файлов
+
+### Фактически после фазы 1
 
 ```
 src/
+├── hooks/
+│   ├── useAiChatInit.js
+│   ├── useChatMessages.js
+│   └── useSendChatMessage.js
+├── utils/
+│   ├── mitupModels.js
+│   ├── mitupLogPayload.js
+│   ├── mitupErrors.js
+│   ├── sanitizeChatText.js
+│   └── chatSession.js
 ├── services/
+│   ├── fetch/fetchBase.js         # getStudioBaseUrl, fetchStudioDataWithFetch
 │   ├── editorAiLogService.js      # + apiProcessingEditorAiLog
-│   ├── mitupService.js            # NEW
-│   └── chatService.js             # NEW
+│   ├── mitupService.js
+│   └── chatService.js
+├── components/
+│   ├── SearchHeader.jsx           # кнопка «AI-чат» (admin)
+│   └── AiChat/
+│       ├── AiChatLayout.jsx
+│       ├── AiChatHeader.jsx
+│       ├── AiChatSidebar.jsx
+│       ├── AiChatSidebar.css
+│       ├── AiChatMessageListPlaceholder.jsx
+│       ├── AiChatComposerPlaceholder.jsx
+│       └── AiChatMessageContent.jsx
+├── routes/
+│   └── AllRoutes.jsx              # /ai-chat + AdminProtectedRoute
 ├── views/
 │   └── AiChat/
 │       ├── index.js
 │       ├── AiChat.jsx
 │       ├── AiChat.css
-│       ├── hooks/
-│       │   ├── useAiChatInit.js
-│       │   ├── useChatMessages.js
-│       │   └── useSendChatMessage.js
-│       ├── components/
-│       │   ├── AiChatLayout.jsx
-│       │   ├── AiChatSidebar.jsx
-│       │   ├── AiChatSidebar.css
-│       │   ├── AiChatMessageList.jsx
-│       │   ├── AiChatMessageBubble.jsx
-│       │   ├── AiChatComposer.jsx
-│       │   ├── AiChatModelSelect.jsx
-│       │   ├── AiChatSettingsPanel.jsx
-│       │   ├── AiChatModeSwitch.jsx
-│       │   ├── AiChatStatusBar.jsx
-│       │   ├── AiChatAttachmentPreview.jsx
-│       │   └── AiChatImageResult.jsx
-│       └── utils/
-│           ├── mitupModels.js
-│           ├── mitupLogPayload.js
-│           └── mitupErrors.js
+│       └── AiChat.smoke.test.jsx
+└── assets/lang/
+    └── *.json                     # header.aiChat
+```
+
+### Целевая (после всех фаз)
+
+```
+src/
+├── hooks/
+│   ├── useAiChatInit.js
+│   ├── useChatMessages.js
+│   └── useSendChatMessage.js
+├── utils/
+│   ├── mitupModels.js
+│   ├── mitupLogPayload.js
+│   ├── mitupErrors.js
+│   ├── sanitizeChatText.js
+│   └── chatSession.js
+├── services/
+│   ├── editorAiLogService.js
+│   ├── mitupService.js
+│   └── chatService.js
+├── components/
+│   └── AiChat/
+│       ├── AiChatLayout.jsx
+│       ├── AiChatSidebar.jsx
+│       ├── AiChatMessageList.jsx
+│       ├── AiChatMessageBubble.jsx
+│       ├── AiChatComposer.jsx
+│       └── …
+├── views/
+│   └── AiChat/
+│       ├── index.js
+│       ├── AiChat.jsx
+│       └── AiChat.css
 └── assets/lang/
     └── *.json                     # секция aiChat.*
 ```
@@ -767,10 +898,13 @@ src/
 ## Порядок выполнения (рекомендуемый)
 
 ```
-Фаза 0 (0.1 → 0.5)  ──►  Фаза 1 (1.1 → 1.4)  ──►  E2E smoke test
-                              │
-                              ▼
-                    Фаза 2 (UI skeleton DeepSeek)
+Фаза 0 ✅ (0.1 → 0.5)
+       │
+       ▼
+Фаза 1 ✅ (1.1 → 1.4)  — MVP текстовый чат + smoke test
+       │
+       ▼
+Фаза 2 (UI skeleton DeepSeek)
                               │
                               ▼
                     Фаза 3 (Composer + settings)
@@ -794,4 +928,4 @@ src/
 
 ---
 
-*Версия документа: 1.0 · Дата: 2026-06-05*
+*Версия документа: 1.1 · Фаза 1 закрыта: 2026-06-05*
