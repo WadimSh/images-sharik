@@ -170,6 +170,8 @@ describe('AiChat smoke', () => {
       expect(screen.getByText('Ответ ассистента')).toBeInTheDocument();
     });
 
+    expect(screen.getByTestId('ai-chat-message-meta')).toHaveTextContent('Test Model');
+
     expect(screen.getByTestId('ai-chat-message-user')).toHaveTextContent('Привет');
 
     expect(chatService.apiCreateChatSession).toHaveBeenCalledWith(

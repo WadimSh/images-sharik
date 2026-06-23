@@ -1,4 +1,5 @@
 import { AiChatMessageContent } from './AiChatMessageContent';
+import { AiChatMessageMeta } from './AiChatMessageMeta';
 
 /**
  * Placeholder ленты сообщений до TASK-2.2 (AiChatMessageList).
@@ -56,6 +57,7 @@ export function AiChatMessageListPlaceholder({
               >
                 <div className="ai-chat-message-bubble">
                   <AiChatMessageContent message={message} />
+                  {message.role === 'assistant' && <AiChatMessageMeta message={message} />}
                 </div>
               </div>
             ))}
