@@ -28,9 +28,22 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
   const pageRef = useRef(1);
   const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const shouldScrollToBottomRef = useRef(false);
 
-  const scrollToBottom = useCallback((behavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView?.({ behavior, block: 'end' });
+  const scrollToBottom = useCallback((behavior = 'auto') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    requestAnimationFrame(() => {
+      const top = container.scrollHeight;
+
+      if (typeof container.scrollTo === 'function') {
+        container.scrollTo({ top, behavior });
+        return;
+      }
+
+      container.scrollTop = top;
+    });
   }, []);
 
   const loadMessages = useCallback(
@@ -63,6 +76,10 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
         setPagination(response?.pagination || null);
 
         setMessages((prev) => (reset ? items : [...prev, ...items]));
+
+        if (reset) {
+          shouldScrollToBottomRef.current = items.length > 0;
+        }
       } catch (err) {
         console.error('useChatMessages load error:', err);
         if (reset) {
@@ -85,6 +102,11 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
       setLoading(false);
       setLoadingMore(false);
       pageRef.current = 1;
+      shouldScrollToBottomRef.current = false;
+
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
       return;
     }
 
@@ -99,12 +121,13 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
   }, [activeSessionId, loadMessages, skipInitialLoadRef]);
 
   useEffect(() => {
-    if (!activeSessionId || loading || messages.length === 0) {
+    if (!shouldScrollToBottomRef.current || loading || messages.length === 0) {
       return;
     }
 
+    shouldScrollToBottomRef.current = false;
     scrollToBottom('auto');
-  }, [activeSessionId, loading, messages.length, scrollToBottom]);
+  }, [loading, messages, scrollToBottom]);
 
   const loadMore = useCallback(async () => {
     if (!activeSessionId || !pagination?.hasNext || loading || loadingMore) {
@@ -129,7 +152,9 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
         return [...prev, message];
       });
 
-      requestAnimationFrame(() => scrollToBottom('smooth'));
+      if (message.role === 'user') {
+        requestAnimationFrame(() => scrollToBottom('smooth'));
+      }
     },
     [scrollToBottom]
   );

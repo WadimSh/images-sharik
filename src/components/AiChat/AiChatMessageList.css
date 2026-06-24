@@ -1,0 +1,79 @@
+.ai-chat-message-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-chat-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.ai-chat-welcome-logo {
+  display: block;
+  width: min(240px, 72vw);
+  max-width: 240px;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
+}
+
+.ai-chat-welcome-greeting {
+  margin: 0;
+  max-width: none;
+  font-size: 26px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+
+.ai-chat-messages-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ai-chat-messages-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ai-chat-messages-scroll-anchor {
+  flex-shrink: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.ai-chat-load-more {
+  align-self: center;
+  border: none;
+  background: transparent;
+  color: var(--ai-chat-accent);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+.ai-chat-load-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .ai-chat-welcome-greeting {
+    font-size: clamp(16px, 4.5vw, 20px);
+  }
+}

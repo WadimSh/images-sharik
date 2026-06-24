@@ -53,7 +53,7 @@ function buildRequestData(prompt, attachments = []) {
   return requestData;
 }
 
-function buildModelConfig(aiSettings = {}) {
+function buildModelConfig(aiSettings = {}, outputType = 'out_text') {
   const modelConfig = {
     model: aiSettings.model,
   };
@@ -64,7 +64,9 @@ function buildModelConfig(aiSettings = {}) {
   if (aiSettings.topP !== undefined) {
     modelConfig.topP = aiSettings.topP;
   }
-  if (aiSettings.responseFormat) {
+  // editor-ai-logs validator allows only model/temperature/topP/responseFormat here.
+  // thinking, webSearch, imageSize, imageQuality go to Mitup generate, not the audit log.
+  if (outputType === 'out_image' && aiSettings.responseFormat) {
     modelConfig.responseFormat = aiSettings.responseFormat;
   }
 
@@ -94,7 +96,7 @@ function buildStartPayloadBase({
     startedAt,
     requestData: buildRequestData(prompt, attachments),
     requestConfig: {
-      model: buildModelConfig(aiSettings),
+      model: buildModelConfig(aiSettings, outputType),
       mitup: {
         outputType,
         generationType,

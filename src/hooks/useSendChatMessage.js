@@ -19,6 +19,7 @@ import {
 } from '../services/mitupService';
 import { getChatMessageId } from './useChatMessages';
 import {
+  buildImageLogStartPayload,
   buildLogCompletePayload,
   buildLogErrorCompletePayload,
   buildTextLogStartPayload,
@@ -30,33 +31,143 @@ import {
 } from '../utils/mitupErrors';
 
 const PROMPT_MAX_LENGTH = 2000;
+const TYPEWRITER_CHARS_PER_TICK = 3;
+const TYPEWRITER_TICK_MS = 20;
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+/**
+ * @param {string} event
+ * @param {object} data
+ * @returns {{ mode: 'append'|'replace', text: string }|null}
+ */
+function getStreamTextFromEvent(event, data) {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+
+  if (event !== 'processing' && event !== 'submitted') {
+    return null;
+  }
+
+  if (typeof data.delta === 'string' && data.delta) {
+    return { mode: 'append', text: data.delta };
+  }
+
+  if (typeof data.text === 'string' && data.text) {
+    return { mode: 'replace', text: data.text };
+  }
+
+  if (typeof data.partialText === 'string' && data.partialText) {
+    return { mode: 'replace', text: data.partialText };
+  }
+
+  return null;
+}
+
+async function revealAssistantTextGradually(fullText, assistantMessageId, updateMessage, scrollToBottom) {
+  if (!fullText || !assistantMessageId || !updateMessage) {
+    return;
+  }
+
+  updateMessage(assistantMessageId, {
+    status: 'processing',
+    result: { text: '' },
+  });
+  scrollToBottom?.('auto');
+
+  let index = 0;
+
+  while (index < fullText.length) {
+    index = Math.min(fullText.length, index + TYPEWRITER_CHARS_PER_TICK);
+    updateMessage(assistantMessageId, {
+      status: 'processing',
+      result: { text: fullText.slice(0, index) },
+    });
+    scrollToBottom?.('auto');
+    await wait(TYPEWRITER_TICK_MS);
+  }
+}
 
 function buildMitupAiPayload(aiSettings) {
+  const outputType = aiSettings.outputType || 'out_text';
   const ai = {
     model: aiSettings.model,
     temperature: aiSettings.temperature ?? 0.9,
     top_p: aiSettings.topP ?? 1,
   };
 
-  if (aiSettings.thinking !== undefined) {
-    ai.thinking = aiSettings.thinking;
+  if (outputType === 'out_text') {
+    if (aiSettings.thinking !== undefined) {
+      ai.thinking = aiSettings.thinking;
+    }
+    if (aiSettings.webSearch !== undefined) {
+      ai.web_search = aiSettings.webSearch;
+    }
   }
-  if (aiSettings.webSearch !== undefined) {
-    ai.web_search = aiSettings.webSearch;
+
+  if (outputType === 'out_image') {
+    if (aiSettings.imageSize) {
+      ai.image_size = aiSettings.imageSize;
+    }
+    if (aiSettings.imageQuality) {
+      ai.image_quality = aiSettings.imageQuality;
+    }
+    if (aiSettings.responseFormat) {
+      ai.response_format = aiSettings.responseFormat;
+    }
   }
 
   return ai;
 }
 
 function buildGenerationMeta(aiSettings) {
-  return {
-    type: 'out_text',
+  const outputType = aiSettings.outputType || 'out_text';
+  const meta = {
+    type: outputType,
     model: aiSettings.model,
     temperature: aiSettings.temperature ?? 0.9,
     topP: aiSettings.topP ?? 1,
-    thinking: Boolean(aiSettings.thinking),
-    webSearch: Boolean(aiSettings.webSearch),
   };
+
+  if (outputType === 'out_text') {
+    meta.thinking = Boolean(aiSettings.thinking);
+    meta.webSearch = Boolean(aiSettings.webSearch);
+  } else {
+    meta.imageSize = aiSettings.imageSize;
+    meta.imageQuality = aiSettings.imageQuality;
+    meta.responseFormat = aiSettings.responseFormat;
+  }
+
+  return meta;
+}
+
+function buildLogStartPayload({ companyId, sessionId, prompt, attachments, aiSettings, startedAt }) {
+  const outputType = aiSettings.outputType || 'out_text';
+
+  if (outputType === 'out_image') {
+    return buildImageLogStartPayload({
+      companyId,
+      sessionId,
+      prompt,
+      attachments,
+      aiSettings,
+      startedAt,
+    });
+  }
+
+  return buildTextLogStartPayload({
+    companyId,
+    sessionId,
+    prompt,
+    attachments,
+    aiSettings,
+    startedAt,
+  });
 }
 
 function buildGenerateContent(prompt, attachments = []) {
@@ -71,9 +182,34 @@ function buildGenerateContent(prompt, attachments = []) {
   return content;
 }
 
-async function resolveMitupGenerateResult(taskId, companyId, signal) {
+async function resolveMitupGenerateResult(
+  taskId,
+  companyId,
+  signal,
+  { assistantMessageId, updateMessage, scrollToBottom } = {}
+) {
+  let streamedText = '';
+  let receivedStreamChunks = false;
+
+  const handleStreamEvent = ({ event, data }) => {
+    const part = getStreamTextFromEvent(event, data);
+    if (!part || !assistantMessageId || !updateMessage) {
+      return;
+    }
+
+    receivedStreamChunks = true;
+    streamedText = part.mode === 'append' ? streamedText + part.text : part.text;
+
+    updateMessage(assistantMessageId, {
+      status: 'processing',
+      result: { text: streamedText },
+    });
+    scrollToBottom?.('auto');
+  };
+
   try {
-    return await streamMitupResult(taskId, companyId, signal);
+    const result = await streamMitupResult(taskId, companyId, signal, handleStreamEvent);
+    return { result, receivedStreamChunks, streamedText };
   } catch (error) {
     if (error instanceof MitupStreamError) {
       throw error;
@@ -83,7 +219,7 @@ async function resolveMitupGenerateResult(taskId, companyId, signal) {
       const status = await apiMitupStatus(taskId, companyId);
 
       if (status?.done && status.result) {
-        return status.result;
+        return { result: status.result, receivedStreamChunks: false, streamedText: '' };
       }
 
       if (status?.done && status.error) {
@@ -119,6 +255,7 @@ async function completeEditorLogSafe(logId, payload) {
  * @param {import('react').MutableRefObject<boolean>} [params.skipInitialLoadRef]
  * @param {Function} [params.onSessionCreated]
  * @param {Function} [params.onFinished]
+ * @param {Function} [params.scrollToBottom]
  */
 export function useSendChatMessage({
   companyId,
@@ -129,6 +266,7 @@ export function useSendChatMessage({
   skipInitialLoadRef,
   onSessionCreated,
   onFinished,
+  scrollToBottom,
 }) {
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState(null);
@@ -155,6 +293,13 @@ export function useSendChatMessage({
 
       if (!aiSettings?.model) {
         setSendError('Выберите модель');
+        return null;
+      }
+
+      const outputType = aiSettings.outputType || 'out_text';
+
+      if (outputType !== 'out_text') {
+        setSendError('Генерация изображений пока недоступна');
         return null;
       }
 
@@ -219,8 +364,9 @@ export function useSendChatMessage({
         );
         assistantMessageId = getChatMessageId(assistantMessage);
         appendMessage(assistantMessage);
+        scrollToBottom?.('smooth');
 
-        const logStartPayload = buildTextLogStartPayload({
+        const logStartPayload = buildLogStartPayload({
           companyId,
           sessionId,
           prompt: trimmedPrompt,
@@ -234,7 +380,7 @@ export function useSendChatMessage({
 
         const generateResponse = await apiMitupGenerate({
           companyId,
-          type: 'out_text',
+          type: outputType,
           content: buildGenerateContent(trimmedPrompt, attachments),
           ai: buildMitupAiPayload(aiSettings),
         });
@@ -265,7 +411,22 @@ export function useSendChatMessage({
           companyId
         );
 
-        const result = await resolveMitupGenerateResult(taskId, companyId, controller.signal);
+        const { result, receivedStreamChunks } = await resolveMitupGenerateResult(
+          taskId,
+          companyId,
+          controller.signal,
+          { assistantMessageId, updateMessage, scrollToBottom }
+        );
+
+        const finalText = result?.text || '';
+        if (!receivedStreamChunks && finalText) {
+          await revealAssistantTextGradually(
+            finalText,
+            assistantMessageId,
+            updateMessage,
+            scrollToBottom
+          );
+        }
 
         updateMessage(assistantMessageId, {
           status: 'completed',
@@ -288,10 +449,11 @@ export function useSendChatMessage({
 
         await completeEditorLogSafe(
           logId,
-          buildLogCompletePayload(result, startedAt, 'out_text')
+          buildLogCompletePayload(result, startedAt, outputType)
         );
 
         onFinished?.({ result, sessionId, balance: result?.balance });
+        scrollToBottom?.('auto');
 
         return {
           sessionId,
@@ -362,6 +524,7 @@ export function useSendChatMessage({
       skipInitialLoadRef,
       onSessionCreated,
       onFinished,
+      scrollToBottom,
       isSending,
     ]
   );

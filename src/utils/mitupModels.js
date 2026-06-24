@@ -104,6 +104,21 @@ export function getModelLabel(model) {
 /**
  * @param {Array<MitupModel|string>|null|undefined} models
  * @param {'out_text'|'out_image'} outputType
+ * @param {string|null|undefined} defaultModel
+ * @returns {string}
+ */
+export function resolveDefaultModelValue(models, outputType, defaultModel) {
+  if (!defaultModel) {
+    return '';
+  }
+
+  const filtered = filterModelsByOutputType(models, outputType);
+  return filtered.some((model) => getModelLabel(model).value === defaultModel) ? defaultModel : '';
+}
+
+/**
+ * @param {Array<MitupModel|string>|null|undefined} models
+ * @param {'out_text'|'out_image'} outputType
  * @returns {MitupModel[]}
  */
 export function filterModelsByOutputType(models, outputType) {

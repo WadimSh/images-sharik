@@ -147,6 +147,34 @@ export function useAiChatInit() {
     }
   }, []);
 
+  const updateLimitsFromResult = useCallback((resultLimits) => {
+    if (!resultLimits || typeof resultLimits !== 'object') {
+      return;
+    }
+
+    setLimits((prev) => ({
+      ...(prev || {}),
+      usage: {
+        ...(prev?.usage || {}),
+        ...(resultLimits.minute != null ? { minute: resultLimits.minute } : {}),
+        ...(resultLimits.day != null ? { day: resultLimits.day } : {}),
+      },
+    }));
+  }, []);
+
+  const updateSession = useCallback((sessionId, patch) => {
+    if (!sessionId || !patch) {
+      return;
+    }
+
+    setSessions((prev) =>
+      prev.map((session) => {
+        const id = session.id || session._id;
+        return id === sessionId ? { ...session, ...patch } : session;
+      })
+    );
+  }, []);
+
   return {
     companyId,
     models,
@@ -159,7 +187,9 @@ export function useAiChatInit() {
     mitupConfigured,
     reload: load,
     prependSession,
+    updateSession,
     updateBalance,
+    updateLimitsFromResult,
     formatBalance: formatMitupBalance,
   };
 }

@@ -1,0 +1,134 @@
+.ai-chat-layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--ai-chat-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.ai-chat-layout-sidebar {
+  width: var(--ai-chat-sidebar-width);
+  flex-shrink: 0;
+  background: var(--ai-chat-sidebar-bg);
+  border-right: 1px solid var(--ai-chat-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ai-chat-sidebar-backdrop {
+  display: none;
+}
+
+.ai-chat-layout-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-chat-layout-main-inner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--ai-chat-content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ai-chat-layout-main-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-chat-layout-main-inner--welcome {
+  justify-content: center;
+}
+
+.ai-chat-welcome-center {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 0 8vh;
+  box-sizing: border-box;
+  transform: translateY(-6vh);
+}
+
+.ai-chat-layout-mode-switch {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.ai-chat-welcome-center .ai-chat-layout-main-scroll {
+  flex: 0 1 auto;
+  overflow: visible;
+}
+
+.ai-chat-welcome-center .ai-chat-message-list {
+  flex: 0 0 auto;
+}
+
+.ai-chat-welcome-center .ai-chat-layout-composer {
+  width: 100%;
+  padding-bottom: 0;
+}
+
+.ai-chat-layout-composer {
+  flex-shrink: 0;
+  padding-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .ai-chat-layout {
+    position: relative;
+  }
+
+  .ai-chat-layout-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 120;
+    width: min(var(--ai-chat-sidebar-width), 85vw);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: none;
+  }
+
+  .ai-chat-layout-sidebar--open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .ai-chat-sidebar-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 110;
+    border: none;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+  }
+}

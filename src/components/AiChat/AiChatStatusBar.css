@@ -1,0 +1,29 @@
+.ai-chat-status-bar {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.72);
+  white-space: nowrap;
+}
+
+.ai-chat-status-bar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.ai-chat-status-bar-item--limit-exceeded {
+  color: #b42318;
+  font-weight: 500;
+}
+
+.ai-chat-status-bar-limit-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d92d20;
+  flex-shrink: 0;
+}
