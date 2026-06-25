@@ -1,6 +1,10 @@
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 
-import { sanitizeChatText } from '../../utils/sanitizeChatText';
+import { normalizeMarkdownTables, sanitizeChatText } from '../../utils/sanitizeChatText';
+import { getMessageAttachments } from '../../utils/chatAttachment';
+import { AiChatMessageAttachments } from './AiChatMessageAttachments';
 import { AiChatMessageMeta } from './AiChatMessageMeta';
 import './AiChatMessageBubble.css';
 
@@ -21,12 +25,22 @@ function MarkdownCode({ inline, children, ...props }) {
 }
 
 /**
- * @param {{ message: object, isStreaming?: boolean }} props
+ * @param {{ message: object, isStreaming?: boolean, companyId?: string|null }} props
  */
-export function AiChatMessageContent({ message, isStreaming = false }) {
+export function AiChatMessageContent({ message, isStreaming = false, companyId = null }) {
   if (message?.role === 'user') {
     const text = sanitizeChatText(message?.content?.text);
-    return <div className="ai-chat-message-text">{text || '—'}</div>;
+    const attachments = getMessageAttachments(message);
+
+    return (
+      <div className="ai-chat-message-user-content">
+        {attachments.length > 0 ? (
+          <AiChatMessageAttachments attachments={attachments} companyId={companyId} />
+        ) : null}
+        {text ? <div className="ai-chat-message-text">{text}</div> : null}
+        {!text && attachments.length === 0 ? <div className="ai-chat-message-text">—</div> : null}
+      </div>
+    );
   }
 
   if (message?.status === 'failed') {
@@ -37,7 +51,9 @@ export function AiChatMessageContent({ message, isStreaming = false }) {
     );
   }
 
-  const assistantText = sanitizeChatText(message?.result?.text || message?.content?.text);
+  const assistantText = normalizeMarkdownTables(
+    sanitizeChatText(message?.result?.text || message?.content?.text)
+  );
 
   if (!assistantText) {
     return <div className="ai-chat-message-text">—</div>;
@@ -46,11 +62,17 @@ export function AiChatMessageContent({ message, isStreaming = false }) {
   return (
     <div className="ai-chat-message-markdown">
       <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         components={{
           a: ({ ...props }) => (
             <a target="_blank" rel="noopener noreferrer" {...props} />
           ),
           code: MarkdownCode,
+          table: ({ children, ...props }) => (
+            <div className="ai-chat-message-table-wrap">
+              <table {...props}>{children}</table>
+            </div>
+          ),
         }}
       >
         {assistantText}
@@ -77,8 +99,9 @@ function AiChatThinkingIndicator() {
  * @param {object} props
  * @param {object} props.message
  * @param {Function} [props.onRetry]
+ * @param {string|null} [props.companyId]
  */
-export function AiChatMessageBubble({ message, onRetry }) {
+export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
   const isAssistant = message?.role === 'assistant';
   const isFailed = message?.status === 'failed';
   const isPending = message?.status === 'pending';
@@ -101,7 +124,7 @@ export function AiChatMessageBubble({ message, onRetry }) {
             <AiChatThinkingIndicator />
           </div>
         ) : (
-          <AiChatMessageContent message={message} isStreaming={isStreaming} />
+          <AiChatMessageContent message={message} isStreaming={isStreaming} companyId={companyId} />
         )}
 
         {showMeta ? <AiChatMessageMeta message={message} /> : null}

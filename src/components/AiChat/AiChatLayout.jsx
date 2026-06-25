@@ -11,10 +11,13 @@ export function AiChatLayout({
   sidebarOpen = false,
   onSidebarClose,
   isWelcomeCenter = false,
+  showSidebar = true,
 }) {
   return (
-    <div className="ai-chat-layout">
-      {sidebarOpen && onSidebarClose ? (
+    <div
+      className={`ai-chat-layout${showSidebar ? '' : ' ai-chat-layout--no-sidebar'}`}
+    >
+      {showSidebar && sidebarOpen && onSidebarClose ? (
         <button
           type="button"
           className="ai-chat-sidebar-backdrop"
@@ -23,11 +26,13 @@ export function AiChatLayout({
         />
       ) : null}
 
-      <aside
-        className={`ai-chat-layout-sidebar ${sidebarOpen ? 'ai-chat-layout-sidebar--open' : ''}`}
-      >
-        {sidebar}
-      </aside>
+      {showSidebar ? (
+        <aside
+          className={`ai-chat-layout-sidebar ${sidebarOpen ? 'ai-chat-layout-sidebar--open' : ''}`}
+        >
+          {sidebar}
+        </aside>
+      ) : null}
 
       <div className="ai-chat-layout-main">
         <div

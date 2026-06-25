@@ -1,0 +1,95 @@
+.ai-chat-attachment {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-chat-attachment-card {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.ai-chat-attachment-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--ai-chat-border);
+}
+
+.ai-chat-attachment-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ai-chat-attachment-thumb--empty {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.ai-chat-attachment-name {
+  display: -webkit-box;
+  margin-top: 6px;
+  width: 100%;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.62);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.ai-chat-attachment-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.ai-chat-attachment-remove svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ai-chat-attachment-preview:hover .ai-chat-attachment-remove,
+.ai-chat-attachment-remove:focus-visible {
+  opacity: 1;
+}
+
+.ai-chat-attachment-remove:hover {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.ai-chat-message-attachments {
+  margin-bottom: 8px;
+}
+
+.ai-chat-message-attachments:last-child {
+  margin-bottom: 0;
+}
+
+.ai-chat-message-user-content .ai-chat-message-text {
+  margin-top: 0;
+}
+
+.ai-chat-message-user-content .ai-chat-message-attachments + .ai-chat-message-text {
+  margin-top: 8px;
+}

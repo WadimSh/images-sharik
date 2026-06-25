@@ -9,6 +9,7 @@ import { PiCirclesThreePlusLight } from "react-icons/pi";
 import { TagsFilterComponent } from "../TagsFilterComponent/TagsFilterComponent";
 import { useAuth } from "../../contexts/AuthContext"; 
 import { apiGetImagesExcludingMarketplaces, uploadGraphicFile } from "../../services/mediaService";
+import { normalizeMongoFileId } from "../../utils/chatAttachment";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import Pagination from "../../ui/Pagination/Pagination";
 import { PREDEFINED_TAGS } from "../../constants/tags";
@@ -244,7 +245,8 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
         await onSelectImage({
           url: imageUrl,
           fileName: imageMeta.fileName,
-          id: imageMeta._id || imageMeta.id,
+          id: normalizeMongoFileId(imageMeta._id || imageMeta.id),
+          mimeType: imageMeta.mimeType,
         });
         handleCloseViewMode();
         onClose();
@@ -679,7 +681,8 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
         await onSelectImage({
           url: fullImageUrl,
           fileName: uploadedFile.fileName || finalFileName,
-          id: uploadedFile._id || uploadedFile.id,
+          id: normalizeMongoFileId(uploadedFile._id || uploadedFile.id),
+          mimeType: uploadedFile.mimeType,
         });
         onClose();
         return;

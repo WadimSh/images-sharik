@@ -19,10 +19,11 @@ export function AiChatMessageList({
   scrollContainerRef,
   messagesEndRef,
   onRetry,
+  companyId,
 }) {
   const { user } = useAuth();
   const showWelcome = isWelcomeState && messages.length === 0 && !messagesLoading;
-  const welcomeGreeting = getAiChatWelcomeGreeting(user);
+  const { greetingLine, questionLine } = getAiChatWelcomeGreeting(user);
 
   return (
     <div className="ai-chat-message-list" data-testid="ai-chat-message-list">
@@ -38,7 +39,14 @@ export function AiChatMessageList({
             className="ai-chat-welcome-logo"
             data-testid="ai-chat-welcome-logo"
           />
-          <h3 className="ai-chat-welcome-greeting">{welcomeGreeting}</h3>
+          <div className="ai-chat-welcome-text">
+            <h3 className="ai-chat-welcome-greeting" data-testid="ai-chat-welcome-greeting">
+              {greetingLine}
+            </h3>
+            <p className="ai-chat-welcome-question" data-testid="ai-chat-welcome-question">
+              {questionLine}
+            </p>
+          </div>
         </div>
       )}
 
@@ -64,6 +72,7 @@ export function AiChatMessageList({
               <AiChatMessageBubble
                 key={message.id || message._id}
                 message={message}
+                companyId={companyId}
                 onRetry={message.role === 'assistant' ? onRetry : undefined}
               />
             ))}

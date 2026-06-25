@@ -25,6 +25,10 @@ import {
   buildTextLogStartPayload,
 } from '../utils/mitupLogPayload';
 import {
+  sanitizeChatAttachments,
+  validateChatAttachments,
+} from '../utils/chatAttachment';
+import {
   getMitupErrorLifecycleStatus,
   getMitupUserMessage,
   normalizeMitupError,
@@ -93,7 +97,7 @@ async function revealAssistantTextGradually(fullText, assistantMessageId, update
   }
 }
 
-function buildMitupAiPayload(aiSettings) {
+function buildMitupAiPayload(aiSettings, hasAttachments = false) {
   const outputType = aiSettings.outputType || 'out_text';
   const ai = {
     model: aiSettings.model,
@@ -101,7 +105,7 @@ function buildMitupAiPayload(aiSettings) {
     top_p: aiSettings.topP ?? 1,
   };
 
-  if (outputType === 'out_text') {
+  if (outputType === 'out_text' && !hasAttachments) {
     if (aiSettings.thinking !== undefined) {
       ai.thinking = aiSettings.thinking;
     }
@@ -173,10 +177,8 @@ function buildLogStartPayload({ companyId, sessionId, prompt, attachments, aiSet
 function buildGenerateContent(prompt, attachments = []) {
   const content = [{ type: 'input_text', text: prompt.trim() }];
 
-  attachments.forEach((attachment) => {
-    if (attachment?.fileId) {
-      content.push({ type: 'input_file', fileId: attachment.fileId });
-    }
+  sanitizeChatAttachments(attachments).forEach((attachment) => {
+    content.push({ type: 'input_file', fileId: attachment.fileId });
   });
 
   return content;
@@ -296,6 +298,13 @@ export function useSendChatMessage({
         return null;
       }
 
+      const sanitizedAttachments = sanitizeChatAttachments(attachments);
+      const attachmentError = validateChatAttachments(attachments);
+      if (attachmentError) {
+        setSendError(attachmentError);
+        return null;
+      }
+
       const outputType = aiSettings.outputType || 'out_text';
 
       if (outputType !== 'out_text') {
@@ -346,7 +355,7 @@ export function useSendChatMessage({
             role: 'user',
             content: {
               text: trimmedPrompt,
-              attachments: attachments.length > 0 ? attachments : undefined,
+              attachments: sanitizedAttachments.length > 0 ? sanitizedAttachments : undefined,
             },
           },
           companyId
@@ -370,7 +379,7 @@ export function useSendChatMessage({
           companyId,
           sessionId,
           prompt: trimmedPrompt,
-          attachments,
+          attachments: sanitizedAttachments,
           aiSettings,
           startedAt,
         });
@@ -381,8 +390,8 @@ export function useSendChatMessage({
         const generateResponse = await apiMitupGenerate({
           companyId,
           type: outputType,
-          content: buildGenerateContent(trimmedPrompt, attachments),
-          ai: buildMitupAiPayload(aiSettings),
+          content: buildGenerateContent(trimmedPrompt, sanitizedAttachments),
+          ai: buildMitupAiPayload(aiSettings, sanitizedAttachments.length > 0),
         });
 
         const taskId = generateResponse?.taskId;

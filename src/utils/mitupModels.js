@@ -64,13 +64,50 @@ export function canAttachFromLibrary(model) {
 }
 
 /**
+ * Форматы изображений в библиотеке Sharik.
+ * Mitup `ext` может отставать от реальной поддержки (например, без webp).
+ */
+const LIBRARY_IMAGE_EXTENSIONS = new Set([
+  'webp',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'bmp',
+  'tiff',
+  'avif',
+  'svg',
+]);
+
+/**
  * @param {MitupModel|string|null|undefined} model
  * @param {string} fileName
  * @returns {boolean}
  */
 export function isExtensionAllowed(model, fileName) {
   if (!isMitupModelDetail(model) || !model.in_image) return false;
+
+  const ext = fileName.split('.').pop()?.toLowerCase();
+  if (!ext) return false;
+
+  // Библиотека отдаёт image/*; не блокируем из‑за неполного списка Mitup ext.
+  if (LIBRARY_IMAGE_EXTENSIONS.has(ext)) return true;
+
   if (!model.ext) return true;
+
+  return model.ext
+    .split(',')
+    .map((part) => part.trim().toLowerCase())
+    .includes(ext);
+}
+
+/**
+ * @param {MitupModel|string|null|undefined} model
+ * @param {string} fileName
+ * @returns {boolean} true, если расширение явно указано в Mitup ext
+ */
+export function isExtensionListedByMitup(model, fileName) {
+  if (!isMitupModelDetail(model) || !model.ext) return true;
 
   const ext = fileName.split('.').pop()?.toLowerCase();
   if (!ext) return false;
@@ -99,6 +136,21 @@ export function getModelLabel(model) {
     hint: model.best_for || '',
     value: model.output_name,
   };
+}
+
+/**
+ * @param {Array<MitupModel|string>|null|undefined} models
+ * @param {string|null|undefined} modelValue
+ * @returns {MitupModel|null}
+ */
+export function findMitupModelByValue(models, modelValue) {
+  if (!modelValue || !Array.isArray(models)) {
+    return null;
+  }
+
+  return (
+    models.find((model) => isMitupModelDetail(model) && model.output_name === modelValue) || null
+  );
 }
 
 /**

@@ -142,6 +142,11 @@ function renderAiChat() {
 describe('AiChat smoke', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: jest.fn().mockResolvedValue(undefined),
+      },
+    });
     setupMocks();
   });
 
@@ -155,9 +160,13 @@ describe('AiChat smoke', () => {
     });
 
     expect(screen.getByRole('button', { name: /Назад/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('ai-chat-sidebar')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'История чатов' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ai-chat-composer-attach')).not.toBeInTheDocument();
     expect(screen.getByTestId('ai-chat-welcome-center')).toBeInTheDocument();
     expect(screen.getByTestId('ai-chat-welcome-logo')).toBeInTheDocument();
-    expect(screen.getByText('Здравствуйте, Vadim! Что вас интересует?')).toBeInTheDocument();
+    expect(screen.getByTestId('ai-chat-welcome-greeting')).toHaveTextContent('Здравствуйте, Vadim!');
+    expect(screen.getByTestId('ai-chat-welcome-question')).toHaveTextContent('Что вас интересует?');
   });
 
   test('send text → assistant response in feed → editor AI log recorded', async () => {
@@ -173,6 +182,15 @@ describe('AiChat smoke', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('ai-chat-message-meta')).toHaveTextContent('Test Model');
+      expect(screen.getByTestId('ai-chat-sidebar')).toBeInTheDocument();
+    });
+
+    const copyButton = screen.getByTestId('ai-chat-message-copy');
+    expect(copyButton).toHaveAttribute('aria-label', 'Копировать ответ');
+    await userEvent.click(copyButton);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Ответ ассистента');
+    await waitFor(() => {
+      expect(copyButton).toHaveAttribute('aria-label', 'Скопировано');
     });
 
     expect(screen.getByTestId('ai-chat-message-user')).toHaveTextContent('Привет');

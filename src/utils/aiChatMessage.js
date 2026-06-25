@@ -1,3 +1,17 @@
+import { sanitizeChatText } from './sanitizeChatText';
+
+/**
+ * @param {object|null|undefined} message
+ * @returns {string}
+ */
+export function getAssistantMessageCopyText(message) {
+  if (message?.role !== 'assistant') {
+    return '';
+  }
+
+  return sanitizeChatText(message?.result?.text || message?.content?.text).trim();
+}
+
 /**
  * @param {object|null|undefined} message
  * @returns {string}

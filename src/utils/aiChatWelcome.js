@@ -11,14 +11,13 @@ export function getUserDisplayName(user) {
 
 /**
  * @param {{ username?: string, email?: string }|null|undefined} user
- * @returns {string}
+ * @returns {{ greetingLine: string, questionLine: string }}
  */
 export function getAiChatWelcomeGreeting(user) {
   const displayName = getUserDisplayName(user);
 
-  if (displayName) {
-    return `Здравствуйте, ${displayName}! Что вас интересует?`;
-  }
-
-  return 'Здравствуйте! Что вас интересует?';
+  return {
+    greetingLine: displayName ? `Здравствуйте, ${displayName}!` : 'Здравствуйте!',
+    questionLine: 'Что вас интересует?',
+  };
 }

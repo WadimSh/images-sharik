@@ -47,11 +47,37 @@ export function normalizeMitupError(error) {
     || error.data?.message
     || '';
 
+  const message = humanizeMitupMessage(rawMessage, code);
+
   return {
     code,
-    message: rawMessage || getMitupErrorMessage(code),
+    message: message || getMitupErrorMessage(code),
     httpStatus: error.httpStatus || error.payload?.httpStatus,
   };
+}
+
+/**
+ * @param {string} rawMessage
+ * @param {string} code
+ * @returns {string}
+ */
+function humanizeMitupMessage(rawMessage, code) {
+  if (!rawMessage) return '';
+
+  const normalized = rawMessage.trim().toLowerCase();
+  if (
+    normalized === 'ошибка валидации'
+    || normalized === 'validation failed'
+    || normalized.includes('validation')
+  ) {
+    return 'Mitup отклонил запрос. Проверьте, что модель поддерживает изображения (in_image), файл не больше 5 МБ, и текст сообщения корректен.';
+  }
+
+  if (code !== 'MITUP_UNKNOWN_ERROR' && code !== 'MITUP_API_ERROR') {
+    return rawMessage;
+  }
+
+  return rawMessage;
 }
 
 /**

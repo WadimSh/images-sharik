@@ -11,7 +11,9 @@ import { AiChatMessageList } from '../../components/AiChat/AiChatMessageList';
 import { AiChatModeSwitch } from '../../components/AiChat/AiChatModeSwitch';
 import { AiChatSidebar } from '../../components/AiChat/AiChatSidebar';
 import { AiChatStatusBar } from '../../components/AiChat/AiChatStatusBar';
-import { apiPatchChatSession } from '../../services/chatService';
+import { LibraryMediaModal } from '../../components/LibraryMediaModal/LibraryMediaModal';
+import { apiGetStudioFileUrl, apiPatchChatSession } from '../../services/chatService';
+import { normalizeMongoFileId } from '../../utils/chatAttachment';
 import { getSessionId } from '../../utils/chatSession';
 import {
   createDefaultAiSettings,
@@ -20,7 +22,10 @@ import {
   normalizeAiSettingsForOutputType,
 } from '../../utils/aiChatSettings';
 import {
+  canAttachFromLibrary,
   filterModelsByOutputType,
+  findMitupModelByValue,
+  isExtensionAllowed,
   resolveDefaultModelValue,
 } from '../../utils/mitupModels';
 import { isMinuteRateLimitReached } from '../../utils/mitupLimits';
@@ -30,6 +35,8 @@ export const AiChat = () => {
   const navigate = useNavigate();
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [prompt, setPrompt] = useState('');
+  const [attachment, setAttachment] = useState(null);
+  const [libraryModalOpen, setLibraryModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const skipInitialLoadRef = useRef(false);
   const prevSessionIdRef = useRef(null);
@@ -55,6 +62,11 @@ export const AiChat = () => {
   const availableModels = useMemo(
     () => filterModelsByOutputType(models, aiSettings.outputType),
     [models, aiSettings.outputType]
+  );
+
+  const selectedModel = useMemo(
+    () => findMitupModelByValue(models, aiSettings.model),
+    [models, aiSettings.model]
   );
 
   const {
@@ -184,15 +196,18 @@ export const AiChat = () => {
     event.preventDefault();
     clearSendError();
 
-    const result = await sendMessage({ prompt });
+    const attachments = attachment ? [attachment] : [];
+    const result = await sendMessage({ prompt, attachments });
     if (result) {
       setPrompt('');
+      setAttachment(null);
     }
   };
 
   const handleNewChat = () => {
     setActiveSessionId(null);
     setPrompt('');
+    setAttachment(null);
     clearSendError();
   };
 
@@ -247,6 +262,7 @@ export const AiChat = () => {
     availableModels.length === 0 ||
     isRateLimited;
   const isImageMode = aiSettings.outputType === 'out_image';
+  const canAttach = !isImageMode && canAttachFromLibrary(selectedModel);
   const inputDisabled = composerDisabled || isImageMode;
   const canSend =
     !isImageMode &&
@@ -256,6 +272,59 @@ export const AiChat = () => {
   const showMessages = !isWelcomeState || messages.length > 0;
   const isWelcomeCenter = isWelcomeState && messages.length === 0 && !messagesLoading;
   const showModeSwitch = isWelcomeCenter;
+  const showSidebar = sessions.length > 0;
+
+  useEffect(() => {
+    if (!showSidebar && sidebarOpen) {
+      setSidebarOpen(false);
+    }
+  }, [showSidebar, sidebarOpen]);
+
+  useEffect(() => {
+    if (!canAttach) {
+      setAttachment(null);
+      setLibraryModalOpen(false);
+    }
+  }, [canAttach]);
+
+  const handleLibrarySelect = useCallback(
+    async (file) => {
+      const fileName = file?.fileName || 'image';
+      if (!isExtensionAllowed(selectedModel, fileName)) {
+        window.alert('Формат файла не поддерживается выбранной моделью.');
+        return;
+      }
+
+      const mimeType =
+        file?.mimeType
+        || (fileName.toLowerCase().endsWith('.webp') ? 'image/webp' : 'image/jpeg');
+
+      const fileId = normalizeMongoFileId(file?.id ?? file?.fileId ?? file?._id);
+      if (!fileId) {
+        window.alert('Не удалось определить ID файла. Выберите другое изображение.');
+        return;
+      }
+
+      let previewUrl = file?.url;
+      if (companyId) {
+        try {
+          const studioFile = await apiGetStudioFileUrl(fileId, companyId);
+          previewUrl = studioFile?.url || previewUrl;
+        } catch (error) {
+          console.warn('[AiChat] failed to resolve studio file url:', error);
+        }
+      }
+
+      setAttachment({
+        fileId,
+        fileName,
+        url: previewUrl,
+        mimeType,
+      });
+      clearSendError();
+    },
+    [selectedModel, clearSendError, companyId]
+  );
 
   const headerMeta = !initLoading ? (
     <AiChatStatusBar balance={balance} limits={limits} formatBalance={formatBalance} />
@@ -266,7 +335,7 @@ export const AiChat = () => {
       <AiChatHeader
         onBack={handleBack}
         meta={headerMeta}
-        showSidebarToggle={!initLoading}
+        showSidebarToggle={showSidebar && !initLoading}
         onOpenSidebar={() => setSidebarOpen(true)}
       />
 
@@ -290,6 +359,7 @@ export const AiChat = () => {
             sidebarOpen={sidebarOpen}
             onSidebarClose={() => setSidebarOpen(false)}
             isWelcomeCenter={isWelcomeCenter}
+            showSidebar={showSidebar}
             modeSwitch={
               showModeSwitch ? (
                 <AiChatModeSwitch
@@ -321,6 +391,7 @@ export const AiChat = () => {
                 scrollContainerRef={scrollContainerRef}
                 messagesEndRef={messagesEndRef}
                 onRetry={handleRetry}
+                companyId={companyId}
               />
             }
             composer={
@@ -338,11 +409,24 @@ export const AiChat = () => {
                 canSend={canSend}
                 isSending={isSending}
                 sendError={sendError}
+                canAttach={canAttach}
+                attachment={attachment}
+                onAttachClick={() => setLibraryModalOpen(true)}
+                onRemoveAttachment={() => setAttachment(null)}
+                attachTooltipPosition={isWelcomeCenter ? 'bottom' : 'top'}
               />
             }
           />
         )}
       </div>
+
+      {libraryModalOpen ? (
+        <LibraryMediaModal
+          isOpen={libraryModalOpen}
+          onClose={() => setLibraryModalOpen(false)}
+          onSelectImage={handleLibrarySelect}
+        />
+      ) : null}
     </div>
   );
 };
