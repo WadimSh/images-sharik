@@ -47,3 +47,21 @@ export function formatRelativeTime(value) {
 export function getSessionId(session) {
   return session?.id || session?._id || '';
 }
+
+export const CHAT_SESSION_TITLE_MAX_LENGTH = 100;
+
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function normalizeChatSessionTitle(value) {
+  return String(value ?? '').trim().slice(0, CHAT_SESSION_TITLE_MAX_LENGTH);
+}
+
+/**
+ * @param {unknown} prompt
+ * @returns {string}
+ */
+export function buildChatSessionTitleFromPrompt(prompt) {
+  return normalizeChatSessionTitle(prompt) || 'Новый чат';
+}

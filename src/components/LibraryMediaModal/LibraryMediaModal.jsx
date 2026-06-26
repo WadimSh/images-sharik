@@ -9,7 +9,12 @@ import { PiCirclesThreePlusLight } from "react-icons/pi";
 import { TagsFilterComponent } from "../TagsFilterComponent/TagsFilterComponent";
 import { useAuth } from "../../contexts/AuthContext"; 
 import { apiGetImagesExcludingMarketplaces, uploadGraphicFile } from "../../services/mediaService";
-import { normalizeMongoFileId } from "../../utils/chatAttachment";
+import {
+  formatAttachmentBytesRu,
+  formatOversizedAttachmentMessage,
+  normalizeMongoFileId,
+  parseAttachmentSizeBytes,
+} from "../../utils/chatAttachment";
 import { LanguageContext } from "../../contexts/contextLanguage";
 import Pagination from "../../ui/Pagination/Pagination";
 import { PREDEFINED_TAGS } from "../../constants/tags";
@@ -93,8 +98,15 @@ const capitalizeTag = (tag) => {
   }).join(' ');
 };
 
-export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage }) => {
+export const LibraryMediaModal = ({
+  isOpen,
+  onClose,
+  setElements,
+  onSelectImage,
+  maxSelectableFileBytes,
+}) => {
   const isPickMode = Boolean(onSelectImage);
+  const hasPickSizeLimit = isPickMode && Number.isFinite(maxSelectableFileBytes) && maxSelectableFileBytes > 0;
   const { t } = useContext(LanguageContext);
   const { user } = useAuth(); 
 
@@ -239,14 +251,44 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
     setCurrentPage(page);
   };
 
+  const getImageSizeBytes = (image) => parseAttachmentSizeBytes(image?.size ?? image?.sizeBytes);
+
+  const isImageTooLargeForPick = (image) => {
+    if (!hasPickSizeLimit) return false;
+
+    const sizeBytes = getImageSizeBytes(image);
+    if (sizeBytes == null) return false;
+
+    return sizeBytes > maxSelectableFileBytes;
+  };
+
+  const notifyImageTooLargeForPick = (image) => {
+    const sizeBytes = getImageSizeBytes(image);
+    window.alert(
+      formatOversizedAttachmentMessage(
+        sizeBytes ?? maxSelectableFileBytes + 1,
+        maxSelectableFileBytes
+      )
+    );
+  };
+
   const handleSelectImage = async (imageUrl, imageMeta = {}) => {
     if (isPickMode) {
+      if (hasPickSizeLimit) {
+        const sizeBytes = parseAttachmentSizeBytes(imageMeta.size ?? imageMeta.sizeBytes);
+        if (sizeBytes != null && sizeBytes > maxSelectableFileBytes) {
+          notifyImageTooLargeForPick(imageMeta);
+          return;
+        }
+      }
+
       try {
         await onSelectImage({
           url: imageUrl,
           fileName: imageMeta.fileName,
           id: normalizeMongoFileId(imageMeta._id || imageMeta.id),
           mimeType: imageMeta.mimeType,
+          size: parseAttachmentSizeBytes(imageMeta.size ?? imageMeta.sizeBytes) ?? undefined,
         });
         handleCloseViewMode();
         onClose();
@@ -326,6 +368,11 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
         alert('Файл превышает размер 100MB');
         return;
       }
+
+      if (hasPickSizeLimit && file.size > maxSelectableFileBytes) {
+        window.alert(formatOversizedAttachmentMessage(file.size, maxSelectableFileBytes));
+        return;
+      }
       
       setSelectedFile(file);
       setOriginalFileName(file.name);
@@ -341,9 +388,15 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
 
   // Открытие режима просмотра
   const handleImageClickView = (index) => {
+    const image = images[index];
+    if (isImageTooLargeForPick(image)) {
+      notifyImageTooLargeForPick(image);
+      return;
+    }
+
     setSelectedImageIndex(index);
     setViewMode(true);
-    updateTagColors(images[index].tags || []);
+    updateTagColors(image.tags || []);
   };
 
   // Закрытие режима просмотра
@@ -354,6 +407,11 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
   // Применение выбранного изображения
   const handleApplyImage = async () => {
     const selectedImage = images[selectedImageIndex];
+    if (isImageTooLargeForPick(selectedImage)) {
+      notifyImageTooLargeForPick(selectedImage);
+      return;
+    }
+
     const imageUrl = getFullImageUrl(selectedImage.url);
     await handleSelectImage(imageUrl, selectedImage);
   };
@@ -678,11 +736,25 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
       };
 
       if (isPickMode) {
+        const uploadedSizeBytes = parseAttachmentSizeBytes(
+          uploadedFile.size ?? uploadedFile.sizeBytes ?? selectedFile?.size
+        );
+
+        if (
+          hasPickSizeLimit
+          && uploadedSizeBytes != null
+          && uploadedSizeBytes > maxSelectableFileBytes
+        ) {
+          window.alert(formatOversizedAttachmentMessage(uploadedSizeBytes, maxSelectableFileBytes));
+          return;
+        }
+
         await onSelectImage({
           url: fullImageUrl,
           fileName: uploadedFile.fileName || finalFileName,
           id: normalizeMongoFileId(uploadedFile._id || uploadedFile.id),
           mimeType: uploadedFile.mimeType,
+          size: uploadedSizeBytes ?? undefined,
         });
         onClose();
         return;
@@ -1007,11 +1079,20 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
                 )}
               </div>
             ) : (
-              images.map((image, index) => (
+              images.map((image, index) => {
+                const isTooLarge = isImageTooLargeForPick(image);
+                const sizeBytes = getImageSizeBytes(image);
+
+                return (
                 <div 
                   key={image._id} 
-                  className="images_card"
+                  className={`images_card${isTooLarge ? ' images_card--too-large' : ''}`}
                   onClick={() => handleImageClickView(index)}
+                  title={
+                    isTooLarge
+                      ? formatOversizedAttachmentMessage(sizeBytes, maxSelectableFileBytes)
+                      : undefined
+                  }
                 >
                   <div className="images-container">
                     <img
@@ -1023,6 +1104,13 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
                         e.target.src = getFullImageUrl(image.url);
                       }}
                     />
+                    {isTooLarge ? (
+                      <div className="library-image-size-limit-overlay">
+                        <span className="library-image-size-limit-badge">
+                          {formatAttachmentBytesRu(sizeBytes)} · нельзя выбрать
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                   <div className="image-info-overlay">
                     <div className="image-filename" title={image.fileName}>
@@ -1035,7 +1123,8 @@ export const LibraryMediaModal = ({ isOpen, onClose, setElements, onSelectImage 
                     )}
                   </div>
                 </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

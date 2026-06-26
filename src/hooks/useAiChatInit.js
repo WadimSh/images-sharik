@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { apiGetChatSessions } from '../services/chatService';
+import { getSessionId } from '../utils/chatSession';
 import { fetchDataWithFetch } from '../services/fetch/fetchBase';
 import {
   apiGetMitupBalance,
@@ -175,6 +176,14 @@ export function useAiChatInit() {
     );
   }, []);
 
+  const removeSession = useCallback((sessionId) => {
+    if (!sessionId) {
+      return;
+    }
+
+    setSessions((prev) => prev.filter((session) => getSessionId(session) !== sessionId));
+  }, []);
+
   return {
     companyId,
     models,
@@ -188,6 +197,7 @@ export function useAiChatInit() {
     reload: load,
     prependSession,
     updateSession,
+    removeSession,
     updateBalance,
     updateLimitsFromResult,
     formatBalance: formatMitupBalance,

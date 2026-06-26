@@ -2,8 +2,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 
+import { BsArrowRepeat } from 'react-icons/bs';
+
+import { getThinkingPhraseForMessage } from '../../utils/aiChatThinkingPhrases';
 import { normalizeMarkdownTables, sanitizeChatText } from '../../utils/sanitizeChatText';
 import { getMessageAttachments } from '../../utils/chatAttachment';
+import { Tooltip } from '../../ui/Tooltip/Tooltip';
 import { AiChatMessageAttachments } from './AiChatMessageAttachments';
 import { AiChatMessageMeta } from './AiChatMessageMeta';
 import './AiChatMessageBubble.css';
@@ -82,10 +86,10 @@ export function AiChatMessageContent({ message, isStreaming = false, companyId =
   );
 }
 
-function AiChatThinkingIndicator() {
+function AiChatThinkingIndicator({ phrase }) {
   return (
-    <span className="ai-chat-thinking" aria-label="Хороший вопрос, надо подумать">
-      <span className="ai-chat-thinking-text">Хороший вопрос, надо подумать</span>
+    <span className="ai-chat-thinking" aria-label={phrase}>
+      <span className="ai-chat-thinking-text">{phrase}</span>
       <span className="ai-chat-thinking-dots" aria-hidden="true">
         <span />
         <span />
@@ -110,6 +114,7 @@ export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
   const isStreaming = isAssistant && isProcessing && Boolean(streamingText);
   const showThinking = isAssistant && (isPending || (isProcessing && !streamingText));
   const showMeta = isAssistant && message?.status === 'completed';
+  const thinkingPhrase = showThinking ? getThinkingPhraseForMessage(message) : '';
 
   return (
     <div
@@ -121,7 +126,7 @@ export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
       <div className={`ai-chat-message-bubble ai-chat-message-bubble--${message.role}`}>
         {showThinking ? (
           <div className="ai-chat-message-status">
-            <AiChatThinkingIndicator />
+            <AiChatThinkingIndicator phrase={thinkingPhrase} />
           </div>
         ) : (
           <AiChatMessageContent message={message} isStreaming={isStreaming} companyId={companyId} />
@@ -130,13 +135,19 @@ export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
         {showMeta ? <AiChatMessageMeta message={message} /> : null}
 
         {isFailed && onRetry ? (
-          <button
-            type="button"
-            className="ai-chat-message-retry"
-            onClick={() => onRetry(message)}
-          >
-            Повторить
-          </button>
+          <div className="ai-chat-message-retry-wrap">
+            <Tooltip content="Повторить" position="bottom-shift-left">
+              <button
+                type="button"
+                className="ai-chat-message-retry"
+                onClick={() => onRetry(message)}
+                aria-label="Повторить"
+                data-testid="ai-chat-message-retry"
+              >
+                <BsArrowRepeat className="ai-chat-message-retry-icon" aria-hidden="true" />
+              </button>
+            </Tooltip>
+          </div>
         ) : null}
       </div>
     </div>

@@ -1,8 +1,14 @@
 import {
+  MITUP_MAX_ATTACHMENT_BYTES,
   normalizeMongoFileId,
   sanitizeChatAttachment,
   sanitizeChatAttachments,
+  serializeChatAttachmentsForApi,
   validateChatAttachments,
+  validateAttachmentSize,
+  parseAttachmentSizeBytes,
+  formatOversizedAttachmentMessage,
+  isAttachmentWithinSizeLimit,
   resolveAttachmentPreviewUrl,
   getMessageAttachments,
 } from './chatAttachment';
@@ -34,6 +40,7 @@ describe('chatAttachment', () => {
         fileName: 'photo.png',
         url: 'https://mp.sharik.ru/media/x/y/photo.png',
         mimeType: 'image/png',
+        size: 1024,
         extra: 'ignored',
       })
     ).toEqual({
@@ -41,7 +48,58 @@ describe('chatAttachment', () => {
       fileName: 'photo.png',
       url: 'https://mp.sharik.ru/media/x/y/photo.png',
       mimeType: 'image/png',
+      sizeBytes: 1024,
     });
+  });
+
+  test('validateAttachmentSize rejects files over Mitup limit', () => {
+    expect(validateAttachmentSize(MITUP_MAX_ATTACHMENT_BYTES)).toBeNull();
+    expect(validateAttachmentSize(MITUP_MAX_ATTACHMENT_BYTES + 1)).toMatch(/слишком большой/);
+  });
+
+  test('validateChatAttachments rejects oversized attachment', () => {
+    expect(
+      validateChatAttachments([
+        {
+          fileId: '6655a1b2c3d4e5f6a7b8c9d1',
+          sizeBytes: MITUP_MAX_ATTACHMENT_BYTES + 1,
+        },
+      ])
+    ).toMatch(/слишком большой/);
+  });
+
+  test('parseAttachmentSizeBytes and isAttachmentWithinSizeLimit', () => {
+    expect(parseAttachmentSizeBytes('2048')).toBe(2048);
+    expect(parseAttachmentSizeBytes('bad')).toBeNull();
+    expect(isAttachmentWithinSizeLimit(MITUP_MAX_ATTACHMENT_BYTES)).toBe(true);
+    expect(isAttachmentWithinSizeLimit(MITUP_MAX_ATTACHMENT_BYTES + 1)).toBe(false);
+    expect(isAttachmentWithinSizeLimit(null)).toBe(true);
+  });
+
+  test('formatOversizedAttachmentMessage includes human-readable sizes', () => {
+    expect(formatOversizedAttachmentMessage(6 * 1024 * 1024)).toMatch(/6 МБ/);
+    expect(formatOversizedAttachmentMessage(6 * 1024 * 1024)).toMatch(/5 МБ/);
+  });
+
+  test('serializeChatAttachmentsForApi omits sizeBytes for studio API', () => {
+    expect(
+      serializeChatAttachmentsForApi([
+        {
+          fileId: '6655a1b2c3d4e5f6a7b8c9d1',
+          fileName: 'photo.webp',
+          url: 'https://mp.sharik.ru/media/x/y/photo.webp',
+          mimeType: 'image/webp',
+          sizeBytes: 164288,
+        },
+      ])
+    ).toEqual([
+      {
+        fileId: '6655a1b2c3d4e5f6a7b8c9d1',
+        fileName: 'photo.webp',
+        url: 'https://mp.sharik.ru/media/x/y/photo.webp',
+        mimeType: 'image/webp',
+      },
+    ]);
   });
 
   test('validateChatAttachments detects invalid attachment id', () => {

@@ -17,7 +17,9 @@ import {
   MitupStreamError,
   streamMitupResult,
 } from '../services/mitupService';
+import { pickRandomThinkingPhrase } from '../utils/aiChatThinkingPhrases';
 import { getChatMessageId } from './useChatMessages';
+import { buildChatSessionTitleFromPrompt } from '../utils/chatSession';
 import {
   buildImageLogStartPayload,
   buildLogCompletePayload,
@@ -26,6 +28,7 @@ import {
 } from '../utils/mitupLogPayload';
 import {
   sanitizeChatAttachments,
+  serializeChatAttachmentsForApi,
   validateChatAttachments,
 } from '../utils/chatAttachment';
 import {
@@ -331,7 +334,7 @@ export function useSendChatMessage({
         if (!sessionId) {
           const session = await apiCreateChatSession({
             companyId,
-            title: trimmedPrompt.slice(0, 50) || 'Новый чат',
+            title: buildChatSessionTitleFromPrompt(trimmedPrompt),
             defaultModel: aiSettings.model,
             defaultTemperature: aiSettings.temperature ?? 0.9,
             defaultTopP: aiSettings.topP ?? 1,
@@ -355,7 +358,10 @@ export function useSendChatMessage({
             role: 'user',
             content: {
               text: trimmedPrompt,
-              attachments: sanitizedAttachments.length > 0 ? sanitizedAttachments : undefined,
+              attachments:
+                sanitizedAttachments.length > 0
+                  ? serializeChatAttachmentsForApi(sanitizedAttachments)
+                  : undefined,
             },
           },
           companyId
@@ -372,7 +378,10 @@ export function useSendChatMessage({
           companyId
         );
         assistantMessageId = getChatMessageId(assistantMessage);
-        appendMessage(assistantMessage);
+        appendMessage({
+          ...assistantMessage,
+          thinkingPhrase: pickRandomThinkingPhrase(),
+        });
         scrollToBottom?.('smooth');
 
         const logStartPayload = buildLogStartPayload({

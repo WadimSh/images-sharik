@@ -708,8 +708,8 @@ if (!sessionId) {
 - Badge «AI» / cost
 
 **Критерии приёмки:**
-- [ ] Поддержка нескольких files в одном ответе
-- [ ] Fallback если только `text` без files
+- [+] Поддержка нескольких files в одном ответе
+- [+] Fallback если только `text` без files
 
 **Зависимости:** TASK-5.1
 
@@ -717,7 +717,7 @@ if (!sessionId) {
 
 ## Фаза 6 — Надёжность и polish
 
-### TASK-6.1 — Retry failed message
+### +++ TASK-6.1 — Retry failed message
 
 **Описание:** кнопка «Повторить» на assistant со `status: failed`.
 
@@ -754,8 +754,8 @@ if (!sessionId) {
 - Confirm modal
 
 **Критерии приёмки:**
-- [ ] Архивированный чат исчезает из sidebar
-- [ ] Title auto-update от первого промпта (optional)
+- [x] Архивированный чат исчезает из sidebar
+- [x] Title auto-update от первого промпта (optional)
 
 **Зависимости:** TASK-2.1
 
@@ -770,7 +770,7 @@ if (!sessionId) {
 
 **Критерии приёмки:**
 - [+] Работает на viewport ≤ 768px (drawer + hamburger)
-- [ ] Touch-friendly hit areas ≥ 44px (send 36px на mobile — проверить)
+- [+] Touch-friendly hit areas ≥ 44px (send 36px на mobile — проверить)
 
 **Зависимости:** TASK-2.4
 
@@ -858,7 +858,7 @@ if (!sessionId) {
 - [ ] Вложение из Библиотеки (если `in_image`)
 - [ ] Генерация изображений (режим «Картинка»)
 - [~] Retry при ошибке — UI есть, логика без дубля user (TASK-6.1)
-- [ ] Archive / rename чата
+- [x] Archive / rename чата
 
 ### UI (DeepSeek) — фаза 2 ✅ + внеплановые доработки
 - [+] Sidebar с историей и «Новый чат» (финальный вид + mobile drawer)

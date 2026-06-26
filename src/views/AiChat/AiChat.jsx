@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAiChatInit } from '../../hooks/useAiChatInit';
 import { getChatMessageId, useChatMessages } from '../../hooks/useChatMessages';
 import { useSendChatMessage } from '../../hooks/useSendChatMessage';
+import { AiChatArchiveSessionModal } from '../../components/AiChat/AiChatArchiveSessionModal';
 import { AiChatComposer } from '../../components/AiChat/AiChatComposer';
 import { AiChatHeader } from '../../components/AiChat/AiChatHeader';
 import { AiChatLayout } from '../../components/AiChat/AiChatLayout';
@@ -12,9 +13,15 @@ import { AiChatModeSwitch } from '../../components/AiChat/AiChatModeSwitch';
 import { AiChatSidebar } from '../../components/AiChat/AiChatSidebar';
 import { AiChatStatusBar } from '../../components/AiChat/AiChatStatusBar';
 import { LibraryMediaModal } from '../../components/LibraryMediaModal/LibraryMediaModal';
-import { apiGetStudioFileUrl, apiPatchChatSession } from '../../services/chatService';
-import { normalizeMongoFileId } from '../../utils/chatAttachment';
-import { getSessionId } from '../../utils/chatSession';
+import { apiArchiveChatSession, apiGetStudioFileUrl, apiPatchChatSession } from '../../services/chatService';
+import {
+  getMessageAttachments,
+  MITUP_MAX_ATTACHMENT_BYTES,
+  normalizeMongoFileId,
+  parseAttachmentSizeBytes,
+  validateAttachmentSize,
+} from '../../utils/chatAttachment';
+import { getSessionId, normalizeChatSessionTitle } from '../../utils/chatSession';
 import {
   createDefaultAiSettings,
   DEFAULT_OUTPUT_TYPE,
@@ -38,6 +45,8 @@ export const AiChat = () => {
   const [attachment, setAttachment] = useState(null);
   const [libraryModalOpen, setLibraryModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingSession, setIsDeletingSession] = useState(false);
   const skipInitialLoadRef = useRef(false);
   const prevSessionIdRef = useRef(null);
 
@@ -53,6 +62,7 @@ export const AiChat = () => {
     sessions,
     prependSession,
     updateSession,
+    removeSession,
     updateBalance,
     updateLimitsFromResult,
   } = useAiChatInit();
@@ -99,12 +109,15 @@ export const AiChat = () => {
       }
       prependSession(session);
     },
-    onFinished: ({ balance: nextBalance, result }) => {
+    onFinished: ({ balance: nextBalance, result, sessionId }) => {
       if (nextBalance) {
         updateBalance(nextBalance);
       }
       if (result?.limits) {
         updateLimitsFromResult(result.limits);
+      }
+      if (sessionId) {
+        updateSession(sessionId, { lastMessageAt: new Date().toISOString() });
       }
     },
   });
@@ -216,6 +229,73 @@ export const AiChat = () => {
     clearSendError();
   };
 
+  const handleRenameSession = useCallback(
+    async (sessionId, title) => {
+      const normalizedTitle = normalizeChatSessionTitle(title);
+      if (!sessionId || !normalizedTitle || !companyId) {
+        return false;
+      }
+
+      try {
+        await apiPatchChatSession(sessionId, { title: normalizedTitle }, companyId);
+        updateSession(sessionId, { title: normalizedTitle });
+        return true;
+      } catch (error) {
+        console.warn('[AiChat] failed to rename session:', error);
+        window.alert('Не удалось переименовать чат. Попробуйте ещё раз.');
+        return false;
+      }
+    },
+    [companyId, updateSession]
+  );
+
+  const handleDeleteSessionRequest = useCallback((session) => {
+    setDeleteTarget(session);
+  }, []);
+
+  const handleDeleteSessionClose = useCallback(() => {
+    if (isDeletingSession) {
+      return;
+    }
+
+    setDeleteTarget(null);
+  }, [isDeletingSession]);
+
+  const handleDeleteSessionConfirm = useCallback(async () => {
+    const sessionId = getSessionId(deleteTarget);
+    if (!sessionId || !companyId || isDeletingSession) {
+      return;
+    }
+
+    setIsDeletingSession(true);
+
+    try {
+      await apiArchiveChatSession(sessionId, companyId);
+      removeSession(sessionId);
+
+      if (activeSessionId === sessionId) {
+        setActiveSessionId(null);
+        setPrompt('');
+        setAttachment(null);
+        clearSendError();
+      }
+
+      setDeleteTarget(null);
+    } catch (error) {
+      console.warn('[AiChat] failed to delete session:', error);
+      window.alert('Не удалось удалить чат. Попробуйте ещё раз.');
+    } finally {
+      setIsDeletingSession(false);
+    }
+  }, [
+    activeSessionId,
+    deleteTarget,
+    clearSendError,
+    companyId,
+    isDeletingSession,
+    removeSession,
+  ]);
+
   const isRateLimited = isMinuteRateLimitReached(limits);
 
   const handleRetry = useCallback(
@@ -232,13 +312,19 @@ export const AiChat = () => {
         .reverse()
         .find((message) => message.role === 'user');
 
-      const text = userMessage?.content?.text?.trim();
-      if (!text || !aiSettings.model || isSending || isRateLimited) {
+      if (!userMessage) {
+        return;
+      }
+
+      const text = userMessage?.content?.text?.trim() || '';
+      const attachments = getMessageAttachments(userMessage);
+
+      if ((!text && attachments.length === 0) || !aiSettings.model || isSending || isRateLimited) {
         return;
       }
 
       clearSendError();
-      sendMessage({ prompt: text });
+      sendMessage({ prompt: text, attachments });
     },
     [messages, aiSettings.model, isSending, isRateLimited, sendMessage, clearSendError]
   );
@@ -306,13 +392,24 @@ export const AiChat = () => {
       }
 
       let previewUrl = file?.url;
+      let sizeBytes = parseAttachmentSizeBytes(file?.size ?? file?.sizeBytes);
+
       if (companyId) {
         try {
           const studioFile = await apiGetStudioFileUrl(fileId, companyId);
           previewUrl = studioFile?.url || previewUrl;
+          if (sizeBytes == null) {
+            sizeBytes = parseAttachmentSizeBytes(studioFile?.size ?? studioFile?.sizeBytes);
+          }
         } catch (error) {
           console.warn('[AiChat] failed to resolve studio file url:', error);
         }
+      }
+
+      const sizeError = validateAttachmentSize(sizeBytes);
+      if (sizeError) {
+        window.alert(sizeError);
+        return;
       }
 
       setAttachment({
@@ -320,6 +417,7 @@ export const AiChat = () => {
         fileName,
         url: previewUrl,
         mimeType,
+        ...(sizeBytes != null ? { sizeBytes } : {}),
       });
       clearSendError();
     },
@@ -375,6 +473,8 @@ export const AiChat = () => {
                 sessions={sessions}
                 onNewChat={handleNewChat}
                 onSelectSession={handleSelectSession}
+                onRenameSession={handleRenameSession}
+                onDeleteSession={handleDeleteSessionRequest}
                 onClose={() => setSidebarOpen(false)}
               />
             }
@@ -425,8 +525,17 @@ export const AiChat = () => {
           isOpen={libraryModalOpen}
           onClose={() => setLibraryModalOpen(false)}
           onSelectImage={handleLibrarySelect}
+          maxSelectableFileBytes={MITUP_MAX_ATTACHMENT_BYTES}
         />
       ) : null}
+
+      <AiChatArchiveSessionModal
+        isOpen={Boolean(deleteTarget)}
+        sessionTitle={deleteTarget?.title}
+        isSubmitting={isDeletingSession}
+        onClose={handleDeleteSessionClose}
+        onConfirm={handleDeleteSessionConfirm}
+      />
     </div>
   );
 };

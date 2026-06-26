@@ -44,9 +44,11 @@ jest.mock('../../services/mitupService', () => ({
 }));
 
 jest.mock('../../services/chatService', () => ({
+  apiArchiveChatSession: jest.fn(),
   apiCreateChatSession: jest.fn(),
   apiGetChatSessions: jest.fn(),
   apiGetChatMessages: jest.fn(),
+  apiPatchChatSession: jest.fn(),
   apiPostChatMessage: jest.fn(),
   apiPatchChatMessage: jest.fn(),
 }));
@@ -276,5 +278,58 @@ describe('AiChat smoke', () => {
 
     expect(input).toBeDisabled();
     expect(sendButton).toBeDisabled();
+  });
+
+  test('sidebar rename and delete session', async () => {
+    chatService.apiGetChatSessions.mockResolvedValue({
+      data: [
+        {
+          id: 'session-old',
+          title: 'Старый чат',
+          lastMessageAt: '2026-01-01T10:00:00.000Z',
+        },
+      ],
+      pagination: {},
+    });
+    chatService.apiGetChatMessages.mockResolvedValue({ data: [], pagination: {} });
+    chatService.apiPatchChatSession.mockResolvedValue({
+      id: 'session-old',
+      title: 'Новое название',
+    });
+    chatService.apiArchiveChatSession.mockResolvedValue({ success: true });
+
+    renderAiChat();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('ai-chat-sidebar')).toBeInTheDocument();
+      expect(screen.getByText('Старый чат')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByTestId('ai-chat-sidebar-rename-session-old'));
+
+    const renameInput = await screen.findByTestId('ai-chat-sidebar-session-rename-input');
+    await userEvent.clear(renameInput);
+    await userEvent.type(renameInput, 'Новое название');
+    await userEvent.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(chatService.apiPatchChatSession).toHaveBeenCalledWith(
+        'session-old',
+        { title: 'Новое название' },
+        'company-1'
+      );
+      expect(screen.getByText('Новое название')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByTestId('ai-chat-sidebar-delete-session-old'));
+
+    expect(screen.getByTestId('ai-chat-delete-session-modal')).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId('ai-chat-delete-session-confirm'));
+
+    await waitFor(() => {
+      expect(chatService.apiArchiveChatSession).toHaveBeenCalledWith('session-old', 'company-1');
+      expect(screen.queryByText('Новое название')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('ai-chat-sidebar')).not.toBeInTheDocument();
+    });
   });
 });
