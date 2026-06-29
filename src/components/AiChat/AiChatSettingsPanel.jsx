@@ -7,6 +7,7 @@ import {
   DEFAULT_TOP_P,
   getImageQualityOptionsForModel,
   getImageSizeOptionsForModel,
+  modelSupportsImageQuality,
   RESPONSE_FORMAT_OPTIONS,
 } from '../../utils/aiChatSettings';
 import './AiChatSettingsPanel.css';
@@ -109,6 +110,10 @@ export function AiChatSettingsPanel({
   const topP = settings.topP ?? DEFAULT_TOP_P;
   const imageSizeOptions = getImageSizeOptionsForModel(selectedModel);
   const imageQualityOptions = getImageQualityOptionsForModel(selectedModel);
+  const showImageQuality = modelSupportsImageQuality(selectedModel);
+  const imageSizeLabel = showImageQuality
+    ? 'Размер картинки (image_size)'
+    : 'Разрешение (image_size)';
 
   return (
     <div
@@ -191,7 +196,7 @@ export function AiChatSettingsPanel({
             <>
               <div className="ai-chat-settings-panel-field">
                 <label className="ai-chat-settings-panel-label" htmlFor={`${panelId}-image-size`}>
-                  Размер картинки (image_size)
+                  {imageSizeLabel}
                 </label>
                 <select
                   id={`${panelId}-image-size`}
@@ -208,27 +213,29 @@ export function AiChatSettingsPanel({
                 </select>
               </div>
 
-              <div className="ai-chat-settings-panel-field">
-                <label
-                  className="ai-chat-settings-panel-label"
-                  htmlFor={`${panelId}-image-quality`}
-                >
-                  Качество изображения (image_quality)
-                </label>
-                <select
-                  id={`${panelId}-image-quality`}
-                  className="ai-chat-settings-panel-select"
-                  value={settings.imageQuality || imageQualityOptions[0]?.value}
-                  onChange={(event) => updateSetting({ imageQuality: event.target.value })}
-                  data-testid="ai-chat-settings-image-quality"
-                >
-                  {imageQualityOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {showImageQuality ? (
+                <div className="ai-chat-settings-panel-field">
+                  <label
+                    className="ai-chat-settings-panel-label"
+                    htmlFor={`${panelId}-image-quality`}
+                  >
+                    Качество изображения (image_quality)
+                  </label>
+                  <select
+                    id={`${panelId}-image-quality`}
+                    className="ai-chat-settings-panel-select"
+                    value={settings.imageQuality || imageQualityOptions[0]?.value}
+                    onChange={(event) => updateSetting({ imageQuality: event.target.value })}
+                    data-testid="ai-chat-settings-image-quality"
+                  >
+                    {imageQualityOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
 
               <div className="ai-chat-settings-panel-field">
                 <label

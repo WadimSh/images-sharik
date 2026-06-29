@@ -1,6 +1,7 @@
 import {
   getImageQualityOptionsForModel,
   getImageSizeOptionsForModel,
+  modelSupportsImageQuality,
   normalizeImageSettingsForModel,
 } from './mitupImageParams';
 
@@ -20,13 +21,29 @@ describe('aiChatSettings image params', () => {
     expect(settings.imageQuality).toBe('1K');
   });
 
-  test('getImageSizeOptionsForModel returns pixel sizes for gpt-image models', () => {
-    const options = getImageSizeOptionsForModel({ output_name: 'gpt-image-2' });
-    expect(options.some((option) => option.value === '1024x1024')).toBe(true);
+  test('seedream models expose resolution options and no quality', () => {
+    expect(getImageSizeOptionsForModel({ output_name: 'seedream-4.0', ai: 'ByteDance' }).map((o) => o.value)).toEqual([
+      '1K',
+      '2K',
+      '4K',
+    ]);
+    expect(modelSupportsImageQuality({ output_name: 'seedream-4.0' })).toBe(false);
+    expect(getImageQualityOptionsForModel({ output_name: 'seedream-4.0' })).toEqual([]);
   });
 
-  test('getImageQualityOptionsForModel returns uppercase qualities for gemini pro image', () => {
-    const options = getImageQualityOptionsForModel({ output_name: 'gemini-3-pro-image' });
-    expect(options.map((option) => option.value)).toEqual(['1K', '2K', '4K']);
+  test('getImageQualityOptionsForModel returns profile-specific qualities', () => {
+    expect(getImageQualityOptionsForModel({ output_name: 'gpt-5-mini', ai: 'OpenAI' }).map((o) => o.value)).toEqual([
+      'auto',
+      'low',
+      'medium',
+      'high',
+    ]);
+    expect(getImageQualityOptionsForModel({ output_name: 'alice-ai', ai: 'YandexGPT' }).map((o) => o.value)).toEqual([
+      'auto',
+      'low',
+      'medium',
+      'high',
+    ]);
+    expect(getImageQualityOptionsForModel({ output_name: 'alice-ai-art', ai: 'YandexGPT' })).toEqual([]);
   });
 });

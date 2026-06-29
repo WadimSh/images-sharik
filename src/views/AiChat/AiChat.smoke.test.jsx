@@ -72,6 +72,7 @@ const TEST_MODEL = {
 
 const IMAGE_MODEL = {
   output_name: 'Image Model',
+  model: 'gpt-5-mini',
   out_text: false,
   out_image: true,
   ai: 'OpenAI',
@@ -385,9 +386,9 @@ describe('AiChat smoke', () => {
         type: 'out_image',
         response_format: 'url',
         ai: expect.objectContaining({
-          model: 'Image Model',
-          image_size: '1:1',
-          image_quality: '1k',
+          model: 'gpt-5-mini',
+          image_size: 'auto',
+          image_quality: 'auto',
         }),
       })
     );

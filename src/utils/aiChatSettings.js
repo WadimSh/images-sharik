@@ -12,6 +12,7 @@ export const DEFAULT_OUTPUT_TYPE = 'out_text';
 export {
   getImageQualityOptionsForModel,
   getImageSizeOptionsForModel,
+  modelSupportsImageQuality,
   normalizeImageSettingsForModel,
 } from './mitupImageParams';
 
@@ -41,7 +42,7 @@ export function createDefaultAiSettings() {
     thinking: false,
     webSearch: false,
     imageSize: defaultSizeOptions[0]?.value || '1:1',
-    imageQuality: defaultQualityOptions[0]?.value || '1k',
+    imageQuality: defaultQualityOptions[0]?.value || '1K',
     responseFormat: RESPONSE_FORMAT_OPTIONS[0].value,
   };
 }
