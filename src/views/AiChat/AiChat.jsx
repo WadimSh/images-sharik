@@ -27,6 +27,7 @@ import {
   DEFAULT_OUTPUT_TYPE,
   inferOutputTypeFromMessages,
   normalizeAiSettingsForOutputType,
+  normalizeImageSettingsForModel,
 } from '../../utils/aiChatSettings';
 import {
   canAttachFromLibrary,
@@ -98,6 +99,7 @@ export const AiChat = () => {
     companyId,
     activeSessionId,
     aiSettings,
+    selectedModel,
     appendMessage,
     updateMessage,
     skipInitialLoadRef,
@@ -184,7 +186,9 @@ export const AiChat = () => {
 
   const handleModelChange = useCallback(
     async (model) => {
-      setAiSettings((prev) => ({ ...prev, model }));
+      setAiSettings((prev) =>
+        normalizeImageSettingsForModel({ ...prev, model }, findMitupModelByValue(models, model))
+      );
       clearSendError();
 
       if (!activeSessionId || !companyId) {
@@ -349,9 +353,8 @@ export const AiChat = () => {
     isRateLimited;
   const isImageMode = aiSettings.outputType === 'out_image';
   const canAttach = !isImageMode && canAttachFromLibrary(selectedModel);
-  const inputDisabled = composerDisabled || isImageMode;
+  const inputDisabled = composerDisabled;
   const canSend =
-    !isImageMode &&
     Boolean(aiSettings.model) &&
     Boolean(prompt.trim()) &&
     !composerDisabled;
@@ -503,6 +506,7 @@ export const AiChat = () => {
                 onModelChange={handleModelChange}
                 onSettingsChange={handleSettingsChange}
                 models={models}
+                selectedModel={selectedModel}
                 outputType={aiSettings.outputType}
                 composerDisabled={composerDisabled}
                 inputDisabled={inputDisabled}

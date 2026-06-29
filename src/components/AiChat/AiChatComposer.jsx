@@ -22,6 +22,7 @@ export function AiChatComposer({
   onModelChange,
   onSettingsChange,
   models,
+  selectedModel = null,
   outputType = 'out_text',
   composerDisabled,
   inputDisabled,
@@ -70,7 +71,7 @@ export function AiChatComposer({
   const isAtLimit = promptLength >= PROMPT_MAX_LENGTH;
   const isImageMode = outputType === 'out_image';
   const textareaPlaceholder = isImageMode
-    ? 'Генерация изображений скоро будет доступна…'
+    ? 'Опишите изображение…'
     : 'Сообщение…';
 
   return (
@@ -132,6 +133,7 @@ export function AiChatComposer({
           <AiChatSettingsPanel
             outputType={outputType}
             settings={aiSettings}
+            selectedModel={selectedModel}
             onChange={onSettingsChange}
             disabled={composerDisabled}
           />

@@ -27,6 +27,10 @@ import {
   buildTextLogStartPayload,
 } from '../utils/mitupLogPayload';
 import {
+  buildMitupImageAiParams,
+  getMitupModelApiId,
+} from '../utils/mitupImageParams';
+import {
   sanitizeChatAttachments,
   serializeChatAttachmentsForApi,
   validateChatAttachments,
@@ -100,10 +104,10 @@ async function revealAssistantTextGradually(fullText, assistantMessageId, update
   }
 }
 
-function buildMitupAiPayload(aiSettings, hasAttachments = false) {
+function buildMitupAiPayload(aiSettings, selectedModel, hasAttachments = false) {
   const outputType = aiSettings.outputType || 'out_text';
   const ai = {
-    model: aiSettings.model,
+    model: getMitupModelApiId(selectedModel) || aiSettings.model,
     temperature: aiSettings.temperature ?? 0.9,
     top_p: aiSettings.topP ?? 1,
   };
@@ -118,18 +122,27 @@ function buildMitupAiPayload(aiSettings, hasAttachments = false) {
   }
 
   if (outputType === 'out_image') {
-    if (aiSettings.imageSize) {
-      ai.image_size = aiSettings.imageSize;
-    }
-    if (aiSettings.imageQuality) {
-      ai.image_quality = aiSettings.imageQuality;
-    }
-    if (aiSettings.responseFormat) {
-      ai.response_format = aiSettings.responseFormat;
-    }
+    Object.assign(ai, buildMitupImageAiParams(selectedModel, aiSettings));
   }
 
   return ai;
+}
+
+function buildMitupGenerateRequest(companyId, aiSettings, selectedModel, prompt, attachments = []) {
+  const outputType = aiSettings.outputType || 'out_text';
+  const sanitizedAttachments = sanitizeChatAttachments(attachments);
+  const body = {
+    companyId,
+    type: outputType,
+    content: buildGenerateContent(prompt, sanitizedAttachments),
+    ai: buildMitupAiPayload(aiSettings, selectedModel, sanitizedAttachments.length > 0),
+  };
+
+  if (outputType === 'out_image' && aiSettings.responseFormat) {
+    body.response_format = aiSettings.responseFormat;
+  }
+
+  return body;
 }
 
 function buildGenerationMeta(aiSettings) {
@@ -266,6 +279,7 @@ export function useSendChatMessage({
   companyId,
   activeSessionId,
   aiSettings,
+  selectedModel,
   appendMessage,
   updateMessage,
   skipInitialLoadRef,
@@ -310,8 +324,8 @@ export function useSendChatMessage({
 
       const outputType = aiSettings.outputType || 'out_text';
 
-      if (outputType !== 'out_text') {
-        setSendError('Генерация изображений пока недоступна');
+      if (outputType === 'out_image' && sanitizedAttachments.length > 0) {
+        setSendError('Вложения недоступны в режиме генерации изображений');
         return null;
       }
 
@@ -396,12 +410,15 @@ export function useSendChatMessage({
         const logStartResponse = await apiStartEditorAiLog(logStartPayload);
         logId = extractEditorAiLogId(logStartResponse);
 
-        const generateResponse = await apiMitupGenerate({
-          companyId,
-          type: outputType,
-          content: buildGenerateContent(trimmedPrompt, sanitizedAttachments),
-          ai: buildMitupAiPayload(aiSettings, sanitizedAttachments.length > 0),
-        });
+        const generateResponse = await apiMitupGenerate(
+          buildMitupGenerateRequest(
+            companyId,
+            aiSettings,
+            selectedModel,
+            trimmedPrompt,
+            sanitizedAttachments
+          )
+        );
 
         const taskId = generateResponse?.taskId;
         if (!taskId) {
@@ -433,17 +450,31 @@ export function useSendChatMessage({
           taskId,
           companyId,
           controller.signal,
-          { assistantMessageId, updateMessage, scrollToBottom }
+          outputType === 'out_text'
+            ? { assistantMessageId, updateMessage, scrollToBottom }
+            : {}
         );
 
         const finalText = result?.text || '';
-        if (!receivedStreamChunks && finalText) {
+        if (
+          outputType === 'out_text'
+          && !receivedStreamChunks
+          && finalText
+        ) {
           await revealAssistantTextGradually(
             finalText,
             assistantMessageId,
             updateMessage,
             scrollToBottom
           );
+        }
+
+        if (
+          outputType === 'out_image'
+          && (!Array.isArray(result?.files) || result.files.length === 0)
+          && !finalText
+        ) {
+          throw new Error('Mitup не вернул изображение');
         }
 
         updateMessage(assistantMessageId, {
@@ -537,6 +568,7 @@ export function useSendChatMessage({
       companyId,
       activeSessionId,
       aiSettings,
+      selectedModel,
       appendMessage,
       updateMessage,
       skipInitialLoadRef,

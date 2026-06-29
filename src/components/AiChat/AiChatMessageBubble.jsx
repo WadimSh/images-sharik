@@ -5,9 +5,14 @@ import remarkGfm from 'remark-gfm';
 import { BsArrowRepeat } from 'react-icons/bs';
 
 import { getThinkingPhraseForMessage } from '../../utils/aiChatThinkingPhrases';
+import {
+  getAssistantImageFiles,
+  isAssistantImageGeneration,
+} from '../../utils/aiChatImageResult';
 import { normalizeMarkdownTables, sanitizeChatText } from '../../utils/sanitizeChatText';
 import { getMessageAttachments } from '../../utils/chatAttachment';
 import { Tooltip } from '../../ui/Tooltip/Tooltip';
+import { AiChatImageResult } from './AiChatImageResult';
 import { AiChatMessageAttachments } from './AiChatMessageAttachments';
 import { AiChatMessageMeta } from './AiChatMessageMeta';
 import './AiChatMessageBubble.css';
@@ -55,9 +60,38 @@ export function AiChatMessageContent({ message, isStreaming = false, companyId =
     );
   }
 
+  const imageFiles = getAssistantImageFiles(message);
+  const isImageGeneration = isAssistantImageGeneration(message);
   const assistantText = normalizeMarkdownTables(
     sanitizeChatText(message?.result?.text || message?.content?.text)
   );
+
+  if (imageFiles.length > 0) {
+    return (
+      <div className="ai-chat-message-assistant-content">
+        <AiChatImageResult files={imageFiles} />
+        {assistantText ? (
+          <div className="ai-chat-message-markdown ai-chat-message-markdown--caption">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkBreaks]}
+              components={{
+                a: ({ ...props }) => (
+                  <a target="_blank" rel="noopener noreferrer" {...props} />
+                ),
+                code: MarkdownCode,
+              }}
+            >
+              {assistantText}
+            </ReactMarkdown>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (isImageGeneration && message?.status === 'completed' && !assistantText) {
+    return <div className="ai-chat-message-text">Изображение не получено</div>;
+  }
 
   if (!assistantText) {
     return <div className="ai-chat-message-text">—</div>;
@@ -111,8 +145,11 @@ export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
   const isPending = message?.status === 'pending';
   const isProcessing = message?.status === 'processing';
   const streamingText = sanitizeChatText(message?.result?.text);
+  const imageFiles = getAssistantImageFiles(message);
   const isStreaming = isAssistant && isProcessing && Boolean(streamingText);
-  const showThinking = isAssistant && (isPending || (isProcessing && !streamingText));
+  const showThinking =
+    isAssistant
+    && (isPending || (isProcessing && !streamingText && imageFiles.length === 0));
   const showMeta = isAssistant && message?.status === 'completed';
   const thinkingPhrase = showThinking ? getThinkingPhraseForMessage(message) : '';
 

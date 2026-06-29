@@ -18,6 +18,8 @@ import { Tooltip } from "../ui/Tooltip/Tooltip";
 import { uploadGraphicFile } from '../services/mediaService';
 import ImageUploadModal from '../components/ImageUploadModal/ImageUploadModal';
 
+import img from '../assets/logo-img.png';
+
 const showUploadNotification = () => {
     
   return {
@@ -388,7 +390,8 @@ const convertToWebP = (file) => {
             position='bottom'
           >
             <button onClick={handleAiChatClick} className="creat-temp-button">
-              <VscCopilot className="creat-temp-icon" />
+              <img src={img} alt="logo" className="creat-temp-icon" width={22} height={22}/>
+              {/**<VscCopilot className="creat-temp-icon" />**/}
             </button>
           </Tooltip>
         )}

@@ -525,7 +525,7 @@ if (!sessionId) {
 
 ## Фаза 3 — Composer и настройки модели ✅
 
-> **Статус:** UI composer, model select, settings panel и mode switch **закрыты**. Отправка `out_image` — в TASK-5.1.
+> **Статус:** UI composer, model select, settings panel, mode switch и отправка `out_image` **закрыты**.
 
 ### +++ TASK-3.1 — Компонент `AiChatComposer`
 
@@ -607,8 +607,8 @@ if (!sessionId) {
 **Критерии приёмки:**
 - [+] MVP: режим «Текст» активен по умолчанию
 - [+] Переключатель виден только до первого сообщения
-- [+] Режим «Картинка»: composer disabled, placeholder «скоро будет доступно»
-- [ ] Отправка `out_image` подключена в TASK-5.1
+- [x] Режим «Картинка»: composer активен, placeholder «Опишите изображение…»
+- [x] Отправка `out_image` подключена в TASK-5.1
 
 **Зависимости:** TASK-3.2
 
@@ -691,8 +691,8 @@ if (!sessionId) {
 - Complete: `imageResult.files`
 
 **Критерии приёмки:**
-- [ ] Assistant bubble показывает grid картинок из `result.files`
-- [ ] Persisted URLs (`/media/...`) открываются в новой вкладке
+- [x] Assistant bubble показывает grid картинок из `result.files`
+- [x] Persisted URLs (`/media/...`) открываются в новой вкладке
 
 **Зависимости:** TASK-3.4, TASK-1.3
 
@@ -985,7 +985,7 @@ src/
 Фаза 3 ✅ (3.1 → 3.4 UI; send out_image → 5.1)
        │
        ▼
-Фаза 4 (attachments) / Фаза 5 (images send)  ← текущий фокус
+Фаза 5 ✅ (5.1 → 5.2)  — генерация изображений out_image
 ```
 
 ---

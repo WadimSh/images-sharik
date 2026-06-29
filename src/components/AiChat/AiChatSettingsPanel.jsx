@@ -5,8 +5,8 @@ import {
   clampSettingNumber,
   DEFAULT_TEMPERATURE,
   DEFAULT_TOP_P,
-  IMAGE_QUALITY_OPTIONS,
-  IMAGE_SIZE_OPTIONS,
+  getImageQualityOptionsForModel,
+  getImageSizeOptionsForModel,
   RESPONSE_FORMAT_OPTIONS,
 } from '../../utils/aiChatSettings';
 import './AiChatSettingsPanel.css';
@@ -61,9 +61,16 @@ function SettingSlider({ id, label, value, min, max, step, onChange, testId }) {
  * @param {'out_text'|'out_image'} props.outputType
  * @param {object} props.settings
  * @param {Function} props.onChange
+ * @param {object} [props.selectedModel]
  * @param {boolean} [props.disabled]
  */
-export function AiChatSettingsPanel({ outputType, settings, onChange, disabled = false }) {
+export function AiChatSettingsPanel({
+  outputType,
+  settings,
+  selectedModel = null,
+  onChange,
+  disabled = false,
+}) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const panelId = useId();
@@ -100,6 +107,8 @@ export function AiChatSettingsPanel({ outputType, settings, onChange, disabled =
 
   const temperature = settings.temperature ?? DEFAULT_TEMPERATURE;
   const topP = settings.topP ?? DEFAULT_TOP_P;
+  const imageSizeOptions = getImageSizeOptionsForModel(selectedModel);
+  const imageQualityOptions = getImageQualityOptionsForModel(selectedModel);
 
   return (
     <div
@@ -187,11 +196,11 @@ export function AiChatSettingsPanel({ outputType, settings, onChange, disabled =
                 <select
                   id={`${panelId}-image-size`}
                   className="ai-chat-settings-panel-select"
-                  value={settings.imageSize || IMAGE_SIZE_OPTIONS[0].value}
+                  value={settings.imageSize || imageSizeOptions[0]?.value}
                   onChange={(event) => updateSetting({ imageSize: event.target.value })}
                   data-testid="ai-chat-settings-image-size"
                 >
-                  {IMAGE_SIZE_OPTIONS.map((option) => (
+                  {imageSizeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -209,11 +218,11 @@ export function AiChatSettingsPanel({ outputType, settings, onChange, disabled =
                 <select
                   id={`${panelId}-image-quality`}
                   className="ai-chat-settings-panel-select"
-                  value={settings.imageQuality || IMAGE_QUALITY_OPTIONS[0].value}
+                  value={settings.imageQuality || imageQualityOptions[0]?.value}
                   onChange={(event) => updateSetting({ imageQuality: event.target.value })}
                   data-testid="ai-chat-settings-image-quality"
                 >
-                  {IMAGE_QUALITY_OPTIONS.map((option) => (
+                  {imageQualityOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -243,9 +252,6 @@ export function AiChatSettingsPanel({ outputType, settings, onChange, disabled =
                 </select>
               </div>
 
-              <p className="ai-chat-settings-panel-note">
-                Отправка изображений будет доступна в следующем обновлении.
-              </p>
             </>
           )}
         </div>

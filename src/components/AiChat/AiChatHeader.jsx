@@ -1,7 +1,9 @@
 import { useContext } from 'react';
 import { HiOutlineBars3, HiOutlineChevronLeft } from 'react-icons/hi2';
+import { PiCaretLeftBold } from "react-icons/pi";
 
 import { LanguageContext } from '../../contexts/contextLanguage';
+import img from '../../assets/logo-text.png';
 import './AiChatHeader.css';
 
 /**
@@ -12,8 +14,8 @@ export function AiChatHeader({ onBack, meta, onOpenSidebar, showSidebarToggle = 
 
   return (
     <div className="header-section ai-chat-page-header">
-      <button type="button" onClick={onBack} className="button-back">
-        <HiOutlineChevronLeft /> {t('header.back')}
+      <button type="button" onClick={onBack} className="button-back" style={{ fontSize: '24px', fontWeight: 'bold', padding: '8px' }}>
+        <PiCaretLeftBold />
       </button>
 
       {showSidebarToggle && onOpenSidebar ? (
@@ -27,8 +29,8 @@ export function AiChatHeader({ onBack, meta, onOpenSidebar, showSidebarToggle = 
         </button>
       ) : null}
 
-      <h2>{t('header.aiChat')}</h2>
-
+      <img src={img} alt={t('header.aiChat')} className="creat-temp-icon" width={86} height={30}/>
+      
       {meta ?? null}
     </div>
   );

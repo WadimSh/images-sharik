@@ -30,6 +30,7 @@ jest.mock('react-markdown', () => {
 
 jest.mock('../../services/fetch/fetchBase', () => ({
   fetchDataWithFetch: jest.fn(),
+  getApiBaseUrl: () => 'https://mp.sharik.ru',
 }));
 
 jest.mock('../../services/mitupService', () => ({
@@ -67,6 +68,17 @@ const TEST_MODEL = {
   in_image: false,
   ext: null,
   best_for: 'Короткие ответы и черновики текстов',
+};
+
+const IMAGE_MODEL = {
+  output_name: 'Image Model',
+  out_text: false,
+  out_image: true,
+  ai: 'OpenAI',
+  in_text: true,
+  in_image: false,
+  ext: null,
+  best_for: 'Генерация изображений',
 };
 
 function setupMocks() {
@@ -156,12 +168,12 @@ describe('AiChat smoke', () => {
     renderAiChat();
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'AI-чат' })).toBeInTheDocument();
+      expect(screen.getByAltText('Bloom')).toBeInTheDocument();
       expect(screen.getByTestId('ai-chat-status-bar-balance')).toHaveTextContent('Баланс: 100 ₽');
       expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveTextContent('Лимит: 1/10/мин');
     });
 
-    expect(screen.getByRole('button', { name: /Назад/i })).toBeInTheDocument();
+    expect(document.querySelector('.button-back')).toBeInTheDocument();
     expect(screen.queryByTestId('ai-chat-sidebar')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'История чатов' })).not.toBeInTheDocument();
     expect(screen.queryByTestId('ai-chat-composer-attach')).not.toBeInTheDocument();
@@ -331,5 +343,66 @@ describe('AiChat smoke', () => {
       expect(screen.queryByText('Новое название')).not.toBeInTheDocument();
       expect(screen.queryByTestId('ai-chat-sidebar')).not.toBeInTheDocument();
     });
+  });
+
+  test('send image prompt → assistant shows image grid and image log', async () => {
+    mitupService.apiGetMitupModels.mockResolvedValue({
+      models: [TEST_MODEL, IMAGE_MODEL],
+    });
+    mitupService.streamMitupResult.mockResolvedValue({
+      files: [
+        {
+          url: '/media/company-1/generated.png',
+          fileName: 'generated.png',
+          mimeType: 'image/png',
+        },
+      ],
+      cost: { amount: 1.2 },
+    });
+
+    renderAiChat();
+
+    const input = await screen.findByTestId('ai-chat-composer-input');
+    await waitFor(() => expect(input).not.toBeDisabled());
+
+    await userEvent.click(screen.getByTestId('ai-chat-mode-switch-out_image'));
+    await userEvent.click(screen.getByTestId('ai-chat-model-select-trigger'));
+    await userEvent.click(screen.getByTestId('ai-chat-model-option-Image Model'));
+    await userEvent.type(input, 'Красный шар на белом фоне');
+    await userEvent.click(screen.getByTestId('ai-chat-composer-send'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('ai-chat-image-result')).toBeInTheDocument();
+      expect(screen.getByTestId('ai-chat-image-result-item-0')).toHaveAttribute(
+        'href',
+        'https://mp.sharik.ru/media/company-1/generated.png'
+      );
+    });
+
+    expect(mitupService.apiMitupGenerate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyId: 'company-1',
+        type: 'out_image',
+        response_format: 'url',
+        ai: expect.objectContaining({
+          model: 'Image Model',
+          image_size: '1:1',
+          image_quality: '1k',
+        }),
+      })
+    );
+
+    expect(editorAiLogService.apiStartEditorAiLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operationId: 'generateImage',
+        section: 'ai_image_generation',
+        requestConfig: expect.objectContaining({
+          mitup: {
+            outputType: 'out_image',
+            generationType: 'image',
+          },
+        }),
+      })
+    );
   });
 });

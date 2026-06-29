@@ -245,6 +245,18 @@
   align-items: center;
 }
 
+.ai-chat-message-assistant-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.ai-chat-message-markdown--caption {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.62);
+}
+
 .ai-chat-thinking {
   display: inline-flex;
   align-items: flex-end;

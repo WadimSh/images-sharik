@@ -1,19 +1,25 @@
-import { filterModelsByOutputType, getModelLabel } from './mitupModels';
+import { filterModelsByOutputType, findMitupModelByValue, getModelLabel } from './mitupModels';
+import {
+  getImageQualityOptionsForModel,
+  getImageSizeOptionsForModel,
+  normalizeImageSettingsForModel,
+} from './mitupImageParams';
 
 export const DEFAULT_TEMPERATURE = 0.9;
 export const DEFAULT_TOP_P = 1;
 export const DEFAULT_OUTPUT_TYPE = 'out_text';
 
-export const IMAGE_SIZE_OPTIONS = [
-  { value: '1024x1024', label: '1024×1024' },
-  { value: '1792x1024', label: '1792×1024' },
-  { value: '1024x1792', label: '1024×1792' },
-];
+export {
+  getImageQualityOptionsForModel,
+  getImageSizeOptionsForModel,
+  normalizeImageSettingsForModel,
+} from './mitupImageParams';
 
-export const IMAGE_QUALITY_OPTIONS = [
-  { value: 'standard', label: 'Обычное (standard)' },
-  { value: 'hd', label: 'Высокое (hd)' },
-];
+/** @deprecated Используйте getImageSizeOptionsForModel(selectedModel) */
+export const IMAGE_SIZE_OPTIONS = getImageSizeOptionsForModel(null);
+
+/** @deprecated Используйте getImageQualityOptionsForModel(selectedModel) */
+export const IMAGE_QUALITY_OPTIONS = getImageQualityOptionsForModel(null);
 
 export const RESPONSE_FORMAT_OPTIONS = [
   { value: 'url', label: 'Ссылка на файл (url)' },
@@ -24,6 +30,9 @@ export const RESPONSE_FORMAT_OPTIONS = [
  * @returns {import('./mitupLogPayload').MitupAiSettings & { outputType: 'out_text'|'out_image', model: string }}
  */
 export function createDefaultAiSettings() {
+  const defaultSizeOptions = getImageSizeOptionsForModel(null);
+  const defaultQualityOptions = getImageQualityOptionsForModel(null);
+
   return {
     outputType: DEFAULT_OUTPUT_TYPE,
     model: '',
@@ -31,8 +40,8 @@ export function createDefaultAiSettings() {
     topP: DEFAULT_TOP_P,
     thinking: false,
     webSearch: false,
-    imageSize: IMAGE_SIZE_OPTIONS[0].value,
-    imageQuality: IMAGE_QUALITY_OPTIONS[0].value,
+    imageSize: defaultSizeOptions[0]?.value || '1:1',
+    imageQuality: defaultQualityOptions[0]?.value || '1k',
     responseFormat: RESPONSE_FORMAT_OPTIONS[0].value,
   };
 }
@@ -57,14 +66,16 @@ export function normalizeAiSettingsForOutputType(settings, outputType, models) {
   };
 
   if (outputType === 'out_image') {
-    return {
-      ...base,
-      thinking: false,
-      webSearch: false,
-      imageSize: settings.imageSize || IMAGE_SIZE_OPTIONS[0].value,
-      imageQuality: settings.imageQuality || IMAGE_QUALITY_OPTIONS[0].value,
-      responseFormat: settings.responseFormat || RESPONSE_FORMAT_OPTIONS[0].value,
-    };
+    const selectedModel = findMitupModelByValue(models, base.model);
+    return normalizeImageSettingsForModel(
+      {
+        ...base,
+        thinking: false,
+        webSearch: false,
+        responseFormat: settings.responseFormat || RESPONSE_FORMAT_OPTIONS[0].value,
+      },
+      selectedModel
+    );
   }
 
   return {

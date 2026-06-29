@@ -70,7 +70,7 @@ function humanizeMitupMessage(rawMessage, code) {
     || normalized === 'validation failed'
     || normalized.includes('validation')
   ) {
-    return 'Mitup отклонил запрос. Проверьте, что модель поддерживает изображения (in_image), файл не больше 5 МБ, и текст сообщения корректен.';
+    return 'Mitup отклонил параметры запроса. Проверьте модель и настройки изображения (размер и качество зависят от модели), длину текста (до 2000 символов) и вложения (до 5 МБ).';
   }
 
   if (code !== 'MITUP_UNKNOWN_ERROR' && code !== 'MITUP_API_ERROR') {
