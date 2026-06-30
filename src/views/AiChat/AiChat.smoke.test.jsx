@@ -77,8 +77,8 @@ const IMAGE_MODEL = {
   out_image: true,
   ai: 'OpenAI',
   in_text: true,
-  in_image: false,
-  ext: null,
+  in_image: true,
+  ext: 'png, jpg, jpeg',
   best_for: 'Генерация изображений',
 };
 
@@ -369,6 +369,9 @@ describe('AiChat smoke', () => {
     await userEvent.click(screen.getByTestId('ai-chat-mode-switch-out_image'));
     await userEvent.click(screen.getByTestId('ai-chat-model-select-trigger'));
     await userEvent.click(screen.getByTestId('ai-chat-model-option-Image Model'));
+
+    expect(screen.getByTestId('ai-chat-composer-attach')).toBeInTheDocument();
+
     await userEvent.type(input, 'Красный шар на белом фоне');
     await userEvent.click(screen.getByTestId('ai-chat-composer-send'));
 

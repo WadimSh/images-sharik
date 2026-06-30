@@ -351,8 +351,7 @@ export const AiChat = () => {
     isLastAssistantPendingOrProcessing ||
     availableModels.length === 0 ||
     isRateLimited;
-  const isImageMode = aiSettings.outputType === 'out_image';
-  const canAttach = !isImageMode && canAttachFromLibrary(selectedModel);
+  const canAttach = canAttachFromLibrary(selectedModel);
   const inputDisabled = composerDisabled;
   const canSend =
     Boolean(aiSettings.model) &&

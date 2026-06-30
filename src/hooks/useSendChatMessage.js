@@ -35,6 +35,7 @@ import {
   serializeChatAttachmentsForApi,
   validateChatAttachments,
 } from '../utils/chatAttachment';
+import { canAttachFromLibrary } from '../utils/mitupModels';
 import {
   getMitupErrorLifecycleStatus,
   getMitupUserMessage,
@@ -324,8 +325,8 @@ export function useSendChatMessage({
 
       const outputType = aiSettings.outputType || 'out_text';
 
-      if (outputType === 'out_image' && sanitizedAttachments.length > 0) {
-        setSendError('Вложения недоступны в режиме генерации изображений');
+      if (sanitizedAttachments.length > 0 && !canAttachFromLibrary(selectedModel)) {
+        setSendError('Выбранная модель не поддерживает входное изображение');
         return null;
       }
 
