@@ -170,8 +170,9 @@ describe('AiChat smoke', () => {
 
     await waitFor(() => {
       expect(screen.getByAltText('Bloom')).toBeInTheDocument();
-      expect(screen.getByTestId('ai-chat-status-bar-balance')).toHaveTextContent('Баланс: 100 ₽');
-      expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveTextContent('Лимит: 1/10/мин');
+      expect(screen.getByTestId('ai-chat-status-bar-balance')).toHaveTextContent('100 ₽');
+      expect(screen.getByTestId('ai-chat-status-bar-limit-count')).toHaveTextContent('1 / 10');
+      expect(screen.getByTestId('ai-chat-status-bar-limit-fill')).toHaveStyle({ width: '10%' });
     });
 
     expect(document.querySelector('.button-back')).toBeInTheDocument();
@@ -209,6 +210,11 @@ describe('AiChat smoke', () => {
     });
 
     expect(screen.getByTestId('ai-chat-message-user')).toHaveTextContent('Привет');
+
+    const userCopyButton = screen.getByTestId('ai-chat-user-message-copy');
+    expect(userCopyButton).toHaveAttribute('aria-label', 'Копировать');
+    await userEvent.click(userCopyButton);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Привет');
 
     expect(chatService.apiCreateChatSession).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -267,8 +273,8 @@ describe('AiChat smoke', () => {
     await userEvent.click(screen.getByTestId('ai-chat-composer-send'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('ai-chat-status-bar-balance')).toHaveTextContent('Баланс: 95 ₽');
-      expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveTextContent('Лимит: 2/10/мин');
+      expect(screen.getByTestId('ai-chat-status-bar-balance')).toHaveTextContent('95 ₽');
+      expect(screen.getByTestId('ai-chat-status-bar-limit-count')).toHaveTextContent('2 / 10');
     });
   });
 
@@ -284,9 +290,8 @@ describe('AiChat smoke', () => {
     const sendButton = screen.getByTestId('ai-chat-composer-send');
 
     await waitFor(() => {
-      expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveClass(
-        'ai-chat-status-bar-item--limit-exceeded'
-      );
+      expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveClass('ai-chat-status-limit--exceeded');
+      expect(screen.getByTestId('ai-chat-status-bar-limit')).toHaveAttribute('data-tone', 'exceeded');
     });
 
     expect(input).toBeDisabled();

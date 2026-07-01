@@ -10,15 +10,21 @@ import {
   isAssistantImageGeneration,
 } from '../../utils/aiChatImageResult';
 import { normalizeMarkdownTables, sanitizeChatText } from '../../utils/sanitizeChatText';
+import { splitAssistantMessageSections, prepareAssistantMarkdownSection } from '../../utils/aiChatAssistantSections';
 import { getMessageAttachments } from '../../utils/chatAttachment';
 import { Tooltip } from '../../ui/Tooltip/Tooltip';
 import { AiChatImageResult } from './AiChatImageResult';
+import { AiChatMarkdownCodeBlock } from './AiChatMarkdownCodeBlock';
+import { isMarkdownBlockCode } from '../../utils/aiChatMarkdownCode';
 import { AiChatMessageAttachments } from './AiChatMessageAttachments';
 import { AiChatMessageMeta } from './AiChatMessageMeta';
+import { AiChatUserMessageActions } from './AiChatUserMessageActions';
 import './AiChatMessageBubble.css';
 
-function MarkdownCode({ inline, children, ...props }) {
-  if (inline) {
+function MarkdownCode({ inline, className, children, ...props }) {
+  const useBlockCode = inline === false || (inline == null && isMarkdownBlockCode(className, children));
+
+  if (!useBlockCode) {
     return (
       <code className="ai-chat-message-inline-code" {...props}>
         {children}
@@ -27,9 +33,91 @@ function MarkdownCode({ inline, children, ...props }) {
   }
 
   return (
-    <pre className="ai-chat-message-pre">
-      <code {...props}>{children}</code>
-    </pre>
+    <AiChatMarkdownCodeBlock className={className} {...props}>
+      {children}
+    </AiChatMarkdownCodeBlock>
+  );
+}
+
+const MARKDOWN_PRE = ({ children }) => <>{children}</>;
+
+const ASSISTANT_MARKDOWN_COMPONENTS = {
+  a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
+  pre: MARKDOWN_PRE,
+  code: MarkdownCode,
+  table: ({ children, ...props }) => (
+    <div className="ai-chat-message-table-wrap">
+      <table {...props}>{children}</table>
+    </div>
+  ),
+};
+
+const CAPTION_MARKDOWN_COMPONENTS = {
+  a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
+  pre: MARKDOWN_PRE,
+  code: MarkdownCode,
+};
+
+function renderAssistantMarkdown(text) {
+  return prepareAssistantMarkdownSection(text);
+}
+
+/**
+ * @param {string} text
+ * @param {boolean} [isStreaming]
+ */
+function AssistantMarkdownSections({ text, isStreaming = false }) {
+  const sections = splitAssistantMessageSections(text);
+  const hasReasoning = sections.some((section) => section.type === 'reasoning');
+
+  if (!hasReasoning) {
+    return (
+      <div className="ai-chat-message-markdown">
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={ASSISTANT_MARKDOWN_COMPONENTS}>
+          {renderAssistantMarkdown(text)}
+        </ReactMarkdown>
+        {isStreaming ? <span className="ai-chat-streaming-cursor" aria-hidden="true" /> : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="ai-chat-message-sections">
+      {sections.map((section, index) => {
+        const isLastSection = index === sections.length - 1;
+        const showStreamingCursor = isStreaming && isLastSection && section.type === 'answer';
+        const sectionMarkdown = renderAssistantMarkdown(section.content);
+
+        if (section.type === 'reasoning') {
+          return (
+            <div
+              key={`reasoning-${index}`}
+              className="ai-chat-message-reasoning"
+              data-testid="ai-chat-message-reasoning"
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={ASSISTANT_MARKDOWN_COMPONENTS}
+              >
+                {sectionMarkdown}
+              </ReactMarkdown>
+            </div>
+          );
+        }
+
+        return (
+          <div key={`answer-${index}`} className="ai-chat-message-markdown">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkBreaks]}
+              components={ASSISTANT_MARKDOWN_COMPONENTS}
+            >
+              {sectionMarkdown}
+            </ReactMarkdown>
+            {showStreamingCursor ? <span className="ai-chat-streaming-cursor" aria-hidden="true" /> : null}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -74,12 +162,7 @@ export function AiChatMessageContent({ message, isStreaming = false, companyId =
           <div className="ai-chat-message-markdown ai-chat-message-markdown--caption">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkBreaks]}
-              components={{
-                a: ({ ...props }) => (
-                  <a target="_blank" rel="noopener noreferrer" {...props} />
-                ),
-                code: MarkdownCode,
-              }}
+              components={CAPTION_MARKDOWN_COMPONENTS}
             >
               {assistantText}
             </ReactMarkdown>
@@ -97,27 +180,7 @@ export function AiChatMessageContent({ message, isStreaming = false, companyId =
     return <div className="ai-chat-message-text">—</div>;
   }
 
-  return (
-    <div className="ai-chat-message-markdown">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
-        components={{
-          a: ({ ...props }) => (
-            <a target="_blank" rel="noopener noreferrer" {...props} />
-          ),
-          code: MarkdownCode,
-          table: ({ children, ...props }) => (
-            <div className="ai-chat-message-table-wrap">
-              <table {...props}>{children}</table>
-            </div>
-          ),
-        }}
-      >
-        {assistantText}
-      </ReactMarkdown>
-      {isStreaming ? <span className="ai-chat-streaming-cursor" aria-hidden="true" /> : null}
-    </div>
-  );
+  return <AssistantMarkdownSections text={assistantText} isStreaming={isStreaming} />;
 }
 
 function AiChatThinkingIndicator({ phrase }) {
@@ -137,10 +200,12 @@ function AiChatThinkingIndicator({ phrase }) {
  * @param {object} props
  * @param {object} props.message
  * @param {Function} [props.onRetry]
+ * @param {Function} [props.onResendUserMessage]
  * @param {string|null} [props.companyId]
  */
-export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
+export function AiChatMessageBubble({ message, onRetry, onResendUserMessage, companyId = null }) {
   const isAssistant = message?.role === 'assistant';
+  const isUser = message?.role === 'user';
   const isFailed = message?.status === 'failed';
   const isPending = message?.status === 'pending';
   const isProcessing = message?.status === 'processing';
@@ -170,6 +235,14 @@ export function AiChatMessageBubble({ message, onRetry, companyId = null }) {
         )}
 
         {showMeta ? <AiChatMessageMeta message={message} /> : null}
+
+        {isUser ? (
+          <AiChatUserMessageActions
+            message={message}
+            companyId={companyId}
+            onResend={onResendUserMessage}
+          />
+        ) : null}
 
         {isFailed && onRetry ? (
           <div className="ai-chat-message-retry-wrap">

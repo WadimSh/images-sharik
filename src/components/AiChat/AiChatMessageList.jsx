@@ -19,6 +19,7 @@ export function AiChatMessageList({
   scrollContainerRef,
   messagesEndRef,
   onRetry,
+  onResendUserMessage,
   companyId,
 }) {
   const { user } = useAuth();
@@ -74,6 +75,7 @@ export function AiChatMessageList({
                 message={message}
                 companyId={companyId}
                 onRetry={message.role === 'assistant' ? onRetry : undefined}
+                onResendUserMessage={message.role === 'user' ? onResendUserMessage : undefined}
               />
             ))}
             <div ref={messagesEndRef} className="ai-chat-messages-scroll-anchor" aria-hidden="true" />

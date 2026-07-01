@@ -17,7 +17,7 @@ import {
   MitupStreamError,
   streamMitupResult,
 } from '../services/mitupService';
-import { pickRandomThinkingPhrase } from '../utils/aiChatThinkingPhrases';
+import { pickRandomImageThinkingPhrase, pickRandomThinkingPhrase } from '../utils/aiChatThinkingPhrases';
 import { getChatMessageId } from './useChatMessages';
 import { buildChatSessionTitleFromPrompt } from '../utils/chatSession';
 import {
@@ -395,7 +395,10 @@ export function useSendChatMessage({
         assistantMessageId = getChatMessageId(assistantMessage);
         appendMessage({
           ...assistantMessage,
-          thinkingPhrase: pickRandomThinkingPhrase(),
+          thinkingPhrase:
+            (aiSettings.outputType || 'out_text') === 'out_image'
+              ? pickRandomImageThinkingPhrase()
+              : pickRandomThinkingPhrase(),
         });
         scrollToBottom?.('smooth');
 

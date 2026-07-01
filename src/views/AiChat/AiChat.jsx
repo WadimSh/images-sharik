@@ -14,8 +14,8 @@ import { AiChatSidebar } from '../../components/AiChat/AiChatSidebar';
 import { AiChatStatusBar } from '../../components/AiChat/AiChatStatusBar';
 import { LibraryMediaModal } from '../../components/LibraryMediaModal/LibraryMediaModal';
 import { apiArchiveChatSession, apiGetStudioFileUrl, apiPatchChatSession } from '../../services/chatService';
+import { getUserMessageResendPayload } from '../../utils/aiChatUserMessage';
 import {
-  getMessageAttachments,
   MITUP_MAX_ATTACHMENT_BYTES,
   normalizeMongoFileId,
   parseAttachmentSizeBytes,
@@ -302,6 +302,41 @@ export const AiChat = () => {
 
   const isRateLimited = isMinuteRateLimitReached(limits);
 
+  const isLastAssistantPendingOrProcessing = messages.some((message, index) => {
+    if (message.role !== 'assistant') {
+      return false;
+    }
+
+    return (
+      (message.status === 'pending' || message.status === 'processing') &&
+      !messages.slice(index + 1).some((nextMessage) => nextMessage.role === 'assistant')
+    );
+  });
+
+  const handleResendUserMessage = useCallback(
+    (userMessage) => {
+      const payload = getUserMessageResendPayload(userMessage);
+      if (
+        !payload
+        || !aiSettings.model
+        || isRateLimited
+        || isLastAssistantPendingOrProcessing
+      ) {
+        return;
+      }
+
+      clearSendError();
+      sendMessage({ prompt: payload.prompt, attachments: payload.attachments });
+    },
+    [
+      aiSettings.model,
+      isRateLimited,
+      isLastAssistantPendingOrProcessing,
+      sendMessage,
+      clearSendError,
+    ]
+  );
+
   const handleRetry = useCallback(
     (failedMessage) => {
       const failedId = getChatMessageId(failedMessage);
@@ -320,29 +355,10 @@ export const AiChat = () => {
         return;
       }
 
-      const text = userMessage?.content?.text?.trim() || '';
-      const attachments = getMessageAttachments(userMessage);
-
-      if ((!text && attachments.length === 0) || !aiSettings.model || isSending || isRateLimited) {
-        return;
-      }
-
-      clearSendError();
-      sendMessage({ prompt: text, attachments });
+      handleResendUserMessage(userMessage);
     },
-    [messages, aiSettings.model, isSending, isRateLimited, sendMessage, clearSendError]
+    [messages, handleResendUserMessage]
   );
-
-  const isLastAssistantPendingOrProcessing = messages.some((message, index) => {
-    if (message.role !== 'assistant') {
-      return false;
-    }
-
-    return (
-      (message.status === 'pending' || message.status === 'processing') &&
-      !messages.slice(index + 1).some((nextMessage) => nextMessage.role === 'assistant')
-    );
-  });
 
   const composerDisabled =
     initLoading ||
@@ -493,6 +509,7 @@ export const AiChat = () => {
                 scrollContainerRef={scrollContainerRef}
                 messagesEndRef={messagesEndRef}
                 onRetry={handleRetry}
+                onResendUserMessage={handleResendUserMessage}
                 companyId={companyId}
               />
             }
