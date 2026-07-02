@@ -14,7 +14,7 @@ describe('aiChatAssistantSections', () => {
     expect(
       splitAssistantMessageSections('## Размышления\n\nНужно уточнить детали.\n\n## Ответ\n\nГотовый ответ.')
     ).toEqual([
-      { type: 'reasoning', content: '## Размышления\n\nНужно уточнить детали.' },
+      { type: 'reasoning', content: 'Нужно уточнить детали.' },
       { type: 'answer', content: 'Готовый ответ.' },
     ]);
   });
@@ -23,7 +23,7 @@ describe('aiChatAssistantSections', () => {
     expect(
       splitAssistantMessageSections('## Размышления\n\nПромежуточные мысли.\n\n---\n\nИтоговый ответ.')
     ).toEqual([
-      { type: 'reasoning', content: '## Размышления\n\nПромежуточные мысли.' },
+      { type: 'reasoning', content: 'Промежуточные мысли.' },
       { type: 'answer', content: 'Итоговый ответ.' },
     ]);
   });
@@ -32,8 +32,26 @@ describe('aiChatAssistantSections', () => {
     expect(
       splitAssistantMessageSections('Рассуждение:\n\nПроверяю поставщиков.\n\nОтвет:\n\n[{"sku":"A"}]')
     ).toEqual([
-      { type: 'reasoning', content: 'Рассуждение:\n\nПроверяю поставщиков.' },
+      { type: 'reasoning', content: 'Проверяю поставщиков.' },
       { type: 'answer', content: '[{"sku":"A"}]' },
+    ]);
+  });
+
+  test('splits inline reasoning section labeled Рассуждение:', () => {
+    expect(
+      splitAssistantMessageSections('Рассуждение: проверяю поставщиков.\n\nОтвет:\n\nГотово.')
+    ).toEqual([
+      { type: 'reasoning', content: 'проверяю поставщиков.' },
+      { type: 'answer', content: 'Готово.' },
+    ]);
+  });
+
+  test('splits bold reasoning heading with trailing colon', () => {
+    expect(
+      splitAssistantMessageSections('**Рассуждение:**\n\nСверяю данные.\n\nОтвет:\n\nИтог.')
+    ).toEqual([
+      { type: 'reasoning', content: 'Сверяю данные.' },
+      { type: 'answer', content: 'Итог.' },
     ]);
   });
 

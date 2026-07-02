@@ -386,6 +386,11 @@ describe('AiChat smoke', () => {
         'href',
         'https://mp.sharik.ru/media/company-1/generated.png'
       );
+      expect(screen.getByTestId('ai-chat-message-save-to-library')).toHaveAttribute(
+        'aria-label',
+        'Сохранить в библиотеке'
+      );
+      expect(screen.queryByTestId('ai-chat-message-copy')).not.toBeInTheDocument();
     });
 
     expect(mitupService.apiMitupGenerate).toHaveBeenCalledWith(

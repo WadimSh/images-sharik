@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { apiGetChatMessages } from '../services/chatService';
 
-const MESSAGES_LIMIT = 50;
+export const MESSAGES_LIMIT = 50;
 
 /**
  * @param {object|null|undefined} message
@@ -10,6 +10,93 @@ const MESSAGES_LIMIT = 50;
  */
 export function getChatMessageId(message) {
   return message?.id || message?._id || '';
+}
+
+/**
+ * @param {Array<object>} olderItems
+ * @param {Array<object>} currentMessages
+ * @returns {Array<object>}
+ */
+export function mergeOlderMessages(olderItems, currentMessages) {
+  if (!Array.isArray(olderItems) || olderItems.length === 0) {
+    return currentMessages;
+  }
+
+  const seen = new Set(
+    currentMessages
+      .map((message) => getChatMessageId(message))
+      .filter(Boolean)
+  );
+
+  const uniqueOlder = olderItems.filter((message) => {
+    const messageId = getChatMessageId(message);
+    return !messageId || !seen.has(messageId);
+  });
+
+  return [...uniqueOlder, ...currentMessages];
+}
+
+/**
+ * @param {number|null|undefined} pages
+ * @returns {number}
+ */
+export function resolveLastMessagesPage(pages) {
+  const parsed = Number(pages);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return 1;
+  }
+
+  return Math.floor(parsed);
+}
+
+/**
+ * @param {number|null|undefined} total
+ * @param {number} [limit=MESSAGES_LIMIT]
+ * @returns {number}
+ */
+export function resolveLastMessagesPageFromTotal(total, limit = MESSAGES_LIMIT) {
+  const parsedTotal = Number(total);
+  if (!Number.isFinite(parsedTotal) || parsedTotal <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.ceil(parsedTotal / limit));
+}
+
+/**
+ * @param {string} sessionId
+ * @param {string} companyId
+ * @returns {Promise<{ items: Array<object>, pagination: object|null, loadedPage: number }>}
+ */
+export async function fetchLatestChatMessages(sessionId, companyId) {
+  const firstResponse = await apiGetChatMessages(sessionId, {
+    companyId,
+    page: 1,
+    limit: MESSAGES_LIMIT,
+  });
+
+  const total = firstResponse?.pagination?.total ?? 0;
+  const lastPage = resolveLastMessagesPageFromTotal(total, MESSAGES_LIMIT);
+
+  if (lastPage <= 1) {
+    return {
+      items: firstResponse?.data || [],
+      pagination: firstResponse?.pagination || null,
+      loadedPage: 1,
+    };
+  }
+
+  const lastResponse = await apiGetChatMessages(sessionId, {
+    companyId,
+    page: lastPage,
+    limit: MESSAGES_LIMIT,
+  });
+
+  return {
+    items: lastResponse?.data || [],
+    pagination: lastResponse?.pagination || null,
+    loadedPage: lastPage,
+  };
 }
 
 /**
@@ -24,8 +111,9 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [oldestLoadedPage, setOldestLoadedPage] = useState(1);
 
-  const pageRef = useRef(1);
+  const oldestLoadedPageRef = useRef(1);
   const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const shouldScrollToBottomRef = useRef(false);
@@ -46,49 +134,51 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
     });
   }, []);
 
-  const loadMessages = useCallback(
-    async (sessionId, { reset = true, page = 1 } = {}) => {
+  const preserveScrollPosition = useCallback((previousScrollHeight, previousScrollTop) => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      container.scrollTop = previousScrollTop + (container.scrollHeight - previousScrollHeight);
+    });
+  }, []);
+
+  const loadInitialMessages = useCallback(
+    async (sessionId) => {
       if (!sessionId || !companyId) {
-        if (reset) {
-          setMessages([]);
-          setPagination(null);
-          setError(null);
-        }
+        setMessages([]);
+        setPagination(null);
+        setError(null);
+        oldestLoadedPageRef.current = 1;
+        setOldestLoadedPage(1);
         return;
       }
 
-      const setLoadingState = reset ? setLoading : setLoadingMore;
-
       try {
-        setLoadingState(true);
-        if (reset) {
-          setError(null);
-        }
+        setLoading(true);
+        setError(null);
 
-        const response = await apiGetChatMessages(sessionId, {
-          companyId,
-          page,
-          limit: MESSAGES_LIMIT,
-        });
+        const { items, pagination: nextPagination, loadedPage } = await fetchLatestChatMessages(
+          sessionId,
+          companyId
+        );
 
-        const items = response?.data || [];
-        pageRef.current = page;
-        setPagination(response?.pagination || null);
-
-        setMessages((prev) => (reset ? items : [...prev, ...items]));
-
-        if (reset) {
-          shouldScrollToBottomRef.current = items.length > 0;
-        }
+        oldestLoadedPageRef.current = loadedPage;
+        setOldestLoadedPage(loadedPage);
+        setPagination(nextPagination || null);
+        setMessages(items);
+        shouldScrollToBottomRef.current = items.length > 0;
       } catch (err) {
         console.error('useChatMessages load error:', err);
-        if (reset) {
-          setMessages([]);
-          setPagination(null);
-          setError(err?.message || 'Ошибка загрузки сообщений');
-        }
+        setMessages([]);
+        setPagination(null);
+        setError(err?.message || 'Ошибка загрузки сообщений');
+        oldestLoadedPageRef.current = 1;
+        setOldestLoadedPage(1);
       } finally {
-        setLoadingState(false);
+        setLoading(false);
       }
     },
     [companyId]
@@ -101,7 +191,8 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
       setError(null);
       setLoading(false);
       setLoadingMore(false);
-      pageRef.current = 1;
+      oldestLoadedPageRef.current = 1;
+      setOldestLoadedPage(1);
       shouldScrollToBottomRef.current = false;
 
       if (scrollContainerRef.current) {
@@ -110,15 +201,16 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
       return;
     }
 
-    pageRef.current = 1;
+    oldestLoadedPageRef.current = 1;
+    setOldestLoadedPage(1);
 
     if (skipInitialLoadRef?.current) {
       skipInitialLoadRef.current = false;
       return;
     }
 
-    loadMessages(activeSessionId, { reset: true, page: 1 });
-  }, [activeSessionId, loadMessages, skipInitialLoadRef]);
+    loadInitialMessages(activeSessionId);
+  }, [activeSessionId, loadInitialMessages, skipInitialLoadRef]);
 
   useEffect(() => {
     if (!shouldScrollToBottomRef.current || loading || messages.length === 0) {
@@ -130,15 +222,40 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
   }, [loading, messages, scrollToBottom]);
 
   const loadMore = useCallback(async () => {
-    if (!activeSessionId || !pagination?.hasNext || loading || loadingMore) {
+    if (!activeSessionId || !companyId || loading || loadingMore) {
       return;
     }
 
-    await loadMessages(activeSessionId, {
-      reset: false,
-      page: pageRef.current + 1,
-    });
-  }, [activeSessionId, pagination?.hasNext, loading, loadingMore, loadMessages]);
+    if (oldestLoadedPageRef.current <= 1) {
+      return;
+    }
+
+    const container = scrollContainerRef.current;
+    const previousScrollHeight = container?.scrollHeight ?? 0;
+    const previousScrollTop = container?.scrollTop ?? 0;
+    const nextPage = oldestLoadedPageRef.current - 1;
+
+    try {
+      setLoadingMore(true);
+
+      const response = await apiGetChatMessages(activeSessionId, {
+        companyId,
+        page: nextPage,
+        limit: MESSAGES_LIMIT,
+      });
+
+      const items = response?.data || [];
+      oldestLoadedPageRef.current = nextPage;
+      setOldestLoadedPage(nextPage);
+      setPagination(response?.pagination || null);
+      setMessages((prev) => mergeOlderMessages(items, prev));
+      preserveScrollPosition(previousScrollHeight, previousScrollTop);
+    } catch (err) {
+      console.error('useChatMessages load more error:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [activeSessionId, companyId, loading, loadingMore, preserveScrollPosition]);
 
   const appendMessage = useCallback(
     (message) => {
@@ -173,15 +290,17 @@ export function useChatMessages({ companyId, activeSessionId, skipInitialLoadRef
     setMessages(Array.isArray(nextMessages) ? nextMessages : []);
   }, []);
 
+  const hasMore = oldestLoadedPage > 1;
+
   return {
     messages,
     pagination,
     loading,
     loadingMore,
     error,
-    hasMore: Boolean(pagination?.hasNext),
+    hasMore,
     isWelcomeState: !activeSessionId,
-    loadMessages,
+    loadInitialMessages,
     loadMore,
     appendMessage,
     updateMessage,

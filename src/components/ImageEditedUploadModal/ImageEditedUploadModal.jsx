@@ -3,6 +3,7 @@ import { FiX, FiPlus, FiArrowLeft, FiUser, FiCheck, FiEdit2 } from 'react-icons/
 import { MdClose } from "react-icons/md";
 
 import { PREDEFINED_TAGS } from '../../constants/tags';
+import '../ImageUploadModal/ImageUploadModal.css';
 import './ImageEditedUploadModal.css';
 
 const ImageEditedUploadModal = ({ 
@@ -11,7 +12,9 @@ const ImageEditedUploadModal = ({
   onUpload, 
   user, 
   selectedFile,
-  existingImageData // Новый пропс с данными существующего изображения
+  existingImageData, // Новый пропс с данными существующего изображения
+  fileNameStoragePart = 'edited',
+  showAddTagPlusIcon = true,
 }) => {
   const [articles, setArticles] = useState(['']);
   const [imageDescription, setImageDescription] = useState('');
@@ -90,7 +93,9 @@ const extractDescriptionFromFileName = (fileName, articles) => {
   });
   
   // Удаляем признак хранилища (BW или ED)
-  const storageIndex = descriptionParts.findIndex(part => part === 'BW' || part === 'ED' || part === 'WB' || part === 'OZ');
+  const storageIndex = descriptionParts.findIndex(
+    (part) => part === 'BW' || part === 'ED' || part === 'WB' || part === 'OZ' || part === 'ai_generation'
+  );
   if (storageIndex !== -1) {
     descriptionParts.splice(storageIndex, 1);
   }
@@ -153,8 +158,8 @@ useEffect(() => {
     const validArticles = articles.filter(article => article.trim() !== '' && /^\d{4}-\d{4}$/.test(article));
     const articlesPart = validArticles.join('_');
     
-    // 2. Признак редактированного изображения
-    const storagePart = 'edited';
+    // 2. Признак типа изображения (edited / ai_generation и т.п.)
+    const storagePart = fileNameStoragePart;
     
     // 3. Описание от пользователя (транслитерируем и приводим к нижнему регистру)
     const descriptionPart = formatDescription(imageDescription) || 'image';
@@ -578,7 +583,8 @@ useEffect(() => {
                       disabled={!customTag.trim()}
                       className="image-upload-add-tag-btn"
                     >
-                      <FiPlus />  Добавить
+                      {showAddTagPlusIcon ? <FiPlus /> : null}
+                      Добавить
                     </button>
                   </div>
 

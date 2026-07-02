@@ -7,13 +7,20 @@ import {
   getAssistantMessageCopyText,
   getAssistantMessageMeta,
 } from '../../utils/aiChatMessage';
+import {
+  getAssistantImageFiles,
+  isAssistantImageGeneration,
+} from '../../utils/aiChatImageResult';
+import { AiChatSaveImageToLibraryAction } from './AiChatSaveImageToLibraryAction';
 
 /**
- * @param {{ message: object }} props
+ * @param {{ message: object, companyId?: string|null }} props
  */
-export function AiChatMessageMeta({ message }) {
+export function AiChatMessageMeta({ message, companyId = null }) {
   const meta = getAssistantMessageMeta(message);
   const copyText = getAssistantMessageCopyText(message);
+  const imageFiles = getAssistantImageFiles(message);
+  const showSaveToLibrary = isAssistantImageGeneration(message) && imageFiles.length > 0;
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -30,7 +37,7 @@ export function AiChatMessageMeta({ message }) {
     }
   }, [copyText]);
 
-  if (!meta?.model && !meta?.costLabel && !copyText) {
+  if (!meta?.model && !meta?.costLabel && !copyText && !showSaveToLibrary) {
     return null;
   }
 
@@ -50,7 +57,11 @@ export function AiChatMessageMeta({ message }) {
         ) : null}
       </div>
 
-      {copyText ? (
+      {showSaveToLibrary ? (
+        <AiChatSaveImageToLibraryAction imageFile={imageFiles[0]} companyId={companyId} />
+      ) : null}
+
+      {!showSaveToLibrary && copyText ? (
         <Tooltip content={copyLabel} position="bottom-shift-left">
           <button
             type="button"

@@ -357,6 +357,13 @@
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+  align-items: stretch;
+}
+
+.image-upload-custom-tag-container .image-upload-custom-tag-input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
 }
 
 .image-upload-add-tag-btn {
@@ -370,7 +377,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .image-upload-add-tag-btn:hover:not(:disabled) {

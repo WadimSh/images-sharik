@@ -1,5 +1,8 @@
-const THINKING_HEADING =
-  /^(?:#{1,6}\s+|\*{2}|_{2})?\s*(?:Размышлени(?:е|я)|Рассуждени(?:е|я)|Thinking|Reasoning|Thoughts?)\s*(?:\*{2}|_{2})?\s*:?\s*$/i;
+const THINKING_LINE =
+  /^(?:#{1,6}\s+)?(?:\*{2}|_{2})?\s*(Размышлени(?:е|я)|Рассуждени(?:е|я)|Thinking|Reasoning|Thoughts?)(?:\*{2}\s*)?:+\s*(.*)$/i;
+
+const THINKING_HEADING_ONLY =
+  /^(?:#{1,6}\s+)?(?:\*{2}|_{2})?\s*(Размышлени(?:е|я)|Рассуждени(?:е|я)|Thinking|Reasoning|Thoughts?)(?:\*{2}\s*)?(?::+\s*)?$/i;
 
 const ANSWER_HEADING =
   /^(?:#{1,6}\s+|\*{2}|_{2})?\s*(?:Ответ|Answer|Response|Результат)\s*(?:\*{2}|_{2})?\s*:?\s*$/i;
@@ -49,10 +52,39 @@ function splitByThinkTag(normalized) {
 
 /**
  * @param {string} line
+ * @returns {string}
+ */
+function normalizeThinkingHeadingLine(line) {
+  return line.trim().replace(/\*+\s*$/, '').trim();
+}
+
+/**
+ * @param {string} line
+ * @returns {{ body: string }|null}
+ */
+function matchThinkingLine(line) {
+  const normalized = normalizeThinkingHeadingLine(line);
+
+  if (THINKING_HEADING_ONLY.test(normalized)) {
+    return { body: '' };
+  }
+
+  const match = THINKING_LINE.exec(normalized);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    body: (match[2] || '').trim(),
+  };
+}
+
+/**
+ * @param {string} line
  * @returns {boolean}
  */
 function isThinkingHeading(line) {
-  return THINKING_HEADING.test(line.trim());
+  return Boolean(matchThinkingLine(line));
 }
 
 /**
@@ -118,7 +150,8 @@ export function splitAssistantMessageSections(text) {
 
     flushAnswer();
 
-    const reasoningLines = [line];
+    const thinkingLine = matchThinkingLine(line);
+    const reasoningLines = thinkingLine?.body ? [thinkingLine.body] : [];
     index += 1;
 
     while (index < lines.length) {

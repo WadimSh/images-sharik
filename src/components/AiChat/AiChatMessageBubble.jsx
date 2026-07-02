@@ -95,12 +95,14 @@ function AssistantMarkdownSections({ text, isStreaming = false }) {
               className="ai-chat-message-reasoning"
               data-testid="ai-chat-message-reasoning"
             >
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkBreaks]}
-                components={ASSISTANT_MARKDOWN_COMPONENTS}
-              >
-                {sectionMarkdown}
-              </ReactMarkdown>
+              <div className="ai-chat-message-markdown ai-chat-message-markdown--reasoning">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                  components={ASSISTANT_MARKDOWN_COMPONENTS}
+                >
+                  {sectionMarkdown}
+                </ReactMarkdown>
+              </div>
             </div>
           );
         }
@@ -234,7 +236,7 @@ export function AiChatMessageBubble({ message, onRetry, onResendUserMessage, com
           <AiChatMessageContent message={message} isStreaming={isStreaming} companyId={companyId} />
         )}
 
-        {showMeta ? <AiChatMessageMeta message={message} /> : null}
+        {showMeta ? <AiChatMessageMeta message={message} companyId={companyId} /> : null}
 
         {isUser ? (
           <AiChatUserMessageActions
